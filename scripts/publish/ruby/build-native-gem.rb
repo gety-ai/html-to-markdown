@@ -34,8 +34,8 @@ end
 puts "Found native extensions: #{native_extensions.join(', ')}"
 
 # Load the gemspec
-spec = Gem::Specification.load('html-to-markdown-rb.gemspec')
-abort 'ERROR: Could not load html-to-markdown-rb.gemspec' unless spec
+spec = Gem::Specification.load('html_to_markdown.gemspec')
+abort 'ERROR: Could not load html_to_markdown.gemspec' unless spec
 
 # Set platform (transforms source gem into platform gem)
 spec.platform = Gem::Platform.new(platform)
