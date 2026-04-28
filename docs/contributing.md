@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for considering a contribution to html-to-markdown. Every fix, feature, and documentation improvement helps us to make it better.
+Thanks for considering a contribution to html-to-markdown. Every fix, feature, and documentation improvement helps.
 
 ## Ways to contribute
 
@@ -45,3 +45,5 @@ New pages go in `docs/`, must be added to `nav:` in `mkdocs.yaml`, and should fo
 - **Have Any Questions** — [Join the GitHub Discussions](https://github.com/kreuzberg-dev/html-to-markdown/discussions)
 - **Join Our community** — [Discord](https://discord.gg/pXxagNK2zN)
 - **Report a Bugs** — [GitHub Issues](https://github.com/kreuzberg-dev/html-to-markdown/issues)
+
+--8<-- "snippets/feedback.md"

@@ -44,7 +44,7 @@ html-to-markdown --url https://example.com > output.md
 | Flag | Description |
 |------|-------------|
 | `-o`, `--output FILE` | Write output to file (default: stdout). |
-| `-f`, `--output-format FORMAT` | Output format: `markdown` (default), `djot`, or `plain`. |
+| `-f`, `--output-format FORMAT` | Output format: `markdown` (default) or `djot`. |
 
 ## Heading Options
 
@@ -83,16 +83,18 @@ html-to-markdown --url https://example.com > output.md
 
 ## Links
 
-| Flag | Description |
-|------|-------------|
-| `--no-autolinks` | Disable autolink conversion. By default, when link text equals the href, `<url>` syntax is used instead of `[url](url)`. |
-| `--default-title` | Use href as link title when no `title` attribute exists. |
+| Flag | Values | Default | Description |
+|------|--------|---------|-------------|
+| `--no-autolinks` | — | off | Disable autolink conversion. By default, when link text equals the href, the output is `<url>`. Pass this flag to emit `[url](url)` instead. |
+| `--default-title` | — | off | Use href as link title when no `title` attribute exists. |
+| `--link-style STYLE` | `inline`, `reference` | `inline` | `inline` emits `[text](url)`. `reference` emits `[text][1]` with numbered definitions at the end of the document. |
 
 ## Images
 
 | Flag | Description |
 |------|-------------|
 | `--keep-inline-images-in ELEMENTS` | Comma-separated element names where images stay as `![alt](src)` (e.g. `a,strong`). |
+| `--skip-images` | Drop all `<img>` elements entirely. No `![alt](src)` output, no alt-text fallback. |
 
 ## Tables
 
@@ -120,16 +122,26 @@ html-to-markdown --url https://example.com > output.md
 |------|-------------|
 | `--convert-as-inline` | Treat block elements as inline (no paragraph breaks). |
 | `--strip-tags TAGS` | Comma-separated tags to strip (text content preserved, no Markdown conversion). |
-| `--preserve-tags TAGS` | Comma-separated tags to keep as raw HTML in output (e.g. `details,summary`). |
-| `--skip-images` | Omit all `<img>` elements from output. |
-| `--max-depth N` | Truncate DOM subtrees beyond N levels of nesting (default: unlimited). |
+| `--preserve-tags TAGS` | Comma-separated tags to emit verbatim as raw HTML instead of converting. |
+| `--max-depth N` | Silently truncate subtrees beyond this DOM nesting depth. Omit for unlimited depth. |
 
 ## Metadata
 
 | Flag | Description |
 |------|-------------|
-| `--extract-metadata` | Prepend a metadata comment block to the Markdown output. |
-| `--json` | Output a full `ConversionResult` as JSON (content, metadata, tables, images, warnings). |
+| `--extract-metadata` | Prepend a metadata comment block (title, description, Open Graph, links, images) to the Markdown output. In `--json` mode, populates the `metadata` field. |
+
+## JSON Output
+
+`--json` swaps the default Markdown output for a full `ConversionResult` object: `content`, `metadata`, `tables`, `document`, `images`, and `warnings` on a single JSON value. The flags in this section control which fields are populated.
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Output a full `ConversionResult` as JSON instead of Markdown. |
+| `--include-structure` | Populate `document` with the parsed semantic tree. Requires `--json`. |
+| `--extract-inline-images` | Populate `images` with extracted data URIs and SVGs. Requires `--json`. |
+| `--no-content` | Skip Markdown rendering. `content` is empty, metadata and structure still populate. Requires `--json`. |
+| `--show-warnings` | Print each processing warning to stderr as `Warning [<kind>]: <message>`. Works with or without `--json`. |
 
 ## Preprocessing
 
@@ -165,7 +177,9 @@ html-to-markdown --generate-man > html-to-markdown.1
 html-to-markdown page.html --preprocess --preset aggressive
 
 # Extract full structured result as JSON
-html-to-markdown input.html --json -o output.json
+html-to-markdown input.html --json \
+    --extract-metadata --include-structure \
+    -o output.json
 
 # Discord/Slack-friendly output (2-space list indents)
 html-to-markdown input.html --list-indent-width 2
@@ -179,3 +193,53 @@ html-to-markdown input.html \
 # Fetch and convert with Djot output
 html-to-markdown --url https://example.com --output-format djot
 ```
+
+## CLI Flag ↔ ConversionOptions Mapping
+
+Each CLI flag has a corresponding `ConversionOptions` field. Library users can cross-reference here when translating a CLI invocation to code (or vice versa).
+
+| CLI Flag | `ConversionOptions` field | Notes |
+|----------|--------------------------|-------|
+| `--output-format FORMAT` | `output_format` | `"markdown"` \| `"djot"` \| `"plain"` \| `"none"` |
+| `--heading-style STYLE` | `heading_style` | `"atx"` \| `"underlined"` \| `"atx-closed"` |
+| `--list-indent-type TYPE` | `list_indent_type` | `"spaces"` \| `"tab"` |
+| `--list-indent-width N` | `list_indent_width` | integer |
+| `--bullets CHARS` | `bullets` | string |
+| `--strong-em-symbol CHAR` | `strong_em_symbol` | `"*"` \| `"_"` |
+| `--newline-style STYLE` | `newline_style` | `"backslash"` \| `"spaces"` |
+| `--sub-symbol SYMBOL` | `sub_symbol` | string |
+| `--sup-symbol SYMBOL` | `sup_symbol` | string |
+| `--highlight-style STYLE` | `highlight_style` | `"double-equal"` \| `"html"` \| `"bold"` \| `"none"` |
+| `--escape-asterisks` | `escape_asterisks` | boolean flag |
+| `--escape-underscores` | `escape_underscores` | boolean flag |
+| `--escape-misc` | `escape_misc` | boolean flag |
+| `--escape-ascii` | `escape_ascii` | boolean flag |
+| `--code-block-style STYLE` | `code_block_style` | `"indented"` \| `"backticks"` \| `"tildes"` |
+| `-l, --code-language LANG` | `code_language` | string |
+| `--no-autolinks` | `autolinks` | inverted: flag sets `autolinks = false`; default is `true` |
+| `--default-title` | `default_title` | boolean flag |
+| `--link-style STYLE` | `link_style` | `"inline"` \| `"reference"` |
+| `--keep-inline-images-in ELEMS` | `keep_inline_images_in` | comma-separated tag list |
+| `--skip-images` | `skip_images` | boolean flag |
+| `--br-in-tables` | `br_in_tables` | boolean flag |
+| `--whitespace-mode MODE` | `whitespace_mode` | `"normalized"` \| `"strict"` |
+| `--strip-newlines` | `strip_newlines` | boolean flag |
+| `-w, --wrap` | `wrap` | boolean flag |
+| `--wrap-width N` | `wrap_width` | integer |
+| `--convert-as-inline` | `convert_as_inline` | boolean flag |
+| `--strip-tags TAGS` | `strip_tags` | comma-separated tag list |
+| `--preserve-tags TAGS` | `preserve_tags` | comma-separated tag list |
+| `--max-depth N` | `max_depth` | integer |
+| `--extract-metadata` | `extract_metadata` | boolean flag |
+| `--include-structure` | `include_document_structure` | boolean flag; `--json` only |
+| `--extract-inline-images` | `extract_images` | boolean flag; `--json` only |
+| `-p, --preprocess` | `preprocess` | boolean flag |
+| `--preset LEVEL` | `preset` | `"minimal"` \| `"standard"` \| `"aggressive"` |
+| `--keep-navigation` | `keep_navigation` | boolean flag |
+| `--keep-forms` | `keep_forms` | boolean flag |
+| `-e, --encoding ENCODING` | `encoding` | CLI only — decoded before `convert()` |
+| `--debug` | `debug` | CLI only — diagnostic output to stderr |
+
+Flags without a `ConversionOptions` counterpart: `FILE`, `--url`, `--user-agent`, `-o/--output`, `--json`, `--no-content`, `--show-warnings`, `--generate-completion`, `--generate-man`.
+
+--8<-- "snippets/feedback.md"

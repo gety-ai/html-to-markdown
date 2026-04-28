@@ -1,21 +1,17 @@
 ```javascript
-import { convert } from '@kreuzberg/html-to-markdown-wasm';
+import init, { convert } from '@kreuzberg/html-to-markdown-wasm';
+
+await init();
 
 const visitor = {
-  visitLink(ctx, href, text, title) {
-    // Custom handling for links
-    return { custom: `[${text}](${href})` };
+  visit_link(ctx, href, text, title) {
+    return { type: 'continue' };
   },
-  visitHeading(ctx, level, text, id) {
-    // Use default conversion for headings
-    return 'continue';
-  },
-  visitImage(ctx, src, alt, title) {
-    // Skip all images
-    return 'skip';
+  visit_image(ctx, src, alt, title) {
+    return { type: 'continue' };
   },
 };
 
-const result = convert('<h1>Title</h1><a href="url">Link</a>', null, visitor);
-const markdown = result.content;
+const result = convert('<h1>Hello</h1><a href="https://example.com">link</a>', undefined, visitor);
+console.log(result.content);
 ```

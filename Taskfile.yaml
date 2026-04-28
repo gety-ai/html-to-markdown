@@ -225,9 +225,10 @@ tasks:
 
   # === Alef lifecycle ===
   alef:generate:
-    desc: "Run full alef pipeline (generate + stubs + scaffold + readme + docs + e2e)"
+    desc: "Run full alef pipeline (generate + stubs + scaffold + readme + sync + e2e) and `alef docs` (docs/reference for Zensical)"
     cmds:
       - alef all
+      - alef docs
 
   alef:verify:
     desc: "Check bindings are up-to-date (CI mode)"

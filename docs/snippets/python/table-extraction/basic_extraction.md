@@ -1,5 +1,5 @@
 ```python
-from html_to_markdown import convert
+from html_to_markdown import ConversionOptions, convert
 
 html = """
 <table>
@@ -9,10 +9,10 @@ html = """
 </table>
 """
 
-result = convert(html)
+result = convert(html, ConversionOptions())
 
 for table in result.tables:
     for cell in table.grid.cells:
         prefix = "Header" if cell.is_header else "Cell"
-        print(f"  {prefix}: {cell.content}")
+        print(f"  {prefix} (r{cell.row},c{cell.col}): {cell.content}")
 ```

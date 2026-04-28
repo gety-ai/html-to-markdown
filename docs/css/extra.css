@@ -1712,6 +1712,76 @@ body:has(.full-width-iframe) article {
 	border-bottom-color: rgba(255, 255, 255, 0.1);
 }
 
+/* Home: "What it does" — card grid (markup in index.html only; not Markdown list/code heuristics). */
+.md-typeset .home-feature-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+	gap: 1rem 1.15rem;
+	margin: 1rem 0 0;
+}
+
+.md-typeset .home-feature-card {
+	margin: 0;
+	padding: 1rem 1.1rem 1.05rem;
+	border-radius: 0.4rem;
+	border: 1px solid rgba(50, 48, 64, 0.12);
+	background: rgba(50, 48, 64, 0.04);
+	box-sizing: border-box;
+	min-width: 0;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .home-feature-card {
+	border-color: rgba(255, 255, 255, 0.1);
+	background: rgba(0, 0, 0, 0.28);
+}
+
+.md-typeset .home-feature-card__title {
+	margin: 0 0 0.65rem;
+	padding: 0 0 0.65rem;
+	font-size: 0.9rem;
+	font-weight: 700;
+	line-height: 1.3;
+	color: #1a1926;
+	border: none;
+	border-bottom: 1px solid rgba(50, 48, 64, 0.15);
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.md-typeset .home-feature-card__title::before {
+	content: "";
+	width: 0.2rem;
+	min-height: 1.1rem;
+	border-radius: 2px;
+	background: #da2ae0;
+	flex-shrink: 0;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .home-feature-card__title {
+	color: rgba(255, 255, 255, 0.96);
+	border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-md-color-scheme="slate"] .md-typeset .home-feature-card__title::before {
+	background: #58fbda;
+}
+
+.md-typeset .home-feature-card__desc {
+	margin: 0.75rem 0 0;
+	font-size: 0.8rem;
+	line-height: 1.55;
+	color: #5b5966;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .home-feature-card__desc {
+	color: rgba(255, 255, 255, 0.72);
+}
+
+.md-typeset .home-feature-card__desc code {
+	font-size: 0.9em;
+}
+
 .md-typeset .home-kreuzberg {
 	margin-top: 2.5rem;
 	padding: 1.15rem 1.35rem;

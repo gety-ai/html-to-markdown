@@ -11,15 +11,12 @@ String html = """
 </table>
 """;
 
-ConversionOptions options = ConversionOptions.builder()
-    .extractTables(true)
-    .build();
-ConversionResult result = HtmlToMarkdown.convert(html, options);
+ConversionResult result = HtmlToMarkdown.convert(html, new ConversionOptions());
 
 for (var table : result.tables()) {
-    for (int i = 0; i < table.cells().size(); i++) {
-        String prefix = table.isHeaderRow().get(i) ? "Header" : "Row";
-        System.out.printf("  %s: %s%n", prefix, table.cells().get(i));
+    for (var cell : table.grid().cells()) {
+        String prefix = cell.isHeader() ? "Header" : "Cell";
+        System.out.printf("  %s (r%d,c%d): %s%n", prefix, cell.row(), cell.col(), cell.content());
     }
 }
 ```
