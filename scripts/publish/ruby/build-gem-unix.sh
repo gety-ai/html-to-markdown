@@ -25,6 +25,16 @@ python3 "$REPO_ROOT/scripts/ci/ruby/vendor-core-crate.py"
 pushd packages/ruby >/dev/null
 bundle install
 
+# Ensure source gem packages the vendored crate so end-users on platforms
+# without a precompiled gem (e.g., aarch64-linux fallback) can build from
+# source. The alef-generated gemspec only globs lib/ ext/ sig/, missing
+# vendor/. Inject a one-line glob extension before rake build.
+# Fixes #325.
+if grep -q "Dir.glob(%w\[lib/" html_to_markdown.gemspec && ! grep -q "vendor/\*\*/\*" html_to_markdown.gemspec; then
+  sed -i.bak 's|Dir.glob(%w\[\([^]]*\)\])|Dir.glob(%w[\1 vendor/**/*])|' html_to_markdown.gemspec
+  rm -f html_to_markdown.gemspec.bak
+fi
+
 # Build source gem
 bundle exec rake build
 
