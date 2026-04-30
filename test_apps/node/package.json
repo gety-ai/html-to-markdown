@@ -8,6 +8,6 @@
 	},
 	"devDependencies": {
 		"vitest": "^3.0.0",
-		"@kreuzberg/html-to-markdown": "3.4.0-rc.20"
+		"@kreuzberg/html-to-markdown": "3.4.0-rc.21"
 	}
 }
