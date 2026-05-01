@@ -403,24 +403,16 @@ jobs:
         platform:
           - os: ubuntu-latest
             label: linux-x86_64
-            arch: x86_64
-            os_family: linux
-            libc: glibc
+            target: x86_64-unknown-linux-gnu
           - os: ubuntu-24.04-arm
             label: linux-arm64
-            arch: arm64
-            os_family: linux
-            libc: glibc
+            target: aarch64-unknown-linux-gnu
           - os: macos-latest
             label: macos-arm64
-            arch: arm64
-            os_family: darwin
-            libc: bsdlibc
+            target: aarch64-apple-darwin
           - os: windows-latest
             label: windows-x86_64
-            arch: x86_64
-            os_family: windows
-            libc: ""
+            target: x86_64-pc-windows-msvc
     steps:
       - name: Checkout
         uses: actions/checkout@v6 # v6
@@ -446,8 +438,10 @@ jobs:
           cache-key-prefix: publish-php-${{ matrix.platform.label }}-php${{ matrix.php }}
           toolchain: stable
 
+      - name: Install alef
+        uses: kreuzberg-dev/actions/install-alef@v1 # v1
+
       - name: Build PHP extension
-        id: build
         uses: kreuzberg-dev/actions/build-php-extension@v1 # v1
         with:
           crate-name: html-to-markdown-php
@@ -456,7 +450,7 @@ jobs:
           php-ts: nts
 
       - name: Determine Windows compiler
-        if: matrix.platform.os_family == 'windows'
+        if: runner.os == 'Windows'
         id: wincompiler
         shell: pwsh
         run: |
@@ -470,19 +464,14 @@ jobs:
           "compiler=$compiler" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
       - name: Package PIE archive
-        shell: bash
-        env:
-          EXTENSION_NAME: html_to_markdown
-          VERSION: ${{ needs.prepare.outputs.version }}
-          PHP_VERSION: ${{ matrix.php }}
-          ARCH: ${{ matrix.platform.arch }}
-          OS_FAMILY: ${{ matrix.platform.os_family }}
-          LIBC: ${{ matrix.platform.libc }}
-          TS_MODE: nts
-          BUILT_LIB_PATH: ${{ steps.build.outputs.extension-path }}
-          OUTPUT_DIR: dist/php-package
-          WINDOWS_COMPILER: ${{ steps.wincompiler.outputs.compiler }}
-        run: scripts/publish/package-php-pie.sh
+        uses: kreuzberg-dev/actions/package-php-pie@v1 # v1
+        with:
+          php-version: ${{ matrix.php }}
+          php-ts: nts
+          target: ${{ matrix.platform.target }}
+          windows-compiler: ${{ steps.wincompiler.outputs.compiler }}
+          version: ${{ needs.prepare.outputs.version }}
+          output-dir: dist/php-package
 
       - name: Upload PHP PIE package artifact
         uses: actions/upload-artifact@v7 # v7
