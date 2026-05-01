@@ -12,7 +12,6 @@ defmodule E2eElixir.MixProject do
 
   defp deps do
     [
-      {:html_to_markdown, "~> 3.2"}
     ]
   end
 end

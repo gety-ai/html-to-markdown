@@ -71,6 +71,7 @@
     "support-zts": true,
     "support-nts": true,
     "build-path": "crates/html-to-markdown-php",
+    "download-url-method": ["pre-packaged-binary", "composer-default"],
     "configure-options": [
       {
         "name": "with-cargo-bin",

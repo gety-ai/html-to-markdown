@@ -389,25 +389,38 @@ jobs:
           retention-days: 14
 
   php-package:
-    name: Build PHP PIE package (${{ matrix.settings.label }})
-    needs: [prepare, check-packagist]
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.check-packagist.outputs.exists != 'true' }}
-    runs-on: ${{ matrix.settings.os }}
+    name: Build PHP PIE binary (php${{ matrix.php }} ${{ matrix.platform.label }})
+    needs: prepare
+    if: ${{ needs.prepare.outputs.is_tag == 'true' }}
+    runs-on: ${{ matrix.platform.os }}
     timeout-minutes: 60
     permissions:
       contents: read
     strategy:
       fail-fast: false
       matrix:
-        settings:
+        php: ["8.2", "8.3", "8.4", "8.5"]
+        platform:
           - os: ubuntu-latest
             label: linux-x86_64
-            platform: linux-x86_64
-            target: x86_64-unknown-linux-gnu
+            arch: x86_64
+            os_family: linux
+            libc: glibc
+          - os: ubuntu-24.04-arm
+            label: linux-arm64
+            arch: arm64
+            os_family: linux
+            libc: glibc
           - os: macos-latest
             label: macos-arm64
-            platform: macos-arm64
-            target: aarch64-apple-darwin
+            arch: arm64
+            os_family: darwin
+            libc: bsdlibc
+          - os: windows-latest
+            label: windows-x86_64
+            arch: x86_64
+            os_family: windows
+            libc: ""
     steps:
       - name: Checkout
         uses: actions/checkout@v6 # v6
@@ -422,26 +435,64 @@ jobs:
         run: scripts/publish/common/ensure-target-commit.sh
         shell: bash
 
+      - name: Setup PHP
+        uses: kreuzberg-dev/actions/setup-php@v1 # v1
+        with:
+          php-version: ${{ matrix.php }}
+
       - name: Setup Rust
         uses: kreuzberg-dev/actions/setup-rust@v1 # v1
         with:
-          cache-key-prefix: publish-php-${{ matrix.settings.label }}
+          cache-key-prefix: publish-php-${{ matrix.platform.label }}-php${{ matrix.php }}
           toolchain: stable
 
-      - name: Install alef
-        uses: kreuzberg-dev/actions/install-alef@v1
+      - name: Build PHP extension
+        id: build
+        uses: kreuzberg-dev/actions/build-php-extension@v1 # v1
+        with:
+          crate-name: html-to-markdown-php
+          lib-name: html_to_markdown_php
+          php-version: ${{ matrix.php }}
+          php-ts: nts
 
-      - name: Build and package PHP extension
-        shell: bash
+      - name: Determine Windows compiler
+        if: matrix.platform.os_family == 'windows'
+        id: wincompiler
+        shell: pwsh
         run: |
-          alef publish build --lang php --target ${{ matrix.settings.target }}
-          alef publish package --lang php --target ${{ matrix.settings.target }} -o dist/php
+          $compiler = switch ('${{ matrix.php }}') {
+            '8.2' { 'vs16' }
+            '8.3' { 'vs16' }
+            '8.4' { 'vs17' }
+            '8.5' { 'vs17' }
+            default { 'vs17' }
+          }
+          "compiler=$compiler" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Package PIE archive
+        shell: bash
+        env:
+          EXTENSION_NAME: html_to_markdown
+          VERSION: ${{ needs.prepare.outputs.version }}
+          PHP_VERSION: ${{ matrix.php }}
+          ARCH: ${{ matrix.platform.arch }}
+          OS_FAMILY: ${{ matrix.platform.os_family }}
+          LIBC: ${{ matrix.platform.libc }}
+          TS_MODE: nts
+          BUILT_LIB_PATH: ${{ steps.build.outputs.extension-path }}
+          OUTPUT_DIR: dist/php-package
+          WINDOWS_COMPILER: ${{ steps.wincompiler.outputs.compiler }}
+        run: scripts/publish/package-php-pie.sh
 
       - name: Upload PHP PIE package artifact
         uses: actions/upload-artifact@v7 # v7
         with:
-          name: php-package-${{ matrix.settings.label }}
-          path: dist/php/html-to-markdown-*.tar.gz*
+          name: php-package-${{ matrix.platform.label }}-php${{ matrix.php }}
+          path: |
+            dist/php-package/php_*.tgz
+            dist/php-package/php_*.tgz.sha256
+            dist/php-package/php_*.zip
+            dist/php-package/php_*.zip.sha256
           retention-days: 14
 
   node-typescript-defs:

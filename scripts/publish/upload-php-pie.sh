@@ -4,7 +4,12 @@ set -euo pipefail
 tag="${TAG:?TAG is required}"
 
 shopt -s nullglob
-packages=(dist/php-package/*.tar.gz dist/php-package/*.tar.gz.sha256)
+packages=(
+  dist/php-package/php_*.tgz
+  dist/php-package/php_*.tgz.sha256
+  dist/php-package/php_*.zip
+  dist/php-package/php_*.zip.sha256
+)
 
 if [[ ${#packages[@]} -eq 0 ]]; then
   echo "::warning::No PHP package artifacts found in dist/php-package/" >&2
