@@ -140,7 +140,7 @@ repos:
         args: ["-c", "packages/java/checkstyle.xml", "-p", "packages/java/checkstyle.properties"]
         exclude: ^(\.mvn/wrapper/|e2e/|test_apps/|packages/java/src/)
       - id: mypy
-        exclude: "e2e/|tests/|scripts/"
+        exclude: "e2e/|tests/|scripts/|^packages/r/"
       - id: go-fmt
         exclude: ^(e2e/|test_apps/)
       - id: golangci-lint

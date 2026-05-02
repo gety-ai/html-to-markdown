@@ -110,6 +110,7 @@ exclude = [
   "^test_apps/",
   "^packages/typescript/",
   "^packages/ruby/",
+  "^packages/r/",
   "^scripts/",
   "^node_modules/",
   "^dist/",
