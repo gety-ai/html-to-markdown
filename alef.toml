@@ -1,17 +1,5 @@
 version = "0.13.6"
-languages = [
-  "python",
-  "node",
-  "ruby",
-  "php",
-  "ffi",
-  "go",
-  "java",
-  "csharp",
-  "elixir",
-  "wasm",
-  "r",
-]
+languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm", "r"]
 
 [crate]
 name = "html-to-markdown-rs"
@@ -588,6 +576,8 @@ replace = '"kreuzberg-dev/html-to-markdown": ">={version}"'
 trait_name = "HtmlVisitor"
 type_alias = "VisitorHandle"
 param_name = "visitor"
+bind_via = "options_field"
+options_type = "ConversionOptions"
 
 [scaffold]
 description = "High-performance HTML to Markdown converter"
@@ -671,9 +661,9 @@ format = "find e2e/c -name '*.c' -o -name '*.h' | xargs clang-format -i"
 check = "cppcheck --std=c11 --enable=warning,style,performance --suppress=missingIncludeSystem --suppress=unusedStructMember e2e/c/"
 
 [test.python]
-precondition = "command -v ruff >/dev/null 2>&1"
-before = "cd packages/python && maturin develop --release"
-e2e = "cd e2e/python && python3 -m pytest tests/ -q"
+precondition = "command -v uv >/dev/null 2>&1"
+before = "cd e2e/python && uv sync && uv pip install --refresh ../../packages/python"
+e2e = "cd e2e/python && uv run pytest tests/ -q"
 
 [test.node]
 precondition = "command -v npx >/dev/null 2>&1"
@@ -807,7 +797,6 @@ enum_module = "html_to_markdown._html_to_markdown"
 [e2e.call.overrides.go]
 module = "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
 function = "Convert"
-visitor_function = "ConvertWithVisitor"
 alias = "htmd"
 options_type = "ConversionOptions"
 returns_result = true
@@ -1022,6 +1011,7 @@ path = "../../crates/html-to-markdown-ffi"
 python = "ruff check --fix {dir} && ruff format {dir}"
 go = "gofmt -w {dir}"
 rust = "(cd {dir} && cargo fmt --all)"
+c = "find {dir} \\( -name '*.c' -o -name '*.h' \\) | xargs clang-format -i"
 
 [e2e.fields_c_types]
 "conversion_result.metadata" = "HtmlMetadata"
