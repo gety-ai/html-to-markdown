@@ -39,7 +39,7 @@ image = { version = "0.25", default-features = false, features = [
     "bmp",
     "webp",
 ], optional = true }
-lru = "0.17"
+lru = "0.18"
 memchr = "2"
 once_cell.workspace = true
 regex.workspace = true

@@ -24,7 +24,7 @@ clap_complete.workspace = true
 clap_mangen.workspace = true
 encoding_rs.workspace = true
 html-to-markdown-rs = { workspace = true, features = ["metadata", "inline-images", "visitor", "serde"] }
-reqwest = { version = "0.13.2", default-features = false, features = [
+reqwest = { version = "0.13.3", default-features = false, features = [
     "blocking",
     "rustls",
     "gzip",
