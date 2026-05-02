@@ -83,6 +83,7 @@ namespace = "HtmlToMarkdown"
 
 [php]
 extension_name = "html_to_markdown"
+namespace = "HtmlToMarkdown"
 
 [ruby]
 gem_name = "html-to-markdown"
@@ -776,6 +777,10 @@ args = [
 crate_name = "html_to_markdown_rs"
 module = "html_to_markdown_rs"
 function = "convert"
+options_type = "ConversionOptions"
+wrap_options_in_some = true
+extra_args = ["None"]
+returns_result = true
 
 [e2e.call.overrides.python]
 module = "html_to_markdown"
@@ -802,6 +807,7 @@ enum_module = "html_to_markdown._html_to_markdown"
 [e2e.call.overrides.go]
 module = "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
 function = "Convert"
+visitor_function = "ConvertWithVisitor"
 alias = "htmd"
 options_type = "ConversionOptions"
 returns_result = true
