@@ -1,7 +1,47 @@
-version = "0.13.10"
+[workspace]
+alef_version = "0.14.1"
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm", "r"]
 
-[crate]
+[workspace.sync]
+extra_paths = [
+  "packages/ruby/lib/html_to_markdown/version.rb",
+  "packages/python/html_to_markdown/__init__.py",
+  "crates/html-to-markdown-node/package.json",
+  "crates/html-to-markdown-node/npm/*/package.json",
+]
+
+# test_apps version sync — use text_replacements to avoid clobbering unrelated semver strings
+[[workspace.sync.text_replacements]]
+path = "test_apps/node/package.json"
+search = '"@kreuzberg/html-to-markdown": "[^"]*"'
+replace = '"@kreuzberg/html-to-markdown": "{version}"'
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/bun/package.json"
+search = '"@kreuzberg/html-to-markdown": "[^"]*"'
+replace = '"@kreuzberg/html-to-markdown": "{version}"'
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/wasm/package.json"
+search = '"@kreuzberg/html-to-markdown-wasm": "[^"]*"'
+replace = '"@kreuzberg/html-to-markdown-wasm": "{version}"'
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/java/pom.xml"
+search = "<version>{version}</version>"
+replace = "<version>{version}</version>"
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/csharp/TestApp.csproj"
+search = 'Include="KreuzbergDev.HtmlToMarkdown" Version="[^"]*"'
+replace = 'Include="KreuzbergDev.HtmlToMarkdown" Version="{version}"'
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/php/composer.json"
+search = '"kreuzberg-dev/html-to-markdown": "[^"]*"'
+replace = '"kreuzberg-dev/html-to-markdown": ">={version}"'
+
+[[crates]]
 name = "html-to-markdown-rs"
 core_import = "html_to_markdown_rs"
 sources = [
@@ -23,703 +63,200 @@ version_from = "Cargo.toml"
 workspace_root = "."
 features = ["full", "metadata", "visitor", "serde", "inline-images"]
 
-[include]
-types = ["ConversionOptions", "ConversionResult", "HtmlVisitor"]
-functions = ["convert"]
+[crates.python]
+module_name = "_html_to_markdown"
+pip_name = "html-to-markdown"
 
-[exclude]
-types = []
-functions = []
-methods = []
+[crates.python.stubs]
+output = "packages/python/html_to_markdown/"
 
-[output]
+[crates.node]
+package_name = "@kreuzberg/html-to-markdown-node"
+
+[crates.ruby]
+gem_name = "html-to-markdown"
+
+[crates.ruby.stubs]
+output = "packages/ruby/sig/"
+
+[crates.php]
+extension_name = "html_to_markdown"
+namespace = "HtmlToMarkdown"
+
+[crates.elixir]
+app_name = "html_to_markdown"
+exclude_types = ["VisitorHandle", "ConversionOptionsBuilder"]
+cpu_bound_functions = ["convert"]
+
+[crates.ffi]
+prefix = "htm"
+header_name = "html_to_markdown.h"
+lib_name = "html_to_markdown_ffi"
+visitor_callbacks = true
+
+[crates.go]
+module = "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
+package_name = "htmltomarkdown"
+
+[crates.java]
+package = "dev.kreuzberg.htmltomarkdown"
+
+[crates.csharp]
+namespace = "HtmlToMarkdown"
+
+[crates.r]
+package_name = "htmltomarkdown"
+
+[crates.output]
 python = "crates/html-to-markdown-py/src/"
 node = "crates/html-to-markdown-node/src/"
 ruby = "packages/ruby/ext/html_to_markdown_rb/src/"
 php = "crates/html-to-markdown-php/src/"
 ffi = "crates/html-to-markdown-ffi/src/"
 go = "packages/go/"
+java = "packages/java/src/main/java/"
 elixir = "packages/elixir/native/html_to_markdown_nif/src/"
 wasm = "crates/html-to-markdown-wasm/src/"
 r = "packages/r/src/rust/src/"
 
-[python]
-module_name = "_html_to_markdown"
-pip_name = "html-to-markdown"
-
-[python.stubs]
-output = "packages/python/html_to_markdown/"
-
-[node]
-package_name = "@kreuzberg/html-to-markdown-node"
-
-[ffi]
-prefix = "htm"
-header_name = "html_to_markdown.h"
-lib_name = "html_to_markdown_ffi"
-visitor_callbacks = true
-
-[go]
-module = "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
-package_name = "htmltomarkdown"
-
-[java]
-package = "dev.kreuzberg.htmltomarkdown"
-
-[csharp]
-namespace = "HtmlToMarkdown"
-
-[php]
-extension_name = "html_to_markdown"
-namespace = "HtmlToMarkdown"
-
-[ruby]
-gem_name = "html-to-markdown"
-
-[ruby.stubs]
-output = "packages/ruby/sig/"
-
-[elixir]
-app_name = "html_to_markdown"
-
-[r]
-package_name = "htmltomarkdown"
-
-[readme]
-template_dir = "readme_templates"
-snippets_dir = "docs/snippets"
-discord_url = "https://discord.gg/pXxagNK2zN"
-banner_url = "https://github.com/user-attachments/assets/419fc06c-8313-4324-b159-4b4d3cfce5c0"
-
-[readme.languages.python]
-name = "Python"
-template = "language_package.md"
-package_manager = ["pip"]
-package_name = "html-to-markdown"
-install_command = "pip install html-to-markdown"
-description = """
-High-performance HTML to Markdown converter with a clean Python API (powered by a Rust core).
-The same engine also drives the Node.js, Ruby, PHP, and WebAssembly bindings, so rendered Markdown
-stays identical across runtimes. Wheels are published for Linux, macOS, and Windows.
-"""
-migration_version = ""
-
-[readme.languages.python.features]
-visitor_pattern = true
-metadata_extraction = true
-cli_proxy = false
-
-[readme.languages.python.performance]
-platform = "Apple M4"
-function = "convert()"
-note = "Real Wikipedia documents"
-
-[[readme.languages.python.performance.benchmarks]]
-name = "Lists (Timeline)"
-size = "129KB"
-latency = "0.62ms"
-throughput = "208 MB/s"
-
-[[readme.languages.python.performance.benchmarks]]
-name = "Tables (Countries)"
-size = "360KB"
-latency = "2.02ms"
-throughput = "178 MB/s"
-
-[[readme.languages.python.performance.benchmarks]]
-name = "Mixed (Python wiki)"
-size = "656KB"
-latency = "4.56ms"
-throughput = "144 MB/s"
-
-[readme.languages.python.snippets]
-basic_usage = "getting-started/basic_usage.md"
-with_options = "getting-started/with_options.md"
-metadata_extraction = "metadata/basic_extraction.md"
-visitor_basic = "visitor/basic_visitor.md"
-table_extraction = "table-extraction/basic_extraction.md"
-
-[readme.languages.typescript]
-name = "TypeScript (Node.js)"
-template = "language_package.md"
-output_path = "packages/typescript/README.md"
-package_manager = ["npm", "pnpm", "yarn", "bun"]
-package_name = "@kreuzberg/html-to-markdown"
-install_command = "npm install @kreuzberg/html-to-markdown"
-description = """
-High-performance HTML to Markdown converter for Node.js and Bun with full TypeScript support.
-This package wraps native `@kreuzberg/html-to-markdown` bindings and provides a type-safe API.
-"""
-migration_version = "3.1.0"
-
-[readme.languages.typescript.features]
-visitor_pattern = true
-metadata_extraction = true
-cli_proxy = false
-
-[readme.languages.typescript.performance]
-platform = "Apple M4"
-function = "convert()"
-note = "Real Wikipedia documents"
-
-[[readme.languages.typescript.performance.benchmarks]]
-name = "Lists (Timeline)"
-size = "129KB"
-latency = "0.58ms"
-throughput = "222 MB/s"
-
-[[readme.languages.typescript.performance.benchmarks]]
-name = "Tables (Countries)"
-size = "360KB"
-latency = "1.89ms"
-throughput = "190 MB/s"
-
-[[readme.languages.typescript.performance.benchmarks]]
-name = "Mixed (Python wiki)"
-size = "656KB"
-latency = "4.21ms"
-throughput = "156 MB/s"
-
-[readme.languages.typescript.snippets]
-basic_usage = "getting-started/basic_usage.md"
-with_options = "getting-started/with_options.md"
-metadata_extraction = "metadata/basic_extraction.md"
-visitor_basic = "visitor/basic_visitor.md"
-table_extraction = "table-extraction/basic_extraction.md"
-
-[readme.languages.ruby]
-name = "Ruby"
-template = "language_package.md"
-output_path = "packages/ruby/README.md"
-package_manager = ["gem", "bundler"]
-package_name = "html-to-markdown"
-install_command = "gem install html-to-markdown"
-description = """
-Blazing-fast HTML to Markdown conversion for Ruby, powered by the same Rust engine used by our Python, Node.js, WebAssembly, and PHP packages.
-Ship identical Markdown across every runtime while enjoying native extension performance with Magnus bindings.
-"""
-migration_version = ""
-
-[readme.languages.ruby.features]
-visitor_pattern = true
-metadata_extraction = true
-cli_proxy = true
-
-[readme.languages.ruby.performance]
-platform = "Apple M4"
-function = "convert()"
-note = "Real Wikipedia documents"
-
-[[readme.languages.ruby.performance.benchmarks]]
-name = "Lists (Timeline)"
-size = "129KB"
-latency = "0.71ms"
-throughput = "182 MB/s"
-
-[[readme.languages.ruby.performance.benchmarks]]
-name = "Tables (Countries)"
-size = "360KB"
-latency = "2.15ms"
-throughput = "167 MB/s"
-
-[[readme.languages.ruby.performance.benchmarks]]
-name = "Mixed (Python wiki)"
-size = "656KB"
-latency = "4.89ms"
-throughput = "134 MB/s"
-
-[readme.languages.ruby.snippets]
-basic_usage = "getting-started/basic_usage.md"
-with_options = "getting-started/with_options.md"
-metadata_extraction = "metadata/basic_extraction.md"
-visitor_basic = "visitor/basic_visitor.md"
-table_extraction = "table-extraction/basic_extraction.md"
-
-[readme.languages.php]
-name = "PHP"
-template = "language_package.md"
-package_manager = ["composer", "pie"]
-package_name = "kreuzberg-dev/html-to-markdown"
-install_command = "composer require kreuzberg-dev/html-to-markdown"
-description = """
-High-performance HTML to Markdown converter with typed PHP bindings powered by a Rust core.
-Provides a type-safe API with full PHPStan level 9 support, modern PHP 8.2+ features, and comprehensive metadata extraction.
-
-Note: The package was previously published as `goldziher/html-to-markdown`, which still works for backward compatibility.
-"""
-migration_version = ""
-
-[readme.languages.php.features]
-visitor_pattern = true
-metadata_extraction = true
-cli_proxy = false
-
-[readme.languages.php.performance]
-platform = "Apple M4"
-function = "convert()"
-note = "Real Wikipedia documents"
-
-[[readme.languages.php.performance.benchmarks]]
-name = "Lists (Timeline)"
-size = "129KB"
-ops_sec = 3346
-
-[[readme.languages.php.performance.benchmarks]]
-name = "Tables (Countries)"
-size = "360KB"
-ops_sec = 973
-
-[[readme.languages.php.performance.benchmarks]]
-name = "Medium (Python)"
-size = "657KB"
-ops_sec = 485
-
-[readme.languages.php.snippets]
-basic_usage = "getting-started/basic_usage.md"
-with_options = "getting-started/with_options.md"
-metadata_extraction = "metadata/basic_extraction.md"
-visitor_basic = "visitor/basic_visitor.md"
-table_extraction = "table-extraction/basic_extraction.md"
-
-[readme.languages.go]
-name = "Go"
-template = "language_package.md"
-output_path = "packages/go/v3/README.md"
-package_manager = ["go"]
-package_name = "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown"
-install_command = "go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown"
-description = """
-High-performance HTML to Markdown converter with Go bindings to the Rust core library.
-Supports automatic downloading of prebuilt FFI libraries for Linux, macOS, and Windows with customizable caching.
-"""
-migration_version = ""
-
-[readme.languages.go.features]
-visitor_pattern = true
-metadata_extraction = false
-cli_proxy = false
-
-[readme.languages.go.performance]
-platform = "Apple M4"
-function = "Convert()"
-note = "Real Wikipedia documents"
-
-[[readme.languages.go.performance.benchmarks]]
-name = "Lists (Timeline)"
-size = "129KB"
-latency = "0.46ms"
-throughput = "277.5 MB/s"
-
-[[readme.languages.go.performance.benchmarks]]
-name = "Tables (Countries)"
-size = "360KB"
-latency = "1.37ms"
-throughput = "262.1 MB/s"
-
-[[readme.languages.go.performance.benchmarks]]
-name = "Mixed (Python wiki)"
-size = "656KB"
-latency = "2.75ms"
-throughput = "237.9 MB/s"
-
-[readme.languages.go.snippets]
-basic_usage = "getting-started/basic_usage.md"
-with_options = "getting-started/with_options.md"
-table_extraction = "table-extraction/basic_extraction.md"
-
-[readme.languages.java]
-name = "Java"
-template = "language_package.md"
-output_path = "packages/java/README.md"
-package_manager = ["maven", "gradle"]
-package_name = "dev.kreuzberg:html-to-markdown"
-install_command = """
-<dependency>
-    <groupId>dev.kreuzberg</groupId>
-    <artifactId>html-to-markdown</artifactId>
-    <version>3.1.0</version>
-    <classifier>linux</classifier> <!-- or macos, windows -->
-</dependency>"""
-description = """
-High-performance HTML to Markdown converter with Java Panama FFI bindings to the Rust core.
-Uses Foreign Function & Memory API for zero-dependency, thread-safe conversion with full metadata extraction support.
-"""
-migration_version = "3.1.0"
-
-[readme.languages.java.features]
-visitor_pattern = true
-metadata_extraction = false
-cli_proxy = false
-
-[readme.languages.java.performance]
-platform = "Apple M4"
-function = "convert()"
-note = "Real Wikipedia documents"
-
-[[readme.languages.java.performance.benchmarks]]
-name = "Lists (Timeline)"
-size = "129KB"
-ops_sec = 2308
-throughput = "291.5 MB/s"
-
-[[readme.languages.java.performance.benchmarks]]
-name = "Tables (Countries)"
-size = "360KB"
-ops_sec = 773
-throughput = "272.0 MB/s"
-
-[[readme.languages.java.performance.benchmarks]]
-name = "Mixed (Python)"
-size = "656KB"
-ops_sec = 403
-throughput = "258.5 MB/s"
-
-[readme.languages.java.snippets]
-basic_usage = "getting-started/basic_usage.md"
-with_options = "getting-started/with_options.md"
-table_extraction = "table-extraction/basic_extraction.md"
-
-[readme.languages.csharp]
-name = "C# / .NET"
-template = "language_package.md"
-output_path = "packages/csharp/README.md"
-package_manager = ["nuget"]
-package_name = "KreuzbergDev.HtmlToMarkdown"
-install_command = "dotnet add package KreuzbergDev.HtmlToMarkdown"
-description = """
-High-performance HTML to Markdown converter with C#/.NET bindings using P/Invoke to the Rust core.
-Provides type-safe record-based APIs for metadata extraction, visitor patterns, and thread-safe concurrent conversion.
-"""
-migration_version = "3.1.0"
-
-[readme.languages.csharp.features]
-visitor_pattern = true
-metadata_extraction = false
-cli_proxy = false
-
-[readme.languages.csharp.performance]
-platform = "Apple M4"
-function = "Convert()"
-note = "Real Wikipedia documents"
-
-[[readme.languages.csharp.performance.benchmarks]]
-name = "Lists (Timeline)"
-size = "129KB"
-ops_sec = 3111
-throughput = "392.9 MB/s"
-
-[[readme.languages.csharp.performance.benchmarks]]
-name = "Tables (Countries)"
-size = "360KB"
-ops_sec = 853
-throughput = "300.1 MB/s"
-
-[[readme.languages.csharp.performance.benchmarks]]
-name = "Mixed (Python)"
-size = "656KB"
-ops_sec = 456
-throughput = "292.3 MB/s"
-
-[readme.languages.csharp.snippets]
-basic_usage = "getting-started/basic_usage.md"
-with_options = "getting-started/with_options.md"
-table_extraction = "table-extraction/basic_extraction.md"
-
-[readme.languages.elixir]
-name = "Elixir"
-template = "language_package.md"
-output_path = "packages/elixir/README.md"
-package_manager = ["mix"]
-package_name = "html_to_markdown"
-install_command = 'Add {:html_to_markdown, "~> 3.0"} to mix.exs deps'
-description = """
-Elixir bindings for the Rust html-to-markdown engine. The package exposes a fast HTML to Markdown converter implemented with Rustler.
-Ship identical Markdown across every runtime while enjoying native performance with Rustler NIF bindings.
-"""
-migration_version = ""
-
-[readme.languages.elixir.features]
-visitor_pattern = true
-metadata_extraction = true
-cli_proxy = false
-
-[readme.languages.elixir.performance]
-platform = "Apple M4"
-function = "convert()"
-note = "Real Wikipedia documents"
-
-[[readme.languages.elixir.performance.benchmarks]]
-name = "Lists (Timeline)"
-size = "129KB"
-ops_sec = 2547
-throughput = "321.7 MB/s"
-
-[[readme.languages.elixir.performance.benchmarks]]
-name = "Tables (Countries)"
-size = "360KB"
-ops_sec = 835
-throughput = "293.8 MB/s"
-
-[[readme.languages.elixir.performance.benchmarks]]
-name = "Medium (Python)"
-size = "656KB"
-ops_sec = 439
-throughput = "281.5 MB/s"
-
-[[readme.languages.elixir.performance.benchmarks]]
-name = "Large (Rust)"
-size = "567KB"
-ops_sec = 485
-throughput = "268.7 MB/s"
-
-[[readme.languages.elixir.performance.benchmarks]]
-name = "Small (Intro)"
-size = "463KB"
-ops_sec = 581
-throughput = "262.9 MB/s"
-
-[readme.languages.elixir.snippets]
-basic_usage = "getting-started/basic_usage.md"
-with_options = "getting-started/with_options.md"
-metadata_extraction = "metadata/basic_extraction.md"
-visitor_basic = "visitor/basic_visitor.md"
-table_extraction = "table-extraction/basic_extraction.md"
-
-[readme.languages.r]
-name = "R"
-template = "language_package.md"
-output_path = "packages/r/README.md"
-package_manager = ["install.packages"]
-package_name = "htmltomarkdown"
-install_command = 'install.packages("htmltomarkdown")'
-description = """
-High-performance HTML to Markdown converter with R bindings powered by a Rust core via extendr.
-Ship identical Markdown across every runtime while enjoying native performance with extendr bindings.
-"""
-migration_version = ""
-
-[readme.languages.r.features]
-visitor_pattern = true
-metadata_extraction = true
-cli_proxy = false
-
-[readme.languages.r.performance]
-platform = "Apple M4"
-function = "convert()"
-note = "Real Wikipedia documents"
-
-[[readme.languages.r.performance.benchmarks]]
-name = "Lists (Timeline)"
-size = "129KB"
-latency = "0.68ms"
-throughput = "190 MB/s"
-
-[[readme.languages.r.performance.benchmarks]]
-name = "Tables (Countries)"
-size = "360KB"
-latency = "2.10ms"
-throughput = "171 MB/s"
-
-[[readme.languages.r.performance.benchmarks]]
-name = "Mixed (Python wiki)"
-size = "656KB"
-latency = "4.75ms"
-throughput = "138 MB/s"
-
-[readme.languages.r.snippets]
-basic_usage = "getting-started/basic_usage.md"
-with_options = "getting-started/with_options.md"
-metadata_extraction = "metadata/basic_extraction.md"
-visitor_basic = "visitor/basic_visitor.md"
-table_extraction = "table-extraction/basic_extraction.md"
-
-[sync]
-extra_paths = [
-  "packages/ruby/lib/html_to_markdown/version.rb",
-  "packages/python/html_to_markdown/__init__.py",
-  "crates/html-to-markdown-node/package.json",
-  "crates/html-to-markdown-node/npm/*/package.json",
-]
-
-# test_apps version sync — use text_replacements to avoid clobbering unrelated semver strings
-[[sync.text_replacements]]
-path = "test_apps/node/package.json"
-search = '"@kreuzberg/html-to-markdown": "[^"]*"'
-replace = '"@kreuzberg/html-to-markdown": "{version}"'
-
-[[sync.text_replacements]]
-path = "test_apps/bun/package.json"
-search = '"@kreuzberg/html-to-markdown": "[^"]*"'
-replace = '"@kreuzberg/html-to-markdown": "{version}"'
-
-[[sync.text_replacements]]
-path = "test_apps/wasm/package.json"
-search = '"@kreuzberg/html-to-markdown-wasm": "[^"]*"'
-replace = '"@kreuzberg/html-to-markdown-wasm": "{version}"'
-
-[[sync.text_replacements]]
-path = "test_apps/java/pom.xml"
-search = "<version>{version}</version>"
-replace = "<version>{version}</version>"
-
-[[sync.text_replacements]]
-path = "test_apps/csharp/TestApp.csproj"
-search = 'Include="KreuzbergDev.HtmlToMarkdown" Version="[^"]*"'
-replace = 'Include="KreuzbergDev.HtmlToMarkdown" Version="{version}"'
-
-[[sync.text_replacements]]
-path = "test_apps/php/composer.json"
-search = '"kreuzberg-dev/html-to-markdown": "[^"]*"'
-replace = '"kreuzberg-dev/html-to-markdown": ">={version}"'
-
-[[trait_bridges]]
-trait_name = "HtmlVisitor"
-type_alias = "VisitorHandle"
-param_name = "visitor"
-bind_via = "options_field"
-options_type = "ConversionOptions"
-
-[scaffold]
-description = "High-performance HTML to Markdown converter"
-license = "MIT"
-repository = "https://github.com/kreuzberg-dev/html-to-markdown"
-authors = ["Kreuzberg Team"]
-keywords = ["html", "markdown", "converter"]
-
-[publish]
-core_crate = "crates/html-to-markdown"
-
-[publish.languages.ruby]
-vendor_mode = "core-only"
-
-[publish.languages.elixir]
-vendor_mode = "core-only"
-nif_versions = ["2.16", "2.17"]
-
-[publish.languages.r]
-vendor_mode = "full"
-
-[publish.languages.ffi]
-pkg_config = true
-cmake_config = true
-
-[custom_modules]
-node = ["helpers"]
-
-[build_commands.ruby]
-precondition = "command -v cargo >/dev/null 2>&1"
-build = "cd packages/ruby/ext/html_to_markdown_rb && cargo build"
-build_release = "cd packages/ruby/ext/html_to_markdown_rb && cargo build --release"
-
-[lint.python]
+[crates.exclude]
+types = []
+functions = []
+methods = []
+
+[crates.include]
+types = ["ConversionOptions", "ConversionResult", "HtmlVisitor"]
+functions = ["convert"]
+
+[crates.lint.python]
 precondition = "command -v ruff >/dev/null 2>&1"
 before = "cd packages/python && uv sync"
 typecheck = "cd packages/python && uv run mypy ."
 
-[lint.node]
+[crates.lint.node]
 precondition = "command -v npx >/dev/null 2>&1"
 format = "npx oxfmt packages/typescript/src/"
 check = "npx oxlint packages/typescript/"
 
-[lint.ruby]
+[crates.lint.ruby]
 precondition = "command -v bundle >/dev/null 2>&1"
 before = "cd packages/ruby && bundle install"
 format = "cd packages/ruby && bundle exec rubocop -a ."
 
-[lint.php]
+[crates.lint.php]
 precondition = "command -v php >/dev/null 2>&1"
 before = "cd packages/php && composer install"
 format = "cd packages/php && vendor/bin/php-cs-fixer fix ."
 check = "cd packages/php && vendor/bin/phpstan --configuration=phpstan.neon --memory-limit=512M"
 
-[lint.go]
+[crates.lint.go]
 before = "cargo build --release -p html-to-markdown-ffi"
 
-[lint.elixir]
+[crates.lint.elixir]
 precondition = "command -v mix >/dev/null 2>&1"
 before = "cd packages/elixir && mix deps.get"
 check = "cd packages/elixir && mix credo"
 
-[lint.java]
+[crates.lint.java]
 precondition = "command -v mvn >/dev/null 2>&1"
 check = "mvn -f packages/java/pom.xml spotless:check -q"
 
-
-[lint.wasm]
+[crates.lint.wasm]
 precondition = "command -v npx >/dev/null 2>&1"
 format = "npx oxfmt packages/wasm/"
 check = "npx oxlint packages/wasm/"
 
-[lint.r]
+[crates.lint.r]
 precondition = "command -v Rscript >/dev/null 2>&1"
 format = "cd packages/r && Rscript -e 'styler::style_dir(\"R\")'"
 check = "cd packages/r && Rscript -e 'lintr::lint_dir(\"R\")'"
 
-[lint.ffi]
+[crates.lint.ffi]
 precondition = "test -d e2e/c"
 format = "find e2e/c -name '*.c' -o -name '*.h' | xargs clang-format -i"
 check = "cppcheck --std=c11 --enable=warning,style,performance --suppress=missingIncludeSystem --suppress=unusedStructMember e2e/c/"
 
-[test.python]
+[crates.test.python]
 precondition = "command -v uv >/dev/null 2>&1"
 before = "cd e2e/python && uv sync && uv pip install --refresh ../../packages/python"
 e2e = "cd e2e/python && uv run pytest tests/ -q"
 
-[test.node]
+[crates.test.node]
 precondition = "command -v npx >/dev/null 2>&1"
 before = "cd crates/html-to-markdown-node && napi build --output-dir . --release"
 e2e = "cd e2e/node && npx vitest run"
 
-[test.go]
+[crates.test.go]
 precondition = "command -v go >/dev/null 2>&1"
 before = "cargo build --release -p html-to-markdown-ffi"
 e2e = "cd e2e/go && go test ./... -count=1"
 
-[test.ruby]
+[crates.test.ruby]
 precondition = "command -v bundle >/dev/null 2>&1"
 before = "cd e2e/ruby && bundle install"
 e2e = "cd e2e/ruby && bundle exec rspec"
 
-[test.php]
+[crates.test.php]
 precondition = "command -v php >/dev/null 2>&1"
 before = "cd e2e/php && composer install"
 e2e = "cd e2e/php && composer test"
 
-[test.java]
+[crates.test.java]
 precondition = "command -v mvn >/dev/null 2>&1"
 before = "cargo build --release -p html-to-markdown-ffi"
 e2e = "cd e2e/java && mvn test -q"
 
-[test.csharp]
+[crates.test.csharp]
 precondition = "command -v dotnet >/dev/null 2>&1"
 before = "cargo build --release -p html-to-markdown-ffi"
 e2e = "dotnet test e2e/csharp"
 
-[test.elixir]
+[crates.test.elixir]
 precondition = "command -v mix >/dev/null 2>&1"
 before = "cd packages/elixir && mix deps.get && mix compile"
 e2e = "cd e2e/elixir && mix test"
 
-[test.r]
+[crates.test.r]
 precondition = "which Rscript 2>/dev/null"
 e2e = "cd e2e/r && Rscript -e \"devtools::load_all('../../packages/r'); testthat::set_max_fails(Inf); testthat::test_dir('tests')\""
 
-[test.wasm]
+[crates.test.wasm]
 precondition = "command -v npx >/dev/null 2>&1"
 before = "wasm-pack build crates/html-to-markdown-wasm --release --target bundler && cd e2e/wasm && npm install"
 e2e = "cd e2e/wasm && npm test"
 
-[test.rust]
+[crates.test.rust]
 precondition = "command -v cargo >/dev/null 2>&1"
 e2e = "cd e2e/rust && cargo test"
 
-[test.c]
+[crates.test.c]
 precondition = "command -v make >/dev/null 2>&1"
 before = "cargo build --release -p html-to-markdown-ffi"
 e2e = "cd e2e/c && make clean && make && DYLD_LIBRARY_PATH=../../target/release ./test_runner"
 
-# E2E test generation configuration
-[e2e]
+[crates.build_commands.ruby]
+precondition = "command -v cargo >/dev/null 2>&1"
+build = "cd packages/ruby/ext/html_to_markdown_rb && cargo build"
+build_release = "cd packages/ruby/ext/html_to_markdown_rb && cargo build --release"
+
+[crates.publish]
+core_crate = "crates/html-to-markdown"
+
+[crates.publish.languages.ruby]
+vendor_mode = "core-only"
+
+[crates.publish.languages.elixir]
+vendor_mode = "core-only"
+nif_versions = ["2.16", "2.17"]
+
+[crates.publish.languages.r]
+vendor_mode = "full"
+
+[crates.publish.languages.ffi]
+pkg_config = true
+cmake_config = true
+
+[crates.e2e]
 fixtures = "fixtures"
 output = "e2e"
 languages = [
@@ -754,7 +291,7 @@ fields_optional = [
   "metadata.document.twitter_card[description]",
 ]
 
-[e2e.call]
+[crates.e2e.call]
 function = "convert"
 module = "html_to_markdown_rs"
 result_var = "result"
@@ -763,7 +300,7 @@ args = [
   { name = "options", field = "options", type = "json_object", optional = true },
 ]
 
-[e2e.call.overrides.rust]
+[crates.e2e.call.overrides.rust]
 crate_name = "html_to_markdown_rs"
 module = "html_to_markdown_rs"
 function = "convert"
@@ -772,13 +309,13 @@ wrap_options_in_some = true
 extra_args = ["None"]
 returns_result = true
 
-[e2e.call.overrides.python]
+[crates.e2e.call.overrides.python]
 module = "html_to_markdown"
 function = "convert"
 options_type = "ConversionOptions"
 enum_module = "html_to_markdown.options"
 
-[e2e.call.overrides.python.enum_fields]
+[crates.e2e.call.overrides.python.enum_fields]
 headingStyle = "HeadingStyle"
 codeBlockStyle = "CodeBlockStyle"
 listIndentType = "ListIndentType"
@@ -788,13 +325,13 @@ highlightStyle = "HighlightStyle"
 linkStyle = "LinkStyle"
 outputFormat = "OutputFormat"
 
-[e2e.call.overrides.node]
+[crates.e2e.call.overrides.node]
 module = "html-to-markdown"
 function = "convert"
 options_type = "ConversionOptions"
 enum_module = "html_to_markdown._html_to_markdown"
 
-[e2e.call.overrides.go]
+[crates.e2e.call.overrides.go]
 module = "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
 function = "Convert"
 alias = "htmd"
@@ -802,18 +339,18 @@ options_type = "ConversionOptions"
 returns_result = true
 options_ptr = true
 
-[e2e.call.overrides.java]
+[crates.e2e.call.overrides.java]
 class = "dev.kreuzberg.htmltomarkdown.HtmlToMarkdown"
 function = "convert"
 options_type = "ConversionOptions"
 enum_module = "html_to_markdown._html_to_markdown"
 
-[e2e.call.overrides.csharp]
+[crates.e2e.call.overrides.csharp]
 class = "HtmlToMarkdownRs"
 function = "Convert"
 options_type = "ConversionOptions"
 
-[e2e.call.overrides.csharp.enum_fields]
+[crates.e2e.call.overrides.csharp.enum_fields]
 headingStyle = "HeadingStyle"
 codeBlockStyle = "CodeBlockStyle"
 listIndentType = "ListIndentType"
@@ -823,13 +360,13 @@ highlightStyle = "HighlightStyle"
 linkStyle = "LinkStyle"
 outputFormat = "OutputFormat"
 
-[e2e.call.overrides.php]
+[crates.e2e.call.overrides.php]
 module = "HtmlToMarkdown"
 class = "HtmlToMarkdown"
 function = "convert"
 result_is_simple = true
 
-[e2e.call.overrides.php.enum_fields]
+[crates.e2e.call.overrides.php.enum_fields]
 headingStyle = "HeadingStyle"
 codeBlockStyle = "CodeBlockStyle"
 listIndentType = "ListIndentType"
@@ -839,12 +376,12 @@ highlightStyle = "HighlightStyle"
 linkStyle = "LinkStyle"
 outputFormat = "OutputFormat"
 
-[e2e.call.overrides.ruby]
+[crates.e2e.call.overrides.ruby]
 module = "html_to_markdown"
 options_type = "Kreuzberg::ConversionOptions"
 result_is_simple = true
 
-[e2e.call.overrides.ruby.enum_fields]
+[crates.e2e.call.overrides.ruby.enum_fields]
 headingStyle = "HeadingStyle"
 codeBlockStyle = "CodeBlockStyle"
 listIndentType = "ListIndentType"
@@ -854,11 +391,11 @@ highlightStyle = "HighlightStyle"
 linkStyle = "LinkStyle"
 outputFormat = "OutputFormat"
 
-[e2e.call.overrides.elixir]
+[crates.e2e.call.overrides.elixir]
 options_type = "ConversionOptions"
 options_via = "conversionoptions_default"
 
-[e2e.call.overrides.elixir.enum_fields]
+[crates.e2e.call.overrides.elixir.enum_fields]
 headingStyle = "HeadingStyle"
 codeBlockStyle = "CodeBlockStyle"
 listIndentType = "ListIndentType"
@@ -868,10 +405,10 @@ highlightStyle = "HighlightStyle"
 linkStyle = "LinkStyle"
 outputFormat = "OutputFormat"
 
-[e2e.call.overrides.wasm]
+[crates.e2e.call.overrides.wasm]
 options_type = "WasmConversionOptions"
 
-[e2e.call.overrides.wasm.enum_fields]
+[crates.e2e.call.overrides.wasm.enum_fields]
 headingStyle = "WasmHeadingStyle"
 codeBlockStyle = "WasmCodeBlockStyle"
 listIndentType = "WasmListIndentType"
@@ -881,139 +418,600 @@ highlightStyle = "WasmHighlightStyle"
 linkStyle = "WasmLinkStyle"
 outputFormat = "WasmOutputFormat"
 
-[e2e.call.overrides.c]
+[crates.e2e.call.overrides.c]
 header = "html_to_markdown.h"
 function = "htm_convert"
 prefix = "htm"
 result_type = "ConversionResult"
 
-[e2e.registry]
+[crates.e2e.registry]
 output = "test_apps"
 categories = ["smoke", "conversion"]
 
-[e2e.registry.packages.python]
+[crates.e2e.registry.packages.python]
 name = "html-to-markdown"
 version = ">=3.2.0"
 
-[e2e.registry.packages.node]
+[crates.e2e.registry.packages.node]
 name = "@kreuzberg/html-to-markdown"
 version = "^3.2.0"
 
-[e2e.registry.packages.rust]
+[crates.e2e.registry.packages.rust]
 name = "html-to-markdown-rs"
 version = "3.2.0"
 
-[e2e.registry.packages.go]
+[crates.e2e.registry.packages.go]
 module = "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
 version = "v3.2.0"
 
-[e2e.registry.packages.java]
+[crates.e2e.registry.packages.java]
 name = "dev.kreuzberg:html-to-markdown"
 version = "3.2.0"
 
-[e2e.registry.packages.csharp]
+[crates.e2e.registry.packages.csharp]
 name = "KreuzbergDev.HtmlToMarkdown"
 version = "3.2.0"
 
-[e2e.registry.packages.php]
+[crates.e2e.registry.packages.php]
 name = "kreuzberg-dev/html-to-markdown-rs"
 version = ">=3.2.0"
 
-[e2e.registry.packages.ruby]
+[crates.e2e.registry.packages.ruby]
 name = "html-to-markdown"
 version = "~> 3.2"
 
-[e2e.registry.packages.elixir]
+[crates.e2e.registry.packages.elixir]
 name = "html_to_markdown"
 version = "~> 3.2"
 
-[e2e.registry.packages.wasm]
+[crates.e2e.registry.packages.wasm]
 name = "@kreuzberg/html-to-markdown-wasm"
 version = "^3.2.0"
 
-[e2e.registry.packages.r]
+[crates.e2e.registry.packages.r]
 name = "htmltomarkdown"
 version = "3.2.0"
 
-[e2e.registry.packages.c]
+[crates.e2e.registry.packages.c]
 name = "html-to-markdown-ffi"
 version = "3.2.0"
 
-[e2e.packages.rust]
+[crates.e2e.packages.rust]
 path = "../../crates/html-to-markdown"
 
-[e2e.packages.python]
+[crates.e2e.packages.python]
 name = "html-to-markdown"
 path = "../../packages/python"
 
-[e2e.packages.node]
+[crates.e2e.packages.node]
 name = "html-to-markdown"
 path = "../../crates/html-to-markdown-node"
 
-[e2e.packages.go]
+[crates.e2e.packages.go]
 module = "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
 path = "../../packages/go"
 version = "v0.0.0"
 
-[e2e.packages.php]
+[crates.e2e.packages.php]
 name = "kreuzberg-dev/html-to-markdown"
 path = "../../packages/php"
 
-[e2e.packages.java]
+[crates.e2e.packages.java]
 name = "dev.kreuzberg:html-to-markdown"
 path = "../../packages/java"
 
-[e2e.packages.csharp]
+[crates.e2e.packages.csharp]
 name = "HtmlToMarkdown"
 path = "../../packages/csharp/HtmlToMarkdown/HtmlToMarkdown.csproj"
 
-[e2e.packages.ruby]
+[crates.e2e.packages.ruby]
 name = "html-to-markdown"
 path = "../../packages/ruby"
 
-[e2e.packages.elixir]
+[crates.e2e.packages.elixir]
 name = "html_to_markdown"
 path = "../../packages/elixir"
 
-[e2e.packages.wasm]
+[crates.e2e.packages.wasm]
 name = "@kreuzberg/html-to-markdown-wasm"
 path = "../../crates/html-to-markdown-wasm"
 
-[e2e.packages.r]
+[crates.e2e.packages.r]
 name = "htmltomarkdown"
 path = "../../packages/r"
 
-[e2e.packages.c]
+[crates.e2e.packages.c]
 name = "html_to_markdown_ffi"
 path = "../../crates/html-to-markdown-ffi"
 
-[e2e.fields]
-# Scalar metadata fields: fixture "metadata.X" -> API "metadata.document.X"
+[crates.e2e.fields]
 "metadata.title" = "metadata.document.title"
 "metadata.description" = "metadata.document.description"
 "metadata.author" = "metadata.document.author"
 "metadata.canonical_url" = "metadata.document.canonical_url"
-# Collection metadata fields (returned as JSON strings in C FFI)
 "metadata.headings" = "metadata.headers"
-# Open Graph map fields
 "metadata.open_graph.title" = "metadata.document.open_graph[title]"
 "metadata.open_graph.description" = "metadata.document.open_graph[description]"
 "metadata.open_graph.image" = "metadata.document.open_graph[image]"
 "metadata.open_graph.type" = "metadata.document.open_graph[type]"
 "metadata.open_graph.url" = "metadata.document.open_graph[url]"
 "metadata.open_graph.site_name" = "metadata.document.open_graph[site_name]"
-# Twitter Card map fields
 "metadata.twitter.card" = "metadata.document.twitter_card[card]"
 "metadata.twitter.title" = "metadata.document.twitter_card[title]"
 "metadata.twitter.description" = "metadata.document.twitter_card[description]"
 
-[e2e.format]
+[crates.e2e.format]
 python = "ruff check --fix {dir} && ruff format {dir}"
 go = "gofmt -w {dir}"
 rust = "(cd {dir} && cargo fmt --all)"
 c = "find {dir} \\( -name '*.c' -o -name '*.h' \\) | xargs clang-format -i"
 
-[e2e.fields_c_types]
+[crates.e2e.fields_c_types]
 "conversion_result.metadata" = "HtmlMetadata"
 "conversion_result.document" = "DocumentStructure"
 "html_metadata.document" = "DocumentMetadata"
+
+[crates.scaffold]
+description = "High-performance HTML to Markdown converter"
+license = "MIT"
+repository = "https://github.com/kreuzberg-dev/html-to-markdown"
+authors = ["Kreuzberg Team"]
+keywords = ["html", "markdown", "converter"]
+
+[crates.readme]
+template_dir = "readme_templates"
+snippets_dir = "docs/snippets"
+discord_url = "https://discord.gg/pXxagNK2zN"
+banner_url = "https://github.com/user-attachments/assets/419fc06c-8313-4324-b159-4b4d3cfce5c0"
+
+[crates.readme.languages.python]
+name = "Python"
+template = "language_package.md"
+package_manager = ["pip"]
+package_name = "html-to-markdown"
+install_command = "pip install html-to-markdown"
+description = """
+High-performance HTML to Markdown converter with a clean Python API (powered by a Rust core).
+The same engine also drives the Node.js, Ruby, PHP, and WebAssembly bindings, so rendered Markdown
+stays identical across runtimes. Wheels are published for Linux, macOS, and Windows.
+"""
+migration_version = ""
+
+[crates.readme.languages.python.features]
+visitor_pattern = true
+metadata_extraction = true
+cli_proxy = false
+
+[crates.readme.languages.python.performance]
+platform = "Apple M4"
+function = "convert()"
+note = "Real Wikipedia documents"
+
+[[crates.readme.languages.python.performance.benchmarks]]
+name = "Lists (Timeline)"
+size = "129KB"
+latency = "0.62ms"
+throughput = "208 MB/s"
+
+[[crates.readme.languages.python.performance.benchmarks]]
+name = "Tables (Countries)"
+size = "360KB"
+latency = "2.02ms"
+throughput = "178 MB/s"
+
+[[crates.readme.languages.python.performance.benchmarks]]
+name = "Mixed (Python wiki)"
+size = "656KB"
+latency = "4.56ms"
+throughput = "144 MB/s"
+
+[crates.readme.languages.python.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+metadata_extraction = "metadata/basic_extraction.md"
+visitor_basic = "visitor/basic_visitor.md"
+table_extraction = "table-extraction/basic_extraction.md"
+
+[crates.readme.languages.typescript]
+name = "TypeScript (Node.js)"
+template = "language_package.md"
+output_path = "packages/typescript/README.md"
+package_manager = ["npm", "pnpm", "yarn", "bun"]
+package_name = "@kreuzberg/html-to-markdown"
+install_command = "npm install @kreuzberg/html-to-markdown"
+description = """
+High-performance HTML to Markdown converter for Node.js and Bun with full TypeScript support.
+This package wraps native `@kreuzberg/html-to-markdown` bindings and provides a type-safe API.
+"""
+migration_version = "3.1.0"
+
+[crates.readme.languages.typescript.features]
+visitor_pattern = true
+metadata_extraction = true
+cli_proxy = false
+
+[crates.readme.languages.typescript.performance]
+platform = "Apple M4"
+function = "convert()"
+note = "Real Wikipedia documents"
+
+[[crates.readme.languages.typescript.performance.benchmarks]]
+name = "Lists (Timeline)"
+size = "129KB"
+latency = "0.58ms"
+throughput = "222 MB/s"
+
+[[crates.readme.languages.typescript.performance.benchmarks]]
+name = "Tables (Countries)"
+size = "360KB"
+latency = "1.89ms"
+throughput = "190 MB/s"
+
+[[crates.readme.languages.typescript.performance.benchmarks]]
+name = "Mixed (Python wiki)"
+size = "656KB"
+latency = "4.21ms"
+throughput = "156 MB/s"
+
+[crates.readme.languages.typescript.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+metadata_extraction = "metadata/basic_extraction.md"
+visitor_basic = "visitor/basic_visitor.md"
+table_extraction = "table-extraction/basic_extraction.md"
+
+[crates.readme.languages.ruby]
+name = "Ruby"
+template = "language_package.md"
+output_path = "packages/ruby/README.md"
+package_manager = ["gem", "bundler"]
+package_name = "html-to-markdown"
+install_command = "gem install html-to-markdown"
+description = """
+Blazing-fast HTML to Markdown conversion for Ruby, powered by the same Rust engine used by our Python, Node.js, WebAssembly, and PHP packages.
+Ship identical Markdown across every runtime while enjoying native extension performance with Magnus bindings.
+"""
+migration_version = ""
+
+[crates.readme.languages.ruby.features]
+visitor_pattern = true
+metadata_extraction = true
+cli_proxy = true
+
+[crates.readme.languages.ruby.performance]
+platform = "Apple M4"
+function = "convert()"
+note = "Real Wikipedia documents"
+
+[[crates.readme.languages.ruby.performance.benchmarks]]
+name = "Lists (Timeline)"
+size = "129KB"
+latency = "0.71ms"
+throughput = "182 MB/s"
+
+[[crates.readme.languages.ruby.performance.benchmarks]]
+name = "Tables (Countries)"
+size = "360KB"
+latency = "2.15ms"
+throughput = "167 MB/s"
+
+[[crates.readme.languages.ruby.performance.benchmarks]]
+name = "Mixed (Python wiki)"
+size = "656KB"
+latency = "4.89ms"
+throughput = "134 MB/s"
+
+[crates.readme.languages.ruby.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+metadata_extraction = "metadata/basic_extraction.md"
+visitor_basic = "visitor/basic_visitor.md"
+table_extraction = "table-extraction/basic_extraction.md"
+
+[crates.readme.languages.php]
+name = "PHP"
+template = "language_package.md"
+package_manager = ["composer", "pie"]
+package_name = "kreuzberg-dev/html-to-markdown"
+install_command = "composer require kreuzberg-dev/html-to-markdown"
+description = """
+High-performance HTML to Markdown converter with typed PHP bindings powered by a Rust core.
+Provides a type-safe API with full PHPStan level 9 support, modern PHP 8.2+ features, and comprehensive metadata extraction.
+
+Note: The package was previously published as `goldziher/html-to-markdown`, which still works for backward compatibility.
+"""
+migration_version = ""
+
+[crates.readme.languages.php.features]
+visitor_pattern = true
+metadata_extraction = true
+cli_proxy = false
+
+[crates.readme.languages.php.performance]
+platform = "Apple M4"
+function = "convert()"
+note = "Real Wikipedia documents"
+
+[[crates.readme.languages.php.performance.benchmarks]]
+name = "Lists (Timeline)"
+size = "129KB"
+ops_sec = 3346
+
+[[crates.readme.languages.php.performance.benchmarks]]
+name = "Tables (Countries)"
+size = "360KB"
+ops_sec = 973
+
+[[crates.readme.languages.php.performance.benchmarks]]
+name = "Medium (Python)"
+size = "657KB"
+ops_sec = 485
+
+[crates.readme.languages.php.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+metadata_extraction = "metadata/basic_extraction.md"
+visitor_basic = "visitor/basic_visitor.md"
+table_extraction = "table-extraction/basic_extraction.md"
+
+[crates.readme.languages.go]
+name = "Go"
+template = "language_package.md"
+output_path = "packages/go/v3/README.md"
+package_manager = ["go"]
+package_name = "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown"
+install_command = "go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown"
+description = """
+High-performance HTML to Markdown converter with Go bindings to the Rust core library.
+Supports automatic downloading of prebuilt FFI libraries for Linux, macOS, and Windows with customizable caching.
+"""
+migration_version = ""
+
+[crates.readme.languages.go.features]
+visitor_pattern = true
+metadata_extraction = false
+cli_proxy = false
+
+[crates.readme.languages.go.performance]
+platform = "Apple M4"
+function = "Convert()"
+note = "Real Wikipedia documents"
+
+[[crates.readme.languages.go.performance.benchmarks]]
+name = "Lists (Timeline)"
+size = "129KB"
+latency = "0.46ms"
+throughput = "277.5 MB/s"
+
+[[crates.readme.languages.go.performance.benchmarks]]
+name = "Tables (Countries)"
+size = "360KB"
+latency = "1.37ms"
+throughput = "262.1 MB/s"
+
+[[crates.readme.languages.go.performance.benchmarks]]
+name = "Mixed (Python wiki)"
+size = "656KB"
+latency = "2.75ms"
+throughput = "237.9 MB/s"
+
+[crates.readme.languages.go.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+table_extraction = "table-extraction/basic_extraction.md"
+
+[crates.readme.languages.java]
+name = "Java"
+template = "language_package.md"
+output_path = "packages/java/README.md"
+package_manager = ["maven", "gradle"]
+package_name = "dev.kreuzberg:html-to-markdown"
+install_command = """
+<dependency>
+    <groupId>dev.kreuzberg</groupId>
+    <artifactId>html-to-markdown</artifactId>
+    <version>3.1.0</version>
+    <classifier>linux</classifier> <!-- or macos, windows -->
+</dependency>"""
+description = """
+High-performance HTML to Markdown converter with Java Panama FFI bindings to the Rust core.
+Uses Foreign Function & Memory API for zero-dependency, thread-safe conversion with full metadata extraction support.
+"""
+migration_version = "3.1.0"
+
+[crates.readme.languages.java.features]
+visitor_pattern = true
+metadata_extraction = false
+cli_proxy = false
+
+[crates.readme.languages.java.performance]
+platform = "Apple M4"
+function = "convert()"
+note = "Real Wikipedia documents"
+
+[[crates.readme.languages.java.performance.benchmarks]]
+name = "Lists (Timeline)"
+size = "129KB"
+ops_sec = 2308
+throughput = "291.5 MB/s"
+
+[[crates.readme.languages.java.performance.benchmarks]]
+name = "Tables (Countries)"
+size = "360KB"
+ops_sec = 773
+throughput = "272.0 MB/s"
+
+[[crates.readme.languages.java.performance.benchmarks]]
+name = "Mixed (Python)"
+size = "656KB"
+ops_sec = 403
+throughput = "258.5 MB/s"
+
+[crates.readme.languages.java.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+table_extraction = "table-extraction/basic_extraction.md"
+
+[crates.readme.languages.csharp]
+name = "C# / .NET"
+template = "language_package.md"
+output_path = "packages/csharp/README.md"
+package_manager = ["nuget"]
+package_name = "KreuzbergDev.HtmlToMarkdown"
+install_command = "dotnet add package KreuzbergDev.HtmlToMarkdown"
+description = """
+High-performance HTML to Markdown converter with C#/.NET bindings using P/Invoke to the Rust core.
+Provides type-safe record-based APIs for metadata extraction, visitor patterns, and thread-safe concurrent conversion.
+"""
+migration_version = "3.1.0"
+
+[crates.readme.languages.csharp.features]
+visitor_pattern = true
+metadata_extraction = false
+cli_proxy = false
+
+[crates.readme.languages.csharp.performance]
+platform = "Apple M4"
+function = "Convert()"
+note = "Real Wikipedia documents"
+
+[[crates.readme.languages.csharp.performance.benchmarks]]
+name = "Lists (Timeline)"
+size = "129KB"
+ops_sec = 3111
+throughput = "392.9 MB/s"
+
+[[crates.readme.languages.csharp.performance.benchmarks]]
+name = "Tables (Countries)"
+size = "360KB"
+ops_sec = 853
+throughput = "300.1 MB/s"
+
+[[crates.readme.languages.csharp.performance.benchmarks]]
+name = "Mixed (Python)"
+size = "656KB"
+ops_sec = 456
+throughput = "292.3 MB/s"
+
+[crates.readme.languages.csharp.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+table_extraction = "table-extraction/basic_extraction.md"
+
+[crates.readme.languages.elixir]
+name = "Elixir"
+template = "language_package.md"
+output_path = "packages/elixir/README.md"
+package_manager = ["mix"]
+package_name = "html_to_markdown"
+install_command = 'Add {:html_to_markdown, "~> 3.0"} to mix.exs deps'
+description = """
+Elixir bindings for the Rust html-to-markdown engine. The package exposes a fast HTML to Markdown converter implemented with Rustler.
+Ship identical Markdown across every runtime while enjoying native performance with Rustler NIF bindings.
+"""
+migration_version = ""
+
+[crates.readme.languages.elixir.features]
+visitor_pattern = true
+metadata_extraction = true
+cli_proxy = false
+
+[crates.readme.languages.elixir.performance]
+platform = "Apple M4"
+function = "convert()"
+note = "Real Wikipedia documents"
+
+[[crates.readme.languages.elixir.performance.benchmarks]]
+name = "Lists (Timeline)"
+size = "129KB"
+ops_sec = 2547
+throughput = "321.7 MB/s"
+
+[[crates.readme.languages.elixir.performance.benchmarks]]
+name = "Tables (Countries)"
+size = "360KB"
+ops_sec = 835
+throughput = "293.8 MB/s"
+
+[[crates.readme.languages.elixir.performance.benchmarks]]
+name = "Medium (Python)"
+size = "656KB"
+ops_sec = 439
+throughput = "281.5 MB/s"
+
+[[crates.readme.languages.elixir.performance.benchmarks]]
+name = "Large (Rust)"
+size = "567KB"
+ops_sec = 485
+throughput = "268.7 MB/s"
+
+[[crates.readme.languages.elixir.performance.benchmarks]]
+name = "Small (Intro)"
+size = "463KB"
+ops_sec = 581
+throughput = "262.9 MB/s"
+
+[crates.readme.languages.elixir.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+metadata_extraction = "metadata/basic_extraction.md"
+visitor_basic = "visitor/basic_visitor.md"
+table_extraction = "table-extraction/basic_extraction.md"
+
+[crates.readme.languages.r]
+name = "R"
+template = "language_package.md"
+output_path = "packages/r/README.md"
+package_manager = ["install.packages"]
+package_name = "htmltomarkdown"
+install_command = 'install.packages("htmltomarkdown")'
+description = """
+High-performance HTML to Markdown converter with R bindings powered by a Rust core via extendr.
+Ship identical Markdown across every runtime while enjoying native performance with extendr bindings.
+"""
+migration_version = ""
+
+[crates.readme.languages.r.features]
+visitor_pattern = true
+metadata_extraction = true
+cli_proxy = false
+
+[crates.readme.languages.r.performance]
+platform = "Apple M4"
+function = "convert()"
+note = "Real Wikipedia documents"
+
+[[crates.readme.languages.r.performance.benchmarks]]
+name = "Lists (Timeline)"
+size = "129KB"
+latency = "0.68ms"
+throughput = "190 MB/s"
+
+[[crates.readme.languages.r.performance.benchmarks]]
+name = "Tables (Countries)"
+size = "360KB"
+latency = "2.10ms"
+throughput = "171 MB/s"
+
+[[crates.readme.languages.r.performance.benchmarks]]
+name = "Mixed (Python wiki)"
+size = "656KB"
+latency = "4.75ms"
+throughput = "138 MB/s"
+
+[crates.readme.languages.r.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+metadata_extraction = "metadata/basic_extraction.md"
+visitor_basic = "visitor/basic_visitor.md"
+table_extraction = "table-extraction/basic_extraction.md"
+
+[crates.custom_modules]
+node = ["helpers"]
+
+[[crates.trait_bridges]]
+trait_name = "HtmlVisitor"
+type_alias = "VisitorHandle"
+param_name = "visitor"
+bind_via = "options_field"
+options_type = "ConversionOptions"
