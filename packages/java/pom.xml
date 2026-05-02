@@ -67,6 +67,11 @@
             <version>2.21.3</version>
         </dependency>
         <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>26.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>
@@ -164,6 +169,7 @@
                 <version>${maven-javadoc-plugin.version}</version>
                 <configuration>
                     <doclint>none</doclint>
+                    <failOnWarning>true</failOnWarning>
                     <show>protected</show>
                     <additionalOptions>--enable-preview</additionalOptions>
                     <sourcepath>${project.basedir}/src/main/java</sourcepath>
