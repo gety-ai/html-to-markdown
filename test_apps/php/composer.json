@@ -11,7 +11,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Html\\To\\Markdown\\E2e\\": "tests/"
+      "HtmlToMarkdown\\E2e\\": "tests/"
     }
   }
 }
