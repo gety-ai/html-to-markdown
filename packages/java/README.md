@@ -184,15 +184,15 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Syntax Differences
 
-| Element        | Markdown   | Djot       |
-| -------------- | ---------- | ---------- |
-| Strong         | `**text**` | `*text*`   |
-| Emphasis       | `*text*`   | `_text_`   |
-| Strikethrough  | `~~text~~` | `{-text-}` |
-| Inserted/Added | N/A        | `{+text+}` |
-| Highlighted    | N/A        | `{=text=}` |
-| Subscript      | N/A        | `~text~`   |
-| Superscript    | N/A        | `^text^`   |
+| Element | Markdown | Djot |
+|---------|----------|------|
+| Strong | `**text**` | `*text*` |
+| Emphasis | `*text*` | `_text_` |
+| Strikethrough | `~~text~~` | `{-text-}` |
+| Inserted/Added | N/A | `{+text+}` |
+| Highlighted | N/A | `{=text=}` |
+| Subscript | N/A | `~text~` |
+| Superscript | N/A | `^text^` |
 
 ### Example Usage
 
@@ -256,6 +256,7 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 
 
 ## Examples
+
 
 ## Links
 

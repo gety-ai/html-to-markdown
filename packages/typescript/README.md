@@ -116,9 +116,9 @@ npm install @kreuzberg/html-to-markdown-wasm
 Basic conversion:
 
 ```typescript
-import { convert } from "@kreuzberg/html-to-markdown";
+import { convert } from '@kreuzberg/html-to-markdown';
 
-const result = convert("<h1>Hello World</h1>");
+const result = convert('<h1>Hello World</h1>');
 const markdown: string = result.content;
 console.log(markdown); // # Hello World
 ```
@@ -127,15 +127,15 @@ console.log(markdown); // # Hello World
 With conversion options:
 
 ```typescript
-import { convert, ConversionOptions } from "@kreuzberg/html-to-markdown";
+import { convert, ConversionOptions } from '@kreuzberg/html-to-markdown';
 
 const options: ConversionOptions = {
-  headingStyle: "atx",
+  headingStyle: 'atx',
   listIndentWidth: 2,
   wrap: true,
 };
 
-const result = convert("<h1>Title</h1><p>Content</p>", options);
+const result = convert('<h1>Title</h1><p>Content</p>', options);
 const markdown = result.content;
 ```
 
@@ -150,15 +150,15 @@ const markdown = result.content;
 Converts HTML to Markdown. Returns a `ConversionResult` object with all results in a single call.
 
 ```typescript
-import { convert, ConversionOptions } from "@kreuzberg/html-to-markdown";
+import { convert, ConversionOptions } from '@kreuzberg/html-to-markdown';
 
 const result = convert(html);
-const markdown = result.content; // Converted Markdown string
-const metadata = result.metadata; // Metadata (when extractMetadata: true)
-const tables = result.tables; // Structured table data (when extractTables: true)
-const document = result.document; // Document-level info
-const images = result.images; // Extracted images
-const warnings = result.warnings; // Any conversion warnings
+const markdown  = result.content;    // Converted Markdown string
+const metadata  = result.metadata;   // Metadata (when extractMetadata: true)
+const tables    = result.tables;     // Structured table data (when extractTables: true)
+const document  = result.document;   // Document-level info
+const images    = result.images;     // Extracted images
+const warnings  = result.warnings;   // Any conversion warnings
 ```
 
 
@@ -182,21 +182,21 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Syntax Differences
 
-| Element        | Markdown   | Djot       |
-| -------------- | ---------- | ---------- |
-| Strong         | `**text**` | `*text*`   |
-| Emphasis       | `*text*`   | `_text_`   |
-| Strikethrough  | `~~text~~` | `{-text-}` |
-| Inserted/Added | N/A        | `{+text+}` |
-| Highlighted    | N/A        | `{=text=}` |
-| Subscript      | N/A        | `~text~`   |
-| Superscript    | N/A        | `^text^`   |
+| Element | Markdown | Djot |
+|---------|----------|------|
+| Strong | `**text**` | `*text*` |
+| Emphasis | `*text*` | `_text_` |
+| Strikethrough | `~~text~~` | `{-text-}` |
+| Inserted/Added | N/A | `{+text+}` |
+| Highlighted | N/A | `{=text=}` |
+| Subscript | N/A | `~text~` |
+| Superscript | N/A | `^text^` |
 
 ### Example Usage
 
 
 ```typescript
-import { convert, ConversionOptions } from "@kreuzberg/html-to-markdown";
+import { convert, ConversionOptions } from '@kreuzberg/html-to-markdown';
 
 const html = "<p>This is <strong>bold</strong> and <em>italic</em> text.</p>";
 
@@ -205,7 +205,7 @@ const markdown = convert(html);
 // Result: "This is **bold** and *italic* text."
 
 // Djot output
-const djot = convert(html, { outputFormat: "djot" });
+const djot = convert(html, { outputFormat: 'djot' });
 // Result: "This is *bold* and _italic_ text."
 ```
 
@@ -218,11 +218,11 @@ Set `output_format` to `"plain"` to strip all markup and return only visible tex
 
 
 ```typescript
-import { convert } from "@kreuzberg/html-to-markdown";
+import { convert } from '@kreuzberg/html-to-markdown';
 
 const html = "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.</p>";
 
-const plain = convert(html, { outputFormat: "plain" });
+const plain = convert(html, { outputFormat: 'plain' });
 // Result: "Title\n\nThis is bold and italic text."
 ```
 
@@ -248,17 +248,17 @@ The metadata extraction feature enables comprehensive document analysis during c
 
 
 ```typescript
-import { convert } from "@kreuzberg/html-to-markdown";
+import { convert } from '@kreuzberg/html-to-markdown';
 
 const html = '<h1>Article</h1><img src="test.jpg" alt="test">';
 const result = convert(html, { extractMetadata: true });
 
-console.log(result.content); // Converted Markdown
-console.log(result.metadata?.document?.title); // Document title
-console.log(result.metadata?.headers); // All h1-h6 elements
-console.log(result.metadata?.links); // All hyperlinks
-console.log(result.metadata?.images); // All images with alt text
-console.log(result.metadata?.structuredData); // JSON-LD, Microdata, RDFa
+console.log(result.content);                      // Converted Markdown
+console.log(result.metadata?.document?.title);    // Document title
+console.log(result.metadata?.headers);            // All h1-h6 elements
+console.log(result.metadata?.links);              // All hyperlinks
+console.log(result.metadata?.images);             // All images with alt text
+console.log(result.metadata?.structuredData);     // JSON-LD, Microdata, RDFa
 ```
 
 
@@ -280,28 +280,23 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 
 
 ```typescript
-import {
-  convert,
-  type Visitor,
-  type NodeContext,
-  type VisitResult,
-} from "@kreuzberg/html-to-markdown";
+import { convert, type Visitor, type NodeContext, type VisitResult } from '@kreuzberg/html-to-markdown';
 
 const visitor: Visitor = {
   visitLink(ctx: NodeContext, href: string, text: string, title?: string): VisitResult {
     // Rewrite CDN URLs
-    if (href.startsWith("https://old-cdn.com")) {
-      href = href.replace("https://old-cdn.com", "https://new-cdn.com");
+    if (href.startsWith('https://old-cdn.com')) {
+      href = href.replace('https://old-cdn.com', 'https://new-cdn.com');
     }
-    return { type: "custom", output: `[${text}](${href})` };
+    return { type: 'custom', output: `[${text}](${href})` };
   },
 
   visitImage(ctx: NodeContext, src: string, alt?: string, title?: string): VisitResult {
     // Skip tracking pixels
-    if (src.includes("tracking")) {
-      return { type: "skip" };
+    if (src.includes('tracking')) {
+      return { type: 'skip' };
     }
-    return { type: "continue" };
+    return { type: 'continue' };
   },
 };
 
@@ -312,6 +307,7 @@ const markdown = result.content;
 
 
 ## Examples
+
 
 ## Links
 
