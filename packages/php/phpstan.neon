@@ -9,7 +9,7 @@ parameters:
         - src
         - tests
     excludePaths:
-        - stubs/html_to_markdown_rs_extension.php
+        - stubs/html_to_markdown_extension.php
     tmpDir: var/cache/phpstan
     scanFiles:
-        - stubs/html_to_markdown_rs_extension.php
+        - stubs/html_to_markdown_extension.php

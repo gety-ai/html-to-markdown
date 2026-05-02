@@ -2530,6 +2530,21 @@ int32_t htm_visit_result_from_i32(int32_t value);
 int32_t htm_visit_result_from_str(const char *name);
 
 /**
+ * Free a heap-allocated `LinkType` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_link_type_free(HTMLinkType *ptr);
+
+/**
+ * Serialize a heap-allocated `LinkType` to a JSON string.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_link_type_to_json(const HTMLinkType *ptr);
+
+/**
  * Convert HTML to Markdown.
  *
  * Returns a heap-allocated [`ConversionResult`] on success, or null on failure.
