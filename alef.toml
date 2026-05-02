@@ -804,6 +804,8 @@ module = "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
 function = "Convert"
 alias = "htmd"
 options_type = "ConversionOptions"
+returns_result = true
+options_ptr = true
 
 [e2e.call.overrides.java]
 class = "dev.kreuzberg.htmltomarkdown.HtmlToMarkdown"
@@ -843,6 +845,7 @@ linkStyle = "LinkStyle"
 outputFormat = "OutputFormat"
 
 [e2e.call.overrides.ruby]
+module = "html_to_markdown"
 options_type = "Kreuzberg::ConversionOptions"
 result_is_simple = true
 
@@ -887,6 +890,7 @@ outputFormat = "JsOutputFormat"
 header = "html_to_markdown.h"
 function = "htm_convert"
 prefix = "htm"
+result_type = "ConversionResult"
 
 [e2e.registry]
 output = "test_apps"
