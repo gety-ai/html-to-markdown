@@ -13,8 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Allocates Panama FFM upcall stubs for an IHtmlVisitor implementation, assembles the C vtable in native memory, and
- * provides static registerHtmlVisitor/unregisterHtmlVisitor helpers.
+ * Allocates Panama FFM upcall stubs for an IHtmlVisitor implementation,
+ * assembles the C vtable in native memory, and provides static
+ * registerHtmlVisitor/unregisterHtmlVisitor helpers.
  */
 public final class HtmlVisitorBridge implements AutoCloseable {
 
@@ -40,400 +41,283 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         try {
             long offset = 0L;
 
-            var stubVisitElementStart = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitElementStart",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitElementStart = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitElementStart",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitElementStart);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitElementEnd = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitElementEnd",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitElementEnd = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitElementEnd",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitElementEnd);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitText = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitText",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitText = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitText",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitText);
             offset += ValueLayout.ADDRESS.byteSize();
 
             var stubVisitLink = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitLink",
-                    MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class,
-                            MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS),
-                    arena);
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitLink);
             offset += ValueLayout.ADDRESS.byteSize();
 
             var stubVisitImage = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitImage",
-                    MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class,
-                            MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS),
-                    arena);
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitImage);
             offset += ValueLayout.ADDRESS.byteSize();
 
             var stubVisitHeading = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitHeading",
-                    MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, int.class,
-                            MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS),
-                    arena);
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitHeading);
             offset += ValueLayout.ADDRESS.byteSize();
 
             var stubVisitCodeBlock = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitCodeBlock",
-                    MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class,
-                            MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitCodeBlock);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitCodeInline = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitCodeInline",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitCodeInline = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitCodeInline",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitCodeInline);
             offset += ValueLayout.ADDRESS.byteSize();
 
             var stubVisitListItem = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitListItem",
-                    MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, boolean.class,
-                            MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.JAVA_BOOLEAN, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS),
-                    arena);
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, boolean.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_BOOLEAN, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitListItem);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitListStart = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitListStart",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, boolean.class,
-                                    MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.JAVA_BOOLEAN, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitListStart = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitListStart",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, boolean.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_BOOLEAN, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitListStart);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitListEnd = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitListEnd",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, boolean.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.JAVA_BOOLEAN, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitListEnd = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitListEnd",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, boolean.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_BOOLEAN, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitListEnd);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitTableStart = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitTableStart",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitTableStart = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitTableStart",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitTableStart);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitTableRow = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitTableRow",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, boolean.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.JAVA_BOOLEAN, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitTableRow = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitTableRow",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, boolean.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_BOOLEAN, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitTableRow);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitTableEnd = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitTableEnd",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitTableEnd = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitTableEnd",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitTableEnd);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitBlockquote = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitBlockquote",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, long.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitBlockquote = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitBlockquote",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, long.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitBlockquote);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitStrong = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitStrong",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitStrong = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitStrong",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitStrong);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitEmphasis = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitEmphasis",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitEmphasis = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitEmphasis",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitEmphasis);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitStrikethrough = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitStrikethrough",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitStrikethrough = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitStrikethrough",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitStrikethrough);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitUnderline = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitUnderline",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitUnderline = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitUnderline",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitUnderline);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitSubscript = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitSubscript",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitSubscript = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitSubscript",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitSubscript);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitSuperscript = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitSuperscript",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitSuperscript = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitSuperscript",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitSuperscript);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitMark = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitMark",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitMark = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitMark",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitMark);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitLineBreak = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitLineBreak",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitLineBreak = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitLineBreak",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitLineBreak);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitHorizontalRule = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitHorizontalRule",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitHorizontalRule = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitHorizontalRule",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitHorizontalRule);
             offset += ValueLayout.ADDRESS.byteSize();
 
             var stubVisitCustomElement = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitCustomElement",
-                    MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class,
-                            MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitCustomElement);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitDefinitionListStart = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitDefinitionListStart",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitDefinitionListStart = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitDefinitionListStart",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitDefinitionListStart);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitDefinitionTerm = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitDefinitionTerm",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitDefinitionTerm = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitDefinitionTerm",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitDefinitionTerm);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitDefinitionDescription = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitDefinitionDescription",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitDefinitionDescription = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitDefinitionDescription",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitDefinitionDescription);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitDefinitionListEnd = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitDefinitionListEnd",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitDefinitionListEnd = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitDefinitionListEnd",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitDefinitionListEnd);
             offset += ValueLayout.ADDRESS.byteSize();
 
             var stubVisitForm = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitForm",
-                    MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class,
-                            MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitForm);
             offset += ValueLayout.ADDRESS.byteSize();
 
             var stubVisitInput = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitInput",
-                    MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class,
-                            MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS),
-                    arena);
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitInput);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitButton = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitButton",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitButton = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitButton",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitButton);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitAudio = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitAudio",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitAudio = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitAudio",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitAudio);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitVideo = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitVideo",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitVideo = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitVideo",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitVideo);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitIframe = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitIframe",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitIframe = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitIframe",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitIframe);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitDetails = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitDetails",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, boolean.class,
-                                    MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.JAVA_BOOLEAN, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitDetails = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitDetails",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, boolean.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_BOOLEAN, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitDetails);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitSummary = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitSummary",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitSummary = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitSummary",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitSummary);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitFigureStart = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitFigureStart",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitFigureStart = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitFigureStart",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitFigureStart);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitFigcaption = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitFigcaption",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitFigcaption = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitFigcaption",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitFigcaption);
             offset += ValueLayout.ADDRESS.byteSize();
 
-            var stubVisitFigureEnd = LINKER.upcallStub(
-                    LOOKUP.bind(this, "handleVisitFigureEnd",
-                            MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class,
-                                    MemorySegment.class, MemorySegment.class, MemorySegment.class)),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
-                    arena);
+            var stubVisitFigureEnd = LINKER.upcallStub(LOOKUP.bind(this, "handleVisitFigureEnd",
+                MethodType.methodType(int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class)),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+                arena);
             vtable.set(ValueLayout.ADDRESS, offset, stubVisitFigureEnd);
             offset += ValueLayout.ADDRESS.byteSize();
 
@@ -445,12 +329,9 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    MemorySegment vtableSegment() {
-        return vtable;
-    }
+    MemorySegment vtableSegment() { return vtable; }
 
-    private int handleVisitElementStart(MemorySegment userData, MemorySegment _ctx_in, MemorySegment outResult,
-            MemorySegment outError) {
+    private int handleVisitElementStart(MemorySegment userData, MemorySegment _ctx_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -465,8 +346,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitElementEnd(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _output_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitElementEnd(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _output_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -482,8 +362,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitText(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitText(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -499,8 +378,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitLink(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _href_in,
-            MemorySegment _text_in, MemorySegment _title_in, MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitLink(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _href_in, MemorySegment _text_in, MemorySegment _title_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -518,8 +396,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitImage(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _src_in,
-            MemorySegment _alt_in, MemorySegment _title_in, MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitImage(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _src_in, MemorySegment _alt_in, MemorySegment _title_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -537,8 +414,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitHeading(MemorySegment userData, MemorySegment _ctx_in, int _level, MemorySegment _text_in,
-            MemorySegment _id_in, MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitHeading(MemorySegment userData, MemorySegment _ctx_in, int _level, MemorySegment _text_in, MemorySegment _id_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -555,8 +431,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitCodeBlock(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _lang_in,
-            MemorySegment _code_in, MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitCodeBlock(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _lang_in, MemorySegment _code_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -573,8 +448,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitCodeInline(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _code_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitCodeInline(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _code_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -590,8 +464,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitListItem(MemorySegment userData, MemorySegment _ctx_in, boolean _ordered,
-            MemorySegment _marker_in, MemorySegment _text_in, MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitListItem(MemorySegment userData, MemorySegment _ctx_in, boolean _ordered, MemorySegment _marker_in, MemorySegment _text_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -608,8 +481,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitListStart(MemorySegment userData, MemorySegment _ctx_in, boolean _ordered,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitListStart(MemorySegment userData, MemorySegment _ctx_in, boolean _ordered, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -624,8 +496,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitListEnd(MemorySegment userData, MemorySegment _ctx_in, boolean _ordered,
-            MemorySegment _output_in, MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitListEnd(MemorySegment userData, MemorySegment _ctx_in, boolean _ordered, MemorySegment _output_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -641,8 +512,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitTableStart(MemorySegment userData, MemorySegment _ctx_in, MemorySegment outResult,
-            MemorySegment outError) {
+    private int handleVisitTableStart(MemorySegment userData, MemorySegment _ctx_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -657,15 +527,12 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitTableRow(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _cells_in,
-            boolean _is_header, MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitTableRow(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _cells_in, boolean _is_header, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
             String _cells_json = _cells_in.reinterpret(Long.MAX_VALUE).getString(0);
-            List<String> _cells = JSON.readValue(_cells_json,
-                    new com.fasterxml.jackson.core.type.TypeReference<List<String>>() {
-                    });
+            List<String> _cells = JSON.readValue(_cells_json, new com.fasterxml.jackson.core.type.TypeReference<List<String>>() { });
             VisitResult result = impl.visit_table_row(_ctx, _cells, _is_header);
             String json = JSON.writeValueAsString(result);
             MemorySegment jsonCs = arena.allocateFrom(json);
@@ -677,8 +544,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitTableEnd(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _output_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitTableEnd(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _output_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -694,8 +560,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitBlockquote(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _content_in,
-            long _depth, MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitBlockquote(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _content_in, long _depth, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -711,8 +576,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitStrong(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitStrong(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -728,8 +592,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitEmphasis(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitEmphasis(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -745,8 +608,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitStrikethrough(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitStrikethrough(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -762,8 +624,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitUnderline(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitUnderline(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -779,8 +640,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitSubscript(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitSubscript(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -796,8 +656,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitSuperscript(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitSuperscript(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -813,8 +672,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitMark(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitMark(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -830,8 +688,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitLineBreak(MemorySegment userData, MemorySegment _ctx_in, MemorySegment outResult,
-            MemorySegment outError) {
+    private int handleVisitLineBreak(MemorySegment userData, MemorySegment _ctx_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -846,8 +703,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitHorizontalRule(MemorySegment userData, MemorySegment _ctx_in, MemorySegment outResult,
-            MemorySegment outError) {
+    private int handleVisitHorizontalRule(MemorySegment userData, MemorySegment _ctx_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -862,8 +718,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitCustomElement(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _tag_name_in,
-            MemorySegment _html_in, MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitCustomElement(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _tag_name_in, MemorySegment _html_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -880,8 +735,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitDefinitionListStart(MemorySegment userData, MemorySegment _ctx_in, MemorySegment outResult,
-            MemorySegment outError) {
+    private int handleVisitDefinitionListStart(MemorySegment userData, MemorySegment _ctx_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -896,8 +750,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitDefinitionTerm(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitDefinitionTerm(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -913,8 +766,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitDefinitionDescription(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitDefinitionDescription(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -930,8 +782,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitDefinitionListEnd(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _output_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitDefinitionListEnd(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _output_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -947,8 +798,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitForm(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _action_in,
-            MemorySegment _method_in, MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitForm(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _action_in, MemorySegment _method_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -965,8 +815,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitInput(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _input_type_in,
-            MemorySegment _name_in, MemorySegment _value_in, MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitInput(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _input_type_in, MemorySegment _name_in, MemorySegment _value_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -984,8 +833,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitButton(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitButton(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -1001,8 +849,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitAudio(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _src_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitAudio(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _src_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -1018,8 +865,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitVideo(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _src_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitVideo(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _src_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -1035,8 +881,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitIframe(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _src_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitIframe(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _src_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -1052,8 +897,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitDetails(MemorySegment userData, MemorySegment _ctx_in, boolean _open,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitDetails(MemorySegment userData, MemorySegment _ctx_in, boolean _open, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -1068,8 +912,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitSummary(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitSummary(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -1085,8 +928,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitFigureStart(MemorySegment userData, MemorySegment _ctx_in, MemorySegment outResult,
-            MemorySegment outError) {
+    private int handleVisitFigureStart(MemorySegment userData, MemorySegment _ctx_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -1101,8 +943,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitFigcaption(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitFigcaption(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _text_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -1118,8 +959,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
         }
     }
 
-    private int handleVisitFigureEnd(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _output_in,
-            MemorySegment outResult, MemorySegment outError) {
+    private int handleVisitFigureEnd(MemorySegment userData, MemorySegment _ctx_in, MemorySegment _output_in, MemorySegment outResult, MemorySegment outError) {
         try {
             String _ctx_json = _ctx_in.reinterpret(Long.MAX_VALUE).getString(0);
             NodeContext _ctx = JSON.readValue(_ctx_json, NodeContext.class);
@@ -1136,17 +976,12 @@ public final class HtmlVisitorBridge implements AutoCloseable {
     }
 
     private void writeError(MemorySegment outError, Throwable e) {
-        try {
-            outError.set(ValueLayout.ADDRESS, 0,
-                    arena.allocateFrom(e.getClass().getSimpleName() + ": " + e.getMessage()));
-        } catch (Throwable ignored) {
-            /* swallow */ }
+        try { outError.set(ValueLayout.ADDRESS, 0, arena.allocateFrom(e.getClass().getSimpleName() + ": " + e.getMessage())); }
+        catch (Throwable ignored) { /* swallow */ }
     }
 
     @Override
-    public void close() {
-        arena.close();
-    }
+    public void close() { arena.close(); }
 
     /** Register a HtmlVisitor implementation via Panama FFM upcall stubs. */
     public static void registerHtmlVisitor(final IHtmlVisitor impl, String name) throws Exception {
@@ -1155,13 +990,10 @@ public final class HtmlVisitorBridge implements AutoCloseable {
             try (var nameArena = Arena.ofConfined()) {
                 var nameCs = nameArena.allocateFrom(name);
                 MemorySegment outErr = nameArena.allocate(ValueLayout.ADDRESS);
-                int rc = (int) NativeLib.HTM_REGISTER_HTML_VISITOR.invoke(nameCs, bridge.vtableSegment(),
-                        MemorySegment.NULL, outErr);
+                int rc = (int) NativeLib.HTM_REGISTER_HTML_VISITOR.invoke(nameCs, bridge.vtableSegment(), MemorySegment.NULL, outErr);
                 if (rc != 0) {
                     MemorySegment errPtr = outErr.get(ValueLayout.ADDRESS, 0);
-                    String msg = errPtr.equals(MemorySegment.NULL)
-                            ? "registration failed (rc=" + rc + ")"
-                            : errPtr.reinterpret(Long.MAX_VALUE).getString(0);
+                    String msg = errPtr.equals(MemorySegment.NULL) ? "registration failed (rc=" + rc + ")" : errPtr.reinterpret(Long.MAX_VALUE).getString(0);
                     throw new RuntimeException("registerHtmlVisitor: " + msg);
                 }
             }
@@ -1185,9 +1017,7 @@ public final class HtmlVisitorBridge implements AutoCloseable {
                 int rc = (int) NativeLib.HTM_UNREGISTER_HTML_VISITOR.invoke(nameCs, outErr);
                 if (rc != 0) {
                     MemorySegment errPtr = outErr.get(ValueLayout.ADDRESS, 0);
-                    String msg = errPtr.equals(MemorySegment.NULL)
-                            ? "unregistration failed (rc=" + rc + ")"
-                            : errPtr.reinterpret(Long.MAX_VALUE).getString(0);
+                    String msg = errPtr.equals(MemorySegment.NULL) ? "unregistration failed (rc=" + rc + ")" : errPtr.reinterpret(Long.MAX_VALUE).getString(0);
                     throw new RuntimeException("unregisterHtmlVisitor: " + msg);
                 }
             }
@@ -1199,8 +1029,6 @@ public final class HtmlVisitorBridge implements AutoCloseable {
             }
         }
         HtmlVisitorBridge old = HTML_VISITOR_BRIDGES.remove(name);
-        if (old != null) {
-            old.close();
-        }
+        if (old != null) { old.close(); }
     }
 }
