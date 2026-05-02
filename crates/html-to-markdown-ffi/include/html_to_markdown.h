@@ -622,7 +622,6 @@ uintptr_t htm_header_metadata_html_offset(const HTMHeaderMetadata *ptr);
  * # Examples
  *
  * ```
- * # use html_to_markdown_rs::metadata::HeaderMetadata;
  * let valid = HeaderMetadata {
  *     level: 3,
  *     text: "Title".to_string(),
@@ -726,7 +725,6 @@ char *htm_link_metadata_attributes(const HTMLinkMetadata *ptr);
  * # Examples
  *
  * ```
- * # use html_to_markdown_rs::metadata::{LinkMetadata, LinkType};
  * assert_eq!(LinkMetadata::classify_link("#section"), LinkType::Anchor);
  * assert_eq!(LinkMetadata::classify_link("mailto:test@example.com"), LinkType::Email);
  * assert_eq!(LinkMetadata::classify_link("tel:+1234567890"), LinkType::Phone);
