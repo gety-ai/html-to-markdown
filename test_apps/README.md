@@ -298,7 +298,7 @@ jobs:
         run: task e2e:smoke:${{ matrix.language }}
 
   publish:
-    needs: [prepare, smoke-tests]  # Blocks on smoke tests
+    needs: [prepare, smoke-tests] # Blocks on smoke tests
     if: success()
     # ... publish steps
 ```
@@ -390,7 +390,7 @@ gem 'html-to-markdown', '>= 2.18.0'
 
 **File**: `fixtures/basic-html.json`
 
-```json
+````json
 [
   {
     "name": "Code block",
@@ -401,7 +401,7 @@ gem 'html-to-markdown', '>= 2.18.0'
     }
   }
 ]
-```
+````
 
 ### Step 2: Verify in Comprehensive Tests
 
@@ -547,13 +547,13 @@ tasks:
     cmds:
       - task: e2e:smoke:python
       # ... existing languages
-      - task: e2e:smoke:kotlin  # ADD THIS
+      - task: e2e:smoke:kotlin # ADD THIS
 
   e2e:test:all:
     cmds:
       - task: e2e:test:python
       # ... existing languages
-      - task: e2e:test:kotlin  # ADD THIS
+      - task: e2e:test:kotlin # ADD THIS
 ```
 
 ### Step 6: Extend Version Sync
@@ -708,7 +708,7 @@ fixture_path = Path("../fixtures/basic-html.json")  # Depends on cwd
 ```yaml
 # .github/workflows/post-release-validation.yaml
 - run: task e2e:test:all
-  timeout-minutes: 30  # Increase from default 10
+  timeout-minutes: 30 # Increase from default 10
 ```
 
 ## Best Practices

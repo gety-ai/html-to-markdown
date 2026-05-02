@@ -6,8 +6,7 @@ import java.util.Map;
 /**
  * Bridge interface for the HtmlVisitor plugin system.
  *
- * Implementations are wrapped by HtmlVisitorBridge and exposed to the native
- * runtime through Panama FFM upcall stubs.
+ * Implementations are wrapped by HtmlVisitorBridge and exposed to the native runtime through Panama FFM upcall stubs.
  */
 public interface IHtmlVisitor {
 

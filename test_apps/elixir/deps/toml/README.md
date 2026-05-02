@@ -69,24 +69,24 @@ following table provides the conversions.
 hex/octal/binary integers, quoted/literal strings, etc., are considered to be
 the same base type (e.g. integer and string respectively in the examples given).
 
-| TOML | Elixir |
-|-------|-------|
-| String | String.t (binary) |
-| Integer | integer |
-| inf | :infinity |
-| +inf | :infinity |
-| -inf | :negative_infinity |
-| nan | :nan |
-| +nan | :nan |
-| -nan | :negative_nan |
-| Boolean | boolean |
-| Offset Date-Time | DateTime.t |
-| Local Date-Time | NaiveDateTime.t |
-| Local Date | Date.t |
-| Local Time | Time.t |
-| Array | list |
-| Table | map |
-| Table Array | list(map) |
+| TOML             | Elixir             |
+| ---------------- | ------------------ |
+| String           | String.t (binary)  |
+| Integer          | integer            |
+| inf              | :infinity          |
+| +inf             | :infinity          |
+| -inf             | :negative_infinity |
+| nan              | :nan               |
+| +nan             | :nan               |
+| -nan             | :negative_nan      |
+| Boolean          | boolean            |
+| Offset Date-Time | DateTime.t         |
+| Local Date-Time  | NaiveDateTime.t    |
+| Local Date       | Date.t             |
+| Local Time       | Time.t             |
+| Array            | list               |
+| Table            | map                |
+| Table Array      | list(map)          |
 
 ## Implementation-specific Behaviors
 
@@ -117,7 +117,7 @@ The following is a brief overview of how to use this library. First, let's take
 a look at an example TOML file, as borrowed from the [TOML
 homepage](https://github.com/toml-lang/toml):
 
-``` toml
+```toml
 # This is a TOML document.
 
 title = "TOML Example"
@@ -185,7 +185,7 @@ behavior. An example is shown below:
 
 Given the following TOML document:
 
-``` toml
+```toml
 [servers.alpha]
 ip = "192.168.1.1"
 ports = [8080, 8081]
@@ -197,7 +197,7 @@ ports = [8082, 8083]
 
 And the following modules:
 
-``` elixir
+```elixir
 defmodule Server do
   defstruct [:name, :ip, :ports]
 end
@@ -274,7 +274,7 @@ See the "Using as a Config Provider" section for more info.
 Like the above, use the following example as a guideline for how you use this
 in your own release configuration (i.e. in `rel/config.exs`):
 
-``` elixir
+```elixir
 release :myapp do
   # ...snip...
   set config_providers: [
@@ -300,7 +300,7 @@ The config provider expects a certain format to the TOML file, namely that keys
 at the root of the document correspond to applications which need to be configured.
 If it encounters keys at the root of the document which are not tables, they are ignored.
 
-``` toml
+```toml
 # This is an example of something that would be ignored
 title = "My config file"
 

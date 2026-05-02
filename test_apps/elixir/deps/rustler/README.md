@@ -24,22 +24,22 @@ end
 
 1. Fetch and compile all necessary dependencies:
 
-    ```text
-    $ mix deps.get && mix deps.compile
-    ```
+   ```text
+   $ mix deps.get && mix deps.compile
+   ```
 
 2. Check your installation by showing help from the installed Mix task:
 
-    ```text
-    $ mix help rustler.new
-    ```
+   ```text
+   $ mix help rustler.new
+   ```
 
 3. Generate the boilerplate for a new Rustler project. Follow the instructions
    to configure your project:
 
-    ```text
-    $ mix rustler.new
-    ```
+   ```text
+   $ mix rustler.new
+   ```
 
 4. [Load the NIF in your program.](#loading-the-nif).
 
@@ -47,7 +47,6 @@ end
 
 The Rust crate compilation can be controlled via Mix compile-time configuration in `config/config.exs`.
 See [configuration options](https://hexdocs.pm/rustler/Rustler.html#module-configuration-options) for more details.
-
 
 ## Loading the NIF
 

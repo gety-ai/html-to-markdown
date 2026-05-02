@@ -78,16 +78,16 @@ go test -cover
 
 ## Test Coverage by Feature
 
-| Feature | Tests | Coverage |
-|---------|-------|----------|
-| Basic Conversion | 15 | Basic paragraphs, headings, lists, formatting |
-| Metadata Extraction | 6 | Headers, links, images, document metadata |
-| Error Handling | 4 | Valid/malformed HTML, empty input |
-| Complex HTML | 8 | Nested structures, tables, code blocks |
-| Special Characters | 4 | Entities, Unicode, emoji, symbols |
-| Memory & Performance | 3 | Repeated conversions, large documents, consistency |
-| API Features | 3 | Version, MustConvert, sequential operations |
-| Regression | 4 | Content preservation, mixed formats |
+| Feature              | Tests | Coverage                                           |
+| -------------------- | ----- | -------------------------------------------------- |
+| Basic Conversion     | 15    | Basic paragraphs, headings, lists, formatting      |
+| Metadata Extraction  | 6     | Headers, links, images, document metadata          |
+| Error Handling       | 4     | Valid/malformed HTML, empty input                  |
+| Complex HTML         | 8     | Nested structures, tables, code blocks             |
+| Special Characters   | 4     | Entities, Unicode, emoji, symbols                  |
+| Memory & Performance | 3     | Repeated conversions, large documents, consistency |
+| API Features         | 3     | Version, MustConvert, sequential operations        |
+| Regression           | 4     | Content preservation, mixed formats                |
 
 ## Module Dependencies
 

@@ -101,10 +101,10 @@ $options = [
 
 ## Differences from php/ Test App
 
-| Aspect | `php/` (Composer package) | `php-ext/` (Native extension) |
-|--------|--------------------------|-------------------------------|
-| Dependency | `kreuzberg-dev/html-to-markdown` via Composer | Raw `.so`/`.dylib` extension |
-| Functions | Namespaced: `HtmlToMarkdown\convert()` | Global: `html_to_markdown_convert()` |
-| Test framework | PHPUnit | Self-contained test runner |
-| Types | Typed objects (ConversionOptions, etc.) | Associative arrays |
-| Requires | Composer install | Cargo build only |
+| Aspect         | `php/` (Composer package)                     | `php-ext/` (Native extension)        |
+| -------------- | --------------------------------------------- | ------------------------------------ |
+| Dependency     | `kreuzberg-dev/html-to-markdown` via Composer | Raw `.so`/`.dylib` extension         |
+| Functions      | Namespaced: `HtmlToMarkdown\convert()`        | Global: `html_to_markdown_convert()` |
+| Test framework | PHPUnit                                       | Self-contained test runner           |
+| Types          | Typed objects (ConversionOptions, etc.)       | Associative arrays                   |
+| Requires       | Composer install                              | Cargo build only                     |
