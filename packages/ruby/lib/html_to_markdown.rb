@@ -29,12 +29,13 @@ module HtmlToMarkdown
   #   - :preserve_tags       - Array of tag names to preserve verbatim
   #   (and more, matching ConversionOptions fields)
   # @return [String] The converted Markdown content.
-  def self.convert(html, options = {}, visitor = nil)
+  def self.convert(html, options = {}, _visitor = nil)
     # The Rust FFI expects options as a JSON string; serialise the hash here
     # rather than constructing a ConversionOptions object, which the generated
     # FFI layer cannot coerce back to String (see issue #334).
     opts_json = options.nil? || options.empty? ? nil : options.to_json
-    result = HtmlToMarkdownRs.convert(html, opts_json, visitor)
+    # NOTE: visitor support is not yet fully integrated in the Ruby binding
+    result = HtmlToMarkdownRs.convert(html, opts_json)
     result.content || ''
   end
 end
