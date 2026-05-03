@@ -11,7 +11,7 @@ title: "Java API Reference"
 Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images,
 and warnings.
 
-When the `visitor` feature is enabled, a custom `crate.visitor.HtmlVisitor` can be
+When the `visitor` feature is enabled, a custom `HtmlVisitor` can be
 attached via the `visitor` field on `ConversionOptions`.
 
 **Errors:**
@@ -87,7 +87,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `inferDimensions`          | `boolean`                 | `true`                        | Infer image dimensions from data.                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `maxDepth`                 | `Optional<Long>`          | `null`                        | Maximum DOM traversal depth. `null` means unlimited. When set, subtrees beyond this depth are silently truncated.                                                                                                                                                                                                                                                                                                                                                                   |
 | `excludeSelectors`         | `List<String>`            | `Collections.emptyList()`     | CSS selectors for elements to exclude entirely (element + all content). Unlike `strip_tags` (which removes the tag wrapper but keeps children), excluded elements and all their descendants are dropped from the output. Supports any CSS selector that `tl` supports: tag names, `.class`, `#id`, `[attribute]`, etc. Invalid selectors are silently skipped at conversion time. Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]` |
-| `visitor`                  | `HtmlVisitor (interface)` | `null`                        | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `crate.visitor.HtmlVisitor`.                                                                                                                                                                                                                                                   |
+| `visitor`                  | `Optional<VisitorHandle>` | `null`                        | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`.                                                                                                                                                                                                                                                                 |
 
 ##### Methods
 

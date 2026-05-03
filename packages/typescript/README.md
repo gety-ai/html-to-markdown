@@ -63,7 +63,7 @@ This package wraps native `@kreuzberg/html-to-markdown` bindings and provides a 
 ## Installation
 
 ```bash
-npm install @kreuzberg/html-to-markdown
+pnpm add @kreuzberg/html-to-markdown
 ```
 
 

@@ -67,6 +67,11 @@ packages/r/src/*.dll
 packages/r/src/*.dylib
 packages/r/*.tar.gz
 
+# Elixir debug test files
+e2e/elixir/test_convert_debug.exs
+e2e/elixir/test_convert_with_metadata.exs
+e2e/elixir/test_visitor_debug.exs
+
 # Elixir test/e2e dependencies and builds
 tests/test_apps/elixir/deps/
 tests/test_apps/elixir/_build/
