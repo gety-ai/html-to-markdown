@@ -8,11 +8,11 @@ TARGET_RELEASE="${REPO_ROOT}/target/release"
 
 # macOS produces .dylib, Linux produces .so, Windows produces .dll
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    EXTENSION_PATH="${TARGET_RELEASE}/libhtml_to_markdown_php.dylib"
+  EXTENSION_PATH="${TARGET_RELEASE}/libhtml_to_markdown_php.dylib"
 elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-    EXTENSION_PATH="${TARGET_RELEASE}/libhtml_to_markdown_php.dll"
+  EXTENSION_PATH="${TARGET_RELEASE}/libhtml_to_markdown_php.dll"
 else
-    EXTENSION_PATH="${TARGET_RELEASE}/libhtml_to_markdown_php.so"
+  EXTENSION_PATH="${TARGET_RELEASE}/libhtml_to_markdown_php.so"
 fi
 
 # Run phpunit with the extension loaded

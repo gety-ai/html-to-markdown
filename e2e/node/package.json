@@ -1,5 +1,5 @@
 {
-  "name": "@kreuzberg/html-to-markdown-e2e-typescript",
+  "name": "@kreuzberg/html-to-markdown-e2e",
   "version": "0.1.0",
   "private": true,
   "type": "module",
