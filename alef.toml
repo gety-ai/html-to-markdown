@@ -214,7 +214,7 @@ e2e = "dotnet test e2e/csharp"
 [crates.test.elixir]
 precondition = "command -v mix >/dev/null 2>&1"
 before = "cd packages/elixir && mix deps.get && mix compile"
-e2e = "cd e2e/elixir && mix deps.get && mix compile && mix test"
+e2e = "cd e2e/elixir && mix deps.get && HTML_TO_MARKDOWN_BUILD=1 mix compile && HTML_TO_MARKDOWN_BUILD=1 mix test"
 
 [crates.test.r]
 precondition = "which Rscript 2>/dev/null"
