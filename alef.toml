@@ -75,6 +75,7 @@ package_name = "@kreuzberg/html-to-markdown-node"
 
 [crates.ruby]
 gem_name = "html-to-markdown"
+exclude_types = ["ConversionOptionsBuilder"]
 
 [crates.ruby.stubs]
 output = "packages/ruby/sig/"

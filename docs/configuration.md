@@ -304,6 +304,6 @@ import { convert, ConversionOptions } from '@kreuzberg/html-to-markdown';
 ````
 `````
 
-```
+```text
 
 ```

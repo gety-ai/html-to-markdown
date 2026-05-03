@@ -367,7 +367,11 @@ export function convert(html, options) {
   try {
     return wasmConvert(html, wasmOpts);
   } finally {
-    wasmOpts.free();
+    try {
+      wasmOpts.free();
+    } catch {
+      // Ignore cleanup errors
+    }
   }
 }
 `;

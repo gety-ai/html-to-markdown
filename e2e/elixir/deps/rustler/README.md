@@ -27,6 +27,7 @@ end
     ```
     $ mix deps.get && mix deps.compile
     ```
+
 2.  Check your installation by showing help from the installed Mix task:
 
     ```
@@ -46,7 +47,6 @@ end
 
 The Rust crate compilation can be controlled via Mix compile-time configuration in `config/config.exs`.
 See [configuration options](https://hexdocs.pm/rustler/Rustler.html#module-configuration-options) for more details.
-
 
 ## Loading the NIF
 
