@@ -23,15 +23,15 @@ warnings = result.warnings          # Any conversion warnings
 Converts HTML to Markdown. Returns a `ConversionResult` object with all results in a single call.
 
 ```typescript
-import { convert, ConversionOptions } from '@kreuzberg/html-to-markdown';
+import { convert, ConversionOptions } from "@kreuzberg/html-to-markdown";
 
 const result = convert(html);
-const markdown  = result.content;    // Converted Markdown string
-const metadata  = result.metadata;   // Metadata (when extractMetadata: true)
-const tables    = result.tables;     // Structured table data (when extractTables: true)
-const document  = result.document;   // Document-level info
-const images    = result.images;     // Extracted images
-const warnings  = result.warnings;   // Any conversion warnings
+const markdown = result.content; // Converted Markdown string
+const metadata = result.metadata; // Metadata (when extractMetadata: true)
+const tables = result.tables; // Structured table data (when extractTables: true)
+const document = result.document; // Document-level info
+const images = result.images; // Extracted images
+const warnings = result.warnings; // Any conversion warnings
 ```
 
 {% elif language == 'ruby' %}

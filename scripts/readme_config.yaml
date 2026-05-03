@@ -295,7 +295,7 @@ languages:
     package_manager:
       - mix
     package_name: html_to_markdown
-    install_command: "Add {:html_to_markdown, \"~> 3.0\"} to mix.exs deps"
+    install_command: 'Add {:html_to_markdown, "~> 3.0"} to mix.exs deps'
     description: |
       Elixir bindings for the Rust html-to-markdown engine. The package exposes a fast HTML to Markdown converter implemented with Rustler.
       Ship identical Markdown across every runtime while enjoying native performance with Rustler NIF bindings.

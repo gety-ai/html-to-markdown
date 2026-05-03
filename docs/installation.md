@@ -4,20 +4,20 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 
 ## Requirements
 
-| Language | Min version | Package |
-|----------|-------------|---------|
-| Rust | 1.70 | `html-to-markdown-rs` on crates.io |
-| Python | 3.10 | `html-to-markdown` on PyPI |
-| TypeScript / Node.js | Node.js 18 | `@kreuzberg/html-to-markdown` on npm |
-| Go | 1.26 | `github.com/kreuzberg-dev/html-to-markdown/packages/go/v3` |
-| Ruby | 3.2 | `html-to-markdown` on RubyGems |
-| PHP | 8.2 | `kreuzberg-dev/html-to-markdown` on Packagist |
-| Java | 22 | `dev.kreuzberg:html-to-markdown` on Maven Central |
-| C# | .NET Standard 2.0 | `KreuzbergDev.HtmlToMarkdown` on NuGet |
-| Elixir | 1.19 | `html_to_markdown` on Hex |
-| R | 4.0 | `htmltomarkdown` on CRAN |
-| C | — | `libhtml_to_markdown` (GitHub Releases) |
-| WebAssembly | — | `@kreuzberg/html-to-markdown-wasm` on npm |
+| Language             | Min version       | Package                                                    |
+| -------------------- | ----------------- | ---------------------------------------------------------- |
+| Rust                 | 1.70              | `html-to-markdown-rs` on crates.io                         |
+| Python               | 3.10              | `html-to-markdown` on PyPI                                 |
+| TypeScript / Node.js | Node.js 18        | `@kreuzberg/html-to-markdown` on npm                       |
+| Go                   | 1.26              | `github.com/kreuzberg-dev/html-to-markdown/packages/go/v3` |
+| Ruby                 | 3.2               | `html-to-markdown` on RubyGems                             |
+| PHP                  | 8.2               | `kreuzberg-dev/html-to-markdown` on Packagist              |
+| Java                 | 22                | `dev.kreuzberg:html-to-markdown` on Maven Central          |
+| C#                   | .NET Standard 2.0 | `KreuzbergDev.HtmlToMarkdown` on NuGet                     |
+| Elixir               | 1.19              | `html_to_markdown` on Hex                                  |
+| R                    | 4.0               | `htmltomarkdown` on CRAN                                   |
+| C                    | —                 | `libhtml_to_markdown` (GitHub Releases)                    |
+| WebAssembly          | —                 | `@kreuzberg/html-to-markdown-wasm` on npm                  |
 
 ---
 

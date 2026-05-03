@@ -42,9 +42,9 @@ npm install @kreuzberg/html-to-markdown
 ```
 
 ```typescript
-import { convert } from '@kreuzberg/html-to-markdown';
+import { convert } from "@kreuzberg/html-to-markdown";
 
-const result = convert('<h1>Title</h1>', { headingStyle: 'atx' });
+const result = convert("<h1>Title</h1>", { headingStyle: "atx" });
 console.log(result.content);
 ```
 
@@ -211,10 +211,10 @@ npm install @kreuzberg/html-to-markdown-wasm
 ```
 
 ```javascript
-import init, { convert } from '@kreuzberg/html-to-markdown-wasm';
+import init, { convert } from "@kreuzberg/html-to-markdown-wasm";
 
 await init();
-const result = convert('<h1>Title</h1>', { headingStyle: 'atx' });
+const result = convert("<h1>Title</h1>", { headingStyle: "atx" });
 console.log(result.content);
 ```
 

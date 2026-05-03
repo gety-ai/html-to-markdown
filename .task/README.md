@@ -53,15 +53,15 @@ The `.task/` directory structure reduces the root `Taskfile.yml` from 838 lines 
 **Key Variables**:
 
 ```yaml
-VERSION:           # Extracted from Cargo.toml
-BUILD_PROFILE:     # dev/release/ci (default: release)
-OS:                # darwin/linux/windows
-ARCH:              # x86_64/arm64/armv7
-NUM_CPUS:          # Detected CPU count for parallel builds
-ROOT:              # Project root directory
-CRATES_DIR:        # crates/ directory
-PACKAGES_DIR:      # packages/ directory
-TARGET_DIR:        # target/ directory (Rust build outputs)
+VERSION: # Extracted from Cargo.toml
+BUILD_PROFILE: # dev/release/ci (default: release)
+OS: # darwin/linux/windows
+ARCH: # x86_64/arm64/armv7
+NUM_CPUS: # Detected CPU count for parallel builds
+ROOT: # Project root directory
+CRATES_DIR: # crates/ directory
+PACKAGES_DIR: # packages/ directory
+TARGET_DIR: # target/ directory (Rust build outputs)
 ```
 
 **Example Usage**:
@@ -80,14 +80,14 @@ cmds:
 **Key Variables**:
 
 ```yaml
-EXE_EXT:           # .exe on Windows, empty on Unix
-LIB_EXT:           # dylib/so/dll based on OS
-LIB_PREFIX:        # lib on Unix, empty on Windows
-RUST_TARGET:       # Target triple (x86_64-apple-darwin, etc.)
-RUBY_FULL_PATH:    # Full path to Ruby binary (handles Homebrew ARM64)
-IS_WINDOWS:        # Boolean: true on Windows
-IS_MACOS:          # Boolean: true on macOS
-IS_LINUX:          # Boolean: true on Linux
+EXE_EXT: # .exe on Windows, empty on Unix
+LIB_EXT: # dylib/so/dll based on OS
+LIB_PREFIX: # lib on Unix, empty on Windows
+RUST_TARGET: # Target triple (x86_64-apple-darwin, etc.)
+RUBY_FULL_PATH: # Full path to Ruby binary (handles Homebrew ARM64)
+IS_WINDOWS: # Boolean: true on Windows
+IS_MACOS: # Boolean: true on macOS
+IS_LINUX: # Boolean: true on Linux
 ```
 
 **Example Usage**:
@@ -106,20 +106,20 @@ Each language module follows a **consistent pattern**:
 ### Standard Tasks (All Languages)
 
 ```yaml
-install:           # Install dependencies/toolchain
-build:             # Build with profile support (uses BUILD_PROFILE)
-build:dev:         # Debug build (fast, unoptimized)
-build:release:     # Release build (optimized)
-build:ci:          # CI build (release + debug symbols)
-test:              # Run tests
-test:ci:           # Run tests with coverage (CI mode)
-coverage:          # Generate coverage reports (lcov format)
-lint:              # Lint + auto-fix (format + linters)
-lint:check:        # Check-only (no modifications, for CI)
-format:            # Format code
-format:check:      # Check formatting without changes
-update:            # Update dependencies
-clean:             # Remove build artifacts
+install: # Install dependencies/toolchain
+build: # Build with profile support (uses BUILD_PROFILE)
+build:dev: # Debug build (fast, unoptimized)
+build:release: # Release build (optimized)
+build:ci: # CI build (release + debug symbols)
+test: # Run tests
+test:ci: # Run tests with coverage (CI mode)
+coverage: # Generate coverage reports (lcov format)
+lint: # Lint + auto-fix (format + linters)
+lint:check: # Check-only (no modifications, for CI)
+format: # Format code
+format:check: # Check formatting without changes
+update: # Update dependencies
+clean: # Remove build artifacts
 ```
 
 ### Example: `languages/python.yml`
@@ -132,7 +132,7 @@ includes:
   platforms: ../config/platforms.yml
 
 vars:
-  BUILD_PROFILE: "{{.BUILD_PROFILE | default \"release\"}}"
+  BUILD_PROFILE: '{{.BUILD_PROFILE | default "release"}}'
   PYTHON_WORK_DIR: "{{.PACKAGES_DIR}}/python"
 
 tasks:
@@ -282,7 +282,7 @@ tasks:
 
 **Updates**:
 
-- Cargo workspace members (crates/*/Cargo.toml)
+- Cargo workspace members (crates/\*/Cargo.toml)
 - Python (packages/python/pyproject.toml)
 - Node.js (packages/typescript/package.json)
 - Ruby (packages/ruby/lib/html_to_markdown/version.rb)
@@ -291,7 +291,7 @@ tasks:
 - Java (packages/java/pom.xml)
 - C# (packages/csharp/HtmlToMarkdown.csproj)
 - Elixir (packages/elixir/mix.exs)
-- **test_apps manifests** (tests/test_apps/*/pyproject.toml, package.json, etc.)
+- **test_apps manifests** (tests/test_apps/\*/pyproject.toml, package.json, etc.)
 
 ### `tools/general.yml`
 
@@ -328,7 +328,7 @@ includes:
   platforms: ../config/platforms.yml
 
 vars:
-  BUILD_PROFILE: "{{.BUILD_PROFILE | default \"release\"}}"
+  BUILD_PROFILE: '{{.BUILD_PROFILE | default "release"}}'
   SWIFT_WORK_DIR: "{{.PACKAGES_DIR}}/swift"
 
 tasks:
@@ -429,7 +429,7 @@ tasks:
     cmds:
       - task: rust:build
       # ... existing languages
-      - task: swift:build  # ADD THIS
+      - task: swift:build # ADD THIS
 ```
 
 **File**: `.task/workflows/test.yml`
@@ -440,7 +440,7 @@ tasks:
     cmds:
       - task: rust:test
       # ... existing languages
-      - task: swift:test  # ADD THIS
+      - task: swift:test # ADD THIS
 ```
 
 **File**: `.task/workflows/lint.yml`
@@ -451,7 +451,7 @@ tasks:
     cmds:
       - task: rust:lint
       # ... existing languages
-      - task: swift:lint  # ADD THIS
+      - task: swift:lint # ADD THIS
 ```
 
 ### Step 4: Update Root Taskfile Aggregates
@@ -464,7 +464,7 @@ tasks:
     cmds:
       - task: rust:install
       # ... existing installs
-      - task: swift:install  # ADD THIS
+      - task: swift:install # ADD THIS
 ```
 
 Now users can run:
@@ -483,7 +483,7 @@ Defined with `internal: true` at the file level:
 
 ```yaml
 version: "3"
-internal: true  # This file's tasks are not listed in `task --list`
+internal: true # This file's tasks are not listed in `task --list`
 ```
 
 **Characteristics**:
@@ -616,10 +616,10 @@ install:
 ```yaml
 # ✅ Good: Explicit error handling
 - cmd: pytest -v tests/
-  ignore_error: false  # Fail on errors
+  ignore_error: false # Fail on errors
 
 - cmd: rm -rf .cache/
-  ignore_error: true   # OK to fail (file may not exist)
+  ignore_error: true # OK to fail (file may not exist)
 
 # ❌ Bad: Implicit behavior
 - cmd: pytest -v tests/

@@ -39,19 +39,22 @@ function convert(html: string, options?: JsConversionOptions): string;
 
 ```typescript
 import {
-    convertFile,
-    convertStream,
-    wrapVisitorCallback,
-    wrapVisitorCallbacks,
-    hasMetadataSupport,
-} from '@kreuzberg/html-to-markdown-node';
-import type { Readable } from 'node:stream';
+  convertFile,
+  convertStream,
+  wrapVisitorCallback,
+  wrapVisitorCallbacks,
+  hasMetadataSupport,
+} from "@kreuzberg/html-to-markdown-node";
+import type { Readable } from "node:stream";
 
 // File helpers (async, return JSON string — JSON.parse() the result)
 async function convertFile(filePath: string, options?: JsConversionOptions | null): Promise<string>;
 
 // Stream helpers (async, return JSON string — JSON.parse() the result)
-async function convertStream(stream: Readable | AsyncIterable<string | Buffer>, options?: JsConversionOptions | null): Promise<string>;
+async function convertStream(
+  stream: Readable | AsyncIterable<string | Buffer>,
+  options?: JsConversionOptions | null,
+): Promise<string>;
 ```
 
 ## Interfaces
@@ -62,38 +65,38 @@ All fields are optional. Defaults match Rust defaults. Enum values are PascalCas
 
 ```typescript
 interface JsConversionOptions {
-    headingStyle?: 'Atx' | 'Underlined' | 'AtxClosed';
-    listIndentType?: 'Spaces' | 'Tabs';
-    listIndentWidth?: number;
-    bullets?: string;
-    strongEmSymbol?: string;          // '*' or '_'
-    escapeAsterisks?: boolean;
-    escapeUnderscores?: boolean;
-    escapeMisc?: boolean;
-    escapeAscii?: boolean;
-    codeLanguage?: string;
-    autolinks?: boolean;
-    defaultTitle?: boolean;
-    brInTables?: boolean;
-    highlightStyle?: 'DoubleEqual' | 'Html' | 'Bold' | 'None';
-    extractMetadata?: boolean;
-    whitespaceMode?: 'Normalized' | 'Strict';
-    stripNewlines?: boolean;
-    wrap?: boolean;
-    wrapWidth?: number;
-    convertAsInline?: boolean;
-    subSymbol?: string;
-    supSymbol?: string;
-    newlineStyle?: 'Spaces' | 'Backslash';
-    codeBlockStyle?: 'Indented' | 'Backticks' | 'Tildes';
-    keepInlineImagesIn?: string[];
-    preprocessing?: JsPreprocessingOptions;
-    encoding?: string;
-    debug?: boolean;
-    stripTags?: string[];
-    preserveTags?: string[];
-    skipImages?: boolean;
-    outputFormat?: 'Markdown' | 'Djot' | 'Plain';
+  headingStyle?: "Atx" | "Underlined" | "AtxClosed";
+  listIndentType?: "Spaces" | "Tabs";
+  listIndentWidth?: number;
+  bullets?: string;
+  strongEmSymbol?: string; // '*' or '_'
+  escapeAsterisks?: boolean;
+  escapeUnderscores?: boolean;
+  escapeMisc?: boolean;
+  escapeAscii?: boolean;
+  codeLanguage?: string;
+  autolinks?: boolean;
+  defaultTitle?: boolean;
+  brInTables?: boolean;
+  highlightStyle?: "DoubleEqual" | "Html" | "Bold" | "None";
+  extractMetadata?: boolean;
+  whitespaceMode?: "Normalized" | "Strict";
+  stripNewlines?: boolean;
+  wrap?: boolean;
+  wrapWidth?: number;
+  convertAsInline?: boolean;
+  subSymbol?: string;
+  supSymbol?: string;
+  newlineStyle?: "Spaces" | "Backslash";
+  codeBlockStyle?: "Indented" | "Backticks" | "Tildes";
+  keepInlineImagesIn?: string[];
+  preprocessing?: JsPreprocessingOptions;
+  encoding?: string;
+  debug?: boolean;
+  stripTags?: string[];
+  preserveTags?: string[];
+  skipImages?: boolean;
+  outputFormat?: "Markdown" | "Djot" | "Plain";
 }
 ```
 
@@ -103,10 +106,10 @@ interface JsConversionOptions {
 
 ```typescript
 interface JsPreprocessingOptions {
-    enabled?: boolean;
-    preset?: 'minimal' | 'standard' | 'aggressive';
-    removeNavigation?: boolean;
-    removeForms?: boolean;
+  enabled?: boolean;
+  preset?: "minimal" | "standard" | "aggressive";
+  removeNavigation?: boolean;
+  removeForms?: boolean;
 }
 ```
 
@@ -116,12 +119,12 @@ Fields use camelCase (matching the NAPI-RS binding):
 
 ```typescript
 interface JsMetadataConfig {
-    extractDocument?: boolean;
-    extractHeaders?: boolean;
-    extractLinks?: boolean;
-    extractImages?: boolean;
-    extractStructuredData?: boolean;
-    maxStructuredDataSize?: number;
+  extractDocument?: boolean;
+  extractHeaders?: boolean;
+  extractLinks?: boolean;
+  extractImages?: boolean;
+  extractStructuredData?: boolean;
+  maxStructuredDataSize?: number;
 }
 ```
 
@@ -131,13 +134,13 @@ Inline images are extracted when `extractImages` is enabled in options. The resu
 
 ```typescript
 interface JsInlineImage {
-    data: Buffer;
-    format: string;
-    filename?: string;
-    description?: string;
-    dimensions?: number[];    // [width, height]
-    source: string;           // "img_data_uri" | "svg_element"
-    attributes: Record<string, string>;
+  data: Buffer;
+  format: string;
+  filename?: string;
+  description?: string;
+  dimensions?: number[]; // [width, height]
+  source: string; // "img_data_uri" | "svg_element"
+  attributes: Record<string, string>;
 }
 ```
 
@@ -147,18 +150,18 @@ The result of `JSON.parse(convert(html))`:
 
 ```typescript
 interface ConversionResult {
-    content: string | null;     // Markdown text
-    document: object | null;    // structured document tree (null unless includeDocumentStructure enabled)
-    metadata: object | null;    // HtmlMetadata if metadata feature enabled
-    tables: Array<{
-        cells: Array<Array<string>>;    // rows x columns of cell text
-        markdown: string;               // rendered table in target format
-        isHeaderRow: Array<boolean>;    // per-row flag: true if row was inside <thead>
-    }>;
-    warnings: Array<{
-        message: string;
-        kind: string;
-    }>;
+  content: string | null; // Markdown text
+  document: object | null; // structured document tree (null unless includeDocumentStructure enabled)
+  metadata: object | null; // HtmlMetadata if metadata feature enabled
+  tables: Array<{
+    cells: Array<Array<string>>; // rows x columns of cell text
+    markdown: string; // rendered table in target format
+    isHeaderRow: Array<boolean>; // per-row flag: true if row was inside <thead>
+  }>;
+  warnings: Array<{
+    message: string;
+    kind: string;
+  }>;
 }
 ```
 
@@ -169,17 +172,17 @@ interface ConversionResult {
 The visitor is passed as a third argument to `convert()`:
 
 ```typescript
-import { convert } from '@kreuzberg/html-to-markdown-node';
-import { wrapVisitorCallbacks } from '@kreuzberg/html-to-markdown-node';
+import { convert } from "@kreuzberg/html-to-markdown-node";
+import { wrapVisitorCallbacks } from "@kreuzberg/html-to-markdown-node";
 
 const visitor = wrapVisitorCallbacks({
-    visitElementStart: (ctx) => {
-        // ctx.tagName, ctx.attributes available
-        return { type: 'continue' };
-    },
-    visitText: (ctx, text) => {
-        return { type: 'continue' };
-    },
+  visitElementStart: (ctx) => {
+    // ctx.tagName, ctx.attributes available
+    return { type: "continue" };
+  },
+  visitText: (ctx, text) => {
+    return { type: "continue" };
+  },
 });
 
 const result = convert(html, options, visitor);
@@ -191,8 +194,8 @@ Visitor return types: `{ type: 'continue' }` | `{ type: 'skip' }` | `{ type: 'pr
 
 ```typescript
 // Simple conversion
-import { convert } from '@kreuzberg/html-to-markdown-node';
-const result = JSON.parse(convert('<h1>Hello</h1>'));
+import { convert } from "@kreuzberg/html-to-markdown-node";
+const result = JSON.parse(convert("<h1>Hello</h1>"));
 console.log(result.content); // "# Hello\n"
 
 // Metadata extraction — enabled via extractMetadata option, result in result.metadata
@@ -203,18 +206,18 @@ console.log(result2.metadata.headers.length);
 // Tables — always in result.tables
 const result3 = JSON.parse(convert(html));
 for (const table of result3.tables) {
-    console.log(table.markdown);
+  console.log(table.markdown);
 }
 
 // Inline images — enable extractImages in options
 const result4 = JSON.parse(convert(html, { extractImages: true, captureSvg: true }));
 for (const image of result4.images) {
-    console.log(image.format, image.filename);
+  console.log(image.format, image.filename);
 }
 
 // File conversion
-import { convertFile } from '@kreuzberg/html-to-markdown-node';
-const json = await convertFile('./page.html', { headingStyle: 'Atx' });
+import { convertFile } from "@kreuzberg/html-to-markdown-node";
+const json = await convertFile("./page.html", { headingStyle: "Atx" });
 const fileResult = JSON.parse(json);
 console.log(fileResult.content);
 ```

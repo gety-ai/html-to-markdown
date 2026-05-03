@@ -19,84 +19,84 @@ html-to-markdown [OPTIONS] [FILE]
 
 ## Input / Output
 
-| Flag | Short | Description |
-|------|-------|-------------|
-| `[FILE]` | | Input HTML file. Omit or use `-` for stdin. |
-| `--url <URL>` | | Fetch HTML from a URL. Conflicts with FILE. |
-| `--user-agent <UA>` | | User-Agent header when using `--url`. Default mimics a real browser. Requires `--url`. |
-| `--output <FILE>` | `-o` | Output file. Default: stdout. |
+| Flag                | Short | Description                                                                            |
+| ------------------- | ----- | -------------------------------------------------------------------------------------- |
+| `[FILE]`            |       | Input HTML file. Omit or use `-` for stdin.                                            |
+| `--url <URL>`       |       | Fetch HTML from a URL. Conflicts with FILE.                                            |
+| `--user-agent <UA>` |       | User-Agent header when using `--url`. Default mimics a real browser. Requires `--url`. |
+| `--output <FILE>`   | `-o`  | Output file. Default: stdout.                                                          |
 
 ## Heading Options
 
-| Flag | Values | Default | Description |
-|------|--------|---------|-------------|
-| `--heading-style <STYLE>` | `atx`, `underlined`, `atx-closed` | `atx` | `atx`: `# h1`. `underlined`: `h1\n===`. `atx-closed`: `# h1 #`. |
+| Flag                      | Values                            | Default | Description                                                     |
+| ------------------------- | --------------------------------- | ------- | --------------------------------------------------------------- |
+| `--heading-style <STYLE>` | `atx`, `underlined`, `atx-closed` | `atx`   | `atx`: `# h1`. `underlined`: `h1\n===`. `atx-closed`: `# h1 #`. |
 
 ## List Options
 
-| Flag | Short | Values | Default | Description |
-|------|-------|--------|---------|-------------|
-| `--list-indent-type <TYPE>` | | `spaces`, `tabs` | `spaces` | Indentation type for nested lists. |
-| `--list-indent-width <N>` | | 1–8 | `2` | Spaces per indent level. Ignored with `tabs`. |
-| `--bullets <CHARS>` | `-b` | string | `"-*+"` | Bullet characters cycling through nesting levels. E.g. `"*+-"`. |
+| Flag                        | Short | Values           | Default  | Description                                                     |
+| --------------------------- | ----- | ---------------- | -------- | --------------------------------------------------------------- |
+| `--list-indent-type <TYPE>` |       | `spaces`, `tabs` | `spaces` | Indentation type for nested lists.                              |
+| `--list-indent-width <N>`   |       | 1–8              | `2`      | Spaces per indent level. Ignored with `tabs`.                   |
+| `--bullets <CHARS>`         | `-b`  | string           | `"-*+"`  | Bullet characters cycling through nesting levels. E.g. `"*+-"`. |
 
 ## Text Formatting
 
-| Flag | Values | Default | Description |
-|------|--------|---------|-------------|
-| `--strong-em-symbol <CHAR>` | `*`, `_` | `*` | Symbol for bold/italic emphasis. |
-| `--escape-asterisks` | flag | off | Escape `*` in plain text. |
-| `--escape-underscores` | flag | off | Escape `_` in plain text. |
-| `--escape-misc` | flag | off | Escape `[]()#` and other Markdown metacharacters. |
-| `--escape-ascii` | flag | off | Escape all ASCII punctuation (strict CommonMark compliance). |
-| `--sub-symbol <SYMBOL>` | string | `""` | Symbol wrapping `<sub>` text. E.g. `"~"`. |
-| `--sup-symbol <SYMBOL>` | string | `""` | Symbol wrapping `<sup>` text. E.g. `"^"`. |
-| `--newline-style <STYLE>` | `backslash`, `spaces` | `spaces` | `<br>` representation: `backslash` (`\`+newline) or `spaces` (two trailing spaces). |
+| Flag                        | Values                | Default  | Description                                                                         |
+| --------------------------- | --------------------- | -------- | ----------------------------------------------------------------------------------- |
+| `--strong-em-symbol <CHAR>` | `*`, `_`              | `*`      | Symbol for bold/italic emphasis.                                                    |
+| `--escape-asterisks`        | flag                  | off      | Escape `*` in plain text.                                                           |
+| `--escape-underscores`      | flag                  | off      | Escape `_` in plain text.                                                           |
+| `--escape-misc`             | flag                  | off      | Escape `[]()#` and other Markdown metacharacters.                                   |
+| `--escape-ascii`            | flag                  | off      | Escape all ASCII punctuation (strict CommonMark compliance).                        |
+| `--sub-symbol <SYMBOL>`     | string                | `""`     | Symbol wrapping `<sub>` text. E.g. `"~"`.                                           |
+| `--sup-symbol <SYMBOL>`     | string                | `""`     | Symbol wrapping `<sup>` text. E.g. `"^"`.                                           |
+| `--newline-style <STYLE>`   | `backslash`, `spaces` | `spaces` | `<br>` representation: `backslash` (`\`+newline) or `spaces` (two trailing spaces). |
 
 ## Code Blocks
 
-| Flag | Short | Values | Default | Description |
-|------|-------|--------|---------|-------------|
-| `--code-block-style <STYLE>` | | `backticks`, `indented`, `tildes` | `backticks` | Code block fence style. |
-| `--code-language <LANG>` | `-l` | string | `""` | Default language for fenced code blocks. |
+| Flag                         | Short | Values                            | Default     | Description                              |
+| ---------------------------- | ----- | --------------------------------- | ----------- | ---------------------------------------- |
+| `--code-block-style <STYLE>` |       | `backticks`, `indented`, `tildes` | `backticks` | Code block fence style.                  |
+| `--code-language <LANG>`     | `-l`  | string                            | `""`        | Default language for fenced code blocks. |
 
 ## Links
 
-| Flag | Short | Default | Description |
-|------|-------|---------|-------------|
-| `--autolinks` | `-a` | off (CLI default; Rust library default is `true`) | Convert bare URLs to `<url>` autolinks when text equals href. |
-| `--default-title` | | off | Use href as link title when no `title` attribute exists. |
+| Flag              | Short | Default                                           | Description                                                   |
+| ----------------- | ----- | ------------------------------------------------- | ------------------------------------------------------------- |
+| `--autolinks`     | `-a`  | off (CLI default; Rust library default is `true`) | Convert bare URLs to `<url>` autolinks when text equals href. |
+| `--default-title` |       | off                                               | Use href as link title when no `title` attribute exists.      |
 
 ## Images
 
-| Flag | Values | Default | Description |
-|------|--------|---------|-------------|
-| `--keep-inline-images-in <ELEMENTS>` | comma-separated tag names | none | Keep images as Markdown in these parent elements. E.g. `"a,strong"`. |
+| Flag                                 | Values                    | Default | Description                                                          |
+| ------------------------------------ | ------------------------- | ------- | -------------------------------------------------------------------- |
+| `--keep-inline-images-in <ELEMENTS>` | comma-separated tag names | none    | Keep images as Markdown in these parent elements. E.g. `"a,strong"`. |
 
 ## Tables
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--br-in-tables` | off | Use `<br>` in table cells instead of converting to spaces. |
+| Flag             | Default | Description                                                |
+| ---------------- | ------- | ---------------------------------------------------------- |
+| `--br-in-tables` | off     | Use `<br>` in table cells instead of converting to spaces. |
 
 ## Highlighting
 
-| Flag | Values | Default | Description |
-|------|--------|---------|-------------|
+| Flag                        | Values                                 | Default        | Description                                      |
+| --------------------------- | -------------------------------------- | -------------- | ------------------------------------------------ |
 | `--highlight-style <STYLE>` | `double-equal`, `html`, `bold`, `none` | `double-equal` | `<mark>` rendering. `double-equal` → `==text==`. |
 
 ## Metadata
 
 Metadata is extracted by default and included in JSON output when `--json` is used. Use the flags below to control which metadata fields are populated.
 
-| Flag | Description |
-|------|-------------|
-| `--extract-metadata` | Extract title and meta tags as an HTML comment header in Markdown output (plain text mode). |
-| `--extract-document` | Extract document-level metadata (title, description, charset, lang, etc.) into `metadata.document`. |
-| `--extract-headers` | Extract h1-h6 headers with hierarchy into `metadata.headers`. |
-| `--extract-links` | Extract anchor tags with link type classification into `metadata.links`. |
-| `--extract-images` | Extract img tag metadata (not inline image data) into `metadata.images`. |
-| `--extract-structured-data` | Extract JSON-LD, Microdata, and RDFa blocks into `metadata.structured_data`. |
+| Flag                        | Description                                                                                         |
+| --------------------------- | --------------------------------------------------------------------------------------------------- |
+| `--extract-metadata`        | Extract title and meta tags as an HTML comment header in Markdown output (plain text mode).         |
+| `--extract-document`        | Extract document-level metadata (title, description, charset, lang, etc.) into `metadata.document`. |
+| `--extract-headers`         | Extract h1-h6 headers with hierarchy into `metadata.headers`.                                       |
+| `--extract-links`           | Extract anchor tags with link type classification into `metadata.links`.                            |
+| `--extract-images`          | Extract img tag metadata (not inline image data) into `metadata.images`.                            |
+| `--extract-structured-data` | Extract JSON-LD, Microdata, and RDFa blocks into `metadata.structured_data`.                        |
 
 Metadata is returned in `result.metadata` within the JSON output (use `--json` to see it):
 
@@ -115,55 +115,55 @@ Metadata is returned in `result.metadata` within the JSON output (use `--json` t
 
 ## Whitespace
 
-| Flag | Values | Default | Description |
-|------|--------|---------|-------------|
+| Flag                       | Values                 | Default      | Description                                                                   |
+| -------------------------- | ---------------------- | ------------ | ----------------------------------------------------------------------------- |
 | `--whitespace-mode <MODE>` | `normalized`, `strict` | `normalized` | Whitespace handling. `normalized` collapses spaces; `strict` preserves as-is. |
-| `--strip-newlines` | flag | off | Remove all newlines from input HTML before processing. |
+| `--strip-newlines`         | flag                   | off          | Remove all newlines from input HTML before processing.                        |
 
 ## Wrapping
 
-| Flag | Short | Values | Default | Description |
-|------|-------|--------|---------|-------------|
-| `--wrap` | `-w` | flag | off | Enable text wrapping. |
-| `--wrap-width <N>` | | 20–500 | `80` | Column width when `--wrap` is enabled. |
+| Flag               | Short | Values | Default | Description                            |
+| ------------------ | ----- | ------ | ------- | -------------------------------------- |
+| `--wrap`           | `-w`  | flag   | off     | Enable text wrapping.                  |
+| `--wrap-width <N>` |       | 20–500 | `80`    | Column width when `--wrap` is enabled. |
 
 ## Element Handling
 
-| Flag | Values | Default | Description |
-|------|--------|---------|-------------|
-| `--convert-as-inline` | flag | off | Treat block elements as inline (no paragraph breaks). |
-| `--strip-tags <TAGS>` | comma-separated | none | HTML tags to strip entirely (output only text content). E.g. `"script,style"`. |
+| Flag                  | Values          | Default | Description                                                                    |
+| --------------------- | --------------- | ------- | ------------------------------------------------------------------------------ |
+| `--convert-as-inline` | flag            | off     | Treat block elements as inline (no paragraph breaks).                          |
+| `--strip-tags <TAGS>` | comma-separated | none    | HTML tags to strip entirely (output only text content). E.g. `"script,style"`. |
 
 ## Preprocessing
 
-| Flag | Values | Default | Description |
-|------|--------|---------|-------------|
-| `--preprocess` / `-p` | flag | off | Enable HTML preprocessing (removes navigation, ads, forms, etc.). |
-| `--preset <LEVEL>` | `minimal`, `standard`, `aggressive` | `standard` | Preprocessing aggressiveness. Requires `--preprocess`. |
-| `--keep-navigation` | flag | off | Don't remove `<nav>`, menus during preprocessing. Requires `--preprocess`. |
-| `--keep-forms` | flag | off | Don't remove `<form>`, `<input>` during preprocessing. Requires `--preprocess`. |
+| Flag                  | Values                              | Default    | Description                                                                     |
+| --------------------- | ----------------------------------- | ---------- | ------------------------------------------------------------------------------- |
+| `--preprocess` / `-p` | flag                                | off        | Enable HTML preprocessing (removes navigation, ads, forms, etc.).               |
+| `--preset <LEVEL>`    | `minimal`, `standard`, `aggressive` | `standard` | Preprocessing aggressiveness. Requires `--preprocess`.                          |
+| `--keep-navigation`   | flag                                | off        | Don't remove `<nav>`, menus during preprocessing. Requires `--preprocess`.      |
+| `--keep-forms`        | flag                                | off        | Don't remove `<form>`, `<input>` during preprocessing. Requires `--preprocess`. |
 
 ## Parsing
 
-| Flag | Short | Default | Description |
-|------|-------|---------|-------------|
-| `--encoding <ENCODING>` | `-e` | `utf-8` | Input character encoding. E.g. `latin-1`. |
+| Flag                    | Short | Default | Description                               |
+| ----------------------- | ----- | ------- | ----------------------------------------- |
+| `--encoding <ENCODING>` | `-e`  | `utf-8` | Input character encoding. E.g. `latin-1`. |
 
 ## Output Format
 
-| Flag | Short | Values | Default | Description |
-|------|-------|--------|---------|-------------|
-| `--output-format <FORMAT>` | `-f` | `markdown`, `djot` | `markdown` | Output markup format. |
+| Flag                       | Short | Values             | Default    | Description           |
+| -------------------------- | ----- | ------------------ | ---------- | --------------------- |
+| `--output-format <FORMAT>` | `-f`  | `markdown`, `djot` | `markdown` | Output markup format. |
 
 ## JSON Output
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--json` | off | Output the full `ConversionResult` as JSON instead of plain Markdown. JSON has keys: `content`, `tables`, `metadata`, `images`, `warnings`. |
-| `--include-structure` | off | Include document structure tree in JSON output (`document` key). Requires `--json`. |
-| `--extract-inline-images` | off | Include extracted inline image data in JSON output (`images` key). Requires `--json`. |
-| `--show-warnings` | off | Print non-fatal processing warnings to stderr. |
-| `--no-content` | off | Suppress Markdown text output — only extract metadata/tables/images. Useful with `--json` for extraction-only mode. |
+| Flag                      | Default | Description                                                                                                                                 |
+| ------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--json`                  | off     | Output the full `ConversionResult` as JSON instead of plain Markdown. JSON has keys: `content`, `tables`, `metadata`, `images`, `warnings`. |
+| `--include-structure`     | off     | Include document structure tree in JSON output (`document` key). Requires `--json`.                                                         |
+| `--extract-inline-images` | off     | Include extracted inline image data in JSON output (`images` key). Requires `--json`.                                                       |
+| `--show-warnings`         | off     | Print non-fatal processing warnings to stderr.                                                                                              |
+| `--no-content`            | off     | Suppress Markdown text output — only extract metadata/tables/images. Useful with `--json` for extraction-only mode.                         |
 
 When `--json` is used, stdout receives JSON:
 
@@ -185,18 +185,18 @@ When `--json` is used, stdout receives JSON:
 
 ## Debugging
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--debug` | off | Output diagnostic warnings and information. |
+| Flag      | Default | Description                                 |
+| --------- | ------- | ------------------------------------------- |
+| `--debug` | off     | Output diagnostic warnings and information. |
 
 ## Meta
 
-| Flag | Description |
-|------|-------------|
+| Flag                            | Description                                                                             |
+| ------------------------------- | --------------------------------------------------------------------------------------- |
 | `--generate-completion <SHELL>` | Generate shell completion script. SHELL: `bash`, `zsh`, `fish`, `powershell`, `elvish`. |
-| `--generate-man` | Generate man page to stdout. |
-| `--version` | Print version. |
-| `--help` / `-h` | Print help. |
+| `--generate-man`                | Generate man page to stdout.                                                            |
+| `--version`                     | Print version.                                                                          |
+| `--help` / `-h`                 | Print help.                                                                             |
 
 ## Examples
 
@@ -263,8 +263,8 @@ html-to-markdown --generate-man > html-to-markdown.1
 
 ## Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | Conversion error or I/O error |
-| 2 | Invalid arguments |
+| Code | Meaning                       |
+| ---- | ----------------------------- |
+| 0    | Success                       |
+| 1    | Conversion error or I/O error |
+| 2    | Invalid arguments             |

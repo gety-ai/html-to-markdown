@@ -13,18 +13,12 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "My Article"
-        ]
+        "values": ["My Article"]
       },
       {
         "type": "not_contains",
         "field": "content",
-        "values": [
-          "application/ld+json",
-          "@context",
-          "schema.org"
-        ]
+        "values": ["application/ld+json", "@context", "schema.org"]
       }
     ]
   },
@@ -42,18 +36,12 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Widget"
-        ]
+        "values": ["Widget"]
       },
       {
         "type": "not_contains",
         "field": "content",
-        "values": [
-          "@context",
-          "BreadcrumbList",
-          "ListItem"
-        ]
+        "values": ["@context", "BreadcrumbList", "ListItem"]
       }
     ]
   }

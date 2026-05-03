@@ -9,11 +9,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "- Item 1",
-          "- Item 2",
-          "- Item 3"
-        ]
+        "values": ["- Item 1", "- Item 2", "- Item 3"]
       }
     ]
   },
@@ -27,11 +23,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "1. First",
-          "2. Second",
-          "3. Third"
-        ]
+        "values": ["1. First", "2. Second", "3. Third"]
       }
     ]
   },
@@ -45,12 +37,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Parent A",
-          "Child A1",
-          "Child A2",
-          "Parent B"
-        ]
+        "values": ["Parent A", "Child A1", "Child A2", "Parent B"]
       }
     ]
   },
@@ -64,12 +51,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Step 1",
-          "Step 1a",
-          "Step 1b",
-          "Step 2"
-        ]
+        "values": ["Step 1", "Step 1a", "Step 1b", "Step 2"]
       }
     ]
   },
@@ -83,12 +65,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Item A",
-          "Sub 1",
-          "Sub 2",
-          "Item B"
-        ]
+        "values": ["Item A", "Sub 1", "Sub 2", "Item B"]
       }
     ]
   },
@@ -106,10 +83,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Done task",
-          "Pending task"
-        ]
+        "values": ["Done task", "Pending task"]
       }
     ]
   },
@@ -123,11 +97,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "First paragraph in item.",
-          "Second paragraph in item.",
-          "Simple item"
-        ]
+        "values": ["First paragraph in item.", "Second paragraph in item.", "Simple item"]
       }
     ]
   },
@@ -141,12 +111,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Term One",
-          "Definition of term one.",
-          "Term Two",
-          "Definition of term two."
-        ]
+        "values": ["Term One", "Definition of term one.", "Term Two", "Definition of term two."]
       }
     ]
   }

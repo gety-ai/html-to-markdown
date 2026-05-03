@@ -16,11 +16,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "2",
-          "3",
-          "6"
-        ]
+        "values": ["2", "3", "6"]
       }
     ]
   },
@@ -41,11 +37,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "variable",
-          "name",
-          "defined."
-        ]
+        "values": ["variable", "name", "defined."]
       }
     ]
   },
@@ -66,11 +58,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Use",
-          "and",
-          "in text."
-        ]
+        "values": ["Use", "and", "in text."]
       }
     ]
   }

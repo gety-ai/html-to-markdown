@@ -112,8 +112,8 @@ print(result.metadata)       # title, links, headings, …
 import { convert } from "@kreuzberg/html-to-markdown-node";
 
 const result = convert("<h1>Hello</h1><p>World</p>");
-console.log(result.content);    // # Hello\n\nWorld
-console.log(result.metadata);   // title, links, headings, …
+console.log(result.content); // # Hello\n\nWorld
+console.log(result.metadata); // title, links, headings, …
 ```
 
 ```rust
@@ -126,20 +126,20 @@ println!("{}", result.content.unwrap_or_default());
 
 ## Language Bindings
 
-| Language | Package | Install |
-|----------|---------|---------|
-| Rust | [html-to-markdown-rs](https://crates.io/crates/html-to-markdown-rs) | `cargo add html-to-markdown-rs` |
-| Python | [html-to-markdown](https://pypi.org/project/html-to-markdown/) | `pip install html-to-markdown` |
-| TypeScript / Node.js | [@kreuzberg/html-to-markdown-node](https://www.npmjs.com/package/@kreuzberg/html-to-markdown-node) | `npm install @kreuzberg/html-to-markdown-node` |
-| WebAssembly | [@kreuzberg/html-to-markdown-wasm](https://www.npmjs.com/package/@kreuzberg/html-to-markdown-wasm) | `npm install @kreuzberg/html-to-markdown-wasm` |
-| Ruby | [html-to-markdown](https://rubygems.org/gems/html-to-markdown) | `gem install html-to-markdown` |
-| PHP | [kreuzberg-dev/html-to-markdown](https://packagist.org/packages/kreuzberg-dev/html-to-markdown) | `composer require kreuzberg-dev/html-to-markdown` |
-| Go | [htmltomarkdown](https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown) | `go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3` |
-| Java | [dev.kreuzberg:html-to-markdown](https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown) | Maven / Gradle |
-| C# | [KreuzbergDev.HtmlToMarkdown](https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/) | `dotnet add package KreuzbergDev.HtmlToMarkdown` |
-| Elixir | [html_to_markdown](https://hex.pm/packages/html_to_markdown) | `mix deps.get html_to_markdown` |
-| R | [htmltomarkdown](https://kreuzberg-dev.r-universe.dev/htmltomarkdown) | `install.packages("htmltomarkdown")` |
-| C (FFI) | [releases](https://github.com/kreuzberg-dev/html-to-markdown/releases) | Pre-built `.so` / `.dll` / `.dylib` |
+| Language             | Package                                                                                                      | Install                                                           |
+| -------------------- | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
+| Rust                 | [html-to-markdown-rs](https://crates.io/crates/html-to-markdown-rs)                                          | `cargo add html-to-markdown-rs`                                   |
+| Python               | [html-to-markdown](https://pypi.org/project/html-to-markdown/)                                               | `pip install html-to-markdown`                                    |
+| TypeScript / Node.js | [@kreuzberg/html-to-markdown-node](https://www.npmjs.com/package/@kreuzberg/html-to-markdown-node)           | `npm install @kreuzberg/html-to-markdown-node`                    |
+| WebAssembly          | [@kreuzberg/html-to-markdown-wasm](https://www.npmjs.com/package/@kreuzberg/html-to-markdown-wasm)           | `npm install @kreuzberg/html-to-markdown-wasm`                    |
+| Ruby                 | [html-to-markdown](https://rubygems.org/gems/html-to-markdown)                                               | `gem install html-to-markdown`                                    |
+| PHP                  | [kreuzberg-dev/html-to-markdown](https://packagist.org/packages/kreuzberg-dev/html-to-markdown)              | `composer require kreuzberg-dev/html-to-markdown`                 |
+| Go                   | [htmltomarkdown](https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown) | `go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3` |
+| Java                 | [dev.kreuzberg:html-to-markdown](https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown)       | Maven / Gradle                                                    |
+| C#                   | [KreuzbergDev.HtmlToMarkdown](https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/)                   | `dotnet add package KreuzbergDev.HtmlToMarkdown`                  |
+| Elixir               | [html_to_markdown](https://hex.pm/packages/html_to_markdown)                                                 | `mix deps.get html_to_markdown`                                   |
+| R                    | [htmltomarkdown](https://kreuzberg-dev.r-universe.dev/htmltomarkdown)                                        | `install.packages("htmltomarkdown")`                              |
+| C (FFI)              | [releases](https://github.com/kreuzberg-dev/html-to-markdown/releases)                                       | Pre-built `.so` / `.dll` / `.dylib`                               |
 
 ## Part of the Kreuzberg Ecosystem
 

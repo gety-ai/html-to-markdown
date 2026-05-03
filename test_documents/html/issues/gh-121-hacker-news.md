@@ -1,5 +1,3 @@
-
-
 - [https://news.ycombinator.com](https://news.ycombinator.com) **[Hacker News](news)**[new](newest) | [past](front) | [comments](newcomments) | [ask](ask) | [show](show) | [jobs](jobs) | [submit](submit) [login](login?goto=news)
 - 1. [vote?id=46001889&how=up&goto=news](vote?id=46001889&how=up&goto=news) [Olmo 3: Charting a path through the model flow to lead open-source AI](https://allenai.org/blog/olmo3) ([allenai.org](from?site=allenai.org))
 - 269 points by [mseri](user?id=mseri) [9 hours ago](item?id=46001889) | [hide](hide?id=46001889&goto=news) | [61 comments](item?id=46001889)

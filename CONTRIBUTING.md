@@ -147,12 +147,12 @@ html-to-markdown/
 
 ### Package Distribution
 
-| Package                  | Registry  | Description                 |
-| ------------------------ | --------- | --------------------------- |
-| `html-to-markdown-rs`    | crates.io | Core Rust library           |
-| `html-to-markdown`       | PyPI      | Python package              |
-| `html-to-markdown`       | npm       | TypeScript package with CLI |
-| `html-to-markdown`       | RubyGems  | Ruby gem (Magnus bindings)  |
+| Package                 | Registry  | Description                 |
+| ----------------------- | --------- | --------------------------- |
+| `html-to-markdown-rs`   | crates.io | Core Rust library           |
+| `html-to-markdown`      | PyPI      | Python package              |
+| `html-to-markdown`      | npm       | TypeScript package with CLI |
+| `html-to-markdown`      | RubyGems  | Ruby gem (Magnus bindings)  |
 | `html-to-markdown-node` | npm       | Native Node.js bindings     |
 | `html-to-markdown-wasm` | npm       | WebAssembly bindings        |
 
@@ -231,7 +231,7 @@ cargo build --release --package html-to-markdown-cli
 
 ### CI Workflows
 
-- **ci-*.yaml**: Kreuzberg-style, path-filtered workflows (rust, python, node, wasm, ruby, php, go, java, elixir, validate)
+- **ci-\*.yaml**: Kreuzberg-style, path-filtered workflows (rust, python, node, wasm, ruby, php, go, java, elixir, validate)
 - **test-wheels.yaml**: Builds and tests wheels (manual or on Rust/config changes)
 - All workflows must pass before merging
 
@@ -288,13 +288,14 @@ All Python/Rust checks run automatically via prek on commit.
 ### Pre-release Checklist
 
 1. **Update versions** in:
-
    - `Cargo.toml` (workspace.package.version)
    - `packages/*/package.json`
    - `crates/html-to-markdown-node/package.json`
    - `crates/html-to-markdown-wasm/package.json`
 
      ```toml
+
+     ```
 
 ## Cargo.toml
 
@@ -311,17 +312,17 @@ All Python/Rust checks run automatically via prek on commit.
 
 1. Run full test suite:
 
-    ```bash
-    task test           # Python + Rust
-    pnpm test          # JavaScript/TypeScript
-    ```
+   ```bash
+   task test           # Python + Rust
+   pnpm test          # JavaScript/TypeScript
+   ```
 
 1. Build and verify all targets:
 
-    ```bash
-    task build:cli && ./target/release/html-to-markdown --version
-    pnpm run build     # All JS/TS packages
-    ```
+   ```bash
+   task build:cli && ./target/release/html-to-markdown --version
+   pnpm run build     # All JS/TS packages
+   ```
 
 1. Commit changes: `git commit -m "chore: bump version to 2.4.2"`
 
@@ -329,13 +330,12 @@ All Python/Rust checks run automatically via prek on commit.
 
 1. **Create and push tag**:
 
-    ```bash
-    git tag -a v2.4.2 -m "Release v2.4.2"
-    git push origin v2.4.2
-    ```
+   ```bash
+   git tag -a v2.4.2 -m "Release v2.4.2"
+   git push origin v2.4.2
+   ```
 
 1. **Automated workflows trigger**:
-
    - `release.yml` - GitHub release with CLI binaries
    - `release-homebrew.yml` - Updates Homebrew formula
    - `publish-cargo.yml` - Publishes to crates.io
@@ -344,27 +344,26 @@ All Python/Rust checks run automatically via prek on commit.
 
 1. **Publish npm packages** (manual):
 
-    ```bash
-    # Login to npm (once)
-    npm login
+   ```bash
+   # Login to npm (once)
+   npm login
 
-    # Publish main TypeScript package (includes CLI)
-    cd packages/typescript
-    pnpm publish
+   # Publish main TypeScript package (includes CLI)
+   cd packages/typescript
+   pnpm publish
 
-    # Publish native bindings (with pre-built binaries)
-    cd ../../crates/html-to-markdown-node
-    pnpm run build
-    pnpm publish
+   # Publish native bindings (with pre-built binaries)
+   cd ../../crates/html-to-markdown-node
+   pnpm run build
+   pnpm publish
 
-    # Publish WASM
-    cd ../html-to-markdown-wasm
-    pnpm run build:all
-    pnpm publish
-    ```
+   # Publish WASM
+   cd ../html-to-markdown-wasm
+   pnpm run build:all
+   pnpm publish
+   ```
 
 1. **Required secrets** (already configured):
-
    - `CARGO_TOKEN` - From <https://crates.io/settings/tokens>
    - `HOMEBREW_TOKEN` - GitHub token with `repo` scope
    - PyPI uses trusted publishing (OIDC); no `PYPI_TOKEN` secret is required

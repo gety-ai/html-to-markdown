@@ -157,9 +157,9 @@ print(result.content)
 ### TypeScript / Node.js
 
 ```typescript
-import { convert } from '@kreuzberg/html-to-markdown';
+import { convert } from "@kreuzberg/html-to-markdown";
 
-const html = '<h1>Hello World</h1><p>This is a paragraph.</p>';
+const html = "<h1>Hello World</h1><p>This is a paragraph.</p>";
 const result = JSON.parse(convert(html));
 console.log(result.content);
 // Output: # Hello World\n\nThis is a paragraph.\n
@@ -194,14 +194,14 @@ html-to-markdown --url https://example.com > output.md
 
 All languages return the same data structure (as a dict, object, or struct).
 
-| Field | Rust Type | Python | TypeScript | Description |
-|-------|-----------|--------|------------|-------------|
-| `content` | `Option<String>` | `str \| None` | `string \| null` | Converted text (Markdown/Djot/plain). `None` only in extraction-only mode. |
-| `document` | `Option<DocumentStructure>` | `None` (not yet wired) | `null` (not yet wired) | Structured document tree when `include_document_structure=true` |
-| `metadata` | `HtmlMetadata` | `HtmlMetadata \| None` | JSON object or null | Extracted HTML metadata (title, OG, headers, links, images, structured data). Requires `metadata` feature. |
-| `tables` | `Vec<TableData>` | `list[TableData]` | `array` | Extracted tables with `grid` (structured cells) and `markdown` fields |
-| `images` | `Vec<InlineImage>` | `list` | `array` | Extracted inline images (data URIs, SVGs). Requires `inline-images` feature. |
-| `warnings` | `Vec<ProcessingWarning>` | `list[ProcessingWarning]` | `array` | Non-fatal processing warnings with `message` and `kind` fields |
+| Field      | Rust Type                   | Python                    | TypeScript             | Description                                                                                                |
+| ---------- | --------------------------- | ------------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `content`  | `Option<String>`            | `str \| None`             | `string \| null`       | Converted text (Markdown/Djot/plain). `None` only in extraction-only mode.                                 |
+| `document` | `Option<DocumentStructure>` | `None` (not yet wired)    | `null` (not yet wired) | Structured document tree when `include_document_structure=true`                                            |
+| `metadata` | `HtmlMetadata`              | `HtmlMetadata \| None`    | JSON object or null    | Extracted HTML metadata (title, OG, headers, links, images, structured data). Requires `metadata` feature. |
+| `tables`   | `Vec<TableData>`            | `list[TableData]`         | `array`                | Extracted tables with `grid` (structured cells) and `markdown` fields                                      |
+| `images`   | `Vec<InlineImage>`          | `list`                    | `array`                | Extracted inline images (data URIs, SVGs). Requires `inline-images` feature.                               |
+| `warnings` | `Vec<ProcessingWarning>`    | `list[ProcessingWarning]` | `array`                | Non-fatal processing warnings with `message` and `kind` fields                                             |
 
 ## Configuration
 
@@ -248,14 +248,14 @@ print(result.content)
 ### TypeScript / Node.js (object)
 
 ```typescript
-import { convert } from '@kreuzberg/html-to-markdown';
+import { convert } from "@kreuzberg/html-to-markdown";
 
 const options = {
-    headingStyle: 'Atx',
-    codeBlockStyle: 'Backticks',
-    autolinks: true,
-    wrap: true,
-    wrapWidth: 100,
+  headingStyle: "Atx",
+  codeBlockStyle: "Backticks",
+  autolinks: true,
+  wrap: true,
+  wrapWidth: 100,
 };
 
 const result = JSON.parse(convert(html, options));

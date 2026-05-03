@@ -17,9 +17,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "This is a long paragraph"
-        ]
+        "values": ["This is a long paragraph"]
       }
     ]
   },

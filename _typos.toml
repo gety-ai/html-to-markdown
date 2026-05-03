@@ -1,21 +1,21 @@
 [files]
 extend-exclude = [
-    # Test fixtures and real-world HTML samples contain intentional
-    # misspellings, non-English text, and obfuscated class names
-    "test_documents/",
-    "fixtures/",
-    "test_apps/",
-    # Test spec data (CommonMark spec, R inst/)
-    "packages/python/tests/",
-    "packages/r/inst/",
-    # Generated/bundled demo assets
-    "docs/demo/",
-    # Vendored and generated files
-    "*.lock",
-    "vendor/",
-    "node_modules/",
-    "target/",
-    "dist/",
-    ".alef/",
-    "*.svg",
+  # Test fixtures and real-world HTML samples contain intentional
+  # misspellings, non-English text, and obfuscated class names
+  "test_documents/",
+  "fixtures/",
+  "test_apps/",
+  # Test spec data (CommonMark spec, R inst/)
+  "packages/python/tests/",
+  "packages/r/inst/",
+  # Generated/bundled demo assets
+  "docs/demo/",
+  # Vendored and generated files
+  "*.lock",
+  "vendor/",
+  "node_modules/",
+  "target/",
+  "dist/",
+  ".alef/",
+  "*.svg",
 ]

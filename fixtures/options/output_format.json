@@ -13,10 +13,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "# Title",
-          "Some text."
-        ]
+        "values": ["# Title", "Some text."]
       }
     ]
   },
@@ -33,19 +30,12 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Title",
-          "bold",
-          "text."
-        ]
+        "values": ["Title", "bold", "text."]
       },
       {
         "type": "not_contains",
         "field": "content",
-        "values": [
-          "**bold**",
-          "# Title"
-        ]
+        "values": ["**bold**", "# Title"]
       }
     ]
   },
@@ -66,9 +56,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Simple paragraph."
-        ]
+        "values": ["Simple paragraph."]
       }
     ]
   }

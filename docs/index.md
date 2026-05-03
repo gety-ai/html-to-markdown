@@ -5,7 +5,6 @@ description: "html-to-markdown — Convert HTML to Markdown, Djot, or plain text
 
 <div class="home-hero" markdown="1">
 
-
 <p class="home-lead" markdown="1">
 Convert HTML to Markdown, Djot, or plain text. One Rust core, 12 native language bindings, identical output on every runtime.
 </p>
@@ -15,7 +14,7 @@ Convert HTML to Markdown, Djot, or plain text. One Rust core, 12 native language
 ## Start here
 
 1. **[Install a binding](installation.md)** — add the package to your project (versions, feature flags, and verify steps are on that page).
-2. **[Run a minimal `convert()`](usage.md#basic-conversion)** — open *Usage → Basic conversion*, choose your language tab, and copy the hello-world snippet.
+2. **[Run a minimal `convert()`](usage.md#basic-conversion)** — open _Usage → Basic conversion_, choose your language tab, and copy the hello-world snippet.
 
 </div>
 

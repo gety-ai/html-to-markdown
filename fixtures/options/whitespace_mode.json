@@ -16,12 +16,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Text",
-          "with",
-          "extra",
-          "spaces."
-        ]
+        "values": ["Text", "with", "extra", "spaces."]
       }
     ]
   },
@@ -42,10 +37,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Preserved",
-          "spacing."
-        ]
+        "values": ["Preserved", "spacing."]
       }
     ]
   }

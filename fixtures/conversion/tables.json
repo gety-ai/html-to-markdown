@@ -9,14 +9,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Name",
-          "Age",
-          "Alice",
-          "30",
-          "|",
-          "---"
-        ]
+        "values": ["Name", "Age", "Alice", "30", "|", "---"]
       }
     ]
   },
@@ -34,13 +27,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Product",
-          "Price",
-          "Apple",
-          "1.00",
-          "|"
-        ]
+        "values": ["Product", "Price", "Apple", "1.00", "|"]
       }
     ]
   },
@@ -58,11 +45,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Full Name",
-          "John",
-          "Doe"
-        ]
+        "values": ["Full Name", "John", "Doe"]
       }
     ]
   },
@@ -80,15 +63,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Left",
-          "Center",
-          "Right",
-          "L",
-          "C",
-          "R",
-          "|"
-        ]
+        "values": ["Left", "Center", "Right", "L", "C", "R", "|"]
       }
     ]
   },
@@ -106,11 +81,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Expression",
-          "Result",
-          "true"
-        ]
+        "values": ["Expression", "Result", "true"]
       }
     ]
   },

@@ -1,10 +1,10 @@
 ```javascript
-import init, { convert } from '@kreuzberg/html-to-markdown-wasm';
+import init, { convert } from "@kreuzberg/html-to-markdown-wasm";
 
 await init();
 
 const result = convert('<h1>Hello</h1><img src="pic.jpg">', {
-  headingStyle: 'atx',
+  headingStyle: "atx",
   skipImages: true,
 });
 const markdown = result.content;

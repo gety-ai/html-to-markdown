@@ -9,10 +9,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "First line.",
-          "Second line."
-        ]
+        "values": ["First line.", "Second line."]
       }
     ]
   },
@@ -30,10 +27,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Before rule.",
-          "After rule."
-        ]
+        "values": ["Before rule.", "After rule."]
       }
     ]
   },
@@ -47,10 +41,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Start.",
-          "End."
-        ]
+        "values": ["Start.", "End."]
       }
     ]
   }

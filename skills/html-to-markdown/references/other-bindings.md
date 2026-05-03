@@ -327,33 +327,38 @@ result <- convert_handle("<h1>Hello</h1>", handle)
 **Package:** `@kreuzberg/html-to-markdown-wasm` (built with wasm-pack)
 
 ```javascript
-import init, { convert, convertBytes, createConversionOptionsHandle, convertWithOptionsHandle } from '@kreuzberg/html-to-markdown-wasm';
+import init, {
+  convert,
+  convertBytes,
+  createConversionOptionsHandle,
+  convertWithOptionsHandle,
+} from "@kreuzberg/html-to-markdown-wasm";
 
 await init(); // initialize WASM module
 
 // convert() — returns JSON string, always JSON.parse() the result
-const result = JSON.parse(convert('<h1>Hello</h1>', {}));
-console.log(result.content);    // markdown string
-console.log(result.tables);     // extracted tables
-console.log(result.metadata);   // metadata (when enabled)
+const result = JSON.parse(convert("<h1>Hello</h1>", {}));
+console.log(result.content); // markdown string
+console.log(result.tables); // extracted tables
+console.log(result.metadata); // metadata (when enabled)
 
 // convertBytes() — accepts Uint8Array
 const encoder = new TextEncoder();
-const bytes = encoder.encode('<h1>Hello</h1>');
+const bytes = encoder.encode("<h1>Hello</h1>");
 const result2 = JSON.parse(convertBytes(bytes, {}));
 
 // Metadata — in result.metadata when extract_metadata is enabled
-const result3 = JSON.parse(convert('<h1>Hello</h1>', { extractMetadata: true }));
+const result3 = JSON.parse(convert("<h1>Hello</h1>", { extractMetadata: true }));
 console.log(result3.metadata);
 
 // Tables — always in result.tables
 for (const table of result.tables) {
-    console.log(table.markdown);
+  console.log(table.markdown);
 }
 
 // Options handle (reuse for performance)
-const handle = createConversionOptionsHandle({ headingStyle: 'atx' });
-const json = convertWithOptionsHandle('<h1>Hello</h1>', handle);
+const handle = createConversionOptionsHandle({ headingStyle: "atx" });
+const json = convertWithOptionsHandle("<h1>Hello</h1>", handle);
 ```
 
 ---

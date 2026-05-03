@@ -38,23 +38,28 @@ markdown = result.content
 {% elif language == 'typescript' %}
 
 ```typescript
-import { convert, type Visitor, type NodeContext, type VisitResult } from '@kreuzberg/html-to-markdown';
+import {
+  convert,
+  type Visitor,
+  type NodeContext,
+  type VisitResult,
+} from "@kreuzberg/html-to-markdown";
 
 const visitor: Visitor = {
   visitLink(ctx: NodeContext, href: string, text: string, title?: string): VisitResult {
     // Rewrite CDN URLs
-    if (href.startsWith('https://old-cdn.com')) {
-      href = href.replace('https://old-cdn.com', 'https://new-cdn.com');
+    if (href.startsWith("https://old-cdn.com")) {
+      href = href.replace("https://old-cdn.com", "https://new-cdn.com");
     }
-    return { type: 'custom', output: `[${text}](${href})` };
+    return { type: "custom", output: `[${text}](${href})` };
   },
 
   visitImage(ctx: NodeContext, src: string, alt?: string, title?: string): VisitResult {
     // Skip tracking pixels
-    if (src.includes('tracking')) {
-      return { type: 'skip' };
+    if (src.includes("tracking")) {
+      return { type: "skip" };
     }
-    return { type: 'continue' };
+    return { type: "continue" };
   },
 };
 

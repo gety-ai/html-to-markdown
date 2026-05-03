@@ -1963,13 +1963,13 @@ None if using v1 compatibility layer. If migrating to v2 API:
 
 #### Output Differences (Default Settings)
 
-| HTML                     | V1 Output                | V2 Output           |
-| ------------------------ | ------------------------ | ------------------- |
-| `<ul><li>Item</li></ul>` | `*   Item` (4 spaces)    | `- Item` (2 spaces) |
-| `<h1>Title</h1>`         | `Title\n=====`           | `# Title`           |
-| `Text*with*stars`        | `Text\*with\*stars`      | `Text*with*stars`   |
-| `<br>`                   | Two trailing spaces      | Backslash `\`       |
-| `<pre>code</pre>`        | ```` ```\ncode\n``` ```` | Indented 4 spaces   |
+| HTML                     | V1 Output             | V2 Output           |
+| ------------------------ | --------------------- | ------------------- |
+| `<ul><li>Item</li></ul>` | `*   Item` (4 spaces) | `- Item` (2 spaces) |
+| `<h1>Title</h1>`         | `Title\n=====`        | `# Title`           |
+| `Text*with*stars`        | `Text\*with\*stars`   | `Text*with*stars`   |
+| `<br>`                   | Two trailing spaces   | Backslash `\`       |
+| `<pre>code</pre>`        | ` ```\ncode\n``` `    | Indented 4 spaces   |
 
 These differences reflect v2's alignment with CommonMark specification.
 
@@ -1992,7 +1992,7 @@ Total: **~3,850 lines** of Python code removed, replaced by **~4,800 lines** of 
 - **ABI Compatibility**: Uses `abi3` for Python 3.10+ wheel reuse
 - **Rust Version**: Built with stable Rust (tested on 1.75+)
 
-______________________________________________________________________
+---
 
 ## [1.x] - Previous Versions
 

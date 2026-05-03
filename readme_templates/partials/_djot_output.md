@@ -4,15 +4,15 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Syntax Differences
 
-| Element | Markdown | Djot |
-|---------|----------|------|
-| Strong | `**text**` | `*text*` |
-| Emphasis | `*text*` | `_text_` |
-| Strikethrough | `~~text~~` | `{-text-}` |
-| Inserted/Added | N/A | `{+text+}` |
-| Highlighted | N/A | `{=text=}` |
-| Subscript | N/A | `~text~` |
-| Superscript | N/A | `^text^` |
+| Element        | Markdown   | Djot       |
+| -------------- | ---------- | ---------- |
+| Strong         | `**text**` | `*text*`   |
+| Emphasis       | `*text*`   | `_text_`   |
+| Strikethrough  | `~~text~~` | `{-text-}` |
+| Inserted/Added | N/A        | `{+text+}` |
+| Highlighted    | N/A        | `{=text=}` |
+| Subscript      | N/A        | `~text~`   |
+| Superscript    | N/A        | `^text^`   |
 
 ### Example Usage
 
@@ -35,7 +35,7 @@ djot = convert(html, ConversionOptions(output_format="djot"))
 {% elif language == 'typescript' %}
 
 ```typescript
-import { convert, ConversionOptions } from '@kreuzberg/html-to-markdown';
+import { convert, ConversionOptions } from "@kreuzberg/html-to-markdown";
 
 const html = "<p>This is <strong>bold</strong> and <em>italic</em> text.</p>";
 
@@ -44,7 +44,7 @@ const markdown = convert(html);
 // Result: "This is **bold** and *italic* text."
 
 // Djot output
-const djot = convert(html, { outputFormat: 'djot' });
+const djot = convert(html, { outputFormat: "djot" });
 // Result: "This is *bold* and _italic_ text."
 ```
 

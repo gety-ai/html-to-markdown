@@ -12,10 +12,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "# Title",
-          "## Subtitle"
-        ]
+        "values": ["# Title", "## Subtitle"]
       }
     ]
   },
@@ -36,9 +33,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Main Title"
-        ]
+        "values": ["Main Title"]
       }
     ]
   },
@@ -55,9 +50,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "# Closed Heading #"
-        ]
+        "values": ["# Closed Heading #"]
       }
     ]
   }

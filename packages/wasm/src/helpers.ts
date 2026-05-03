@@ -11,7 +11,18 @@ import {
   type WasmLinkStyle,
   type WasmOutputFormat,
   type WasmPreprocessingOptions,
+  WasmVisitorHandle,
 } from "./wasm";
+
+/**
+ * HTML visitor interface for customizing element traversal.
+ * Implement visitor methods to customize how specific HTML elements are converted.
+ */
+export interface HtmlVisitor {
+  [key: string]:
+    | ((ctx?: any, ...args: any[]) => string | { custom: string } | undefined)
+    | undefined;
+}
 
 /**
  * Plain-object options for HTML to Markdown conversion.
@@ -58,6 +69,7 @@ export interface ConversionOptions {
   inferDimensions?: boolean | null;
   maxDepth?: number | null;
   excludeSelectors?: string[] | null;
+  visitor?: HtmlVisitor | null;
 }
 
 /**
@@ -118,8 +130,8 @@ export function convert(html: string, options?: ConversionOptions | null): WasmC
     options.maxImageSize,
     options.captureSvg,
     options.inferDimensions,
-    options.maxDepth,
     options.excludeSelectors,
+    options.maxDepth,
   );
 
   try {

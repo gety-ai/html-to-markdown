@@ -1,14 +1,14 @@
 ```javascript
-import init, { convert } from '@kreuzberg/html-to-markdown-wasm';
+import init, { convert } from "@kreuzberg/html-to-markdown-wasm";
 
 await init();
 
 const visitor = {
   visit_link(ctx, href, text, title) {
-    return { type: 'continue' };
+    return { type: "continue" };
   },
   visit_image(ctx, src, alt, title) {
-    return { type: 'continue' };
+    return { type: "continue" };
   },
 };
 

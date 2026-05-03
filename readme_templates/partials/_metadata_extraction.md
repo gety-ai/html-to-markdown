@@ -31,17 +31,17 @@ print(result.metadata.structured_data)         # JSON-LD, Microdata, RDFa
 {% elif language == 'typescript' %}
 
 ```typescript
-import { convert } from '@kreuzberg/html-to-markdown';
+import { convert } from "@kreuzberg/html-to-markdown";
 
 const html = '<h1>Article</h1><img src="test.jpg" alt="test">';
 const result = convert(html, { extractMetadata: true });
 
-console.log(result.content);                      // Converted Markdown
-console.log(result.metadata?.document?.title);    // Document title
-console.log(result.metadata?.headers);            // All h1-h6 elements
-console.log(result.metadata?.links);              // All hyperlinks
-console.log(result.metadata?.images);             // All images with alt text
-console.log(result.metadata?.structuredData);     // JSON-LD, Microdata, RDFa
+console.log(result.content); // Converted Markdown
+console.log(result.metadata?.document?.title); // Document title
+console.log(result.metadata?.headers); // All h1-h6 elements
+console.log(result.metadata?.links); // All hyperlinks
+console.log(result.metadata?.images); // All images with alt text
+console.log(result.metadata?.structuredData); // JSON-LD, Microdata, RDFa
 ```
 
 {% elif language == 'ruby' %}

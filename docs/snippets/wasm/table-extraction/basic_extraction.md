@@ -1,5 +1,5 @@
 ```javascript
-import init, { convert } from '@kreuzberg/html-to-markdown-wasm';
+import init, { convert } from "@kreuzberg/html-to-markdown-wasm";
 
 await init();
 
@@ -15,8 +15,8 @@ const result = convert(html, { extractTables: true });
 
 for (const table of result.tables ?? []) {
   for (let i = 0; i < table.cells.length; i++) {
-    const prefix = table.isHeaderRow[i] ? 'Header' : 'Row';
-    console.log(`  ${prefix}: ${table.cells[i].join(', ')}`);
+    const prefix = table.isHeaderRow[i] ? "Header" : "Row";
+    console.log(`  ${prefix}: ${table.cells[i].join(", ")}`);
   }
 }
 ```

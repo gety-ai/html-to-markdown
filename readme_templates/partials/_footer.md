@@ -1,24 +1,24 @@
 ## Links
 
 - **GitHub:** [github.com/kreuzberg-dev/html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown)
-{% if language == 'python' %}
+  {% if language == 'python' %}
 - **PyPI:** [pypi.org/project/html-to-markdown](https://pypi.org/project/html-to-markdown/)
-{% elif language == 'typescript' or language == 'node' %}
+  {% elif language == 'typescript' or language == 'node' %}
 - **npm:** [npmjs.com/@kreuzberg/html-to-markdown](https://www.npmjs.com/package/@kreuzberg/html-to-markdown)
 - **WASM:** [npmjs.com/@kreuzberg/html-to-markdown-wasm](https://www.npmjs.com/package/@kreuzberg/html-to-markdown-wasm)
-{% elif language == 'ruby' %}
+  {% elif language == 'ruby' %}
 - **RubyGems:** [rubygems.org/gems/html-to-markdown](https://rubygems.org/gems/html-to-markdown)
-{% elif language == 'php' %}
+  {% elif language == 'php' %}
 - **Packagist:** [packagist.org/packages/kreuzberg-dev/html-to-markdown](https://packagist.org/packages/kreuzberg-dev/html-to-markdown)
-{% elif language == 'go' %}
+  {% elif language == 'go' %}
 - **Go Packages:** [pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v2](https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v2)
-{% elif language == 'java' %}
+  {% elif language == 'java' %}
 - **Maven Central:** [central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown](https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown)
-{% elif language == 'csharp' %}
+  {% elif language == 'csharp' %}
 - **NuGet:** [nuget.org/packages/KreuzbergDev.HtmlToMarkdown](https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/)
-{% elif language == 'elixir' %}
+  {% elif language == 'elixir' %}
 - **Hex.pm:** [hex.pm/packages/html_to_markdown](https://hex.pm/packages/html_to_markdown)
-{% endif %}
+  {% endif %}
 - **Kreuzberg Ecosystem:** [kreuzberg.dev](https://kreuzberg.dev)
 - **Discord:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
 

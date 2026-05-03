@@ -51,18 +51,18 @@ v3 has one function:
 
 ### Migration table
 
-| v2 | v3 |
-|----|-----|
-| `convert(html)` | `convert(html).content` |
-| `convert_with_metadata(html, opts, cfg)` | `convert(html, opts).metadata` |
-| `convert_with_inline_images(html, opts, cfg)` | `convert(html, opts).images` (set `extract_images: true`) |
-| `convert_with_tables(html, opts)` | `convert(html, opts).tables` |
-| `convert_with_visitor(html, opts, v)` | `convert(html, opts, v).content` |
-| `convert_to_string(html)` | `convert(html).content` |
-| `hocr_spatial_tables: true` | Use [Kreuzberg](https://github.com/kreuzberg-dev/kreuzberg) |
-| `ExtendedMetadata` | `HtmlMetadata` |
-| `start_profiling()` | Removed |
-| `markdownify(html)` (Python) | `convert(html).content` |
+| v2                                            | v3                                                          |
+| --------------------------------------------- | ----------------------------------------------------------- |
+| `convert(html)`                               | `convert(html).content`                                     |
+| `convert_with_metadata(html, opts, cfg)`      | `convert(html, opts).metadata`                              |
+| `convert_with_inline_images(html, opts, cfg)` | `convert(html, opts).images` (set `extract_images: true`)   |
+| `convert_with_tables(html, opts)`             | `convert(html, opts).tables`                                |
+| `convert_with_visitor(html, opts, v)`         | `convert(html, opts, v).content`                            |
+| `convert_to_string(html)`                     | `convert(html).content`                                     |
+| `hocr_spatial_tables: true`                   | Use [Kreuzberg](https://github.com/kreuzberg-dev/kreuzberg) |
+| `ExtendedMetadata`                            | `HtmlMetadata`                                              |
+| `start_profiling()`                           | Removed                                                     |
+| `markdownify(html)` (Python)                  | `convert(html).content`                                     |
 
 ## Examples by language
 

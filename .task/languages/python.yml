@@ -2,7 +2,7 @@ version: "3"
 internal: true
 
 vars:
-  BUILD_PROFILE: "{{.BUILD_PROFILE | default \"release\"}}"
+  BUILD_PROFILE: '{{.BUILD_PROFILE | default "release"}}'
   PYTHON_PKG: "packages/python"
 
 tasks:

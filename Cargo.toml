@@ -34,10 +34,7 @@ categories = ["text-processing", "web-programming"]
 rust-version = "1.85"
 
 [workspace.dependencies]
-ahash = { version = "0.8", default-features = false, features = [
-    "std",
-    "compile-time-rng",
-] }
+ahash = { version = "0.8", default-features = false, features = ["std", "compile-time-rng"] }
 base64 = "0.22"
 clap = { version = "4.6", features = ["derive"] }
 clap_complete = "4.6"

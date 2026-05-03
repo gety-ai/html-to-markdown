@@ -9,10 +9,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Article Title",
-          "Article body."
-        ]
+        "values": ["Article Title", "Article body."]
       }
     ]
   },
@@ -26,10 +23,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Section Heading",
-          "Section content."
-        ]
+        "values": ["Section Heading", "Section content."]
       }
     ]
   },
@@ -47,9 +41,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Click to expand"
-        ]
+        "values": ["Click to expand"]
       }
     ]
   },
@@ -63,12 +55,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "HTML",
-          "HyperText Markup Language",
-          "CSS",
-          "Cascading Style Sheets"
-        ]
+        "values": ["HTML", "HyperText Markup Language", "CSS", "Cascading Style Sheets"]
       }
     ]
   },
@@ -86,9 +73,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "highlighted text"
-        ]
+        "values": ["highlighted text"]
       }
     ]
   },
@@ -106,12 +91,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "H",
-          "2",
-          "O",
-          "E=mc"
-        ]
+        "values": ["H", "2", "O", "E=mc"]
       }
     ]
   },
@@ -125,9 +105,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "WWW"
-        ]
+        "values": ["WWW"]
       }
     ]
   },
@@ -145,10 +123,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "Above",
-          "Below"
-        ]
+        "values": ["Above", "Below"]
       }
     ]
   }

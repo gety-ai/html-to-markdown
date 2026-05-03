@@ -8,7 +8,7 @@ The repository root is a **[Cargo workspace](https://doc.rust-lang.org/book/ch14
 
 Under **`crates/`** there are **eight packages** (each is its own crate with its own `Cargo.toml`):
 
-- **Core and shipping:** `html-to-markdown` (the library published as *html-to-markdown-rs*), `html-to-markdown-cli`, and `html-to-markdown-ffi` (`libhtml_to_markdown` for Go, Java, C#, C, and similar consumers).
+- **Core and shipping:** `html-to-markdown` (the library published as _html-to-markdown-rs_), `html-to-markdown-cli`, and `html-to-markdown-ffi` (`libhtml_to_markdown` for Go, Java, C#, C, and similar consumers).
 - **Native bindings compiled from this repo:** `html-to-markdown-py`, `html-to-markdown-node`, `html-to-markdown-php`, and `html-to-markdown-wasm` (each embeds or wraps the core differently—PyO3, NAPI-RS, ext-php-rs, wasm-bindgen).
 - **Shared glue:** `html-to-markdown-bindings-common` holds option marshalling and other bits reused by those bindings so they do not duplicate the same types.
 
@@ -50,26 +50,26 @@ Each language reaches Rust via a different mechanism. All paths fall into one of
 
 ### Direct embedding
 
-| Language | Mechanism | Crate |
-|----------|-----------|-------|
-| Python | [PyO3](https://pyo3.rs) extension module | `html-to-markdown-py` |
-| TypeScript / Node.js | [NAPI-RS](https://napi.rs) Node-API addon | `html-to-markdown-node` |
-| PHP | [ext-php-rs](https://davidcole1340.github.io/ext-php-rs/) PHP extension | `html-to-markdown-php` |
-| Ruby | [Magnus](https://github.com/matsadler/magnus) gem extension | `packages/ruby` |
-| Elixir | [Rustler](https://github.com/rusterlium/rustler) NIF | `packages/elixir` |
-| R | [extendr](https://extendr.github.io) R extension | `packages/r` |
-| WebAssembly | [wasm-bindgen](https://rustwasm.github.io/wasm-bindgen/) | `html-to-markdown-wasm` |
+| Language             | Mechanism                                                               | Crate                   |
+| -------------------- | ----------------------------------------------------------------------- | ----------------------- |
+| Python               | [PyO3](https://pyo3.rs) extension module                                | `html-to-markdown-py`   |
+| TypeScript / Node.js | [NAPI-RS](https://napi.rs) Node-API addon                               | `html-to-markdown-node` |
+| PHP                  | [ext-php-rs](https://davidcole1340.github.io/ext-php-rs/) PHP extension | `html-to-markdown-php`  |
+| Ruby                 | [Magnus](https://github.com/matsadler/magnus) gem extension             | `packages/ruby`         |
+| Elixir               | [Rustler](https://github.com/rusterlium/rustler) NIF                    | `packages/elixir`       |
+| R                    | [extendr](https://extendr.github.io) R extension                        | `packages/r`            |
+| WebAssembly          | [wasm-bindgen](https://rustwasm.github.io/wasm-bindgen/)                | `html-to-markdown-wasm` |
 
 For these, the conversion function is compiled directly into the native extension. The host language never sees the C ABI.
 
 ### Via libhtml_to_markdown
 
-| Language | Mechanism | Notes |
-|----------|-----------|-------|
-| Go | cgo | Bundles `libhtml_to_markdown.a` in the Go module. |
-| Java | Foreign Function & Memory API (Java 22+) | Extracts the shared library from the JAR at startup. |
-| C# | P/Invoke (`DllImport`) | Loads `libhtml_to_markdown` via `NativeLibrary`. |
-| C | Direct link | Consumer links against `html-to-markdown-ffi`. |
+| Language | Mechanism                                | Notes                                                |
+| -------- | ---------------------------------------- | ---------------------------------------------------- |
+| Go       | cgo                                      | Bundles `libhtml_to_markdown.a` in the Go module.    |
+| Java     | Foreign Function & Memory API (Java 22+) | Extracts the shared library from the JAR at startup. |
+| C#       | P/Invoke (`DllImport`)                   | Loads `libhtml_to_markdown` via `NativeLibrary`.     |
+| C        | Direct link                              | Consumer links against `html-to-markdown-ffi`.       |
 
 The C FFI crate exposes a minimal, null-safe C API and catches any Rust panics at the boundary, converting them to `ConversionError::Panic` rather than letting them unwind across the ABI.
 
@@ -77,13 +77,13 @@ The C FFI crate exposes a minimal, null-safe C API and catches any Rust panics a
 
 The core library compiles with six Cargo features. Bindings enable the subset they expose.
 
-| Feature | What it gates |
-|---------|---------------|
-| `metadata` | All metadata extraction code and `HtmlMetadata` types (on by default) |
-| `visitor` | `HtmlVisitor` trait and `ConversionError::Visitor` |
-| `inline-images` | Data-URI decoder and inline SVG extractor |
-| `serde` | `Serialize`/`Deserialize` on option and result types |
-| `full` | All four optional features combined |
+| Feature         | What it gates                                                         |
+| --------------- | --------------------------------------------------------------------- |
+| `metadata`      | All metadata extraction code and `HtmlMetadata` types (on by default) |
+| `visitor`       | `HtmlVisitor` trait and `ConversionError::Visitor`                    |
+| `inline-images` | Data-URI decoder and inline SVG extractor                             |
+| `serde`         | `Serialize`/`Deserialize` on option and result types                  |
+| `full`          | All four optional features combined                                   |
 
 The WASM build omits `inline-images` (no filesystem, no image decoder in the browser sandbox).
 

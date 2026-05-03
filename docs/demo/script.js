@@ -1,4 +1,6 @@
-import init, { convert } from "https://cdn.jsdelivr.net/npm/@kreuzberg/html-to-markdown-wasm@latest/dist-web/html_to_markdown_wasm.js";
+import init, {
+  convert,
+} from "https://cdn.jsdelivr.net/npm/@kreuzberg/html-to-markdown-wasm@latest/dist-web/html_to_markdown_wasm.js";
 
 let wasmInitialized = false;
 
@@ -39,7 +41,7 @@ function highlightJson(obj) {
       if (bool) return `<span class="json-bool">${bool}</span>`;
       if (nil) return `<span class="json-null">${nil}</span>`;
       return match;
-    }
+    },
   );
 }
 
@@ -107,10 +109,7 @@ function switchTab(tab) {
 }
 
 async function copyToClipboard() {
-  const text =
-    activeTab === "markdown"
-      ? outputMarkdown.textContent
-      : outputJson.innerText;
+  const text = activeTab === "markdown" ? outputMarkdown.textContent : outputJson.innerText;
 
   if (!text) {
     statusEl.textContent = "Nothing to copy";

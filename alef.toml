@@ -214,7 +214,7 @@ e2e = "dotnet test e2e/csharp"
 [crates.test.elixir]
 precondition = "command -v mix >/dev/null 2>&1"
 before = "cd packages/elixir && mix deps.get && mix compile"
-e2e = "cd e2e/elixir && mix test"
+e2e = "cd e2e/elixir && mix deps.get && mix compile && mix test"
 
 [crates.test.r]
 precondition = "which Rscript 2>/dev/null"
@@ -326,7 +326,7 @@ linkStyle = "LinkStyle"
 outputFormat = "OutputFormat"
 
 [crates.e2e.call.overrides.node]
-module = "html-to-markdown"
+module = "@kreuzberg/html-to-markdown"
 function = "convert"
 options_type = "ConversionOptions"
 enum_module = "html_to_markdown._html_to_markdown"
@@ -334,6 +334,7 @@ enum_module = "html_to_markdown._html_to_markdown"
 [crates.e2e.call.overrides.go]
 module = "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
 function = "Convert"
+visitor_function = "ConvertWithVisitor"
 alias = "htmd"
 options_type = "ConversionOptions"
 returns_result = true
@@ -484,7 +485,7 @@ name = "html-to-markdown"
 path = "../../packages/python"
 
 [crates.e2e.packages.node]
-name = "html-to-markdown"
+name = "@kreuzberg/html-to-markdown"
 path = "../../crates/html-to-markdown-node"
 
 [crates.e2e.packages.go]

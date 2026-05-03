@@ -9,9 +9,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "![A photo](photo.jpg)"
-        ]
+        "values": ["![A photo](photo.jpg)"]
       }
     ]
   },
@@ -29,9 +27,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "banner.jpg"
-        ]
+        "values": ["banner.jpg"]
       }
     ]
   },
@@ -45,10 +41,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "![Sales chart](chart.png",
-          "Q3 Sales"
-        ]
+        "values": ["![Sales chart](chart.png", "Q3 Sales"]
       }
     ]
   },
@@ -62,10 +55,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "![A sunset](sunset.jpg)",
-          "Beautiful sunset over the ocean"
-        ]
+        "values": ["![A sunset](sunset.jpg)", "Beautiful sunset over the ocean"]
       }
     ]
   },
@@ -79,10 +69,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "![Icon](icon.png)",
-          "https://example.com"
-        ]
+        "values": ["![Icon](icon.png)", "https://example.com"]
       }
     ]
   }

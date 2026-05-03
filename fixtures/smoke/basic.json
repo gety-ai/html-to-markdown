@@ -41,9 +41,7 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": [
-          "# Title"
-        ]
+        "values": ["# Title"]
       }
     ]
   }

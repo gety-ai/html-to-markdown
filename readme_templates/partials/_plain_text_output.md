@@ -16,11 +16,11 @@ plain = convert(html, ConversionOptions(output_format="plain"))
 {% elif language == 'typescript' %}
 
 ```typescript
-import { convert } from '@kreuzberg/html-to-markdown';
+import { convert } from "@kreuzberg/html-to-markdown";
 
 const html = "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.</p>";
 
-const plain = convert(html, { outputFormat: 'plain' });
+const plain = convert(html, { outputFormat: "plain" });
 // Result: "Title\n\nThis is bold and italic text."
 ```
 

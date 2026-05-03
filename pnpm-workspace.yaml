@@ -1,6 +1,8 @@
 packages:
   - crates/html-to-markdown-node
   - crates/html-to-markdown-wasm
+  - packages/typescript
+  - e2e/node
 
 ignoredBuiltDependencies:
   - esbuild
