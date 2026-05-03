@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.14.8"
+alef_version = "0.14.10"
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm", "r"]
 
 [workspace.sync]
@@ -135,9 +135,9 @@ before = "cd packages/python && uv sync"
 typecheck = "cd packages/python && uv run mypy ."
 
 [crates.lint.node]
-precondition = "command -v npx >/dev/null 2>&1"
-format = "npx oxfmt packages/typescript/src/"
-check = "npx oxlint packages/typescript/"
+precondition = "command -v pnpm >/dev/null 2>&1"
+format = "pnpm dlx oxfmt packages/typescript/src/"
+check = "pnpm dlx oxlint packages/typescript/"
 
 [crates.lint.ruby]
 precondition = "command -v bundle >/dev/null 2>&1"
@@ -163,9 +163,9 @@ precondition = "command -v mvn >/dev/null 2>&1"
 check = "mvn -f packages/java/pom.xml spotless:check -q"
 
 [crates.lint.wasm]
-precondition = "command -v npx >/dev/null 2>&1"
-format = "npx oxfmt packages/wasm/"
-check = "npx oxlint packages/wasm/"
+precondition = "command -v pnpm >/dev/null 2>&1"
+format = "pnpm dlx oxfmt packages/wasm/"
+check = "pnpm dlx oxlint packages/wasm/"
 
 [crates.lint.r]
 precondition = "command -v Rscript >/dev/null 2>&1"
@@ -183,9 +183,9 @@ before = "cd e2e/python && uv sync && uv pip install --refresh ../../packages/py
 e2e = "cd e2e/python && uv run pytest tests/ -q"
 
 [crates.test.node]
-precondition = "command -v npx >/dev/null 2>&1"
+precondition = "command -v pnpm >/dev/null 2>&1"
 before = "cd crates/html-to-markdown-node && napi build --output-dir . --release"
-e2e = "cd e2e/node && npx vitest run"
+e2e = "cd e2e/node && pnpm exec vitest run"
 
 [crates.test.go]
 precondition = "command -v go >/dev/null 2>&1"
@@ -222,9 +222,9 @@ precondition = "which Rscript 2>/dev/null"
 e2e = "cd e2e/r && Rscript -e \"devtools::load_all('../../packages/r'); testthat::set_max_fails(Inf); testthat::test_dir('tests')\""
 
 [crates.test.wasm]
-precondition = "command -v npx >/dev/null 2>&1"
-before = "wasm-pack build crates/html-to-markdown-wasm --release --target bundler && cd e2e/wasm && npm install"
-e2e = "cd e2e/wasm && npm test"
+precondition = "command -v pnpm >/dev/null 2>&1"
+before = "wasm-pack build crates/html-to-markdown-wasm --release --target bundler && cd e2e/wasm && pnpm install"
+e2e = "cd e2e/wasm && pnpm test"
 
 [crates.test.rust]
 precondition = "command -v cargo >/dev/null 2>&1"

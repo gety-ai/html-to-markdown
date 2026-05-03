@@ -1,0 +1,6 @@
+test_documents/
+fixtures/
+target/
+node_modules/
+dist/
+vendor/
