@@ -341,21 +341,18 @@ pub fn handle_input(
             };
             match visit_result {
                 VisitResult::Continue => {}
-                VisitResult::Skip => return,
+                VisitResult::Skip => (),
                 VisitResult::Custom(custom) => {
                     output.push_str(&custom);
-                    return;
                 }
                 VisitResult::PreserveHtml => {
                     use crate::converter::utility::serialization::serialize_node;
                     output.push_str(&serialize_node(node_handle, parser));
-                    return;
                 }
                 VisitResult::Error(err) => {
                     if ctx.visitor_error.borrow().is_none() {
                         *ctx.visitor_error.borrow_mut() = Some(err);
                     }
-                    return;
                 }
             }
         }

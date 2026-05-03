@@ -27,7 +27,7 @@ fn convert(
     html_to_markdown_rs::convert(html, Some(opts))
 }
 
-/// Visitor receives visit_form callback even when preprocessing would normally drop the form
+/// Visitor receives `visit_form` callback even when preprocessing would normally drop the form
 #[test]
 fn test_visitor_form_custom_overrides_preprocessing() {
     #[derive(Debug, Default)]
@@ -49,7 +49,7 @@ fn test_visitor_form_custom_overrides_preprocessing() {
     );
 }
 
-/// Visitor receives visit_input callback for inputs inside a form that preprocessing would drop
+/// Visitor receives `visit_input` callback for inputs inside a form that preprocessing would drop
 #[test]
 fn test_visitor_input_custom_inside_preprocessed_form() {
     #[derive(Debug, Default)]
@@ -77,7 +77,7 @@ fn test_visitor_input_custom_inside_preprocessed_form() {
     );
 }
 
-/// Visitor figure_start and figure_end are both called; figure_end receives figure_start output
+/// Visitor `figure_start` and `figure_end` are both called; `figure_end` receives `figure_start` output
 #[test]
 fn test_visitor_figure_start_end_both_called() {
     #[derive(Debug, Default)]
