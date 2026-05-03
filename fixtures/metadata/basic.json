@@ -3,7 +3,10 @@
     "id": "metadata_title_tag",
     "description": "Extract title from <title> tag",
     "input": {
-      "html": "<html><head><title>My Page</title></head><body><p>Content</p></body></html>"
+      "html": "<html><head><title>My Page</title></head><body><p>Content</p></body></html>",
+      "options": {
+        "extract_metadata": true
+      }
     },
     "assertions": [
       {
@@ -21,7 +24,10 @@
     "id": "metadata_description_meta",
     "description": "Extract description from <meta name='description'> tag",
     "input": {
-      "html": "<html><head><title>Page</title><meta name=\"description\" content=\"This is the page description.\"></head><body><p>Content</p></body></html>"
+      "html": "<html><head><title>Page</title><meta name=\"description\" content=\"This is the page description.\"></head><body><p>Content</p></body></html>",
+      "options": {
+        "extract_metadata": true
+      }
     },
     "assertions": [
       {
@@ -39,7 +45,10 @@
     "id": "metadata_author_meta",
     "description": "Extract author from <meta name='author'> tag",
     "input": {
-      "html": "<html><head><title>Page</title><meta name=\"author\" content=\"Jane Doe\"></head><body><p>Content</p></body></html>"
+      "html": "<html><head><title>Page</title><meta name=\"author\" content=\"Jane Doe\"></head><body><p>Content</p></body></html>",
+      "options": {
+        "extract_metadata": true
+      }
     },
     "assertions": [
       {
@@ -57,7 +66,10 @@
     "id": "metadata_keywords_meta",
     "description": "Extract keywords from <meta name='keywords'> tag",
     "input": {
-      "html": "<html><head><title>Page</title><meta name=\"keywords\" content=\"rust, markdown, html, converter\"></head><body><p>Content</p></body></html>"
+      "html": "<html><head><title>Page</title><meta name=\"keywords\" content=\"rust, markdown, html, converter\"></head><body><p>Content</p></body></html>",
+      "options": {
+        "extract_metadata": true
+      }
     },
     "assertions": [
       {
@@ -75,7 +87,10 @@
     "id": "metadata_canonical_url",
     "description": "Extract canonical URL from <link rel='canonical'> tag",
     "input": {
-      "html": "<html><head><title>Page</title><link rel=\"canonical\" href=\"https://example.com/canonical-page\"></head><body><p>Content</p></body></html>"
+      "html": "<html><head><title>Page</title><link rel=\"canonical\" href=\"https://example.com/canonical-page\"></head><body><p>Content</p></body></html>",
+      "options": {
+        "extract_metadata": true
+      }
     },
     "assertions": [
       {
