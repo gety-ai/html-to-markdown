@@ -623,7 +623,7 @@ template = "language_package.md"
 output_path = "packages/typescript/README.md"
 package_manager = ["npm", "pnpm", "yarn", "bun"]
 package_name = "@kreuzberg/html-to-markdown"
-install_command = "npm install @kreuzberg/html-to-markdown"
+install_command = "pnpm add @kreuzberg/html-to-markdown"
 description = """
 High-performance HTML to Markdown converter for Node.js and Bun with full TypeScript support.
 This package wraps native `@kreuzberg/html-to-markdown` bindings and provides a type-safe API.
