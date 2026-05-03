@@ -32,6 +32,7 @@ type DomContext = crate::converter::DomContext;
 /// # Code Block Detection
 /// Code blocks (identified by markdown formatting) are always preserved,
 /// even if they appear "empty" according to trim().
+#[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 pub fn handle(
     node_handle: &NodeHandle,
     parser: &Parser,
@@ -49,6 +50,51 @@ pub fn handle(
         tl::Node::Tag(tag) => tag,
         _ => return,
     };
+
+    #[cfg(feature = "visitor")]
+    if let Some(ref visitor_handle) = ctx.visitor {
+        use crate::converter::utility::content::collect_tag_attributes;
+        use crate::converter::utility::serialization::serialize_tag_to_html;
+        use crate::visitor::{NodeContext, NodeType, VisitResult};
+
+        let tag_name = tag.name().as_utf8_str().to_string();
+        let raw_html = serialize_tag_to_html(node_handle, parser);
+        let attributes = collect_tag_attributes(tag);
+        let node_id = node_handle.get_inner();
+        let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
+        let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
+        let node_ctx = NodeContext {
+            node_type: NodeType::Custom,
+            tag_name: tag_name.clone(),
+            attributes,
+            depth,
+            index_in_parent,
+            parent_tag,
+            is_inline: false,
+        };
+        let visit_result = {
+            let mut visitor = visitor_handle.borrow_mut();
+            visitor.visit_custom_element(&node_ctx, &tag_name, &raw_html)
+        };
+        match visit_result {
+            VisitResult::Continue => {}
+            VisitResult::Skip => return,
+            VisitResult::Custom(custom) => {
+                output.push_str(&custom);
+                return;
+            }
+            VisitResult::PreserveHtml => {
+                output.push_str(&raw_html);
+                return;
+            }
+            VisitResult::Error(err) => {
+                if ctx.visitor_error.borrow().is_none() {
+                    *ctx.visitor_error.borrow_mut() = Some(err);
+                }
+                return;
+            }
+        }
+    }
 
     let len_before = output.len();
     let had_trailing_space = output.ends_with(' ');

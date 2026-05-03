@@ -27,6 +27,7 @@
 /// 1. Normalizes newline + image sequences: `\n![` → `![`
 /// 2. Normalizes space + image sequences: ` ![` → `![`
 /// 3. Trims the final content and wraps it with blank lines
+#[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 pub fn handle_figure(
     _tag_name: &str,
     node_handle: &tl::NodeHandle,
@@ -49,10 +50,94 @@ pub fn handle_figure(
             return;
         }
 
+        // Check visit_figure_start before processing children.
+        #[cfg(feature = "visitor")]
+        if let Some(ref visitor_handle) = ctx.visitor {
+            use crate::converter::utility::content::collect_tag_attributes;
+            use crate::visitor::{NodeContext, NodeType, VisitResult};
+
+            let attributes = collect_tag_attributes(tag);
+            let node_id = node_handle.get_inner();
+            let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
+            let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
+            let node_ctx = NodeContext {
+                node_type: NodeType::Figure,
+                tag_name: "figure".to_string(),
+                attributes,
+                depth,
+                index_in_parent,
+                parent_tag,
+                is_inline: false,
+            };
+            let visit_result = {
+                let mut visitor = visitor_handle.borrow_mut();
+                visitor.visit_figure_start(&node_ctx)
+            };
+            match visit_result {
+                VisitResult::Continue => {}
+                VisitResult::Skip => return,
+                VisitResult::Custom(custom) => {
+                    // Record where custom content starts so visit_figure_end can see it
+                    let start_pos = output.len();
+                    if !output.is_empty() && !output.ends_with("\n\n") {
+                        output.push_str("\n\n");
+                    }
+                    output.push_str(&custom);
+                    // Still call visit_figure_end with the custom content
+                    let safe_start = start_pos.min(output.len());
+                    let figure_output = output[safe_start..].to_owned();
+                    let end_result = {
+                        let mut visitor = visitor_handle.borrow_mut();
+                        visitor.visit_figure_end(&node_ctx, &figure_output)
+                    };
+                    match end_result {
+                        VisitResult::Continue => {
+                            if !output.ends_with('\n') {
+                                output.push_str("\n\n");
+                            } else if !output.ends_with("\n\n") {
+                                output.push('\n');
+                            }
+                        }
+                        VisitResult::Custom(end_custom) => {
+                            output.truncate(safe_start);
+                            output.push_str(&end_custom);
+                        }
+                        VisitResult::Skip => {
+                            output.truncate(safe_start);
+                        }
+                        VisitResult::PreserveHtml => {
+                            use crate::converter::utility::serialization::serialize_node;
+                            output.truncate(safe_start);
+                            output.push_str(&serialize_node(node_handle, parser));
+                        }
+                        VisitResult::Error(err) => {
+                            if ctx.visitor_error.borrow().is_none() {
+                                *ctx.visitor_error.borrow_mut() = Some(err);
+                            }
+                        }
+                    }
+                    return;
+                }
+                VisitResult::PreserveHtml => {
+                    use crate::converter::utility::serialization::serialize_node;
+                    output.push_str(&serialize_node(node_handle, parser));
+                    return;
+                }
+                VisitResult::Error(err) => {
+                    if ctx.visitor_error.borrow().is_none() {
+                        *ctx.visitor_error.borrow_mut() = Some(err);
+                    }
+                    return;
+                }
+            }
+        }
+
         // Ensure spacing before the figure
         if !output.is_empty() && !output.ends_with("\n\n") {
             output.push_str("\n\n");
         }
+
+        let figure_start = output.len();
 
         // Collect content in a separate buffer
         let mut figure_content = String::new();
@@ -78,6 +163,53 @@ pub fn handle_figure(
                 output.push('\n');
             }
         }
+
+        // Call visit_figure_end after collecting content.
+        #[cfg(feature = "visitor")]
+        if let Some(ref visitor_handle) = ctx.visitor {
+            use crate::converter::utility::content::collect_tag_attributes;
+            use crate::visitor::{NodeContext, NodeType, VisitResult};
+
+            let attributes = collect_tag_attributes(tag);
+            let node_id = node_handle.get_inner();
+            let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
+            let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
+            let node_ctx = NodeContext {
+                node_type: NodeType::Figure,
+                tag_name: "figure".to_string(),
+                attributes,
+                depth,
+                index_in_parent,
+                parent_tag,
+                is_inline: false,
+            };
+            let safe_start = figure_start.min(output.len());
+            let figure_output = output[safe_start..].to_owned();
+            let visit_result = {
+                let mut visitor = visitor_handle.borrow_mut();
+                visitor.visit_figure_end(&node_ctx, &figure_output)
+            };
+            match visit_result {
+                VisitResult::Continue => {}
+                VisitResult::Skip => {
+                    output.truncate(safe_start);
+                }
+                VisitResult::Custom(custom) => {
+                    output.truncate(safe_start);
+                    output.push_str(&custom);
+                }
+                VisitResult::PreserveHtml => {
+                    use crate::converter::utility::serialization::serialize_node;
+                    output.truncate(safe_start);
+                    output.push_str(&serialize_node(node_handle, parser));
+                }
+                VisitResult::Error(err) => {
+                    if ctx.visitor_error.borrow().is_none() {
+                        *ctx.visitor_error.borrow_mut() = Some(err);
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -99,6 +231,7 @@ pub fn handle_figure(
 /// 2. Checks for existing output and adds spacing as needed
 /// 3. Wraps content in emphasis markers: `*caption*`
 /// 4. Ensures proper blank-line spacing after the caption
+#[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 pub fn handle_figcaption(
     _tag_name: &str,
     node_handle: &tl::NodeHandle,
@@ -118,30 +251,93 @@ pub fn handle_figcaption(
             }
         }
 
-        let text = text.trim();
-        if !text.is_empty() {
-            // Add spacing before caption if needed
-            if !output.is_empty() {
-                if output.ends_with("```\n") {
-                    output.push('\n');
-                } else {
-                    // Trim trailing whitespace and ensure single blank line
-                    while output.ends_with(' ') || output.ends_with('\t') {
-                        output.pop();
+        let text = text.trim().to_owned();
+        if text.is_empty() {
+            return;
+        }
+
+        #[cfg(feature = "visitor")]
+        if let Some(ref visitor_handle) = ctx.visitor {
+            use crate::converter::utility::content::collect_tag_attributes;
+            use crate::visitor::{NodeContext, NodeType, VisitResult};
+
+            let attributes = collect_tag_attributes(tag);
+            let node_id = node_handle.get_inner();
+            let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
+            let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
+            let node_ctx = NodeContext {
+                node_type: NodeType::Figcaption,
+                tag_name: "figcaption".to_string(),
+                attributes,
+                depth,
+                index_in_parent,
+                parent_tag,
+                is_inline: false,
+            };
+            let visit_result = {
+                let mut visitor = visitor_handle.borrow_mut();
+                visitor.visit_figcaption(&node_ctx, &text)
+            };
+            match visit_result {
+                VisitResult::Continue => {}
+                VisitResult::Skip => return,
+                VisitResult::Custom(custom) => {
+                    // Add spacing before caption if needed
+                    if !output.is_empty() {
+                        if output.ends_with("```\n") {
+                            output.push('\n');
+                        } else {
+                            while output.ends_with(' ') || output.ends_with('\t') {
+                                output.pop();
+                            }
+                            if output.ends_with('\n') && !output.ends_with("\n\n") {
+                                output.push('\n');
+                            } else if !output.ends_with('\n') {
+                                output.push_str("\n\n");
+                            }
+                        }
                     }
-                    if output.ends_with('\n') && !output.ends_with("\n\n") {
-                        output.push('\n');
-                    } else if !output.ends_with('\n') {
+                    output.push_str(&custom);
+                    if !custom.ends_with('\n') {
                         output.push_str("\n\n");
                     }
+                    return;
+                }
+                VisitResult::PreserveHtml => {
+                    use crate::converter::utility::serialization::serialize_node;
+                    output.push_str(&serialize_node(node_handle, parser));
+                    return;
+                }
+                VisitResult::Error(err) => {
+                    if ctx.visitor_error.borrow().is_none() {
+                        *ctx.visitor_error.borrow_mut() = Some(err);
+                    }
+                    return;
                 }
             }
-
-            // Output caption as emphasized text
-            output.push('*');
-            output.push_str(text);
-            output.push_str("*\n\n");
         }
+
+        // Add spacing before caption if needed
+        if !output.is_empty() {
+            if output.ends_with("```\n") {
+                output.push('\n');
+            } else {
+                // Trim trailing whitespace and ensure single blank line
+                while output.ends_with(' ') || output.ends_with('\t') {
+                    output.pop();
+                }
+                if output.ends_with('\n') && !output.ends_with("\n\n") {
+                    output.push('\n');
+                } else if !output.ends_with('\n') {
+                    output.push_str("\n\n");
+                }
+            }
+        }
+
+        // Output caption as emphasized text
+        output.push('*');
+        output.push_str(&text);
+        output.push_str("*\n\n");
     }
 }
 

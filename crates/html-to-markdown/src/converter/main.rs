@@ -376,7 +376,12 @@ pub fn walk_node(
                 }
             }
 
-            if should_drop_for_preprocessing(tag_name.as_ref(), tag, options) {
+            #[cfg(feature = "visitor")]
+            let visitor_is_active = ctx.visitor.is_some();
+            #[cfg(not(feature = "visitor"))]
+            let visitor_is_active = false;
+
+            if !visitor_is_active && should_drop_for_preprocessing(tag_name.as_ref(), tag, options) {
                 trim_trailing_whitespace(output);
                 return;
             }

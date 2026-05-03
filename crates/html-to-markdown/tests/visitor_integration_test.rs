@@ -27,6 +27,79 @@ fn convert(
     html_to_markdown_rs::convert(html, Some(opts))
 }
 
+/// Visitor receives visit_form callback even when preprocessing would normally drop the form
+#[test]
+fn test_visitor_form_custom_overrides_preprocessing() {
+    #[derive(Debug, Default)]
+    struct FormVisitor;
+    impl HtmlVisitor for FormVisitor {
+        fn visit_form(&mut self, _ctx: &NodeContext, action: Option<&str>, _method: Option<&str>) -> VisitResult {
+            VisitResult::Custom(format!("[FORM:{}]", action.unwrap_or("none")))
+        }
+    }
+    let html = r#"<div><form action="/submit" method="POST"><label>Name: <input type="text" name="name"></label><button type="submit">Submit</button></form></div>"#;
+    let visitor: VisitorHandle = Rc::new(RefCell::new(FormVisitor));
+    let result = convert(html, None, Some(visitor))
+        .expect("conversion failed")
+        .content
+        .unwrap_or_default();
+    assert!(
+        result.contains("[FORM:/submit]"),
+        "Should contain custom form output, got: {result:?}"
+    );
+}
+
+/// Visitor receives visit_input callback for inputs inside a form that preprocessing would drop
+#[test]
+fn test_visitor_input_custom_inside_preprocessed_form() {
+    #[derive(Debug, Default)]
+    struct InputVisitor;
+    impl HtmlVisitor for InputVisitor {
+        fn visit_input(&mut self, _ctx: &NodeContext, input_type: &str, _name: Option<&str>, _value: Option<&str>) -> VisitResult {
+            VisitResult::Custom(format!("[INPUT:{input_type}]"))
+        }
+    }
+    let html = r#"<form><input type="text" name="username"></form>"#;
+    let visitor: VisitorHandle = Rc::new(RefCell::new(InputVisitor));
+    let result = convert(html, None, Some(visitor))
+        .expect("conversion failed")
+        .content
+        .unwrap_or_default();
+    assert!(
+        result.contains("[INPUT:text]"),
+        "Should contain custom input output, got: {result:?}"
+    );
+}
+
+/// Visitor figure_start and figure_end are both called; figure_end receives figure_start output
+#[test]
+fn test_visitor_figure_start_end_both_called() {
+    #[derive(Debug, Default)]
+    struct FigureVisitor;
+    impl HtmlVisitor for FigureVisitor {
+        fn visit_figure_start(&mut self, _ctx: &NodeContext) -> VisitResult {
+            VisitResult::Custom("[FIGURE_START]".to_string())
+        }
+        fn visit_figure_end(&mut self, _ctx: &NodeContext, output: &str) -> VisitResult {
+            VisitResult::Custom(format!("{output}[/FIGURE]"))
+        }
+    }
+    let html = r#"<figure><img src="test.jpg" alt="test"><figcaption>Caption</figcaption></figure>"#;
+    let visitor: VisitorHandle = Rc::new(RefCell::new(FigureVisitor));
+    let result = convert(html, None, Some(visitor))
+        .expect("conversion failed")
+        .content
+        .unwrap_or_default();
+    assert!(
+        result.contains("[FIGURE_START]"),
+        "Should contain figure start marker, got: {result:?}"
+    );
+    assert!(
+        result.contains("[/FIGURE]"),
+        "Should contain figure end marker, got: {result:?}"
+    );
+}
+
 /// Test visitor that customizes all output
 #[derive(Debug, Default)]
 struct CustomizingVisitor;
