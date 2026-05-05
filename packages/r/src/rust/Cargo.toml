@@ -16,6 +16,7 @@ crate-type = ["staticlib"]
 html-to-markdown-rs = { path = "vendor/html-to-markdown-rs", features = [
   "inline-images",
   "metadata",
+  "serde",
   "visitor",
 ] }
 extendr-api = "0.9"

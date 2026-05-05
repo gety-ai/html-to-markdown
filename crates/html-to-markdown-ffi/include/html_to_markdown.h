@@ -3019,32 +3019,22 @@ struct HTMHtmVisitor *htm_visitor_create(const struct HTMHtmVisitorCallbacks *ca
 void htm_visitor_free(struct HTMHtmVisitor *visitor);
 
 /**
- * Convert HTML to Markdown using a custom visitor.
+ * Attach a visitor to a [`html_to_markdown_rs::ConversionOptions`] handle before calling `htm_convert`.
  *
- * Equivalent to `htm_convert` but threads the provided visitor through
- * the conversion pipeline so that every `visit_*` callback is invoked during
- * processing.
+ * The visitor will be invoked during conversion via the normal `htm_convert` path.
+ * The `visitor` pointer must remain valid until after `htm_convert` returns.
  *
- * Returns a heap-allocated null-terminated Markdown string on success, or
- * null on failure (check `htm_last_error_code` / `htm_last_error_context`).
- * The returned pointer must be freed with `htm_free_string`.
- *
- * # Arguments
- *
- * - `html`: null-terminated, UTF-8 HTML input. Must not be null.
- * - `options`: optional conversion options; pass null for defaults.
- * - `visitor`: optional visitor handle from `htm_visitor_create`; pass
- *   null for default conversion (equivalent to `htm_convert`).
+ * Passing `null` for either argument is a no-op.
  *
  * # Safety
  *
- * All pointer arguments must be valid or null as described above.
- * The `visitor` pointer (and its embedded `user_data`) must remain valid for
- * the duration of this call.
+ * `options` must be a non-null pointer returned by `htm_conversion_options_from_json`,
+ * valid for write access.  `visitor` must be a non-null pointer returned by
+ * `htm_visitor_create`, or null.  Both must remain valid for the duration of any
+ * subsequent `htm_convert` call.
  */
-char *htm_convert_with_visitor(const char *html,
-                               const HTMConversionOptions *options,
-                               struct HTMHtmVisitor *visitor);
+void htm_options_set_visitor_handle(HTMConversionOptions *options,
+                                    struct HTMHtmVisitor *visitor);
 
 /**
  * Create a new `HtmHtmlVisitorBridge` from a vtable and opaque user_data pointer.

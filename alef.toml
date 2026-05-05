@@ -184,12 +184,12 @@ e2e = "cd e2e/python && uv run pytest tests/ -q"
 
 [crates.test.node]
 precondition = "command -v pnpm >/dev/null 2>&1"
-before = "cd crates/html-to-markdown-node && napi build --platform --release"
-e2e = "cd e2e/node && pnpm exec vitest run"
+before = "cd crates/html-to-markdown-node && napi build --platform --release && cd ../../packages/typescript && pnpm install --silent && pnpm run build"
+e2e = "cd e2e/node && pnpm install --silent && pnpm exec vitest run"
 
 [crates.test.go]
 precondition = "command -v go >/dev/null 2>&1"
-before = "cargo build --release -p html-to-markdown-ffi"
+before = "cargo build --release -p html-to-markdown-ffi && cd e2e/go && go mod tidy"
 e2e = "cd e2e/go && go test ./... -count=1"
 
 [crates.test.ruby]
@@ -204,7 +204,7 @@ e2e = "cd e2e/php && composer test"
 
 [crates.test.java]
 precondition = "command -v mvn >/dev/null 2>&1"
-before = "cargo build --release -p html-to-markdown-ffi"
+before = "cargo build --release -p html-to-markdown-ffi && cd packages/java && mvn package -DskipTests -q"
 e2e = "cd e2e/java && mvn test -q"
 
 [crates.test.csharp]
@@ -360,10 +360,14 @@ highlightStyle = "HighlightStyle"
 linkStyle = "LinkStyle"
 outputFormat = "OutputFormat"
 
+[crates.e2e.call.overrides.csharp.nested_types]
+preprocessing = "PreprocessingOptions"
+
 [crates.e2e.call.overrides.php]
 module = "HtmlToMarkdown"
 class = "HtmlToMarkdown"
 function = "convert"
+options_type = "ConversionOptions"
 result_is_simple = true
 
 [crates.e2e.call.overrides.php.enum_fields]

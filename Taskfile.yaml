@@ -304,6 +304,13 @@ tasks:
     cmds:
       - alef test --e2e
 
+  e2e:full:
+    desc: "Regenerate e2e tests, build all bindings, and run all e2e tests"
+    cmds:
+      - alef e2e generate
+      - alef generate --clean
+      - alef test --e2e
+
   e2e:generate:
     desc: "Generate E2E tests for all languages from fixtures"
     cmds:
