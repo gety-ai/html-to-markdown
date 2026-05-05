@@ -13,11 +13,10 @@
     "test:wasm": "pnpm --filter @kreuzberg/html-to-markdown-wasm test",
     "test:ts": "pnpm --filter @kreuzberg/html-to-markdown test",
     "clean": "pnpm -r run clean && rm -rf node_modules",
-    "lint": "pnpm --filter @kreuzberg/html-to-markdown-node exec biome check --write --no-errors-on-unmatched . && pnpm --filter @kreuzberg/html-to-markdown-wasm exec biome check --write --no-errors-on-unmatched . && pnpm --filter @kreuzberg/html-to-markdown exec biome check --write --no-errors-on-unmatched .",
-    "format": "biome format --write ."
+    "lint": "prek run oxlint --all-files",
+    "format": "prek run oxfmt --all-files"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.14",
     "@types/node": "^25.6.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.5"

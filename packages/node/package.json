@@ -22,12 +22,11 @@
 		"build:debug": "napi build",
 		"build:ts": "echo 'No TypeScript wrapper to build'",
 		"test": "node -e \"console.log('Add test command')\"",
-		"lint": "biome check src",
-		"lint:fix": "biome check --write src",
-		"format": "biome format --write src"
+		"lint": "cd ../.. && prek run oxlint --all-files",
+		"lint:fix": "cd ../.. && prek run oxlint --all-files",
+		"format": "cd ../.. && prek run oxfmt --all-files"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.4.12",
 		"@napi-rs/cli": "^3.0.0",
 		"typescript": "^6.0.3"
 	},

@@ -95,38 +95,8 @@ repos:
         args: ["check"]
 
   # Node/TS/WASM: oxlint
-  - repo: https://github.com/oxc-project/mirrors-oxlint
-    rev: v1.62.0
-    hooks:
-      - id: oxlint
-        args: ["--fix"]
-        exclude: ^(docs/demo/|e2e/)
-
-  # cppcheck — kept upstream until shared repo ships it
-  - repo: https://github.com/pocc/pre-commit-hooks
-    rev: v1.3.5
-    hooks:
-      - id: cppcheck
-        args:
-          [
-            "--std=c11",
-            "--enable=warning,style,performance",
-            "--suppress=missingIncludeSystem",
-            "--suppress=unusedStructMember",
-            "--suppress=normalCheckLevelMaxBranches",
-          ]
-        files: ^crates/html-to-markdown-ffi/tests/c/
-
-  # Markdown linting
-  - repo: https://github.com/rvben/rumdl-pre-commit
-    rev: "v0.1.86"
-    hooks:
-      - id: rumdl-fmt
-        exclude: 'test_documents/|\.ai-rulez/|\.remote-cache/|e2e/|fixtures/|test_apps/|\.github/copilot-instructions\.md|CLAUDE\.md|\.claude/|\.agents/|\.codex/'
-
-  # Shared kreuzberg-dev polyglot hooks (shell, C/C++, Java checkstyle, Go, Python, Ruby, C#, PHP, Elixir)
   - repo: https://github.com/kreuzberg-dev/pre-commit-hooks
-    rev: v0.1.0
+    rev: v1.0.0
     hooks:
       - id: shfmt
         args: ["-w", "-i", "2"]
@@ -173,7 +143,16 @@ repos:
         files: ^packages/elixir/
       - id: java-verify
         files: ^packages/java/
+      - id: textlint
+        files: ^docs/.*\.md$
+        exclude: ^docs/(reference/|api-|snippets/|migration/)
+        args: ["--fix", "--config", ".textlintrc.json"]
 
+      - id: oxlint
+      - id: oxfmt
+      - id: cppcheck
+      - id: rumdl-fmt
+      - id: cpd
   # Alef: verify bindings and sync versions
   - repo: https://github.com/kreuzberg-dev/alef
     rev: v0.13.6
@@ -188,13 +167,6 @@ repos:
       - id: actionlint
 
   # Java cpd — kept upstream (not yet in shared repo)
-  - repo: https://github.com/gherynos/pre-commit-java
-    rev: v0.6.37
-    hooks:
-      - id: cpd
-        exclude: ^(\.mvn/wrapper/|e2e/|test_apps/|packages/java/src/)
-
-  # Spelling (last — runs after all formatters and generators)
   - repo: https://github.com/crate-ci/typos
     rev: v1.46.0
     hooks:

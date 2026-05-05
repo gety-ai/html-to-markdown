@@ -344,6 +344,20 @@ class = "dev.kreuzberg.htmltomarkdown.HtmlToMarkdownRs"
 function = "convert"
 options_type = "ConversionOptions"
 enum_module = "html_to_markdown._html_to_markdown"
+nested_types_optional = false
+
+[crates.e2e.call.overrides.java.enum_fields]
+headingStyle = "HeadingStyle"
+codeBlockStyle = "CodeBlockStyle"
+listIndentType = "ListIndentType"
+newlineStyle = "NewlineStyle"
+whitespaceMode = "WhitespaceMode"
+highlightStyle = "HighlightStyle"
+linkStyle = "LinkStyle"
+outputFormat = "OutputFormat"
+
+[crates.e2e.call.overrides.java.nested_types]
+preprocessing = "PreprocessingOptions"
 
 [crates.e2e.call.overrides.csharp]
 class = "HtmlToMarkdownRs"
