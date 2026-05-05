@@ -10,5 +10,8 @@ export default defineConfig({
   plugins: [wasm()],
   test: {
     include: ["tests/**/*.test.ts"],
+    setupFiles: ["./vitest.setup.ts"],
+    environment: "node",
+    singleThread: true,
   },
 });

@@ -219,6 +219,15 @@ function asExports(value) {
     return value.exports;
   }
   if (typeof value === "object") {
+    // Check if this is the raw Node.js WASM module with wasm functions
+    // (contains functions like convert, memory, wasmconversionoptions_new, etc.)
+    if (typeof value.convert === "function" && value.memory instanceof WebAssembly.Memory) {
+      return value;
+    }
+    // Check if value itself is an object with exports (vite-plugin-wasm)
+    if (value.exports && typeof value.exports === "object") {
+      return value.exports;
+    }
     if (value.instance instanceof WebAssembly.Instance) {
       return value.instance.exports;
     }
@@ -227,6 +236,14 @@ function asExports(value) {
     }
     if (value.default && value.default.instance instanceof WebAssembly.Instance) {
       return value.default.instance.exports;
+    }
+    // Check if value.default has exports (vite-plugin-wasm with default export)
+    if (value.default && value.default.exports && typeof value.default.exports === "object") {
+      return value.default.exports;
+    }
+    // Check if value.default is the raw WASM module
+    if (value.default && typeof value.default.convert === "function" && value.default.memory instanceof WebAssembly.Memory) {
+      return value.default;
     }
   }
   return null;
@@ -289,6 +306,15 @@ async function ensureInitPromise() {
       // Try standard export detection
       const exports = asExports(module);
       if (!exports) {
+        if (typeof global !== "undefined" && global.process && global.process.env.DEBUG_WASM) {
+          console.error("[WASM DEBUG] Failed to extract exports from module", {
+            module: module ? Object.keys(module) : null,
+            moduleType: typeof module,
+            hasDefault: module && "default" in module,
+            hasExports: module && "exports" in module,
+            hasInstance: module && "instance" in module,
+          });
+        }
         throw new Error("html-to-markdown-wasm: failed to initialize WebAssembly bundle. Call initWasm() with a supported bundler configuration.");
       }
       return finalize(exports);
