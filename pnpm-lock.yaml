@@ -41,10 +41,10 @@ importers:
         specifier: file:../../crates/html-to-markdown-wasm/dist
         version: html-to-markdown-wasm@file:crates/html-to-markdown-wasm/dist
       rollup:
-        specifier: ^4.60.3
+        specifier: ^4.53.3
         version: 4.60.3
       vite-plugin-wasm:
-        specifier: ^3.6.0
+        specifier: ^3.4.0
         version: 3.6.0(vite@8.0.10(@types/node@25.6.0))
       vitest:
         specifier: ^4.1.5
