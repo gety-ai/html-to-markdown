@@ -529,7 +529,7 @@ Usage:
 Virtual space:
   Non-class space:       64.00 MB reserved,      13.31 MB ( 21%) committed,  1 nodes.
       Class space:        1.00 GB reserved,       2.12 MB ( <1%) committed,  1 nodes.
-             Both:        1.06 GB reserved,      15.44 MB (  1%) committed. 
+             Both:        1.06 GB reserved,      15.44 MB (  1%) committed.
 
 Chunk freelists:
    Non-Class:  1.91 MB
@@ -684,45 +684,45 @@ Classes redefined (0 events):
 No events
 
 Internal exceptions (20 events):
-Event: 0.315 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b84797820}: 'int java.lang.invoke.DelegatingMethodHandle$Holder.reinvoke_L(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, long, java.lang.Object, java.lang.Object)'> (0x0000000b84797820) 
+Event: 0.315 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b84797820}: 'int java.lang.invoke.DelegatingMethodHandle$Holder.reinvoke_L(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, long, java.lang.Object, java.lang.Object)'> (0x0000000b84797820)
 thrown [src/hotspot/share/interpreter/linkResolver.cpp, line 804]
-Event: 0.341 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83aeb0d0}: 'long java.lang.invoke.DirectMethodHandle$Holder.invokeSpecial(java.lang.Object, java.lang.Object)'> (0x0000000b83aeb0d0) 
+Event: 0.341 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83aeb0d0}: 'long java.lang.invoke.DirectMethodHandle$Holder.invokeSpecial(java.lang.Object, java.lang.Object)'> (0x0000000b83aeb0d0)
 thrown [src/hotspot/share/interpreter/linkResolver.cpp, line 804]
-Event: 0.341 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83af38d0}: 'long java.lang.invoke.DelegatingMethodHandle$Holder.reinvoke_L(java.lang.Object, java.lang.Object)'> (0x0000000b83af38d0) 
+Event: 0.341 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83af38d0}: 'long java.lang.invoke.DelegatingMethodHandle$Holder.reinvoke_L(java.lang.Object, java.lang.Object)'> (0x0000000b83af38d0)
 thrown [src/hotspot/share/interpreter/linkResolver.cpp, line 804]
-Event: 0.353 Thread 0x0000000104c2df70 Exception <a 'sun/nio/fs/UnixException'{0x0000000b83c344b0}> (0x0000000b83c344b0) 
+Event: 0.353 Thread 0x0000000104c2df70 Exception <a 'sun/nio/fs/UnixException'{0x0000000b83c344b0}> (0x0000000b83c344b0)
 thrown [src/hotspot/share/prims/jni.cpp, line 516]
-Event: 0.353 Thread 0x0000000104c2df70 Exception <a 'sun/nio/fs/UnixException'{0x0000000b83c37570}> (0x0000000b83c37570) 
+Event: 0.353 Thread 0x0000000104c2df70 Exception <a 'sun/nio/fs/UnixException'{0x0000000b83c37570}> (0x0000000b83c37570)
 thrown [src/hotspot/share/prims/jni.cpp, line 516]
-Event: 0.515 Thread 0x0000000104c2df70 Exception <a 'java/lang/IncompatibleClassChangeError'{0x0000000b83c488c8}: Found class java.lang.Object, but interface was expected> (0x0000000b83c488c8) 
+Event: 0.515 Thread 0x0000000104c2df70 Exception <a 'java/lang/IncompatibleClassChangeError'{0x0000000b83c488c8}: Found class java.lang.Object, but interface was expected> (0x0000000b83c488c8)
 thrown [src/hotspot/share/interpreter/linkResolver.cpp, line 871]
-Event: 0.516 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83cc5a60}: 'java.lang.Object java.lang.invoke.DirectMethodHandle$Holder.invokeVirtual(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)'> (0x0000000b83cc5a60) 
+Event: 0.516 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83cc5a60}: 'java.lang.Object java.lang.invoke.DirectMethodHandle$Holder.invokeVirtual(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)'> (0x0000000b83cc5a60)
 thrown [src/hotspot/share/interpreter/linkResolver.cpp, line 804]
-Event: 0.517 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83d32ca8}: 'void java.lang.invoke.DirectMethodHandle$Holder.invokeStatic(java.lang.Object, long)'> (0x0000000b83d32ca8) 
+Event: 0.517 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83d32ca8}: 'void java.lang.invoke.DirectMethodHandle$Holder.invokeStatic(java.lang.Object, long)'> (0x0000000b83d32ca8)
 thrown [src/hotspot/share/interpreter/linkResolver.cpp, line 804]
-Event: 0.517 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83d42038}: 'java.lang.Object java.lang.invoke.DirectMethodHandle$Holder.newInvokeSpecial(java.lang.Object, long)'> (0x0000000b83d42038) 
+Event: 0.517 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83d42038}: 'java.lang.Object java.lang.invoke.DirectMethodHandle$Holder.newInvokeSpecial(java.lang.Object, long)'> (0x0000000b83d42038)
 thrown [src/hotspot/share/interpreter/linkResolver.cpp, line 804]
-Event: 0.517 Thread 0x0000000104c2df70 Exception <a 'java/lang/IncompatibleClassChangeError'{0x0000000b83d59e28}: Found class java.lang.Object, but interface was expected> (0x0000000b83d59e28) 
+Event: 0.517 Thread 0x0000000104c2df70 Exception <a 'java/lang/IncompatibleClassChangeError'{0x0000000b83d59e28}: Found class java.lang.Object, but interface was expected> (0x0000000b83d59e28)
 thrown [src/hotspot/share/interpreter/linkResolver.cpp, line 871]
-Event: 0.517 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83d63b78}: 'void java.lang.invoke.DirectMethodHandle$Holder.invokeStatic(java.lang.Object, int, java.lang.Object)'> (0x0000000b83d63b78) 
+Event: 0.517 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83d63b78}: 'void java.lang.invoke.DirectMethodHandle$Holder.invokeStatic(java.lang.Object, int, java.lang.Object)'> (0x0000000b83d63b78)
 thrown [src/hotspot/share/interpreter/linkResolver.cpp, line 804]
-Event: 0.520 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83daf6c8}: 'void java.lang.invoke.DirectMethodHandle$Holder.invokeStaticInit(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)'> (0x0000000b83daf6c8) 
+Event: 0.520 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83daf6c8}: 'void java.lang.invoke.DirectMethodHandle$Holder.invokeStaticInit(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)'> (0x0000000b83daf6c8)
 thrown [src/hotspot/share/interpreter/linkResolver.cpp, line 804]
-Event: 0.522 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83ea3a68}: 'void java.lang.invoke.DirectMethodHandle$Holder.invokeStaticInit(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)'> (0x0000000b83ea3a68) 
+Event: 0.522 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83ea3a68}: 'void java.lang.invoke.DirectMethodHandle$Holder.invokeStaticInit(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)'> (0x0000000b83ea3a68)
 thrown [src/hotspot/share/interpreter/linkResolver.cpp, line 804]
-Event: 0.523 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83ece470}: 'java.lang.Object java.lang.invoke.Invokers$Holder.invoke_MT(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)'> (0x0000000b83ece470) 
+Event: 0.523 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83ece470}: 'java.lang.Object java.lang.invoke.Invokers$Holder.invoke_MT(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)'> (0x0000000b83ece470)
 thrown [src/hotspot/share/interpreter/linkResolver.cpp, line 804]
-Event: 0.523 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83ee7068}: 'void java.lang.invoke.Invokers$Holder.invoke_MT(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)'> (0x0000000b83ee7068) 
+Event: 0.523 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83ee7068}: 'void java.lang.invoke.Invokers$Holder.invoke_MT(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)'> (0x0000000b83ee7068)
 thrown [src/hotspot/share/interpreter/linkResolver.cpp, line 804]
-Event: 0.524 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83f11f50}: 'int java.lang.invoke.Invokers$Holder.invokeExact_MT(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)'> (0x0000000b83f11f50) 
+Event: 0.524 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83f11f50}: 'int java.lang.invoke.Invokers$Holder.invokeExact_MT(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)'> (0x0000000b83f11f50)
 thrown [src/hotspot/share/interpreter/linkResolver.cpp, line 804]
-Event: 0.524 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83f2bf88}: 'long java.lang.invoke.DelegatingMethodHandle$Holder.reinvoke_L(java.lang.Object, java.lang.Object, java.lang.Object, long)'> (0x0000000b83f2bf88) 
+Event: 0.524 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83f2bf88}: 'long java.lang.invoke.DelegatingMethodHandle$Holder.reinvoke_L(java.lang.Object, java.lang.Object, java.lang.Object, long)'> (0x0000000b83f2bf88)
 thrown [src/hotspot/share/interpreter/linkResolver.cpp, line 804]
-Event: 0.526 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83f52f90}: 'int java.lang.invoke.Invokers$Holder.invokeExact_MT(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)'> (0x0000000b83f52f90) 
+Event: 0.526 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83f52f90}: 'int java.lang.invoke.Invokers$Holder.invokeExact_MT(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)'> (0x0000000b83f52f90)
 thrown [src/hotspot/share/interpreter/linkResolver.cpp, line 804]
-Event: 0.526 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83f64e08}: 'void java.lang.invoke.Invokers$Holder.invoke_MT(java.lang.Object, java.lang.Object, java.lang.Object)'> (0x0000000b83f64e08) 
+Event: 0.526 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83f64e08}: 'void java.lang.invoke.Invokers$Holder.invoke_MT(java.lang.Object, java.lang.Object, java.lang.Object)'> (0x0000000b83f64e08)
 thrown [src/hotspot/share/interpreter/linkResolver.cpp, line 804]
-Event: 0.526 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83f6ddc8}: 'void java.lang.invoke.DirectMethodHandle$Holder.invokeSpecial(java.lang.Object, java.lang.Object, long, long)'> (0x0000000b83f6ddc8) 
+Event: 0.526 Thread 0x0000000104c2df70 Exception <a 'java/lang/NoSuchMethodError'{0x0000000b83f6ddc8}: 'void java.lang.invoke.DirectMethodHandle$Holder.invokeSpecial(java.lang.Object, java.lang.Object, long, long)'> (0x0000000b83f6ddc8)
 thrown [src/hotspot/share/interpreter/linkResolver.cpp, line 804]
 
 VM Operations (20 events):
@@ -1227,7 +1227,7 @@ JVMTI agents: none
 
 
 VM Arguments:
-jvm_args: --enable-preview --enable-native-access=ALL-UNNAMED -Djava.library.path=/Users/naamanhirschfeld/workspace/kreuzberg-dev/html-to-markdown/e2e/java/../../target/release 
+jvm_args: --enable-preview --enable-native-access=ALL-UNNAMED -Djava.library.path=/Users/naamanhirschfeld/workspace/kreuzberg-dev/html-to-markdown/e2e/java/../../target/release
 java_command: /Users/naamanhirschfeld/workspace/kreuzberg-dev/html-to-markdown/e2e/java/target/surefire/surefirebooter-20260505165113247_3.jar /Users/naamanhirschfeld/workspace/kreuzberg-dev/html-to-markdown/e2e/java/target/surefire 2026-05-05T16-51-13_215-jvmRun1 surefire-20260505165113247_1tmp surefire_0-20260505165113247_2tmp
 java_class_path (initial): /Users/naamanhirschfeld/workspace/kreuzberg-dev/html-to-markdown/e2e/java/target/surefire/surefirebooter-20260505165113247_3.jar
 Launcher Type: SUN_STANDARD
