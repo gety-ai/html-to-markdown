@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Python `HeadingStyle` import mismatch (#337)** — `from html_to_markdown import HeadingStyle` returned a Python `Enum` that did not satisfy PyO3's type check on `ConversionOptions(heading_style=...)`, raising `TypeError: 'HeadingStyle' object is not an instance of 'HeadingStyle'`. The package now re-exports the native PyO3 enums directly from `_html_to_markdown` and adds uppercase aliases (`HeadingStyle.ATX`, `CodeBlockStyle.BACKTICKS`, etc.) on the same object so both naming conventions work.
+
+- **PHP 8.5 build failure on `pie install` (#333)** — `ext-php-rs` is now pinned to 0.15.12 (via alef ≥ 0.14.27), which includes upstream's PHP 8.5 build fixes for `zend_dval_to_lval_cap`. The publish workflow also produces pre-built PIE archives for **PHP 8.2/8.3/8.4/8.5 × 6 platforms** (linux x86_64/arm64, macOS arm64/x86_64, windows x86_64/arm64), so `pie install kreuzberg-dev/html-to-markdown` no longer needs to build from source via `phpize`.
+
+- **Doc/duplicate updates** — `ms-fscc.html` truncation (#336) was a duplicate of #330's UTF-8 char-boundary panic, fixed in commit 37d6064a.
+
+- **Bogus HTML comment endings drop following content (#339)** — the `astral-tl` parser mishandles HTML comments whose closing sequence contains more than two consecutive dashes (e.g. `<!-- /// --->`); the tokenizer creates an empty comment node and silently discards every byte that follows. A new `normalize_bogus_comment_endings` preprocessing pass rewrites any `--[-]+>` closing sequence to a well-formed `-->` before `tl::parse` runs, restoring all DOM nodes after the bogus comment. Also wired into the html5ever-repair and inline-block-misnest-repair fallback paths.
+
+- **CLI silent failure on conversion panic** — the CLI now wraps the conversion call in `panic::catch_unwind` and surfaces panic payloads as a `Box<dyn Error>` prefixed with `"internal error during conversion (panic): ..."` rather than exiting with a Rust backtrace. Defensive hardening following #330's UTF-8 char-boundary fix; ensures future regressions in the same family produce actionable error messages instead of partial outputs.
+
+- **Pre-existing clippy errors in `form/elements.rs`** — `handle_input`'s uniform handler signature (`output: &mut String`) tripped `clippy::ptr_arg` and `clippy::needless_pass_by_ref_mut` on Rust 1.95.0; allowed at the function level since the signature is shared with sibling form handlers.
+
+### Changed
+
+- **Node binding `index.js`/`index.d.ts` regenerated** — refreshed to match `@napi-rs/cli` 3.6.2 template style; runtime version-mismatch check is now env-gated behind `NAPI_RS_ENFORCE_VERSION_CHECK` (no behaviour change for typical consumers).
+
 ## [3.4.0-rc.27] - 2026-05-07
 
 ### Fixed

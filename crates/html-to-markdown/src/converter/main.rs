@@ -22,7 +22,9 @@ use crate::converter::plain_text::extract_plain_text;
 use crate::converter::preprocessing_helpers::{has_inline_block_misnest, should_drop_for_preprocessing};
 use crate::converter::utility::caching::build_dom_context;
 use crate::converter::utility::content::normalized_tag_name;
-use crate::converter::utility::preprocessing::{preprocess_html, strip_hidden_elements, strip_script_and_style_tags};
+use crate::converter::utility::preprocessing::{
+    normalize_bogus_comment_endings, preprocess_html, strip_hidden_elements, strip_script_and_style_tags,
+};
 use crate::converter::utility::serialization::serialize_tag_to_html;
 use crate::options::OutputFormat;
 
@@ -61,6 +63,9 @@ pub fn convert_html_impl(
     let stripped = strip_script_and_style_tags(html);
     // Strip elements with the `hidden` attribute before parsing.
     let stripped = strip_hidden_elements(&stripped);
+    // Normalise bogus HTML comment endings (`--->`, `---->`, …) that cause the
+    // `tl` parser to silently discard all document content that follows them.
+    let stripped = normalize_bogus_comment_endings(&stripped);
     let mut preprocessed = preprocess_html(&stripped).into_owned();
     let mut preprocessed_len = preprocessed.len();
 
@@ -68,6 +73,7 @@ pub fn convert_html_impl(
         if let Some(repaired_html) = repair_with_html5ever(&preprocessed) {
             let stripped = strip_script_and_style_tags(&repaired_html);
             let stripped = strip_hidden_elements(&stripped);
+            let stripped = normalize_bogus_comment_endings(&stripped);
             let repaired = preprocess_html(&stripped).into_owned();
             preprocessed = repaired;
             preprocessed_len = preprocessed.len();
@@ -81,6 +87,7 @@ pub fn convert_html_impl(
         if let Some(repaired_html) = repair_with_html5ever(&preprocessed) {
             let stripped = strip_script_and_style_tags(&repaired_html);
             let stripped = strip_hidden_elements(&stripped);
+            let stripped = normalize_bogus_comment_endings(&stripped);
             preprocessed = preprocess_html(&stripped).into_owned();
             preprocessed_len = preprocessed.len();
             continue;
@@ -101,6 +108,7 @@ pub fn convert_html_impl(
             drop(dom);
             let stripped = strip_script_and_style_tags(&repaired_html);
             let stripped = strip_hidden_elements(&stripped);
+            let stripped = normalize_bogus_comment_endings(&stripped);
             preprocessed = preprocess_html(&stripped).into_owned();
             preprocessed_len = preprocessed.len();
             // Re-parse with repaired HTML

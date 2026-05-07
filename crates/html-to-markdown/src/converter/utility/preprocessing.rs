@@ -219,6 +219,110 @@ pub fn eq_ascii_insensitive(a: &[u8], b: &[u8]) -> bool {
     a.iter().zip(b.iter()).all(|(x, y)| x.eq_ignore_ascii_case(y))
 }
 
+/// Normalize HTML comment endings that would confuse the `tl` parser.
+///
+/// The `astral-tl` parser mishandles HTML comments whose closing sequence
+/// contains more than two dashes before the `>` (e.g. `<!-- foo --->` or
+/// `<!-- foo ---->`).  When it encounters such a comment it creates an empty
+/// comment node and silently discards every byte that follows, so all document
+/// content after the comment is lost.
+///
+/// This function rewrites those bogus closings: every `--[-]+>` sequence that
+/// terminates an HTML comment is normalised to `-->`.  Regular `-->` closings
+/// are left unchanged.
+///
+/// # Algorithm
+///
+/// Scans the input byte-by-byte looking for `<!--`.  For each comment found it
+/// scans forward for `-->` using the HTML5 comment-end state machine:
+///
+/// - `--[` zero or more `-` `]>` ends the comment.
+/// - Any other character after `--` resets back into the comment body.
+///
+/// If the actual number of leading dashes before `>` is more than two the
+/// closing sequence is replaced with `-->`.
+pub fn normalize_bogus_comment_endings(input: &str) -> Cow<'_, str> {
+    let bytes = input.as_bytes();
+    let len = bytes.len();
+
+    // Fast path: the input must contain at least "<!--" and "--->".
+    // Without "<!--" there are no comments; without "---" there cannot be a
+    // bogus closing.
+    if len < 7 || !bytes.windows(4).any(|w| w == b"<!--") {
+        return Cow::Borrowed(input);
+    }
+
+    let mut idx = 0;
+    let mut last = 0;
+    let mut output: Option<String> = None;
+
+    while idx + 3 < len {
+        // Find the next comment opening.
+        if !(bytes[idx] == b'<' && bytes[idx + 1] == b'!' && bytes[idx + 2] == b'-' && bytes[idx + 3] == b'-') {
+            idx += 1;
+            continue;
+        }
+
+        // We are positioned at `<!--`.
+        idx += 4; // advance past `<!--`
+
+        // Walk the comment body looking for the closing sequence.
+        // The HTML5 comment-end state machine:
+        //   COMMENT state: most chars append to body; `-` → COMMENT_END_DASH
+        //   COMMENT_END_DASH: `-` → COMMENT_END; other → COMMENT
+        //   COMMENT_END: `>` → done; `-` → stay in COMMENT_END (extra dash);
+        //                other → COMMENT
+        // We track consecutive dashes at the current position.
+        let mut consecutive_dashes: usize = 0;
+
+        while idx < len {
+            let b = bytes[idx];
+            if b == b'-' {
+                consecutive_dashes += 1;
+                idx += 1;
+            } else if b == b'>' && consecutive_dashes >= 2 {
+                // We found a closing sequence.  `consecutive_dashes` is the
+                // total number of dashes before this `>`.  A well-formed close
+                // is exactly two (`-->`).  Any additional dashes are bogus.
+                if consecutive_dashes > 2 {
+                    // Rewrite: keep the comment body (without the extra dashes)
+                    // and replace the closing sequence with `-->`.
+                    let out = output.get_or_insert_with(|| String::with_capacity(len));
+                    // Flush everything up to the start of the extra dashes.
+                    // The comment body ends `consecutive_dashes` bytes before
+                    // the current `idx` (which points at `>`).
+                    let close_start = idx - consecutive_dashes;
+                    out.push_str(&input[last..close_start]);
+                    out.push_str("-->");
+                    idx += 1; // consume `>`
+                    last = idx;
+                } else {
+                    // Normal `-->` — no rewrite needed.
+                    idx += 1; // consume `>`
+                }
+                break;
+            } else {
+                // Any non-dash non-`>` character resets the dash count and
+                // returns us to the plain comment body state.
+                consecutive_dashes = 0;
+                idx += 1;
+            }
+        }
+        // If we reached end-of-input without finding a close, the comment is
+        // unclosed.  We leave the remainder as-is; the parser will handle it.
+    }
+
+    match output {
+        Some(mut out) => {
+            if last < len {
+                out.push_str(&input[last..]);
+            }
+            Cow::Owned(out)
+        }
+        None => Cow::Borrowed(input),
+    }
+}
+
 /// Preprocess HTML to normalize tags and fix common issues.
 pub fn preprocess_html(input: &str) -> Cow<'_, str> {
     const SELF_CLOSING: [(&[u8], &str); 3] = [(b"<br/>", "<br>"), (b"<hr/>", "<hr>"), (b"<img/>", "<img>")];
@@ -684,7 +788,60 @@ fn tag_has_hidden_attribute(tag: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::sanitize_markdown_url;
+    use super::{normalize_bogus_comment_endings, sanitize_markdown_url};
+
+    // ── normalize_bogus_comment_endings ───────────────────────────────────────
+
+    #[test]
+    fn normalize_bogus_comment_endings_leaves_well_formed_comment_unchanged() {
+        let input = "<p>A</p><!-- foo --><p>B</p>";
+        let result = normalize_bogus_comment_endings(input);
+        // Borrowed means unchanged
+        assert_eq!(result.as_ref(), input);
+    }
+
+    #[test]
+    fn normalize_bogus_comment_endings_rewrites_triple_dash_close() {
+        let input = "<!-- foo --->";
+        let result = normalize_bogus_comment_endings(input);
+        assert_eq!(result.as_ref(), "<!-- foo -->");
+    }
+
+    #[test]
+    fn normalize_bogus_comment_endings_rewrites_four_dash_close() {
+        let input = "<!-- foo ---->";
+        let result = normalize_bogus_comment_endings(input);
+        assert_eq!(result.as_ref(), "<!-- foo -->");
+    }
+
+    #[test]
+    fn normalize_bogus_comment_endings_preserves_content_after_comment() {
+        let input = "<h1>One</h1><!-- /// ---><p>Two</p>";
+        let result = normalize_bogus_comment_endings(input);
+        assert_eq!(result.as_ref(), "<h1>One</h1><!-- /// --><p>Two</p>");
+    }
+
+    #[test]
+    fn normalize_bogus_comment_endings_handles_multiple_bogus_comments() {
+        let input = "<p>A</p><!-- x ---><p>B</p><!-- y ----><p>C</p>";
+        let result = normalize_bogus_comment_endings(input);
+        assert_eq!(result.as_ref(), "<p>A</p><!-- x --><p>B</p><!-- y --><p>C</p>");
+    }
+
+    #[test]
+    fn normalize_bogus_comment_endings_handles_no_comments() {
+        let input = "<p>Just a paragraph</p>";
+        let result = normalize_bogus_comment_endings(input);
+        assert_eq!(result.as_ref(), input);
+    }
+
+    #[test]
+    fn normalize_bogus_comment_endings_empty_input() {
+        let result = normalize_bogus_comment_endings("");
+        assert_eq!(result.as_ref(), "");
+    }
+
+    // ── sanitize_markdown_url ─────────────────────────────────────────────────
 
     #[test]
     fn sanitize_markdown_url_extracts_scheme_relative_markdown_like_url() {

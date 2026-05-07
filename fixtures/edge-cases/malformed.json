@@ -54,6 +54,20 @@
     ]
   },
   {
+    "id": "malformed_bogus_comment_triple_dash",
+    "description": "HTML comment ending with ---> (three dashes) must not drop content that follows (issue #339)",
+    "input": {
+      "html": "<h1>One</h1>\n<!-- /// --->\n<p>Two</p>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": ["One", "Two"]
+      }
+    ]
+  },
+  {
     "id": "malformed_deeply_nested_elements",
     "description": "Deeply nested elements (100 levels) are handled without stack overflow",
     "input": {

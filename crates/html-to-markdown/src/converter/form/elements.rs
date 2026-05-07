@@ -290,6 +290,7 @@ pub fn handle_label(
 /// An input element represents a form control for user input. Since input
 /// elements typically have no text content, this handler produces no output.
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
+#[allow(clippy::ptr_arg, clippy::needless_pass_by_ref_mut)]
 pub fn handle_input(
     _tag_name: &str,
     node_handle: &tl::NodeHandle,
