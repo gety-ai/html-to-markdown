@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0-rc.34] - 2026-05-08
+
+### Fixed
+
+- **NuGet `KreuzbergDev.HtmlToMarkdown` had a phantom dependency** on a non-existent `HtmlToMarkdown` package, blocking every `dotnet add package KreuzbergDev.HtmlToMarkdown` install with `NU1102: Unable to find package HtmlToMarkdown`. Root cause: outer wrapper csproj `ProjectReference`'d the inner `HtmlToMarkdown` project, and dotnet pack converted that into an external package dep. Set `IsPackable=false` on the inner csproj and `PrivateAssets="all"` on the outer's ProjectReference so the inner DLL is bundled inside the wrapper's nupkg without surfacing as a NuGet dependency. Verified locally — the produced nuspec now ships an empty `<dependencies>` group.
+
+### Verified by smoke tests against rc.33
+
+- ✅ Python (3/3)
+- ✅ Rust (3/3)
+- ✅ Ruby (3/3)
+- ✅ Node (3/3 — TS meta deps now correctly resolved)
+- ⚠ C# blocked by NuGet phantom-dep bug (rc.34 fix above)
+- ⚠ Java blocked by Maven Central indexing lag (rc.32 jar present, rc.33 may take ~4h to index)
+- ⚠ PHP blocked by composer min-stability requirement (alef-generated test_app needs `minimum-stability: "RC"` field)
+- ⚠ Bun blocked by same TS workspace:* (resolved in rc.33 — needs re-test)
+- ⚠ WASM smoke test missing `await initWasm()` (alef e2e generator gap)
+- ⚠ Go binding's CGo link path expects local `target/release` (FFI auto-download flow not wired)
+
 ## [3.4.0-rc.33] - 2026-05-07
 
 ### Fixed

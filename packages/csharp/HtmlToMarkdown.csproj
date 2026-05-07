@@ -3,7 +3,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>HtmlToMarkdown</RootNamespace>
     <PackageId>KreuzbergDev.HtmlToMarkdown</PackageId>
-    <Version>3.4.0-rc.33</Version>
+    <Version>3.4.0-rc.34</Version>
     <Description>High-performance HTML to Markdown converter</Description>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/kreuzberg-dev/html-to-markdown</RepositoryUrl>
@@ -20,8 +20,12 @@
     <Compile Remove="HtmlToMarkdown/**" />
   </ItemGroup>
 
+  <!-- PrivateAssets="all" prevents emitting a NuGet dependency on the inner project's
+       package id (`HtmlToMarkdown`, which is not a published package). The inner project
+       has IsPackable=false so its DLL flows up to this wrapper's normal lib/net10.0/
+       output directory through the standard ProjectReference build path. -->
   <ItemGroup>
-    <ProjectReference Include="HtmlToMarkdown/HtmlToMarkdown.csproj" />
+    <ProjectReference Include="HtmlToMarkdown/HtmlToMarkdown.csproj" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
