@@ -21,9 +21,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Pre-existing clippy errors in `form/elements.rs`** — `handle_input`'s uniform handler signature (`output: &mut String`) tripped `clippy::ptr_arg` and `clippy::needless_pass_by_ref_mut` on Rust 1.95.0; allowed at the function level since the signature is shared with sibling form handlers.
 
+- **npm release-candidate dist-tag (#340)** — pre-release versions (anything matching `-(rc|beta|alpha|pre|dev)`) now publish under the npm `next` dist-tag instead of `latest`, so `npm install @kreuzberg/html-to-markdown-node` no longer pulls a 3.4.0-rc over a stable 3.3.x. Detection lives in `scripts/publish/validate-and-compute-metadata.sh` and is wired through to `publish-npm` for both `@kreuzberg/html-to-markdown-node` and `@kreuzberg/html-to-markdown-wasm`.
+
 ### Changed
 
 - **Node binding `index.js`/`index.d.ts` regenerated** — refreshed to match `@napi-rs/cli` 3.6.2 template style; runtime version-mismatch check is now env-gated behind `NAPI_RS_ENFORCE_VERSION_CHECK` (no behaviour change for typical consumers).
+
+### Documentation
+
+- **Cross-platform npm install in Docker (#273)** — clarified that "Cannot find module `@kreuzberg/html-to-markdown-node-linux-x64-gnu`" inside Docker stems from npm/pnpm's handling of `optionalDependencies` when a lockfile is generated on one platform and consumed on another (npm/cli#4828). The published package's `optionalDependencies` already declares all supported platform variants; pnpm consumers building cross-platform images should set `supportedArchitectures` in `pnpm-workspace.yaml` (or pass `--config.supported-architectures.os/cpu/libc`) so the lockfile resolves natives for every target architecture.
 
 ## [3.4.0-rc.27] - 2026-05-07
 
