@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0-rc.29] - 2026-05-07
+
+### Fixed
+
+- **Ruby Magnus visitor bridge missing constructor** — `RbHtmlVisitorBridge::new` was called by generated visitor wrapper code but never defined (alef ≤ 0.14.33 magnus codegen renders `visitor_bridge_struct.rs.jinja` but never `bridge_struct_impl.rs.jinja`). Hand-patched `packages/ruby/ext/html_to_markdown_rb/src/lib.rs` to add the missing `impl RbHtmlVisitorBridge { pub fn new ... }` block; will be picked up automatically once alef releases the codegen fix.
+- **Intel-macOS alef binary** — `kreuzberg-dev/actions/install-alef@v1` mapped Intel macOS to the aarch64 binary intending to use Rosetta, but the macos-15-intel runner has no Rosetta — every alef invocation failed with "Bad CPU type in executable". Added an inline override in `publish.yaml` after each `install-alef` step that downloads `alef-x86_64-apple-darwin.tar.gz` directly on Intel macOS. Unblocks Java/C#/Go/C-FFI/PHP-PIE on macos-x86_64.
+
+### Removed (deferred)
+
+- Ruby gem `windows-arm64` matrix entry — rb-sys + Magnus toolchain on `aarch64-pc-windows-msvc` not yet validated.
+- PHP PIE `windows-arm64` matrix entry — ext-php-rs cross-compile to `aarch64-pc-windows-msvc` fails.
+- Python wheels `windows-11-arm` — cibuildwheel does not yet support `aarch64-pc-windows-msvc`.
+- Node bindings `*-musl` and `armv7` — napi-cross artifact path mismatch ("No dist dir found") blocks cross-compiled bindings.
+
 ## [3.4.0-rc.28] - 2026-05-07
 
 ### Fixed

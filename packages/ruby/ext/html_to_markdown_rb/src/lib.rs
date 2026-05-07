@@ -3185,6 +3185,17 @@ impl std::fmt::Debug for RbHtmlVisitorBridge {
         write!(f, "RbHtmlVisitorBridge")
     }
 }
+
+// alef-magnus 0.14.33 codegen bug: bridge_struct_impl.rs.jinja exists but
+// trait_bridge.rs never renders it, so the `new` constructor is missing from
+// the generated source even though the template defines it. Hand-patched here
+// to unblock Ruby builds; remove once alef regen produces it.
+impl RbHtmlVisitorBridge {
+    pub fn new(rb_obj: magnus::Value) -> Self {
+        Self { rb_obj }
+    }
+}
+
 impl html_to_markdown_rs::visitor::HtmlVisitor for RbHtmlVisitorBridge {
     fn visit_element_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
         let responds = self.rb_obj.respond_to("visit_element_start", false).unwrap_or(false);

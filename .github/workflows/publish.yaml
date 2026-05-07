@@ -297,7 +297,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, windows-11-arm, macos-latest, macos-15-intel]
+        # windows-11-arm: cibuildwheel does not yet support aarch64-pc-windows-msvc target
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-latest, macos-15-intel]
     steps:
       - name: Checkout
         uses: actions/checkout@v6 # v6
@@ -418,9 +419,7 @@ jobs:
           - os: windows-latest
             label: windows-x86_64
             target: x86_64-pc-windows-msvc
-          - os: windows-11-arm
-            label: windows-arm64
-            target: aarch64-pc-windows-msvc
+          # windows-arm64: deferred until ext-php-rs cross-compile to aarch64-pc-windows-msvc is validated
     steps:
       - name: Checkout
         uses: actions/checkout@v6 # v6
@@ -448,6 +447,16 @@ jobs:
 
       - name: Install alef
         uses: kreuzberg-dev/actions/install-alef@v1 # v1
+
+      - name: Override alef on Intel macOS (workaround pending kreuzberg-dev/actions install-alef fix)
+        if: ${{ runner.os == 'macOS' && runner.arch == 'X64' }}
+        shell: bash
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -fL "https://github.com/kreuzberg-dev/alef/releases/download/v0.14.33/alef-x86_64-apple-darwin.tar.gz" \
+            | tar xz --strip-components=1 -C "$HOME/.local/bin"
+          chmod +x "$HOME/.local/bin/alef"
+          "$HOME/.local/bin/alef" --version
 
       - name: Build PHP extension
         uses: kreuzberg-dev/actions/build-php-extension@v1 # v1
@@ -562,25 +571,19 @@ jobs:
             use_cross: false
             use_napi_cross: false
           - os: ubuntu-latest
-            target: x86_64-unknown-linux-musl
-            rust_target: x86_64-unknown-linux-musl
-            use_cross: true
-            use_napi_cross: false
-          - os: ubuntu-latest
             target: aarch64-unknown-linux-gnu
             rust_target: aarch64-unknown-linux-gnu
             use_cross: false
             use_napi_cross: true
-          - os: ubuntu-latest
-            target: aarch64-unknown-linux-musl
-            rust_target: aarch64-unknown-linux-musl
-            use_cross: true
-            use_napi_cross: false
-          - os: ubuntu-latest
-            target: armv7-unknown-linux-gnueabihf
-            rust_target: armv7-unknown-linux-gnueabihf
-            use_cross: false
-            use_napi_cross: true
+          # musl + armv7 targets deferred — napi-cross artifact path mismatch ("No dist dir found")
+          # blocks every cross-compiled binding.  Track in a follow-up rc once the napi build
+          # output convention is stabilised.
+          # - os: ubuntu-latest
+          #   target: x86_64-unknown-linux-musl
+          # - os: ubuntu-latest
+          #   target: aarch64-unknown-linux-musl
+          # - os: ubuntu-latest
+          #   target: armv7-unknown-linux-gnueabihf
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             rust_target: ""
@@ -870,8 +873,7 @@ jobs:
             label: macos-x86_64
           - os: windows-latest
             label: windows-x64
-          - os: windows-11-arm
-            label: windows-arm64
+          # windows-11-arm: deferred until rb-sys + Magnus toolchain validated on aarch64-pc-windows-msvc
     runs-on: ${{ matrix.os }}
     env:
       RB_SYS_CARGO_PROFILE: release
@@ -1236,6 +1238,16 @@ jobs:
       - name: Install alef
         uses: kreuzberg-dev/actions/install-alef@v1
 
+      - name: Override alef on Intel macOS (workaround pending kreuzberg-dev/actions install-alef fix)
+        if: ${{ runner.os == 'macOS' && runner.arch == 'X64' }}
+        shell: bash
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -fL "https://github.com/kreuzberg-dev/alef/releases/download/v0.14.33/alef-x86_64-apple-darwin.tar.gz" \
+            | tar xz --strip-components=1 -C "$HOME/.local/bin"
+          chmod +x "$HOME/.local/bin/alef"
+          "$HOME/.local/bin/alef" --version
+
       - name: Build and stage FFI library
         shell: bash
         run: |
@@ -1296,6 +1308,16 @@ jobs:
       - name: Install alef
         uses: kreuzberg-dev/actions/install-alef@v1
 
+      - name: Override alef on Intel macOS (workaround pending kreuzberg-dev/actions install-alef fix)
+        if: ${{ runner.os == 'macOS' && runner.arch == 'X64' }}
+        shell: bash
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -fL "https://github.com/kreuzberg-dev/alef/releases/download/v0.14.33/alef-x86_64-apple-darwin.tar.gz" \
+            | tar xz --strip-components=1 -C "$HOME/.local/bin"
+          chmod +x "$HOME/.local/bin/alef"
+          "$HOME/.local/bin/alef" --version
+
       - name: Build and package Go FFI library
         shell: bash
         run: |
@@ -1354,6 +1376,16 @@ jobs:
 
       - name: Install alef
         uses: kreuzberg-dev/actions/install-alef@v1
+
+      - name: Override alef on Intel macOS (workaround pending kreuzberg-dev/actions install-alef fix)
+        if: ${{ runner.os == 'macOS' && runner.arch == 'X64' }}
+        shell: bash
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -fL "https://github.com/kreuzberg-dev/alef/releases/download/v0.14.33/alef-x86_64-apple-darwin.tar.gz" \
+            | tar xz --strip-components=1 -C "$HOME/.local/bin"
+          chmod +x "$HOME/.local/bin/alef"
+          "$HOME/.local/bin/alef" --version
 
       - name: Build and package C FFI distribution
         shell: bash
@@ -1850,6 +1882,16 @@ jobs:
 
       - name: Install alef
         uses: kreuzberg-dev/actions/install-alef@v1
+
+      - name: Override alef on Intel macOS (workaround pending kreuzberg-dev/actions install-alef fix)
+        if: ${{ runner.os == 'macOS' && runner.arch == 'X64' }}
+        shell: bash
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -fL "https://github.com/kreuzberg-dev/alef/releases/download/v0.14.33/alef-x86_64-apple-darwin.tar.gz" \
+            | tar xz --strip-components=1 -C "$HOME/.local/bin"
+          chmod +x "$HOME/.local/bin/alef"
+          "$HOME/.local/bin/alef" --version
 
       - name: Build and stage FFI library
         shell: bash
