@@ -1,6 +1,6 @@
 {
   "name": "@kreuzberg/html-to-markdown-node-linux-x64-gnu",
-  "version": "3.4.0-rc.29",
+  "version": "3.4.0-rc.30",
   "description": "High-performance HTML to Markdown converter - Node.js native bindings",
   "keywords": [
     "converter",
@@ -13,7 +13,10 @@
   "bugs": "https://github.com/kreuzberg-dev/html-to-markdown/issues",
   "license": "MIT",
   "author": "Na'aman Hirschfeld <naaman@kreuzberg.dev>",
-  "repository": "https://github.com/kreuzberg-dev/html-to-markdown",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kreuzberg-dev/html-to-markdown.git"
+  },
   "files": [
     "html-to-markdown-node.linux-x64-gnu.node"
   ],

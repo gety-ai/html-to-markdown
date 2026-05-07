@@ -294,6 +294,11 @@ jobs:
     name: Build Python wheels (${{ matrix.os }})
     needs: prepare
     runs-on: ${{ matrix.os }}
+    env:
+      # Required by cibuildwheel/delocate: the Rust-compiled .so/.dylib targets
+      # macOS 10.12+ (default in modern toolchains). 10.9 was the legacy default
+      # which causes delocate to refuse to relocate the wheel.
+      MACOSX_DEPLOYMENT_TARGET: "10.12"
     strategy:
       fail-fast: false
       matrix:

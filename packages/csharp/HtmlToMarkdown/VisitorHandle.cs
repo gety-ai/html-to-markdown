@@ -13,7 +13,6 @@ namespace HtmlToMarkdown;
 
 internal sealed class VisitorHandleSafeHandle : SafeHandle
 {
-{
     internal VisitorHandleSafeHandle(IntPtr handle) : base(IntPtr.Zero, true)
     {
         SetHandle(handle);
@@ -34,7 +33,6 @@ internal sealed class VisitorHandleSafeHandle : SafeHandle
 /// This allows visitors to be passed around and shared while still being mutable.
 /// </summary>
 public sealed class VisitorHandle : IDisposable
-{
 {
     private readonly VisitorHandleSafeHandle _safeHandle;
 

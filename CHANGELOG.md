@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0-rc.30] - 2026-05-07
+
+### Fixed
+
+- **npm provenance "repository.url is empty"** — Node platform packages (`crates/html-to-markdown-node/npm/<triple>/package.json`) had `repository` as a bare string; npm sigstore provenance requires `{type, url}` object format. All 9 platform packages now use the object form so `npm publish --provenance` accepts them.
+- **WASM package name regression** — `crates/html-to-markdown-wasm/package.json` had drifted from `@kreuzberg/html-to-markdown-wasm` to `@kreuzberg/html-to-markdown-node-wasm`, breaking the `pnpm --filter @kreuzberg/html-to-markdown-wasm run build:all` step in publish (no matching workspace, no `pkg/` produced, "Artifact not found for name: wasm-bundles" downstream).
+- **WASM artifact path mismatch** — `scripts/publish/wasm/package-artifacts.sh` tarred `dist/dist-node/dist-web` (which `wasm-pack` does not produce); rewritten to tar `pkg/{web,bundler,nodejs,deno}` instead. `scripts/publish/wasm/extract-artifacts.sh` updated to extract back into `pkg/`.
+- **C# duplicate opening brace** — alef ≤ 0.14.33 csharp codegen emitted a stray `{` after the class declaration in `VisitorHandle.cs` and `ConversionOptionsBuilder.cs`, causing `error CS1519: Invalid token '{' in a member declaration` and blocking the NuGet pack step. Hand-patched until alef regen produces correct C#.
+- **Python wheel `MACOSX_DEPLOYMENT_TARGET` mismatch** — the Rust-compiled `.so` targets macOS 10.12+ but the wheel name claimed `macosx_10_9`; `delocate-wheel` refused with "Library dependencies do not satisfy target MacOS version 10.9". Job-level `MACOSX_DEPLOYMENT_TARGET: "10.12"` env now exported for all `python-wheels` matrix entries.
+
 ## [3.4.0-rc.29] - 2026-05-07
 
 ### Fixed

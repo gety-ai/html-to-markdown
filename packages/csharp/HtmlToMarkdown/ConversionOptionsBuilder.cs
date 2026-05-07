@@ -16,7 +16,6 @@ namespace HtmlToMarkdown;
 
 internal sealed class ConversionOptionsBuilderSafeHandle : SafeHandle
 {
-{
     internal ConversionOptionsBuilderSafeHandle(IntPtr handle) : base(IntPtr.Zero, true)
     {
         SetHandle(handle);
@@ -37,7 +36,6 @@ internal sealed class ConversionOptionsBuilderSafeHandle : SafeHandle
 /// All fields start with default values. Call `.build()` to produce the final options.
 /// </summary>
 public sealed class ConversionOptionsBuilder : IDisposable
-{
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
