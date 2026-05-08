@@ -9,7 +9,6 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 
 namespace HtmlToMarkdown;
-
 /// <summary>
 /// Bridge interface for HtmlVisitor trait implementation via native FFI
 /// </summary>
@@ -134,7 +133,6 @@ public interface IHtmlVisitor {
 
     /// <summary>visit_figure_end</summary>
     VisitResult VisitFigureEnd(NodeContext Ctx, string Output);
-
 }
 
 /// <summary>
@@ -149,6 +147,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
     private readonly object[] _delegates;
 
     // Vtable slot delegates (41)
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate int VisitElementStartFn(IntPtr userData, IntPtr Ctx, out IntPtr outResult);
 
@@ -489,6 +488,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         var freeFn = new FreeUserDataFn(FreeUserDataCallback);
         _delegates[40] = freeFn;
         Marshal.WriteIntPtr(_vtable, 320, Marshal.GetFunctionPointerForDelegate(freeFn));
+
     }
 
     private static string ToJsonString<T>(T value) {
@@ -1070,6 +1070,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         }
     }
 
+
     public void Dispose() {
         if (_disposed) return;
         _disposed = true;
@@ -1092,9 +1093,11 @@ public static class HtmlVisitorRegistry {
         new ConcurrentDictionary<string, HtmlVisitorBridge>();
 
     /// <summary>Register a HtmlVisitor implementation</summary>
+
     public static void Register(IHtmlVisitor impl, string name) {
         if (impl == null)
             throw new ArgumentNullException(nameof(impl));
+
 
         var bridge = new HtmlVisitorBridge(impl);
 

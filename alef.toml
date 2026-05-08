@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.14.35"
+alef_version = "0.15.0"
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm", "r"]
 
 [workspace.sync]
@@ -175,7 +175,7 @@ format = "cd packages/ruby && bundle exec rubocop -a ."
 [crates.lint.php]
 precondition = "command -v php >/dev/null 2>&1"
 before = "cd packages/php && composer install"
-format = "cd packages/php && vendor/bin/php-cs-fixer fix ."
+format = "cd packages/php && vendor/bin/php-cs-fixer fix"
 check = "cd packages/php && vendor/bin/phpstan --configuration=phpstan.neon --memory-limit=512M"
 
 [crates.lint.go]

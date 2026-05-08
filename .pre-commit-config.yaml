@@ -129,6 +129,7 @@ repos:
         files: ^packages/csharp/.*\.cs$
       - id: php-cs-fixer
         files: ^packages/php/.*\.php$
+        exclude: ^packages/php/stubs/
       - id: phpstan
         files: ^packages/php/(src|tests)/.*\.php$
         args: ["analyse", "--no-progress", "--configuration", "packages/php/phpstan.neon"]

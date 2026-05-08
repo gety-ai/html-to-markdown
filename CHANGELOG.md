@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0-rc.43]
+
+### Fixed
+
+- **Ruby gem build failed for all 4 platforms on rc.42** — committed
+  `packages/ruby/ext/html_to_markdown_rb/src/lib.rs` had a duplicate
+  `impl std::fmt::Debug for RbHtmlVisitorBridge` (lines 3230 + 3235), tripping
+  E0119 in every gem-build matrix entry. Root cause was an alef magnus-backend
+  bug where the post-process line filter for thread-unsafe handle types
+  (`VisitorHandle`) silently failed when alef extracted the IR with the
+  `visitor` feature active (cfg attr stripped → field looked unconditional →
+  filter early-returned without filtering). Fixed in alef commit
+  `9f555938`: replaced post-process line filter with
+  `ConversionConfig::exclude_types`, mirroring the rustler backend. Bindings
+  fully regenerated against the fixed alef.
+
+## [Unreleased — pre-rc.43]
+
 ### Added
 
 - **Homebrew bottles for macOS arm64, macOS x86_64, Linux x86_64, Linux arm64** — `publish.yaml` now builds proper bottles via `brew install --build-bottle && brew bottle` after the formula is updated. New jobs: `homebrew-bottles` (matrix, 4 platforms; installs Homebrew on Linux runners) and `publish-homebrew-bottles` (aggregates JSON manifests, writes `bottle do` block into the formula, pushes). Bottle tarballs upload to the GH release as `<formula>-<version>.<bottle_tag>.bottle.tar.gz`. Users on a covered platform now get "Pouring from bottle"; older OS users still fall through to the existing `on_macos`/`on_linux` URL blocks. Scripts: `scripts/publish/install-homebrew-linux.sh`, `build-homebrew-bottles.sh`, `merge-homebrew-bottles.sh`.
@@ -18,8 +36,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `shfmt` rejected `${sha[cli-aarch64-apple-darwin.tar.gz]}` heredoc expansion in `update-homebrew-formula.sh` — `.` in associative-array keys was parsed as floating-point arithmetic. Refactored to use named scalar variables (`cli_macos_arm_sha`, etc.).
   - `mix-format` wanted to re-flow alef-generated lib files differently than alef writes them (alef pre-wraps URLs alef-internally; mix format re-flows on `line_length`). Removed `lib/` from `.formatter.exs` `inputs:` since every file under `packages/elixir/lib/` is alef-generated.
 - **alef toolchain bumped 0.14.33 → 0.14.34** — regenerated all bindings with the new toolchain (per-binding hash manifest refreshed); `.pre-commit-config.yaml` `kreuzberg-dev/alef` rev pinned to v0.14.34.
-
-
 
 ### Fixed
 
@@ -50,7 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **Hex publish "release not found"** — `scripts/publish/upload-elixir-package.sh` (and several other upload-* scripts) call `gh release upload "$TAG"` but no step in `publish.yaml` was creating the GitHub release for the tag, so the upload failed with "release not found". Added an "Ensure GitHub Release exists for tag" step in the `prepare` job that runs `gh release create` (with `--prerelease` for rcs) when the release is missing — guarantees every downstream upload-to-release script can succeed.
+- **Hex publish "release not found"** — `scripts/publish/upload-elixir-package.sh` (and several other upload-\* scripts) call `gh release upload "$TAG"` but no step in `publish.yaml` was creating the GitHub release for the tag, so the upload failed with "release not found". Added an "Ensure GitHub Release exists for tag" step in the `prepare` job that runs `gh release create` (with `--prerelease` for rcs) when the release is missing — guarantees every downstream upload-to-release script can succeed.
 
 ## [3.4.0-rc.39] - 2026-05-08
 
@@ -112,7 +128,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ⚠ C# blocked by NuGet phantom-dep bug (rc.34 fix above)
 - ⚠ Java blocked by Maven Central indexing lag (rc.32 jar present, rc.33 may take ~4h to index)
 - ⚠ PHP blocked by composer min-stability requirement (alef-generated test_app needs `minimum-stability: "RC"` field)
-- ⚠ Bun blocked by same TS workspace:* (resolved in rc.33 — needs re-test)
+- ⚠ Bun blocked by same TS workspace:\* (resolved in rc.33 — needs re-test)
 - ⚠ WASM smoke test missing `await initWasm()` (alef e2e generator gap)
 - ⚠ Go binding's CGo link path expects local `target/release` (FFI auto-download flow not wired)
 

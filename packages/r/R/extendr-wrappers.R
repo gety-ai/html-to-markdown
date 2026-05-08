@@ -10,223 +10,161 @@ NULL
 
 #' @export
 convert <- function(html, options) .Call("wrap__convert", html, options, PACKAGE = "htmltomarkdown")
-
 DocumentMetadata <- new.env(parent = emptyenv())
-
 DocumentMetadata$from_json <- function(json) .Call("wrap__DocumentMetadata__from_json", json, PACKAGE = "htmltomarkdown")
-
 #' @export
 `$.DocumentMetadata` <- function(self, name) {
   func <- DocumentMetadata[[name]]
   environment(func) <- environment()
   func
 }
-
 #' @export
 `[[.DocumentMetadata` <- `$.DocumentMetadata`
-
 HeaderMetadata <- new.env(parent = emptyenv())
-
 HeaderMetadata$is_valid <- function() .Call("wrap__HeaderMetadata__is_valid", self, PACKAGE = "htmltomarkdown")
-
 #' @export
 `$.HeaderMetadata` <- function(self, name) {
   func <- HeaderMetadata[[name]]
   environment(func) <- environment()
   func
 }
-
 #' @export
 `[[.HeaderMetadata` <- `$.HeaderMetadata`
-
 LinkMetadata <- new.env(parent = emptyenv())
-
 #' @export
 `$.LinkMetadata` <- function(self, name) {
   func <- LinkMetadata[[name]]
   environment(func) <- environment()
   func
 }
-
 #' @export
 `[[.LinkMetadata` <- `$.LinkMetadata`
-
 ImageMetadata <- new.env(parent = emptyenv())
-
 #' @export
 `$.ImageMetadata` <- function(self, name) {
   func <- ImageMetadata[[name]]
   environment(func) <- environment()
   func
 }
-
 #' @export
 `[[.ImageMetadata` <- `$.ImageMetadata`
-
 StructuredData <- new.env(parent = emptyenv())
-
 #' @export
 `$.StructuredData` <- function(self, name) {
   func <- StructuredData[[name]]
   environment(func) <- environment()
   func
 }
-
 #' @export
 `[[.StructuredData` <- `$.StructuredData`
-
 ConversionOptions <- new.env(parent = emptyenv())
-
 ConversionOptions$default <- function() .Call("wrap__ConversionOptions__default", PACKAGE = "htmltomarkdown")
-
 ConversionOptions$builder <- function() .Call("wrap__ConversionOptions__builder", PACKAGE = "htmltomarkdown")
-
 ConversionOptions$from_json <- function(json) .Call("wrap__ConversionOptions__from_json", json, PACKAGE = "htmltomarkdown")
-
 #' @export
 `$.ConversionOptions` <- function(self, name) {
   func <- ConversionOptions[[name]]
   environment(func) <- environment()
   func
 }
-
 #' @export
 `[[.ConversionOptions` <- `$.ConversionOptions`
-
 ConversionOptionsBuilder <- new.env(parent = emptyenv())
-
 ConversionOptionsBuilder$strip_tags <- function(tags) .Call("wrap__ConversionOptionsBuilder__strip_tags", self, tags, PACKAGE = "htmltomarkdown")
-
 ConversionOptionsBuilder$preserve_tags <- function(tags) .Call("wrap__ConversionOptionsBuilder__preserve_tags", self, tags, PACKAGE = "htmltomarkdown")
-
 ConversionOptionsBuilder$keep_inline_images_in <- function(tags) .Call("wrap__ConversionOptionsBuilder__keep_inline_images_in", self, tags, PACKAGE = "htmltomarkdown")
-
 ConversionOptionsBuilder$exclude_selectors <- function(selectors) .Call("wrap__ConversionOptionsBuilder__exclude_selectors", self, selectors, PACKAGE = "htmltomarkdown")
-
 ConversionOptionsBuilder$build <- function() .Call("wrap__ConversionOptionsBuilder__build", self, PACKAGE = "htmltomarkdown")
-
 #' @export
 `$.ConversionOptionsBuilder` <- function(self, name) {
   func <- ConversionOptionsBuilder[[name]]
   environment(func) <- environment()
   func
 }
-
 #' @export
 `[[.ConversionOptionsBuilder` <- `$.ConversionOptionsBuilder`
-
 ConversionOptionsUpdate <- new.env(parent = emptyenv())
-
 ConversionOptionsUpdate$from_json <- function(json) .Call("wrap__ConversionOptionsUpdate__from_json", json, PACKAGE = "htmltomarkdown")
-
 #' @export
 `$.ConversionOptionsUpdate` <- function(self, name) {
   func <- ConversionOptionsUpdate[[name]]
   environment(func) <- environment()
   func
 }
-
 #' @export
 `[[.ConversionOptionsUpdate` <- `$.ConversionOptionsUpdate`
-
 PreprocessingOptions <- new.env(parent = emptyenv())
-
 PreprocessingOptions$default <- function() .Call("wrap__PreprocessingOptions__default", PACKAGE = "htmltomarkdown")
-
 PreprocessingOptions$from_json <- function(json) .Call("wrap__PreprocessingOptions__from_json", json, PACKAGE = "htmltomarkdown")
-
 #' @export
 `$.PreprocessingOptions` <- function(self, name) {
   func <- PreprocessingOptions[[name]]
   environment(func) <- environment()
   func
 }
-
 #' @export
 `[[.PreprocessingOptions` <- `$.PreprocessingOptions`
-
 PreprocessingOptionsUpdate <- new.env(parent = emptyenv())
-
 PreprocessingOptionsUpdate$from_json <- function(json) .Call("wrap__PreprocessingOptionsUpdate__from_json", json, PACKAGE = "htmltomarkdown")
-
 #' @export
 `$.PreprocessingOptionsUpdate` <- function(self, name) {
   func <- PreprocessingOptionsUpdate[[name]]
   environment(func) <- environment()
   func
 }
-
 #' @export
 `[[.PreprocessingOptionsUpdate` <- `$.PreprocessingOptionsUpdate`
-
 TextAnnotation <- new.env(parent = emptyenv())
-
 #' @export
 `$.TextAnnotation` <- function(self, name) {
   func <- TextAnnotation[[name]]
   environment(func) <- environment()
   func
 }
-
 #' @export
 `[[.TextAnnotation` <- `$.TextAnnotation`
-
 GridCell <- new.env(parent = emptyenv())
-
 #' @export
 `$.GridCell` <- function(self, name) {
   func <- GridCell[[name]]
   environment(func) <- environment()
   func
 }
-
 #' @export
 `[[.GridCell` <- `$.GridCell`
-
 TableData <- new.env(parent = emptyenv())
-
 #' @export
 `$.TableData` <- function(self, name) {
   func <- TableData[[name]]
   environment(func) <- environment()
   func
 }
-
 #' @export
 `[[.TableData` <- `$.TableData`
-
 ProcessingWarning <- new.env(parent = emptyenv())
-
 #' @export
 `$.ProcessingWarning` <- function(self, name) {
   func <- ProcessingWarning[[name]]
   environment(func) <- environment()
   func
 }
-
 #' @export
 `[[.ProcessingWarning` <- `$.ProcessingWarning`
-
 NodeContext <- new.env(parent = emptyenv())
-
 #' @export
 `$.NodeContext` <- function(self, name) {
   func <- NodeContext[[name]]
   environment(func) <- environment()
   func
 }
-
 #' @export
 `[[.NodeContext` <- `$.NodeContext`
-
 VisitResult <- new.env(parent = emptyenv())
-
 #' @export
 `$.VisitResult` <- function(self, name) {
   func <- VisitResult[[name]]
   environment(func) <- environment()
   func
 }
-
 #' @export
 `[[.VisitResult` <- `$.VisitResult`
