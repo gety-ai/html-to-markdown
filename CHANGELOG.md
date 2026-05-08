@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0-rc.40] - 2026-05-08
+
+### Fixed
+
+- **Hex publish "release not found"** — `scripts/publish/upload-elixir-package.sh` (and several other upload-* scripts) call `gh release upload "$TAG"` but no step in `publish.yaml` was creating the GitHub release for the tag, so the upload failed with "release not found". Added an "Ensure GitHub Release exists for tag" step in the `prepare` job that runs `gh release create` (with `--prerelease` for rcs) when the release is missing — guarantees every downstream upload-to-release script can succeed.
+
 ## [3.4.0-rc.39] - 2026-05-08
 
 ### Fixed

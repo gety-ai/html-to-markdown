@@ -5,7 +5,7 @@
     <!-- Pack with the public nuget id directly. There's no wrapper; the outer
          `packages/csharp/HtmlToMarkdown.csproj` is no longer used for packing. -->
     <PackageId>KreuzbergDev.HtmlToMarkdown</PackageId>
-    <Version>3.4.0-rc.39</Version>
+    <Version>3.4.0-rc.40</Version>
     <Description>High-performance HTML to Markdown converter</Description>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/kreuzberg-dev/html-to-markdown</RepositoryUrl>
