@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0-rc.42] - 2026-05-08
+
 ### Fixed
 
 - **Homebrew bottle build failed on Linux** — `homebrew-bottles` matrix job ran `brew tap homebrew/core` on `ubuntu-latest` and `ubuntu-24.04-arm`, but Homebrew isn't preinstalled on those runners (`brew: command not found`, exit 127). Both Linux bottle jobs failed every release, blocking `upload-homebrew-bottles` and `publish-homebrew`. Replaced the per-platform bottle-build matrix + `upload-homebrew-bottles` with a single ubuntu job that downloads the already-built CLI/FFI tarballs from the GitHub release, computes SHA256s, regenerates `Formula/html-to-markdown.rb` + `Formula/libhtml-to-markdown.rb` in `kreuzberg-dev/homebrew-tap`, and pushes. New `scripts/publish/update-homebrew-formula.sh` does the formula generation. Both formulas now use `on_macos` / `on_linux` blocks pointing at pre-built tarballs (no bottles, no source build), so `brew install` works on Linux without needing Homebrew bottle infrastructure.
@@ -15,6 +17,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Elixir test_app couldn't resolve dep** — `test_apps/elixir/mix.exs` had `{:html_to_markdown, "../../packages/elixir"}` (Hex requirement parser tried to read the path as a version string and crashed). Replaced with `{:html_to_markdown, ">= 3.4.0-rc.41"}` so the smoke pulls the published Hex artifact end-to-end (verified — rustler_precompiled successfully fetches NIF from the rc.41 GitHub release on first run).
 - **PHP test_app composer install failed** — missing `minimum-stability: "RC"` (composer refused rc tags) and global `~/.composer/config.json` `localphp` path repo overrode Packagist resolution. Added the stability flag and `repositories: { localphp: false }` to disable the global path repo for the test_app.
 - **C# `dotnet test` failed: "more than one project or solution"** — `test_apps/csharp/` contained both `E2eTests.csproj` (legacy) and `KreuzbergDev.HtmlToMarkdown.E2eTests.csproj` (current). Removed the duplicate; updated `alef.toml` text-replacements to drop the deleted file.
+
+### Verified rc.41 publishes
+
+- ✅ PyPI: 25 wheels (5 platforms × 5 Python versions) + sdist; wheels include `py.typed`, `_html_to_markdown.pyi`, native `.so`/`.dylib`, and `bin/html-to-markdown` CLI
+- ✅ npm `@kreuzberg/html-to-markdown-node`: meta package + 5 platform packages with proper `os`/`cpu` metadata
+- ✅ npm `@kreuzberg/html-to-markdown-wasm`: 4 bundler targets (web, bundler, nodejs, deno) with `.wasm` files
+- ✅ RubyGems: 5 gems (4 native + 1 source) with full RBS sigs (`sig/**/*.rbs`)
+- ✅ NuGet: all 6 platforms in `runtimes/<rid>/native/` (linux-x64, linux-arm64, osx-x64, osx-arm64, win-x64, win-arm64)
+- ✅ Hex.pm: NIF checksums for 6 targets (nif-2.16/2.17 × 3 platforms)
+- ✅ crates.io: rc.41 latest
 
 ## [3.4.0-rc.41] - 2026-05-08
 
