@@ -42,6 +42,7 @@ repos:
     rev: "v2.21.2"
     hooks:
       - id: pyproject-fmt
+        exclude: ^test_apps/python/pyproject\.toml$
 
   # Python: ruff (linting + formatting) + mypy (type checking)
   - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -152,7 +153,7 @@ repos:
         exclude: ^test_apps/
   # Alef: verify bindings and sync versions
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.14.33
+    rev: v0.14.34
     hooks:
       - id: alef-verify
       - id: alef-sync-versions

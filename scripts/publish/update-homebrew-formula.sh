@@ -17,8 +17,14 @@ tap_dir="${TAP_DIR:?TAP_DIR is required (path to homebrew-tap checkout)}"
 cli_formula="${tap_dir}/Formula/html-to-markdown.rb"
 ffi_formula="${tap_dir}/Formula/libhtml-to-markdown.rb"
 
-[[ -f "$cli_formula" ]] || { echo "Missing $cli_formula" >&2; exit 1; }
-[[ -f "$ffi_formula" ]] || { echo "Missing $ffi_formula" >&2; exit 1; }
+[[ -f "$cli_formula" ]] || {
+  echo "Missing $cli_formula" >&2
+  exit 1
+}
+[[ -f "$ffi_formula" ]] || {
+  echo "Missing $ffi_formula" >&2
+  exit 1
+}
 
 work_dir="$(mktemp -d)"
 trap 'rm -rf "$work_dir"' EXIT
@@ -28,30 +34,25 @@ trap 'rm -rf "$work_dir"' EXIT
 #        aarch64-unknown-linux-gnu, x86_64-unknown-linux-gnu
 #   FFI: same 4 triples (uses release-prefix html-to-markdown-rs-ffi-${TAG}-)
 
-cli_assets=(
-  "cli-aarch64-apple-darwin.tar.gz"
-  "cli-x86_64-apple-darwin.tar.gz"
-  "cli-aarch64-unknown-linux-gnu.tar.gz"
-  "cli-x86_64-unknown-linux-gnu.tar.gz"
-)
-
-ffi_assets=(
-  "html-to-markdown-rs-ffi-${tag}-aarch64-apple-darwin.tar.gz"
-  "html-to-markdown-rs-ffi-${tag}-x86_64-apple-darwin.tar.gz"
-  "html-to-markdown-rs-ffi-${tag}-aarch64-unknown-linux-gnu.tar.gz"
-  "html-to-markdown-rs-ffi-${tag}-x86_64-unknown-linux-gnu.tar.gz"
-)
-
-declare -A sha
-for asset in "${cli_assets[@]}" "${ffi_assets[@]}"; do
+compute_sha() {
+  local asset="$1"
   echo "Downloading $asset..."
   gh release download "$tag" -p "$asset" -D "$work_dir" --clobber
-  sha["$asset"]=$(shasum -a 256 "$work_dir/$asset" | awk '{print $1}')
-  echo "  SHA256: ${sha[$asset]}"
-done
+  shasum -a 256 "$work_dir/$asset" | awk '{print $1}'
+}
+
+cli_macos_arm_sha=$(compute_sha "cli-aarch64-apple-darwin.tar.gz")
+cli_macos_intel_sha=$(compute_sha "cli-x86_64-apple-darwin.tar.gz")
+cli_linux_arm_sha=$(compute_sha "cli-aarch64-unknown-linux-gnu.tar.gz")
+cli_linux_intel_sha=$(compute_sha "cli-x86_64-unknown-linux-gnu.tar.gz")
+
+ffi_macos_arm_sha=$(compute_sha "html-to-markdown-rs-ffi-${tag}-aarch64-apple-darwin.tar.gz")
+ffi_macos_intel_sha=$(compute_sha "html-to-markdown-rs-ffi-${tag}-x86_64-apple-darwin.tar.gz")
+ffi_linux_arm_sha=$(compute_sha "html-to-markdown-rs-ffi-${tag}-aarch64-unknown-linux-gnu.tar.gz")
+ffi_linux_intel_sha=$(compute_sha "html-to-markdown-rs-ffi-${tag}-x86_64-unknown-linux-gnu.tar.gz")
 
 write_cli_formula() {
-  cat > "$cli_formula" <<EOF
+  cat >"$cli_formula" <<EOF
 # typed: false
 # frozen_string_literal: true
 
@@ -64,24 +65,24 @@ class HtmlToMarkdown < Formula
   on_macos do
     on_arm do
       url "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v#{version}/cli-aarch64-apple-darwin.tar.gz"
-      sha256 "${sha[cli-aarch64-apple-darwin.tar.gz]}"
+      sha256 "${cli_macos_arm_sha}"
     end
 
     on_intel do
       url "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v#{version}/cli-x86_64-apple-darwin.tar.gz"
-      sha256 "${sha[cli-x86_64-apple-darwin.tar.gz]}"
+      sha256 "${cli_macos_intel_sha}"
     end
   end
 
   on_linux do
     on_arm do
       url "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v#{version}/cli-aarch64-unknown-linux-gnu.tar.gz"
-      sha256 "${sha[cli-aarch64-unknown-linux-gnu.tar.gz]}"
+      sha256 "${cli_linux_arm_sha}"
     end
 
     on_intel do
       url "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v#{version}/cli-x86_64-unknown-linux-gnu.tar.gz"
-      sha256 "${sha[cli-x86_64-unknown-linux-gnu.tar.gz]}"
+      sha256 "${cli_linux_intel_sha}"
     end
   end
 
@@ -104,7 +105,7 @@ EOF
 }
 
 write_ffi_formula() {
-  cat > "$ffi_formula" <<EOF
+  cat >"$ffi_formula" <<EOF
 # typed: false
 # frozen_string_literal: true
 
@@ -117,24 +118,24 @@ class LibhtmlToMarkdown < Formula
   on_macos do
     on_arm do
       url "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v#{version}/html-to-markdown-rs-ffi-v#{version}-aarch64-apple-darwin.tar.gz"
-      sha256 "${sha[html-to-markdown-rs-ffi-${tag}-aarch64-apple-darwin.tar.gz]}"
+      sha256 "${ffi_macos_arm_sha}"
     end
 
     on_intel do
       url "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v#{version}/html-to-markdown-rs-ffi-v#{version}-x86_64-apple-darwin.tar.gz"
-      sha256 "${sha[html-to-markdown-rs-ffi-${tag}-x86_64-apple-darwin.tar.gz]}"
+      sha256 "${ffi_macos_intel_sha}"
     end
   end
 
   on_linux do
     on_arm do
       url "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v#{version}/html-to-markdown-rs-ffi-v#{version}-aarch64-unknown-linux-gnu.tar.gz"
-      sha256 "${sha[html-to-markdown-rs-ffi-${tag}-aarch64-unknown-linux-gnu.tar.gz]}"
+      sha256 "${ffi_linux_arm_sha}"
     end
 
     on_intel do
       url "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v#{version}/html-to-markdown-rs-ffi-v#{version}-x86_64-unknown-linux-gnu.tar.gz"
-      sha256 "${sha[html-to-markdown-rs-ffi-${tag}-x86_64-unknown-linux-gnu.tar.gz]}"
+      sha256 "${ffi_linux_intel_sha}"
     end
   end
 

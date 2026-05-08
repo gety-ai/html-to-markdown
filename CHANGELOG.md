@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [3.4.0-rc.42] - 2026-05-08
+### Fixed
+
+- **CI pre-commit failed on rc.42 push** — three real hook failures:
+  - `pyproject-fmt` PEP440-normalized `>=3.4.0-rc.42` to `>=3.4.0rc42` in `test_apps/python/pyproject.toml`, but `alef sync-versions` would re-write the cargo-style form on every bump. Excluded `test_apps/python/pyproject.toml` from `pyproject-fmt`.
+  - `shfmt` rejected `${sha[cli-aarch64-apple-darwin.tar.gz]}` heredoc expansion in `update-homebrew-formula.sh` — `.` in associative-array keys was parsed as floating-point arithmetic. Refactored to use named scalar variables (`cli_macos_arm_sha`, etc.).
+  - `mix-format` wanted to re-flow alef-generated lib files differently than alef writes them (alef pre-wraps URLs alef-internally; mix format re-flows on `line_length`). Removed `lib/` from `.formatter.exs` `inputs:` since every file under `packages/elixir/lib/` is alef-generated.
+- **alef toolchain bumped 0.14.33 → 0.14.34** — regenerated all bindings with the new toolchain (per-binding hash manifest refreshed); `.pre-commit-config.yaml` `kreuzberg-dev/alef` rev pinned to v0.14.34.
+
+
 
 ### Fixed
 
