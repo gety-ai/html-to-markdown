@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Homebrew bottles for macOS arm64, macOS x86_64, Linux x86_64, Linux arm64** — `publish.yaml` now builds proper bottles via `brew install --build-bottle && brew bottle` after the formula is updated. New jobs: `homebrew-bottles` (matrix, 4 platforms; installs Homebrew on Linux runners) and `publish-homebrew-bottles` (aggregates JSON manifests, writes `bottle do` block into the formula, pushes). Bottle tarballs upload to the GH release as `<formula>-<version>.<bottle_tag>.bottle.tar.gz`. Users on a covered platform now get "Pouring from bottle"; older OS users still fall through to the existing `on_macos`/`on_linux` URL blocks. Scripts: `scripts/publish/install-homebrew-linux.sh`, `build-homebrew-bottles.sh`, `merge-homebrew-bottles.sh`.
+
 ### Fixed
 
 - **CI pre-commit failed on rc.42 push** — three real hook failures:

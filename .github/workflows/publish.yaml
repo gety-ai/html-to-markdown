@@ -2223,7 +2223,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  publish-homebrew:
+  publish-homebrew-formula:
     name: Update Homebrew formula
     needs: [prepare, check-homebrew, upload-release-artifacts, c-ffi-libraries, cli-binaries]
     if: |
@@ -2269,4 +2269,115 @@ jobs:
           fi
           git add Formula/html-to-markdown.rb Formula/libhtml-to-markdown.rb
           git commit -m "html-to-markdown ${{ needs.prepare.outputs.version }}"
+          git push origin HEAD
+
+  homebrew-bottles:
+    name: Build Homebrew bottle (${{ matrix.bottle_tag }})
+    needs: [prepare, publish-homebrew-formula]
+    if: |
+      always() &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.prepare.outputs.is_tag == 'true' &&
+      needs.publish-homebrew-formula.result == 'success'
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            bottle_tag: arm64_sonoma
+            install_brew: false
+          - os: macos-15-intel
+            bottle_tag: sonoma
+            install_brew: false
+          - os: ubuntu-latest
+            bottle_tag: x86_64_linux
+            install_brew: true
+          - os: ubuntu-24.04-arm
+            bottle_tag: arm64_linux
+            install_brew: true
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v6 # v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+
+      - name: Install Homebrew (Linux)
+        if: ${{ matrix.install_brew }}
+        run: scripts/publish/install-homebrew-linux.sh
+        shell: bash
+
+      - name: Build bottles
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+          VERSION: ${{ needs.prepare.outputs.version }}
+          TAP: kreuzberg-dev/tap
+          OUT_DIR: ${{ github.workspace }}/bottle-json
+        run: scripts/publish/build-homebrew-bottles.sh
+        shell: bash
+
+      - name: Upload bottle JSON manifests
+        uses: actions/upload-artifact@v5 # v5
+        with:
+          name: homebrew-bottle-json-${{ matrix.bottle_tag }}
+          path: ${{ github.workspace }}/bottle-json/*.json
+          if-no-files-found: error
+
+  publish-homebrew-bottles:
+    name: Merge Homebrew bottle DSL
+    needs: [prepare, publish-homebrew-formula, homebrew-bottles]
+    if: |
+      always() &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.prepare.outputs.is_tag == 'true' &&
+      needs.publish-homebrew-formula.result == 'success' &&
+      needs.homebrew-bottles.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v6 # v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+
+      - name: Checkout homebrew-tap
+        uses: actions/checkout@v6 # v6
+        with:
+          repository: kreuzberg-dev/homebrew-tap
+          token: ${{ secrets.HOMEBREW_TOKEN }}
+          path: homebrew-tap
+
+      - name: Download all bottle JSON manifests
+        uses: actions/download-artifact@v6 # v6
+        with:
+          path: ${{ github.workspace }}/bottle-json
+          pattern: homebrew-bottle-json-*
+          merge-multiple: true
+
+      - name: Merge bottle DSL into formulas
+        env:
+          TAG: ${{ needs.prepare.outputs.tag }}
+          VERSION: ${{ needs.prepare.outputs.version }}
+          TAP_DIR: ${{ github.workspace }}/homebrew-tap
+          JSON_DIR: ${{ github.workspace }}/bottle-json
+        run: scripts/publish/merge-homebrew-bottles.sh
+        shell: bash
+
+      - name: Commit and push bottle DSL
+        working-directory: homebrew-tap
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TOKEN }}
+        run: |
+          git config user.name "html-to-markdown-bot"
+          git config user.email "bot@kreuzberg.dev"
+          if git diff --quiet Formula/; then
+            echo "No bottle DSL changes; skipping commit."
+            exit 0
+          fi
+          git add Formula/html-to-markdown.rb Formula/libhtml-to-markdown.rb
+          git commit -m "html-to-markdown ${{ needs.prepare.outputs.version }}: add bottle DSL"
           git push origin HEAD
