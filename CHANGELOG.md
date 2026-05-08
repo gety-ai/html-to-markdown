@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0-rc.39] - 2026-05-08
+
+### Fixed
+
+- **Elixir Hex package exceeds 128 MiB** — `mix.exs` `package.files` includes the entire `native/` directory, which on a previously-built CI workspace contains 1+ GB of `target/{debug,release}` artifacts. `mix hex.build` rejects with "Creating tarball failed: package exceeds max uncompressed size 134.217728 MB". `scripts/publish/elixir/build-hex-package.sh` now strips every `native/**/target/` directory before invoking `mix hex.build`. With rustler_precompiled, the published tarball doesn't need any built artifacts anyway — the precompiled NIFs are downloaded from GitHub releases at install time.
+
+### Verified rc.38 publishes
+
+- ✅ PyPI 3.4.0rc38 (26 files: 5 platforms × 5 Python versions + sdist)
+- ✅ npm `-node`, `-wasm`, TS meta — all 3.4.0-rc.38
+- ✅ RubyGems 3.4.0.pre.rc.38 — **all 5 platforms** (ruby, x86_64-linux, x86_64-darwin, arm64-darwin, aarch64-linux)
+- ✅ NuGet 3.4.0-rc.38
+- ✅ crates.io 3.4.0-rc.38
+- ✅ Maven publish job success (indexing lag — rc.25 still latest in repo1.maven.org metadata)
+- ✅ Packagist publish job success
+- ❌ Hex still rc.25 — fix above
+
 ## [3.4.0-rc.38] - 2026-05-08
 
 ### Fixed
