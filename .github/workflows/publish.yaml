@@ -341,6 +341,9 @@ jobs:
         with:
           python-version: "3.13"
           package-dir: packages/python
+          # abi3-py310 is enabled in pyo3 features → one wheel per platform covers 3.10+.
+          # Without this override, cibuildwheel rebuilds for cp310/cp311/cp312/cp313/cp314 = 5x duplicates.
+          cibw-build: "cp310-*"
           cibw-before-build-linux: >
             yum install -y openssl-devel &&
             (test -x /usr/bin/aarch64-linux-gnu-gcc ||
