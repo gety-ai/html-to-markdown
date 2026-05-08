@@ -258,7 +258,7 @@ jobs:
         uses: kreuzberg-dev/actions/check-registry@v1 # v1
         with:
           registry: packagist
-          package: kreuzberg-dev/html-to-markdown-rs
+          package: kreuzberg-dev/html-to-markdown
           version: ${{ needs.prepare.outputs.version }}
 
   check-cratesio:
@@ -1848,7 +1848,7 @@ jobs:
         uses: kreuzberg-dev/actions/check-registry@v1 # v1
         with:
           registry: packagist
-          package: kreuzberg-dev/html-to-markdown-rs
+          package: kreuzberg-dev/html-to-markdown
           version: ${{ needs.prepare.outputs.version }}
 
       - name: Trigger Packagist Update
@@ -1856,7 +1856,7 @@ jobs:
         uses: kreuzberg-dev/actions/publish-packagist@v1 # v1
         with:
           packagist-username: kreuzberg-dev
-          package-name: kreuzberg-dev/html-to-markdown-rs
+          package-name: kreuzberg-dev/html-to-markdown
           version: ${{ needs.prepare.outputs.version }}
           repository-url: https://github.com/kreuzberg-dev/html-to-markdown
           dry-run: ${{ needs.prepare.outputs.dry_run }}
@@ -2223,189 +2223,50 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  homebrew-bottles:
-    name: Build Homebrew bottles (${{ matrix.bottle_tag }})
-    needs: [prepare, check-homebrew]
-    if: |
-      needs.prepare.outputs.is_tag == 'true' &&
-      (needs.check-homebrew.outputs.exists != 'true')
-    runs-on: ${{ matrix.runner }}
-    timeout-minutes: 180
-    permissions:
-      contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - runner: macos-latest
-            bottle_tag: arm64_sequoia
-          - runner: macos-15-intel
-            bottle_tag: sequoia
-          - runner: ubuntu-latest
-            bottle_tag: x86_64_linux
-          - runner: ubuntu-24.04-arm
-            bottle_tag: arm64_linux
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
-        with:
-          ref: ${{ needs.prepare.outputs.checkout_ref }}
-          fetch-depth: 0
-
-      - name: Ensure target commit
-        if: ${{ needs.prepare.outputs.target_sha != '' }}
-        run: git checkout --progress --force ${{ needs.prepare.outputs.target_sha }}
-
-      - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Setup Homebrew
-        run: |
-          brew tap homebrew/core
-          brew update
-
-      - name: Extract version
-        id: version
-        env:
-          TAG: ${{ needs.prepare.outputs.tag }}
-        run: |
-          VERSION="${TAG#v}"
-          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
-
-      - name: Build CLI for bottle
-        run: |
-          cargo build --release \
-            -p html-to-markdown-cli
-
-      - name: Create Homebrew bottle
-        id: bottle
-        env:
-          VERSION: ${{ steps.version.outputs.version }}
-          TAG: ${{ needs.prepare.outputs.tag }}
-        run: |
-          # Homebrew bottles require {formula}/{version}/ prefix in the tarball
-          bottle_root="/tmp/html-to-markdown-bottle"
-          bottle_dir="${bottle_root}/html-to-markdown/${VERSION}"
-          mkdir -p "${bottle_dir}/bin"
-
-          # Copy the built binary
-          cp target/release/html-to-markdown "${bottle_dir}/bin/"
-
-          # Create bottle tarball with correct prefix
-          cd "${bottle_root}"
-          bottle_filename="html-to-markdown-${VERSION}.${{ matrix.bottle_tag }}.bottle.tar.gz"
-          tar -czf "${bottle_filename}" html-to-markdown/
-
-          # Calculate SHA256
-          sha256=$(shasum -a 256 "${bottle_filename}" | cut -d' ' -f1)
-          echo "sha256=${sha256}" >> "$GITHUB_OUTPUT"
-          echo "filename=${bottle_filename}" >> "$GITHUB_OUTPUT"
-
-          # Copy to workspace for artifact upload
-          cp "${bottle_filename}" "${{ github.workspace }}/"
-          echo "Bottle created: ${bottle_filename}"
-          echo "SHA256: ${sha256}"
-
-      - name: Verify bottle file in workspace
-        run: |
-          cd "${{ github.workspace }}"
-          ls -lh html-to-markdown-*.bottle.tar.gz
-          echo "Files in workspace:"
-          ls -la
-        shell: bash
-
-      - name: Upload bottle artifact
-        uses: actions/upload-artifact@v7 # v7
-        with:
-          name: homebrew-bottle-${{ matrix.bottle_tag }}
-          path: html-to-markdown-${{ steps.version.outputs.version }}.${{ matrix.bottle_tag }}.bottle.tar.gz
-          retention-days: 14
-          if-no-files-found: error
-
-  upload-homebrew-bottles:
-    name: Upload Homebrew bottles to GitHub Release
-    needs: [prepare, check-homebrew, homebrew-bottles]
-    if: |
-      always() &&
-      needs.prepare.outputs.dry_run != 'true' &&
-      needs.prepare.outputs.is_tag == 'true' &&
-      (needs.check-homebrew.outputs.exists != 'true') &&
-      needs.homebrew-bottles.result == 'success'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
-        with:
-          ref: ${{ needs.prepare.outputs.ref }}
-
-      - name: Ensure GitHub release exists
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: scripts/publish/ensure-github-release-exists.sh "${{ needs.prepare.outputs.tag }}"
-
-      - name: Download bottle artifacts
-        uses: actions/download-artifact@v8 # v8
-        with:
-          pattern: homebrew-bottle-*
-          path: dist/homebrew
-          merge-multiple: true
-
-      - name: Verify downloaded artifacts
-        run: |
-          echo "Contents of dist/homebrew:"
-          ls -laR dist/homebrew || echo "dist/homebrew not found"
-          echo "All dist contents:"
-          ls -laR dist || echo "dist not found"
-        shell: bash
-
-      - name: Upload bottles (idempotent)
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: scripts/publish/upload-homebrew-bottles.sh "${{ needs.prepare.outputs.tag }}" dist/homebrew
-
   publish-homebrew:
     name: Update Homebrew formula
-    needs: [prepare, check-homebrew, upload-homebrew-bottles]
+    needs: [prepare, check-homebrew, upload-release-artifacts, c-ffi-libraries, cli-binaries]
     if: |
       always() &&
       needs.prepare.outputs.dry_run != 'true' &&
       needs.prepare.outputs.is_tag == 'true' &&
       (needs.check-homebrew.outputs.exists != 'true') &&
-      needs.upload-homebrew-bottles.result == 'success'
+      needs.upload-release-artifacts.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Checkout
+      - name: Checkout source repo
         uses: actions/checkout@v6 # v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
 
-      - name: Download bottle artifacts
-        uses: actions/download-artifact@v8 # v8
+      - name: Checkout homebrew-tap
+        uses: actions/checkout@v6 # v6
         with:
-          pattern: homebrew-bottle-*
-          path: dist/homebrew
-          merge-multiple: true
+          repository: kreuzberg-dev/homebrew-tap
+          token: ${{ secrets.HOMEBREW_TOKEN }}
+          path: homebrew-tap
 
-      - name: Setup Git credentials
+      - name: Update formula files
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+          VERSION: ${{ needs.prepare.outputs.version }}
+          TAP_DIR: ${{ github.workspace }}/homebrew-tap
+        run: scripts/publish/update-homebrew-formula.sh
+
+      - name: Commit and push to tap
+        working-directory: homebrew-tap
         env:
           GH_TOKEN: ${{ secrets.HOMEBREW_TOKEN }}
         run: |
-          git config --global credential.helper store
-          echo "https://x-access-token:${GH_TOKEN}@github.com" > ~/.git-credentials
-          git config --global user.name "html-to-markdown-bot"
-          git config --global user.email "bot@kreuzberg.dev"
-
-      - name: Update Homebrew formula with bottles
-        uses: kreuzberg-dev/actions/publish-homebrew@v1 # v1
-        with:
-          bottles-dir: dist/homebrew
-          formula-name: html-to-markdown
-          tap-repo: kreuzberg-dev/homebrew-tap
-          tag: ${{ needs.prepare.outputs.tag }}
-          version: ${{ needs.prepare.outputs.version }}
-          github-repo: kreuzberg-dev/html-to-markdown
-          dry-run: ${{ needs.prepare.outputs.dry_run }}
+          git config user.name "html-to-markdown-bot"
+          git config user.email "bot@kreuzberg.dev"
+          if git diff --quiet Formula/; then
+            echo "No formula changes; skipping commit."
+            exit 0
+          fi
+          git add Formula/html-to-markdown.rb Formula/libhtml-to-markdown.rb
+          git commit -m "html-to-markdown ${{ needs.prepare.outputs.version }}"
+          git push origin HEAD

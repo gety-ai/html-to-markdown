@@ -343,28 +343,28 @@ tasks:
     dir: test_apps/python
     cmds:
       - uv sync
-      - uv run pytest smoke_test.py -v
+      - uv run pytest tests/test_smoke.py -v
 
   e2e:smoke:node:
     desc: "Smoke test Node package from npm"
     dir: test_apps/node
     cmds:
       - pnpm install
-      - pnpm test:smoke
+      - pnpm exec vitest run tests/smoke.test.ts
 
   e2e:smoke:ruby:
     desc: "Smoke test Ruby gem from RubyGems"
     dir: test_apps/ruby
     cmds:
       - bundle install
-      - bundle exec rspec smoke_test.rb
+      - bundle exec rspec spec/smoke_spec.rb
 
   e2e:smoke:php:
     desc: "Smoke test PHP package from Packagist"
     dir: test_apps/php
     cmds:
       - composer install
-      - vendor/bin/phpunit smoke_test.php
+      - vendor/bin/phpunit tests/SmokeTest.php
 
   e2e:smoke:go:
     desc: "Smoke test Go package from pkg.go.dev"
@@ -398,21 +398,21 @@ tasks:
     desc: "Smoke test R package"
     dir: test_apps/r
     cmds:
-      - Rscript smoke_test.R
+      - Rscript -e "library(testthat); library(htmltomarkdown); test_file('tests/test_smoke.R')"
 
   e2e:smoke:bun:
     desc: "Smoke test Node package from npm under Bun"
     dir: test_apps/bun
     cmds:
       - bun install
-      - bun test smoke_test.ts
+      - bun test smoke.test.ts
 
   e2e:smoke:wasm:
     desc: "Smoke test WASM package from npm"
     dir: test_apps/wasm
     cmds:
       - pnpm install
-      - pnpm test:smoke
+      - pnpm exec vitest run tests/smoke.test.ts
 
   e2e:smoke:rust:
     desc: "Smoke test Rust crate from crates.io"
@@ -424,7 +424,7 @@ tasks:
     desc: "Smoke test C FFI from GitHub release tarballs"
     dir: test_apps/c
     cmds:
-      - make smoke
+      - make test
 
   e2e:test:all:
     desc: "Run comprehensive tests for all published packages"

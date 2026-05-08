@@ -1,5 +1,5 @@
 {
-  "name": "kreuzberg-dev/html-to-markdown-rs",
+  "name": "kreuzberg-dev/html-to-markdown",
   "description": "High-performance HTML to Markdown converter",
   "license": "MIT",
   "type": "php-ext",

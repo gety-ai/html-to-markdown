@@ -35,19 +35,14 @@ search = "<artifactId>html-to-markdown</artifactId>\\s*<version>[^<]*</version>"
 replace = "<artifactId>html-to-markdown</artifactId>\n            <version>{version}</version>"
 
 [[workspace.sync.text_replacements]]
-path = "test_apps/csharp/E2eTests.csproj"
-search = 'Include="KreuzbergDev.HtmlToMarkdown" Version="[^"]*"'
-replace = 'Include="KreuzbergDev.HtmlToMarkdown" Version="{version}"'
-
-[[workspace.sync.text_replacements]]
 path = "test_apps/csharp/KreuzbergDev.HtmlToMarkdown.E2eTests.csproj"
 search = 'Include="KreuzbergDev.HtmlToMarkdown" Version="[^"]*"'
 replace = 'Include="KreuzbergDev.HtmlToMarkdown" Version="{version}"'
 
 [[workspace.sync.text_replacements]]
 path = "test_apps/php/composer.json"
-search = '"kreuzberg-dev/html-to-markdown-rs": "[^"]*"'
-replace = '"kreuzberg-dev/html-to-markdown-rs": ">={version}"'
+search = '"kreuzberg-dev/html-to-markdown": "[^"]*"'
+replace = '"kreuzberg-dev/html-to-markdown": ">={version}"'
 
 [[workspace.sync.text_replacements]]
 path = "test_apps/python/pyproject.toml"

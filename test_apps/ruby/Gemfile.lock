@@ -9,8 +9,8 @@ GEM
       logger
     faraday-net_http (3.4.2)
       net-http (~> 0.5)
-    html-to-markdown (3.4.0.pre.rc.40-arm64-darwin)
-    html-to-markdown (3.4.0.pre.rc.40-x86_64-linux)
+    html-to-markdown (3.4.0.pre.rc.41-arm64-darwin)
+    html-to-markdown (3.4.0.pre.rc.41-x86_64-linux)
     json (2.19.3)
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
@@ -67,7 +67,7 @@ PLATFORMS
 
 DEPENDENCIES
   faraday (~> 2.0)
-  html-to-markdown (~> 3.4.0.pre.rc.40)
+  html-to-markdown (~> 3.4.0.pre.rc.41)
   rspec (~> 3.13)
   rubocop (~> 1.86)
   rubocop-rspec (~> 3.9)
@@ -77,8 +77,8 @@ CHECKSUMS
   diff-lcs (1.6.2) sha256=9ae0d2cba7d4df3075fe8cd8602a8604993efc0dfa934cff568969efb1909962
   faraday (2.14.1) sha256=a43cceedc1e39d188f4d2cdd360a8aaa6a11da0c407052e426ba8d3fb42ef61c
   faraday-net_http (3.4.2) sha256=f147758260d3526939bf57ecf911682f94926a3666502e24c69992765875906c
-  html-to-markdown (3.4.0.pre.rc.40-arm64-darwin) sha256=7e932cecb7b0926bd421149f541c011bce3dcc1d2f8d0b17b489190228b07482
-  html-to-markdown (3.4.0.pre.rc.40-x86_64-linux) sha256=e3f24f88e87597ab01283dca9e44fc9ada537b93c2ae2bb2c0008c2e8df63ec6
+  html-to-markdown (3.4.0.pre.rc.41-arm64-darwin) sha256=a1c453c933f26d96d4f5a64ccf7a7e94f04d15dff84a71855ec6a3a5589ad8f3
+  html-to-markdown (3.4.0.pre.rc.41-x86_64-linux) sha256=6a6199099d9796b91779c877e2c33ecfae05ad560d7d7993142980ab63a4a770
   json (2.19.3) sha256=289b0bb53052a1fa8c34ab33cc750b659ba14a5c45f3fcf4b18762dc67c78646
   language_server-protocol (3.17.0.5) sha256=fd1e39a51a28bf3eec959379985a72e296e9f9acfce46f6a79d31ca8760803cc
   lint_roller (1.1.0) sha256=2c0c845b632a7d172cb849cc90c1bce937a28c5c8ccccb50dfd46a485003cc87
