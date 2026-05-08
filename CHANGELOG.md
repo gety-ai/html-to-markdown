@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0-rc.37] - 2026-05-08
+
+### Fixed
+
+- **Ruby gem `x86_64-linux` collision** — `scripts/publish/ruby/build-gem-unix.sh` had a typo: `Darwin-x86_64) PLATFORM="x86_64-linux"`. The macos-15-intel runner was producing a gem labelled `x86_64-linux` (with a Mach-O dylib inside), then `merge-multiple: true` in publish-rubygems would overwrite the actual ubuntu-latest build's `x86_64-linux` gem. The published archive on rubygems.org saw a Mach-O `.so` inside an `x86_64-linux` gem and `gem spec` rejected it as "invalid gem structure". Fixed: `Darwin-x86_64) PLATFORM="x86_64-darwin"`.
+
 ## [3.4.0-rc.36] - 2026-05-08
 
 ### Fixed

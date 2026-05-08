@@ -47,7 +47,7 @@ case "$(uname -s)-$(uname -m)" in
 Linux-x86_64) PLATFORM="x86_64-linux" ;;
 Linux-aarch64) PLATFORM="aarch64-linux" ;;
 Darwin-arm64) PLATFORM="arm64-darwin" ;;
-Darwin-x86_64) PLATFORM="x86_64-linux" ;;
+Darwin-x86_64) PLATFORM="x86_64-darwin" ;;
 *)
   echo "WARNING: Unknown platform, skipping native gem build"
   exit 0
