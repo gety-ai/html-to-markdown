@@ -2389,3 +2389,35 @@ jobs:
           git add Formula/html-to-markdown.rb Formula/libhtml-to-markdown.rb
           git commit -m "html-to-markdown ${{ needs.prepare.outputs.version }}: add bottle DSL"
           git push origin HEAD
+
+  announce-discord:
+    name: Announce release on Discord
+    needs:
+      - prepare
+      - publish-crates
+      - publish-pypi
+      - publish-rubygems
+      - publish-hex
+      - publish-nuget
+      - publish-packagist
+      - publish-maven
+      - publish-node
+      - publish-wasm
+      - publish-homebrew-formula
+      - publish-homebrew-bottles
+    if: |
+      always() &&
+      !cancelled() &&
+      needs.prepare.outputs.is_tag == 'true' &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.prepare.outputs.is_prerelease != 'true' &&
+      !contains(needs.*.result, 'failure')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: kreuzberg-dev/actions/announce-release-discord@v1
+        with:
+          tag: ${{ needs.prepare.outputs.tag }}
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          project-name: html-to-markdown
