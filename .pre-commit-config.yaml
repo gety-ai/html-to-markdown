@@ -154,7 +154,7 @@ repos:
         exclude: ^test_apps/
   # Alef: verify bindings and sync versions
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.14.35
+    rev: v0.15.8
     hooks:
       - id: alef-verify
       - id: alef-sync-versions
@@ -167,7 +167,7 @@ repos:
 
   # Java cpd — kept upstream (not yet in shared repo)
   - repo: https://github.com/crate-ci/typos
-    rev: v1.46.0
+    rev: v1.46.1
     hooks:
       - id: typos
         args: [--force-exclude]

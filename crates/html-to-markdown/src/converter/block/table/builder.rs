@@ -6,7 +6,7 @@
 use std::borrow::Cow;
 
 use super::cell::{collect_table_cells, get_colspan};
-use super::cells::{append_layout_row, convert_table_row};
+use super::cells::{append_layout_row, collect_row_cell_widths, convert_table_row};
 use super::scanner::scan_table;
 use super::utils::{is_tag_name, normalized_tag_name};
 #[cfg(feature = "visitor")]
@@ -216,6 +216,50 @@ pub fn handle_table(
         let mut rowspan_tracker = vec![None; total_cols];
         let mut row_cells = Vec::new();
 
+        // Pre-pass: compute per-column max content widths for aligned padding.
+        // Uses a rowspan tracker so spanned columns are skipped just as they
+        // are in the render pass, keeping column indices correctly aligned.
+        let col_widths = {
+            let mut widths: Vec<usize> = Vec::new();
+            let mut prepass_rowspan: Vec<Option<usize>> = Vec::new();
+            let children = tag.children();
+            for child_handle in children.top().iter() {
+                if let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) {
+                    let tag_name = normalized_tag_name(child_tag.name().as_utf8_str());
+                    match tag_name.as_ref() {
+                        "thead" | "tbody" | "tfoot" => {
+                            for row_handle in child_tag.children().top().iter() {
+                                if is_tag_name(row_handle, parser, dom_ctx, "tr") {
+                                    collect_row_cell_widths(
+                                        row_handle,
+                                        parser,
+                                        options,
+                                        ctx,
+                                        dom_ctx,
+                                        &mut widths,
+                                        &mut prepass_rowspan,
+                                    );
+                                }
+                            }
+                        }
+                        "tr" | "row" => {
+                            collect_row_cell_widths(
+                                child_handle,
+                                parser,
+                                options,
+                                ctx,
+                                dom_ctx,
+                                &mut widths,
+                                &mut prepass_rowspan,
+                            );
+                        }
+                        _ => {}
+                    }
+                }
+            }
+            widths
+        };
+
         let children = tag.children();
         {
             for child_handle in children.top().iter() {
@@ -282,6 +326,7 @@ pub fn handle_table(
                                                 dom_ctx,
                                                 depth + 1,
                                                 is_header_section,
+                                                &col_widths,
                                             );
                                             row_index += 1;
                                         }
@@ -312,6 +357,7 @@ pub fn handle_table(
                                 dom_ctx,
                                 depth + 1,
                                 row_index == 0,
+                                &col_widths,
                             );
                             row_index += 1;
                         }

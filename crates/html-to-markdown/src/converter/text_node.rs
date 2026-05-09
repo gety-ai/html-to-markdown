@@ -114,25 +114,19 @@ pub fn process_text_node(
     let processed_text = if ctx.in_code || ctx.in_ruby {
         text.into_owned()
     } else if ctx.in_table_cell {
+        // Always escape * and _ in table cells to prevent unintended emphasis.
         let escaped = if options.whitespace_mode == crate::options::WhitespaceMode::Normalized {
             let normalized_text = text::normalize_whitespace_cow(text.as_ref());
             let escaped_result = text::escape(
                 normalized_text.as_ref(),
                 options.escape_misc,
-                options.escape_asterisks,
-                options.escape_underscores,
+                true,
+                true,
                 options.escape_ascii,
             );
             escaped_result.into_owned()
         } else {
-            text::escape(
-                text.as_ref(),
-                options.escape_misc,
-                options.escape_asterisks,
-                options.escape_underscores,
-                options.escape_ascii,
-            )
-            .into_owned()
+            text::escape(text.as_ref(), options.escape_misc, true, true, options.escape_ascii).into_owned()
         };
         if options.escape_misc {
             escaped

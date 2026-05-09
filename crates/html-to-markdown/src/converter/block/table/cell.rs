@@ -97,10 +97,86 @@ pub fn collect_table_cells(
     }
 }
 
+/// Extract the text content of a table cell for column width calculation.
+///
+/// Returns the same text that would appear in the rendered cell, without
+/// the surrounding pipe delimiters. Used in the first pass to compute
+/// maximum column widths before rendering with padding.
+///
+/// # Arguments
+/// * `node_handle` - Handle to the cell element
+/// * `parser` - HTML parser instance
+/// * `options` - Conversion options
+/// * `ctx` - Conversion context
+/// * `dom_ctx` - DOM context
+#[allow(clippy::trivially_copy_pass_by_ref)]
+pub fn cell_text_content(
+    node_handle: &tl::NodeHandle,
+    parser: &tl::Parser,
+    options: &crate::options::ConversionOptions,
+    ctx: &super::super::super::Context,
+    dom_ctx: &super::super::super::DomContext,
+) -> String {
+    let mut text = String::with_capacity(64);
+
+    let cell_ctx = super::super::super::Context {
+        in_table_cell: true,
+        ..ctx.clone()
+    };
+
+    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+        let children = tag.children();
+        let has_tag_child = children
+            .top()
+            .iter()
+            .any(|child_handle| matches!(child_handle.get(parser), Some(tl::Node::Tag(_))));
+
+        if has_tag_child {
+            for child_handle in children.top().iter() {
+                super::super::super::walk_node(child_handle, parser, &mut text, options, &cell_ctx, 0, dom_ctx);
+            }
+        } else {
+            let raw = dom_ctx.text_content(*node_handle, parser);
+            let normalized = if options.whitespace_mode == crate::options::WhitespaceMode::Normalized {
+                crate::text::normalize_whitespace_cow(raw.as_str())
+            } else {
+                Cow::Borrowed(raw.as_str())
+            };
+            let escaped = escape_cell_text(normalized.as_ref(), options);
+            text = escaped;
+        }
+    }
+
+    let text = text.trim();
+    if options.br_in_tables {
+        text.to_string()
+    } else if text.contains('\n') {
+        text.replace('\n', " ")
+    } else {
+        text.to_string()
+    }
+}
+
+/// Escape text for use inside a table cell.
+///
+/// Always escapes `*` and `_` (to prevent unintended emphasis inside cells),
+/// applies `escape_misc` / `escape_ascii` per options, and escapes `|` (pipe)
+/// when `escape_misc` is not already handling it.
+fn escape_cell_text(text: &str, options: &crate::options::ConversionOptions) -> String {
+    // Always escape * and _ in table cells to prevent unintended emphasis.
+    let escaped = crate::text::escape(text, options.escape_misc, true, true, options.escape_ascii);
+    if options.escape_misc {
+        escaped.into_owned()
+    } else {
+        escaped.replace('|', r"\|")
+    }
+}
+
 /// Convert a table cell (td or th) to Markdown format.
 ///
 /// Processes cell content and renders it with pipe delimiters for Markdown tables.
 /// Handles colspan by adding extra pipes, and escapes pipes in cell content.
+/// Always escapes `*` and `_` to prevent unintended emphasis inside cells.
 ///
 /// # Arguments
 /// * `node_handle` - Handle to the cell element
@@ -110,6 +186,7 @@ pub fn collect_table_cells(
 /// * `ctx` - Conversion context (visitor, etc)
 /// * `_tag_name` - Tag name (for consistency, not used)
 /// * `dom_ctx` - DOM context for content extraction
+/// * `col_width` - Optional target width for padding (None = no padding)
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn convert_table_cell(
     node_handle: &tl::NodeHandle,
@@ -119,6 +196,7 @@ pub fn convert_table_cell(
     ctx: &super::super::super::Context,
     _tag_name: &str,
     dom_ctx: &super::super::super::DomContext,
+    col_width: Option<usize>,
 ) {
     let mut text = String::with_capacity(128);
 
@@ -145,18 +223,7 @@ pub fn convert_table_cell(
             } else {
                 Cow::Borrowed(raw.as_str())
             };
-            let escaped = crate::text::escape(
-                normalized.as_ref(),
-                options.escape_misc,
-                options.escape_asterisks,
-                options.escape_underscores,
-                options.escape_ascii,
-            );
-            if options.escape_misc {
-                text = escaped.into_owned();
-            } else {
-                text = escaped.replace('|', r"\|");
-            }
+            text = escape_cell_text(normalized.as_ref(), options);
         }
     }
 
@@ -175,6 +242,14 @@ pub fn convert_table_cell(
 
     output.push(' ');
     output.push_str(&text);
+    if let Some(width) = col_width {
+        let text_len = text.chars().count();
+        if text_len < width {
+            for _ in 0..(width - text_len) {
+                output.push(' ');
+            }
+        }
+    }
     for _ in 0..colspan {
         output.push_str(" |");
     }

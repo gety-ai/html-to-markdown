@@ -10,6 +10,8 @@ exclude = [
   # alef-readme generator owns these — formatting must match its template output
   "packages/*/README.md",
   "crates/*/README.md",
+  # Snapshot fixtures for converter regression tests — must match raw converter output
+  "test_documents/**",
 ]
 
 # MD013: Disable line-length enforcement (tables and code blocks can be long)

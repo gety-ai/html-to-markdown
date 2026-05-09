@@ -253,7 +253,25 @@ fn format_image_markdown(
     buf.push_str("![");
     buf.push_str(alt);
     buf.push_str("](");
-    buf.push_str(src);
+
+    if src.is_empty() {
+        buf.push_str("<>");
+    } else if src.contains(' ') || src.contains('\n') {
+        buf.push('<');
+        buf.push_str(src);
+        buf.push('>');
+    } else {
+        let open_count = src.chars().filter(|&c| c == '(').count();
+        let close_count = src.chars().filter(|&c| c == ')').count();
+
+        if open_count == close_count {
+            buf.push_str(src);
+        } else {
+            let escaped_src = src.replace('(', "\\(").replace(')', "\\)");
+            buf.push_str(&escaped_src);
+        }
+    }
+
     if let Some(title_text) = title {
         buf.push_str(" \"");
         buf.push_str(title_text);

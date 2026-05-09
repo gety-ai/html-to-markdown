@@ -18,52 +18,85 @@ pub fn inline_ancestor_allows_block(tag_name: &str) -> bool {
 ///
 /// Excludes elements inside `<pre>` or `<code>` blocks, as they have special
 /// whitespace preservation rules and should not be repaired.
+///
+/// Also detects table structural elements (`td`, `tr`, `th`) nested under `<p>` —
+/// a structural impossibility in valid HTML that signals the `tl` parser absorbed
+/// a table into a paragraph because of an unclosed `<p>` (common in Word/Outlook
+/// HTML such as `<p class='MsoNormal'>` cells). Issue #336.
 pub fn has_inline_block_misnest(dom_ctx: &DomContext, parser: &tl::Parser) -> bool {
     for handle in dom_ctx.node_map.iter().flatten() {
         if let Some(tl::Node::Tag(_tag)) = handle.get(parser) {
-            let is_block = dom_ctx
-                .tag_info(handle.get_inner(), parser)
-                .map(|info| info.is_block)
-                .unwrap_or(false);
-            if is_block {
-                // Check if this block element or any ancestor is pre/code
-                let mut check_parent = Some(handle.get_inner());
-                let mut inside_preformatted = false;
-                while let Some(node_id) = check_parent {
-                    if let Some(info) = dom_ctx.tag_info(node_id, parser) {
-                        if matches!(info.name.as_str(), "pre" | "code") {
-                            inside_preformatted = true;
-                            break;
-                        }
+            let node_id = handle.get_inner();
+            let Some(info) = dom_ctx.tag_info(node_id, parser) else {
+                continue;
+            };
+
+            // Table elements under <p>: tl misparsed an unclosed <p> in <td>.
+            if matches!(info.name.as_str(), "td" | "tr" | "th") && has_p_ancestor(dom_ctx, parser, node_id) {
+                return true;
+            }
+
+            if !info.is_block {
+                continue;
+            }
+
+            // Check if this block element or any ancestor is pre/code
+            let mut check_parent = Some(node_id);
+            let mut inside_preformatted = false;
+            while let Some(check_id) = check_parent {
+                if let Some(info) = dom_ctx.tag_info(check_id, parser) {
+                    if matches!(info.name.as_str(), "pre" | "code") {
+                        inside_preformatted = true;
+                        break;
                     }
-                    check_parent = dom_ctx.parent_of(node_id);
                 }
+                check_parent = dom_ctx.parent_of(check_id);
+            }
 
-                // Skip misnesting check for elements inside pre/code blocks
-                if inside_preformatted {
-                    continue;
-                }
+            // Skip misnesting check for elements inside pre/code blocks
+            if inside_preformatted {
+                continue;
+            }
 
-                let mut current = dom_ctx.parent_of(handle.get_inner());
-                while let Some(parent_id) = current {
-                    if let Some(parent_info) = dom_ctx.tag_info(parent_id, parser) {
-                        if is_inline_element(&parent_info.name) && !inline_ancestor_allows_block(&parent_info.name) {
+            let mut current = dom_ctx.parent_of(node_id);
+            while let Some(parent_id) = current {
+                if let Some(parent_info) = dom_ctx.tag_info(parent_id, parser) {
+                    if is_inline_element(&parent_info.name) && !inline_ancestor_allows_block(&parent_info.name) {
+                        return true;
+                    }
+                } else if let Some(parent_handle) = dom_ctx.node_handle(parent_id) {
+                    if let Some(tl::Node::Tag(parent_tag)) = parent_handle.get(parser) {
+                        let parent_name = normalized_tag_name(parent_tag.name().as_utf8_str());
+                        if is_inline_element(&parent_name) && !inline_ancestor_allows_block(&parent_name) {
                             return true;
                         }
-                    } else if let Some(parent_handle) = dom_ctx.node_handle(parent_id) {
-                        if let Some(tl::Node::Tag(parent_tag)) = parent_handle.get(parser) {
-                            let parent_name = normalized_tag_name(parent_tag.name().as_utf8_str());
-                            if is_inline_element(&parent_name) && !inline_ancestor_allows_block(&parent_name) {
-                                return true;
-                            }
-                        }
                     }
-                    current = dom_ctx.parent_of(parent_id);
                 }
+                current = dom_ctx.parent_of(parent_id);
             }
         }
     }
 
+    false
+}
+
+/// Walk ancestors of `node_id` looking for a `<p>` element.
+///
+/// Stops ascending once it leaves the table hierarchy (`table`/`body`/`html`)
+/// to avoid false positives where a `<p>` legitimately wraps a `<table>`.
+fn has_p_ancestor(dom_ctx: &DomContext, parser: &tl::Parser, node_id: u32) -> bool {
+    let mut current = dom_ctx.parent_of(node_id);
+    while let Some(parent_id) = current {
+        if let Some(parent_info) = dom_ctx.tag_info(parent_id, parser) {
+            if parent_info.name == "p" {
+                return true;
+            }
+            if matches!(parent_info.name.as_str(), "table" | "body" | "html") {
+                return false;
+            }
+        }
+        current = dom_ctx.parent_of(parent_id);
+    }
     false
 }
 

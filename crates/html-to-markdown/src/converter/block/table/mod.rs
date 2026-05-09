@@ -117,11 +117,11 @@ pub fn handle_table_with_context(
         let indented = layout::indent_table_for_list(&table_output, ctx.list_depth, options);
         output.push_str(&indented);
     } else {
-        if !output.ends_with("\n\n") {
-            if output.is_empty() || !output.ends_with('\n') {
-                output.push_str("\n\n");
-            } else {
+        if !output.is_empty() && !output.ends_with("\n\n") {
+            if output.ends_with('\n') {
                 output.push('\n');
+            } else {
+                output.push_str("\n\n");
             }
         }
         output.push_str(&table_output);

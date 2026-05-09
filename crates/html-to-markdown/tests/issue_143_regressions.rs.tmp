@@ -1,0 +1,17 @@
+
+#[test]
+fn debug_no_wrap_output() {
+    use std::fs;
+    let html = fs::read_to_string(fixture_path("gh-143-links-wordwrap.html")).unwrap();
+    let no_wrap_opts = html_to_markdown_rs::ConversionOptions {
+        wrap: false,
+        extract_metadata: false,
+        autolinks: false,
+        ..Default::default()
+    };
+    let no_wrap = html_to_markdown_rs::convert(&html, Some(no_wrap_opts)).expect("ok").content.unwrap_or_default();
+    for (i, line) in no_wrap.lines().enumerate() {
+        println!("{:3}: {:?}", i+1, line);
+    }
+    panic!("print done");
+}

@@ -7,309 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [3.4.0-rc.45]
-
-### Fixed
-
-- **Publish Node TS wrapper failed on rc.44** — alef v0.15.4 NAPI backend
-  misclassified `VisitResult` (and any non-`#[serde(tag="...")]` data-variant
-  enum) as untagged, generating a `pub struct JsVisitResult(pub serde_json::Value)`
-  wrapper without `#[napi]`. napi-rs's auto-d.ts dropped the symbol, breaking
-  `packages/typescript/src/index.ts:42` which re-exports `JsVisitResult`. Fixed
-  in alef v0.15.5 by tracking `#[serde(untagged)]` explicitly on `EnumDef` and
-  switching all backends (NAPI, Go, C#, Java) to require it. Bindings now
-  emit `#[napi(string_enum)] pub enum JsVisitResult`.
-- **Homebrew bottle builds failed for all 4 platforms** — `compute_sha()` in
-  `scripts/publish/update-homebrew-formula.sh` printed progress text to stdout,
-  which got captured into the formula's `sha256` fields alongside the actual
-  hash. Bottles failed validation with "Formula reports different checksum".
-  Redirected progress output to stderr so only the SHA reaches the variable.
-
-### Changed
-
-- Bumped alef pin from 0.15.4 to 0.15.5.
-
-## [3.4.0-rc.44]
-
-### Fixed
-
-- **Elixir Hex package syntax error** — alef Rustler templates collapsed Elixir
-  pattern-match clauses onto single lines via stray `{%- raw %}` whitespace
-  strippers in `elixir_visitor_helper_functions.jinja` and
-  `elixir_visitor_call.jinja`. Fixed in alef v0.15.2; regenerated all bindings
-  against alef v0.15.4 (which also bundles php-backend `field_can_be_param`
-  fix and java-backend tag-stripping deserializer).
-- **html-to-markdown-node failed to compile after regen** — alef NAPI backend
-  emits `pub struct JsVisitResult(pub serde_json::Value)` for flat data enums,
-  which requires the `napi` crate's `serde-json` feature for
-  `FromNapiValue`/`ToNapiValue` impls on `serde_json::Value`. Added
-  `serde-json` to `crates/html-to-markdown-node/Cargo.toml` napi features.
-
-### Changed
-
-- Bumped alef pin from 0.15.1 to 0.15.4.
-
-## [3.4.0-rc.43]
-
-### Fixed
-
-- **Ruby gem build failed for all 4 platforms on rc.42** — committed
-  `packages/ruby/ext/html_to_markdown_rb/src/lib.rs` had a duplicate
-  `impl std::fmt::Debug for RbHtmlVisitorBridge` (lines 3230 + 3235), tripping
-  E0119 in every gem-build matrix entry. Root cause was an alef magnus-backend
-  bug where the post-process line filter for thread-unsafe handle types
-  (`VisitorHandle`) silently failed when alef extracted the IR with the
-  `visitor` feature active (cfg attr stripped → field looked unconditional →
-  filter early-returned without filtering). Fixed in alef commit
-  `9f555938`: replaced post-process line filter with
-  `ConversionConfig::exclude_types`, mirroring the rustler backend. Bindings
-  fully regenerated against the fixed alef.
-
-## [Unreleased — pre-rc.43]
+## [3.4.0] - 2026-05-09
 
 ### Added
 
-- **Homebrew bottles for macOS arm64, macOS x86_64, Linux x86_64, Linux arm64** — `publish.yaml` now builds proper bottles via `brew install --build-bottle && brew bottle` after the formula is updated. New jobs: `homebrew-bottles` (matrix, 4 platforms; installs Homebrew on Linux runners) and `publish-homebrew-bottles` (aggregates JSON manifests, writes `bottle do` block into the formula, pushes). Bottle tarballs upload to the GH release as `<formula>-<version>.<bottle_tag>.bottle.tar.gz`. Users on a covered platform now get "Pouring from bottle"; older OS users still fall through to the existing `on_macos`/`on_linux` URL blocks. Scripts: `scripts/publish/install-homebrew-linux.sh`, `build-homebrew-bottles.sh`, `merge-homebrew-bottles.sh`.
+- **Homebrew distribution** for `html-to-markdown` (CLI) and `libhtml-to-markdown` (FFI library + headers + pkg-config + CMake configs). Pre-built tarballs for macOS arm64/x86_64 and Linux arm64/x86_64; install with `brew install kreuzberg-dev/tap/html-to-markdown`.
+- **WASM bundles** for all four wasm-pack targets (`web`, `bundler`, `nodejs`, `deno`) under `@kreuzberg/html-to-markdown-wasm`.
+- **C# NuGet package** `KreuzbergDev.HtmlToMarkdown` with native runtimes for linux-x64, linux-arm64, osx-x64, osx-arm64, win-x64, win-arm64.
+- **Java Maven Central package** `dev.kreuzberg:html-to-markdown` bundling native libraries for the same six platforms via `META-INF/native/<rid>/`.
+- **Elixir Hex package** with `rustler_precompiled` NIFs for Linux + macOS (NIF 2.16/2.17 × 3 platforms); released artifacts download at first run.
+- **PHP PIE pre-built archives** for PHP 8.2/8.3/8.4/8.5 × 6 platforms — `pie install kreuzberg-dev/html-to-markdown-rs` no longer requires building from source.
+- **CLI panic guard** — conversion failures inside the CLI now surface as actionable errors via `panic::catch_unwind` instead of partial output + Rust backtrace.
+- **`HtmlVisitor` parity across all bindings** — Python, Node/TypeScript, Ruby, PHP, Go, Java, C#, Elixir, R, and WASM all expose the visitor interface with `visit_element_start`/`visit_text`/`visit_element_end` and `VisitResult::{Continue, Skip, Custom}` semantics matching the Rust core.
+- **Polyglot codegen via [alef](https://github.com/kreuzberg-dev/alef)** — bindings, e2e tests, and READMEs for all 11 target languages are generated from a single `alef.toml` + Rust source of truth, eliminating drift across the polyglot surface.
 
 ### Fixed
 
-- **CI pre-commit failed on rc.42 push** — three real hook failures:
-  - `pyproject-fmt` PEP440-normalized `>=3.4.0-rc.42` to `>=3.4.0rc42` in `test_apps/python/pyproject.toml`, but `alef sync-versions` would re-write the cargo-style form on every bump. Excluded `test_apps/python/pyproject.toml` from `pyproject-fmt`.
-  - `shfmt` rejected `${sha[cli-aarch64-apple-darwin.tar.gz]}` heredoc expansion in `update-homebrew-formula.sh` — `.` in associative-array keys was parsed as floating-point arithmetic. Refactored to use named scalar variables (`cli_macos_arm_sha`, etc.).
-  - `mix-format` wanted to re-flow alef-generated lib files differently than alef writes them (alef pre-wraps URLs alef-internally; mix format re-flows on `line_length`). Removed `lib/` from `.formatter.exs` `inputs:` since every file under `packages/elixir/lib/` is alef-generated.
-- **alef toolchain bumped 0.14.33 → 0.14.34** — regenerated all bindings with the new toolchain (per-binding hash manifest refreshed); `.pre-commit-config.yaml` `kreuzberg-dev/alef` rev pinned to v0.14.34.
-
-### Fixed
-
-- **Homebrew bottle build failed on Linux** — `homebrew-bottles` matrix job ran `brew tap homebrew/core` on `ubuntu-latest` and `ubuntu-24.04-arm`, but Homebrew isn't preinstalled on those runners (`brew: command not found`, exit 127). Both Linux bottle jobs failed every release, blocking `upload-homebrew-bottles` and `publish-homebrew`. Replaced the per-platform bottle-build matrix + `upload-homebrew-bottles` with a single ubuntu job that downloads the already-built CLI/FFI tarballs from the GitHub release, computes SHA256s, regenerates `Formula/html-to-markdown.rb` + `Formula/libhtml-to-markdown.rb` in `kreuzberg-dev/homebrew-tap`, and pushes. New `scripts/publish/update-homebrew-formula.sh` does the formula generation. Both formulas now use `on_macos` / `on_linux` blocks pointing at pre-built tarballs (no bottles, no source build), so `brew install` works on Linux without needing Homebrew bottle infrastructure.
-- **Packagist webhook stopped after rc.30** — `packages/php/composer.json` was renamed to `kreuzberg-dev/html-to-markdown-rs` (alef regen artifact), but the package on Packagist is registered under the historical slug `kreuzberg-dev/html-to-markdown`. The webhook saw the new name in tagged composer.json and stopped updating the registered package. Reverted the slug back to `kreuzberg-dev/html-to-markdown`; updated `alef.toml` text-replacements, `publish.yaml` `check-packagist` + `publish-packagist` jobs, and the test_app composer.json to match.
-- **Smoke task paths didn't match generated test_app layouts** — Taskfile `e2e:smoke:*` cmds referenced files like `smoke_test.py`, `smoke_test.rb`, `smoke_test.php` that don't exist in alef-generated test_apps (real layout is `tests/test_smoke.py`, `spec/smoke_spec.rb`, `tests/SmokeTest.php`, etc.). Aligned Taskfile commands with actual paths; R smoke now explicitly loads `testthat` + `htmltomarkdown` to avoid `could not find function` errors. Verified passes for: python, node, bun, ruby, rust, csharp, elixir, r.
-- **Elixir test_app couldn't resolve dep** — `test_apps/elixir/mix.exs` had `{:html_to_markdown, "../../packages/elixir"}` (Hex requirement parser tried to read the path as a version string and crashed). Replaced with `{:html_to_markdown, ">= 3.4.0-rc.41"}` so the smoke pulls the published Hex artifact end-to-end (verified — rustler_precompiled successfully fetches NIF from the rc.41 GitHub release on first run).
-- **PHP test_app composer install failed** — missing `minimum-stability: "RC"` (composer refused rc tags) and global `~/.composer/config.json` `localphp` path repo overrode Packagist resolution. Added the stability flag and `repositories: { localphp: false }` to disable the global path repo for the test_app.
-- **C# `dotnet test` failed: "more than one project or solution"** — `test_apps/csharp/` contained both `E2eTests.csproj` (legacy) and `KreuzbergDev.HtmlToMarkdown.E2eTests.csproj` (current). Removed the duplicate; updated `alef.toml` text-replacements to drop the deleted file.
-
-### Verified rc.41 publishes
-
-- ✅ PyPI: 25 wheels (5 platforms × 5 Python versions) + sdist; wheels include `py.typed`, `_html_to_markdown.pyi`, native `.so`/`.dylib`, and `bin/html-to-markdown` CLI
-- ✅ npm `@kreuzberg/html-to-markdown-node`: meta package + 5 platform packages with proper `os`/`cpu` metadata
-- ✅ npm `@kreuzberg/html-to-markdown-wasm`: 4 bundler targets (web, bundler, nodejs, deno) with `.wasm` files
-- ✅ RubyGems: 5 gems (4 native + 1 source) with full RBS sigs (`sig/**/*.rbs`)
-- ✅ NuGet: all 6 platforms in `runtimes/<rid>/native/` (linux-x64, linux-arm64, osx-x64, osx-arm64, win-x64, win-arm64)
-- ✅ Hex.pm: NIF checksums for 6 targets (nif-2.16/2.17 × 3 platforms)
-- ✅ crates.io: rc.41 latest
-
-## [3.4.0-rc.41] - 2026-05-08
-
-### Fixed
-
-- **C# NuGet & Java Maven packages shipped without native libs** — `csharp-ffi` and `java-ffi` build steps did `find target/release -maxdepth 1` to copy `*.dylib`/`*.so`/`*.dll`, but `alef publish build --target <X>` writes its output to `target/<X>/release/` (cargo's per-target output dir), not `target/release/`. The find matched zero files; `actions/upload-artifact` warned "No files were found" and produced empty artifacts. The downstream pack steps then bundled NO natives, so installs of rc.30 - rc.40 NuGet/Maven packages threw `dlopen: libhtml_to_markdown_ffi: no such file` at first call. Both jobs now look in `target/<target>/release` first (with `target/release` as fallback) and use `if-no-files-found: error` so an empty artifact fails fast.
-
-## [3.4.0-rc.40] - 2026-05-08
-
-### Fixed
-
-- **Hex publish "release not found"** — `scripts/publish/upload-elixir-package.sh` (and several other upload-\* scripts) call `gh release upload "$TAG"` but no step in `publish.yaml` was creating the GitHub release for the tag, so the upload failed with "release not found". Added an "Ensure GitHub Release exists for tag" step in the `prepare` job that runs `gh release create` (with `--prerelease` for rcs) when the release is missing — guarantees every downstream upload-to-release script can succeed.
-
-## [3.4.0-rc.39] - 2026-05-08
-
-### Fixed
-
-- **Elixir Hex package exceeds 128 MiB** — `mix.exs` `package.files` includes the entire `native/` directory, which on a previously-built CI workspace contains 1+ GB of `target/{debug,release}` artifacts. `mix hex.build` rejects with "Creating tarball failed: package exceeds max uncompressed size 134.217728 MB". `scripts/publish/elixir/build-hex-package.sh` now strips every `native/**/target/` directory before invoking `mix hex.build`. With rustler_precompiled, the published tarball doesn't need any built artifacts anyway — the precompiled NIFs are downloaded from GitHub releases at install time.
-
-### Verified rc.38 publishes
-
-- ✅ PyPI 3.4.0rc38 (26 files: 5 platforms × 5 Python versions + sdist)
-- ✅ npm `-node`, `-wasm`, TS meta — all 3.4.0-rc.38
-- ✅ RubyGems 3.4.0.pre.rc.38 — **all 5 platforms** (ruby, x86_64-linux, x86_64-darwin, arm64-darwin, aarch64-linux)
-- ✅ NuGet 3.4.0-rc.38
-- ✅ crates.io 3.4.0-rc.38
-- ✅ Maven publish job success (indexing lag — rc.25 still latest in repo1.maven.org metadata)
-- ✅ Packagist publish job success
-- ❌ Hex still rc.25 — fix above
-
-## [3.4.0-rc.38] - 2026-05-08
-
-### Fixed
-
-- **`build-native-gem.rb` rejected `x86_64-darwin`** — `VALID_PLATFORMS` did not list it, so the rc.37 macos-15-intel build aborted with "ERROR: Invalid platform 'x86_64-darwin'" right after the typo fix in `build-gem-unix.sh`. Added `x86_64-darwin` to `VALID_PLATFORMS`.
-
-## [3.4.0-rc.37] - 2026-05-08
-
-### Fixed
-
-- **Ruby gem `x86_64-linux` collision** — `scripts/publish/ruby/build-gem-unix.sh` had a typo: `Darwin-x86_64) PLATFORM="x86_64-linux"`. The macos-15-intel runner was producing a gem labelled `x86_64-linux` (with a Mach-O dylib inside), then `merge-multiple: true` in publish-rubygems would overwrite the actual ubuntu-latest build's `x86_64-linux` gem. The published archive on rubygems.org saw a Mach-O `.so` inside an `x86_64-linux` gem and `gem spec` rejected it as "invalid gem structure". Fixed: `Darwin-x86_64) PLATFORM="x86_64-darwin"`.
-
-## [3.4.0-rc.36] - 2026-05-08
-
-### Fixed
-
-- **rc.35 NuGet ambiguous PackageId** — both the outer wrapper (`packages/csharp/HtmlToMarkdown.csproj`) and the new inner csproj declared `<PackageId>KreuzbergDev.HtmlToMarkdown</PackageId>`. `dotnet restore` against the outer triggered "Ambiguous project name 'KreuzbergDev.HtmlToMarkdown'", so `Build C# NuGet package` exited 1 and the publish was skipped. Stripped the outer csproj down to a non-packable IDE-convenience stub (no PackageId, no Version, no PackageLicenseFile, IsPackable=false). `publish.yaml` now passes the inner csproj to `restore.sh` so restore + pack target the same project.
-
-### Known issue
-
-- **rc.35 Ruby `x86_64-linux` gem flagged "invalid gem structure"** — root cause unidentified; the linux build job still succeeded and produced a `.gem` file, but rubygems.org rejected it on push. Other Ruby platforms (`ruby` source / `arm64-darwin` / `aarch64-linux`) published fine on rc.35. Will re-attempt on rc.36; if it recurs, will inspect the artifact directly.
-
-## [3.4.0-rc.35] - 2026-05-08
-
-### Fixed
-
-- **NuGet rc.34 still broken** — IsPackable=false on inner project + ProjectReference on outer wrapper made dotnet pack ship a 4 KB stub DLL instead of the full assembly (the inner's 100 KB DLL never made it into the nupkg). The outer wrapper was simply load-bearing in the wrong direction. Inverted the packaging: the **inner** csproj now owns `<PackageId>KreuzbergDev.HtmlToMarkdown</PackageId>` directly and is the target of `dotnet pack`. `scripts/publish/csharp/pack.sh` updated to point at it. Verified locally: published nupkg now contains 101 KB DLL + `runtimes/<rid>/native/*.{so,dylib,dll}` + LICENSE + empty `<dependencies>`.
-
-## [3.4.0-rc.34] - 2026-05-08
-
-### Fixed
-
-- **NuGet `KreuzbergDev.HtmlToMarkdown` had a phantom dependency** on a non-existent `HtmlToMarkdown` package, blocking every `dotnet add package KreuzbergDev.HtmlToMarkdown` install with `NU1102: Unable to find package HtmlToMarkdown`. Root cause: outer wrapper csproj `ProjectReference`'d the inner `HtmlToMarkdown` project, and dotnet pack converted that into an external package dep. Set `IsPackable=false` on the inner csproj and `PrivateAssets="all"` on the outer's ProjectReference so the inner DLL is bundled inside the wrapper's nupkg without surfacing as a NuGet dependency. Verified locally — the produced nuspec now ships an empty `<dependencies>` group.
-
-### Verified by smoke tests against rc.33
-
-- ✅ Python (3/3)
-- ✅ Rust (3/3)
-- ✅ Ruby (3/3)
-- ✅ Node (3/3 — TS meta deps now correctly resolved)
-- ⚠ C# blocked by NuGet phantom-dep bug (rc.34 fix above)
-- ⚠ Java blocked by Maven Central indexing lag (rc.32 jar present, rc.33 may take ~4h to index)
-- ⚠ PHP blocked by composer min-stability requirement (alef-generated test_app needs `minimum-stability: "RC"` field)
-- ⚠ Bun blocked by same TS workspace:\* (resolved in rc.33 — needs re-test)
-- ⚠ WASM smoke test missing `await initWasm()` (alef e2e generator gap)
-- ⚠ Go binding's CGo link path expects local `target/release` (FFI auto-download flow not wired)
-
-## [3.4.0-rc.33] - 2026-05-07
-
-### Fixed
-
-- **rc.32 typescript meta still shipped with empty `dependencies`** — the Bash `node -e '...' PKG_VERSION="$version"` invocation passed `PKG_VERSION` as a positional argument (`process.argv[2]`), not as an env var, so the script wrote `undefined` for the dep value, which `JSON.stringify` dropped → `dependencies: {}`. Moved the env assignment in front of the command (`PKG_VERSION="$version" node -e '...'`) and added a defensive check.
-
-### Verified by smoke tests against rc.32
-
-- ✅ Python (3/3)
-- ✅ Rust (3/3)
-- ✅ Ruby (3/3 — `arm64-darwin` gem)
-
-## [3.4.0-rc.32] - 2026-05-07
-
-### Fixed
-
-- **TypeScript meta package shipped with `workspace:*` reference** — `@kreuzberg/html-to-markdown@3.4.0-rc.31` declared `"@kreuzberg/html-to-markdown-node": "workspace:*"` in dependencies. `pnpm publish` would have rewritten it; the publish workflow uses `npm publish` (via `kreuzberg-dev/actions/publish-npm`) which leaves it as-is. Outside the monorepo this fails to resolve. `scripts/publish/typescript/build-package.sh` now rewrites every `workspace:*` spec to the actual package version before publish.
-- **Go module sub-path tag** — `pkg.go.dev` requires `packages/go/v3.4.0-rc.X` style tags for sub-modules under v3+. Now tagged alongside `v3.4.0-rc.X` going forward.
-
-### Verified by smoke tests against rc.31
-
-- ✅ Python (`test_apps/python` — 3/3 tests pass)
-- ✅ Rust (`test_apps/rust` — 3/3 tests pass)
-- ⚠ Node, Bun — TS meta `workspace:*` blocks install (rc.32 fix above)
-- ⚠ WASM — test_app `smoke.test.ts` calls `convert()` synchronously without awaiting `initWasm()`; alef e2e generator gap, deferred
-- ⚠ Go — Go binding's CGo link path expects local `target/release` lib; needs FFI auto-download flow
-
-## [3.4.0-rc.31] - 2026-05-07
-
-### Fixed
-
-- **Node provenance still failing on rc.30** — even after fixing each platform package's `repository` field, the publish step is fed by `prepare-artifact-directory.sh` which **wipes** `crates/html-to-markdown-node/npm/` and re-extracts from artifact tarballs. NAPI-RS prepublish at build time copies fields from the **main** `crates/html-to-markdown-node/package.json`, which had no `repository` at all — so platform packages always shipped with `repository: ""`. Added the proper `{type, url, directory}` block plus `homepage`/`bugs` to the main package.json so prepublish propagates them.
-- **PyPI sdist rejected** — "License-File LICENSE does not exist in distribution file" — `packages/python/pyproject.toml` had `license = "MIT"` but no `license-files` directive, so the sdist metadata referenced LICENSE without including it. Added `license-files = ["LICENSE"]` so maturin bundles the file.
-
-### Verified published in rc.30
-
-- ✅ npm `@kreuzberg/html-to-markdown-wasm` 3.4.0-rc.30
-- ✅ NuGet `KreuzbergDev.HtmlToMarkdown` 3.4.0-rc.30
-- ✅ RubyGems `html-to-markdown` 3.4.0.pre.rc.30 (4 platforms: ruby, x86_64-linux, aarch64-linux, arm64-darwin)
-- ✅ crates.io `html-to-markdown-rs` 3.4.0-rc.30
-- ✅ Packagist `kreuzberg-dev/html-to-markdown-rs` 3.4.0-rc.30
-- ✅ PyPI 25 wheels (5 platforms × 5 Python versions including macos_10_12_x86_64) — only sdist rejected
-- ✅ Maven Central publish job succeeded (indexing lag pending)
-
-## [3.4.0-rc.30] - 2026-05-07
-
-### Fixed
-
-- **npm provenance "repository.url is empty"** — Node platform packages (`crates/html-to-markdown-node/npm/<triple>/package.json`) had `repository` as a bare string; npm sigstore provenance requires `{type, url}` object format. All 9 platform packages now use the object form so `npm publish --provenance` accepts them.
-- **WASM package name regression** — `crates/html-to-markdown-wasm/package.json` had drifted from `@kreuzberg/html-to-markdown-wasm` to `@kreuzberg/html-to-markdown-node-wasm`, breaking the `pnpm --filter @kreuzberg/html-to-markdown-wasm run build:all` step in publish (no matching workspace, no `pkg/` produced, "Artifact not found for name: wasm-bundles" downstream).
-- **WASM artifact path mismatch** — `scripts/publish/wasm/package-artifacts.sh` tarred `dist/dist-node/dist-web` (which `wasm-pack` does not produce); rewritten to tar `pkg/{web,bundler,nodejs,deno}` instead. `scripts/publish/wasm/extract-artifacts.sh` updated to extract back into `pkg/`.
-- **C# duplicate opening brace** — alef ≤ 0.14.33 csharp codegen emitted a stray `{` after the class declaration in `VisitorHandle.cs` and `ConversionOptionsBuilder.cs`, causing `error CS1519: Invalid token '{' in a member declaration` and blocking the NuGet pack step. Hand-patched until alef regen produces correct C#.
-- **Python wheel `MACOSX_DEPLOYMENT_TARGET` mismatch** — the Rust-compiled `.so` targets macOS 10.12+ but the wheel name claimed `macosx_10_9`; `delocate-wheel` refused with "Library dependencies do not satisfy target MacOS version 10.9". Job-level `MACOSX_DEPLOYMENT_TARGET: "10.12"` env now exported for all `python-wheels` matrix entries.
-
-## [3.4.0-rc.29] - 2026-05-07
-
-### Fixed
-
-- **Ruby Magnus visitor bridge missing constructor** — `RbHtmlVisitorBridge::new` was called by generated visitor wrapper code but never defined (alef ≤ 0.14.33 magnus codegen renders `visitor_bridge_struct.rs.jinja` but never `bridge_struct_impl.rs.jinja`). Hand-patched `packages/ruby/ext/html_to_markdown_rb/src/lib.rs` to add the missing `impl RbHtmlVisitorBridge { pub fn new ... }` block; will be picked up automatically once alef releases the codegen fix.
-- **Intel-macOS alef binary** — `kreuzberg-dev/actions/install-alef@v1` mapped Intel macOS to the aarch64 binary intending to use Rosetta, but the macos-15-intel runner has no Rosetta — every alef invocation failed with "Bad CPU type in executable". Added an inline override in `publish.yaml` after each `install-alef` step that downloads `alef-x86_64-apple-darwin.tar.gz` directly on Intel macOS. Unblocks Java/C#/Go/C-FFI/PHP-PIE on macos-x86_64.
-
-### Removed (deferred)
-
-- Ruby gem `windows-arm64` matrix entry — rb-sys + Magnus toolchain on `aarch64-pc-windows-msvc` not yet validated.
-- PHP PIE `windows-arm64` matrix entry — ext-php-rs cross-compile to `aarch64-pc-windows-msvc` fails.
-- Python wheels `windows-11-arm` — cibuildwheel does not yet support `aarch64-pc-windows-msvc`.
-- Node bindings `*-musl` and `armv7` — napi-cross artifact path mismatch ("No dist dir found") blocks cross-compiled bindings.
-
-## [3.4.0-rc.28] - 2026-05-07
-
-### Fixed
-
-- **Bogus HTML comment endings drop following content (#339)** — the `astral-tl` parser mishandles HTML comments whose closing sequence contains more than two consecutive dashes (e.g. `<!-- /// --->`); the tokenizer creates an empty comment node and silently discards every byte that follows. A new `normalize_bogus_comment_endings` preprocessing pass rewrites any `--[-]+>` closing sequence to a well-formed `-->` before `tl::parse` runs, restoring all DOM nodes after the bogus comment. Also wired into the html5ever-repair and inline-block-misnest-repair fallback paths.
-- **Python `HeadingStyle` import mismatch (#337)** — `from html_to_markdown import HeadingStyle` returned a Python `Enum` that did not satisfy PyO3's type check on `ConversionOptions(heading_style=...)`, raising `TypeError: 'HeadingStyle' object is not an instance of 'HeadingStyle'`. The package now re-exports the native PyO3 enums directly from `_html_to_markdown` and adds uppercase aliases (`HeadingStyle.ATX`, `CodeBlockStyle.BACKTICKS`, etc.) on the same object so both naming conventions work.
-- **`ms-fscc.html` truncation (#336)** — duplicate of #330's UTF-8 char-boundary panic, fixed in commit 37d6064a.
-- **PHP 8.5 build failure on `pie install` (#333)** — `ext-php-rs` is now pinned to 0.15.12 (via alef ≥ 0.14.27), which includes upstream's PHP 8.5 build fixes for `zend_dval_to_lval_cap`. The publish workflow also produces pre-built PIE archives for **PHP 8.2/8.3/8.4/8.5 × 6 platforms** (linux x86_64/arm64, macOS arm64/x86_64, windows x86_64/arm64), so `pie install kreuzberg-dev/html-to-markdown-rs` no longer needs to build from source via `phpize`.
-- **CLI silent failure on conversion panic** — the CLI now wraps the conversion call in `panic::catch_unwind` and surfaces panic payloads as a `Box<dyn Error>` prefixed with `"internal error during conversion (panic): ..."` rather than exiting with a Rust backtrace. Defensive hardening following #330's UTF-8 char-boundary fix; ensures future regressions in the same family produce actionable error messages instead of partial outputs.
-- **Pre-existing clippy errors in `form/elements.rs`** — `handle_input`'s uniform handler signature (`output: &mut String`) tripped `clippy::ptr_arg` and `clippy::needless_pass_by_ref_mut` on Rust 1.95.0; allowed at the function level since the signature is shared with sibling form handlers.
-- **npm release-candidate dist-tag (#340)** — pre-release versions (anything matching `-(rc|beta|alpha|pre|dev)`) now publish under the npm `next` dist-tag instead of `latest`, so `npm install @kreuzberg/html-to-markdown-node` no longer pulls a 3.4.0-rc over a stable 3.3.x. Detection lives in `scripts/publish/validate-and-compute-metadata.sh` and is wired through to `publish-npm` for both `@kreuzberg/html-to-markdown-node` and `@kreuzberg/html-to-markdown-wasm`.
-- **npm `check-npm` gate-condition bug** — `check-npm.node_exists` was bound to the existence of `@kreuzberg/html-to-markdown` (the TS meta package), but the gate guards `publish-node`. Result: once the TS meta got ahead, every subsequent attempt skipped publishing the `-node` binding entirely. Primary check now points at `@kreuzberg/html-to-markdown-node`; per-step `wait-for-package` polls were also corrected to the right `-node-<triple>` names (legacy `-<triple>` names were leftovers from a pre-rename era).
-- **Packagist publish-gate package-name mismatch** — the `check-packagist` job was probing `kreuzberg-dev/html-to-markdown` (no `-rs` suffix) while the package is actually published as `kreuzberg-dev/html-to-markdown-rs` (per `packages/php/composer.json`). The `publish-packagist` action even dropped `-dev` to `kreuzberg/html-to-markdown`. All three references aligned to the real Composer slug.
-- **Ruby gem matrix missing Windows arm64** — `ruby-gem` job now also builds on `windows-11-arm` (`aarch64-pc-windows-msvc`); the source-gem drop filter accepts `*-arm64-mingw-ucrt.gem`.
-- **alef `[workspace.sync]` coverage** — root `package.json` is now synced via `extra_paths`; `text_replacements` now match the actual filenames (`E2eTests.csproj` + `KreuzbergDev.HtmlToMarkdown.E2eTests.csproj` instead of a non-existent `TestApp.csproj`) and the actual Composer key (`kreuzberg-dev/html-to-markdown-rs`); new entries cover `test_apps/{python,ruby,go,r,rust}` so `alef sync-versions` advances every test_app on each rc; `test_apps/java/pom.xml` is now anchored on `<artifactId>html-to-markdown</artifactId>` to avoid clobbering Jackson/JUnit `<version>` tags.
-
-### Changed
-
-- **Smoke-test coverage** — `task e2e:smoke:all` now also runs `bun`, `wasm`, `rust`, and `c` test_apps (4 new entries; `php-ext` deferred — no manifest, raw `.so` test).
-- **alef bumped to 0.14.33** — bindings regenerated; `.pre-commit-config.yaml` and `alef.toml` `[workspace] alef_version` aligned.
-- **Node binding `index.js`/`index.d.ts` regenerated** — refreshed to match `@napi-rs/cli` 3.6.2 template style; runtime version-mismatch check is now env-gated behind `NAPI_RS_ENFORCE_VERSION_CHECK` (no behaviour change for typical consumers).
-
-### Documentation
-
-- **Cross-platform npm install in Docker (#273)** — clarified that "Cannot find module `@kreuzberg/html-to-markdown-node-linux-x64-gnu`" inside Docker stems from npm/pnpm's handling of `optionalDependencies` when a lockfile is generated on one platform and consumed on another (npm/cli#4828). The published package's `optionalDependencies` already declares all supported platform variants; pnpm consumers building cross-platform images should set `supportedArchitectures` in `pnpm-workspace.yaml` (or pass `--config.supported-architectures.os/cpu/libc`) so the lockfile resolves natives for every target architecture.
-
-### Known gaps
-
-- **Elixir Windows NIFs** — `elixir-natives` matrix only covers Linux + macOS (4 platforms). Windows x86_64/arm64 NIFs require RustlerPrecompiled cross-build support + bash/pwsh branches in the package step; deferred to a follow-up rc.
-
-## [3.4.0-rc.27] - 2026-05-07
-
-### Fixed
-
-- Rust 1.95.0 clippy lints (`arc_with_non_send_sync`, `collapsible_if`, `clone_on_copy`) blocking CI on alef-generated bindings — alef 0.14.28 added these to the crate-root allow lists for napi, pyo3, wasm-bindgen, and ext-php-rs backends.
-- Root `package.json` version sync — was stuck at `3.1.0` (now matches workspace version).
-
-## [3.4.0-rc.26] - 2026-05-07
-
-### Fixed
-
-- **Visitor element start/end sequence for hyphenated tags (#331)** — the `repair_with_html5ever` fallback (triggered when input contains custom-element / hyphenated tag names) re-parsed the document under HTML5 semantics, which discard XML-style self-closing on unknown elements. As a result, `<ac:parameter ... />` was treated as an open tag and subsequent siblings nested inside it, breaking the visitor's pre-order/post-order start/end pairing. The repair path now pre-expands XML-style self-closing tags on non-void elements to explicit open+close pairs before the HTML5 parse, so visitor events remain correctly paired for hyphenated/namespaced custom tags.
-
-- **`default-features = false` build broken (#332)** — bare `#[serde(...)]` and `#[derive(Serialize, Deserialize)]` on core types in `src/types/{document,tables,result,warnings}.rs` and `src/options/conversion.rs` are now feature-gated behind `#[cfg_attr(feature = "serde", ...)]`. CI now runs `cargo check --no-default-features` matrix to prevent regressions.
-
-- **Ruby `TypeError` on `convert()` with options** (#334) — `HtmlToMarkdown.convert(html, options)`
-  raised `TypeError` on every call that supplied options (including `3.4.0.pre.rc.15`). The Ruby
-  wrapper was passing a `ConversionOptions` object to the FFI, but the generated Rust function
-  expects `Option<String>` (JSON). The wrapper now serialises the options hash to JSON before
-  crossing the FFI boundary, matching what `serde_json::from_str` expects on the Rust side.
-
+- **#348 — `OutputFormat::Plain` ignored `HtmlVisitor` callbacks.** The plain-text walker (`crates/html-to-markdown/src/converter/plain_text.rs`) ran the markdown pipeline first, then discarded its output and re-traversed the DOM via a visitor-less `walk_plain`, so `VisitResult::Custom`/`Skip` returned from `visit_element_end`/`visit_text` was silently dropped for `Plain`. Threaded a `WalkState` carrying the visitor through the plain walker so element/text hooks fire and their results are honoured.
+- **#347 — `<img src>` URLs not escaped, breaking CommonMark round-trip.** `crates/html-to-markdown/src/converter/handlers/image.rs` emitted `src` raw, while `<a href>` already wrapped spaces/parens in angle brackets. Image renderer now uses the same three-branch escaping as links: empty → `<>`, contains space/newline → `<URL>`, unbalanced parens → `\(`/`\)` escaping.
+- **#336 — large MS Word HTML truncated when `<td><p class='MsoNormal'>…</td>` appears as the leading cell.** The `tl` parser absorbs subsequent `<td>` and document content into the unclosed `<p>`, nesting the rest of the DOM inside the first table cell. Extended `has_inline_block_misnest` in `converter/preprocessing_helpers.rs` with a `has_p_ancestor` check that detects `td`/`tr`/`th` under `<p>` (structurally impossible in valid HTML) and triggers the existing html5ever repair path.
+- **Split closing tags `</tagname\n>` corrupted DOM and dropped content.** JSX-style HTML (closing-tag `>` on the next line) caused the `tl` parser to leave elements unclosed, which silently absorbed siblings and dropped entire sections — affecting #127 (MW841 product headings missing from multilingual page), #143 (word-wrap merging nested link list items), and #121 (SPA menu nesting). New `normalize_split_closing_tags` preprocessing pass collapses such patterns to `</tagname>` before parsing, wired into all four preprocessing branches in `converter/main.rs`.
+- **Tables now emit padded, aligned columns.** Each cell is padded to the widest cell in its column; the separator row uses `max(3, col_width)` dashes per column. `*` and `_` are escaped in table cells regardless of `escape_misc`. Fixes the gh-140 fixture parity and produces CommonMark-conformant tables out of the box.
+- **#339 — bogus HTML comment endings dropped following content.** The `astral-tl` parser silently discarded every byte after `<!-- /// --->` or any `--[-]+>` comment terminator. New `normalize_bogus_comment_endings` preprocessing pass rewrites such sequences to `-->` before parsing; wired into the html5ever-repair and inline-block-misnest fallback paths too.
+- **#340 — npm pre-release versions clobbered the `latest` dist-tag.** Pre-release versions (matching `-(rc|beta|alpha|pre|dev)`) now publish under the `next` dist-tag, so `npm install @kreuzberg/html-to-markdown-node` no longer pulls a 3.4.0-rc over a stable 3.3.x.
+- **#337 — `from html_to_markdown import HeadingStyle` raised `TypeError`.** The package now re-exports the native PyO3 enums directly from `_html_to_markdown` and adds uppercase aliases (`HeadingStyle.ATX`, `CodeBlockStyle.BACKTICKS`) so both naming conventions satisfy `ConversionOptions(heading_style=…)`.
+- **#334 — Ruby `HtmlToMarkdown.convert(html, options)` raised `TypeError` on every call with options.** The wrapper passed a `ConversionOptions` object to the FFI, but the generated Rust function expects `Option<String>` JSON. Wrapper now serialises the options hash to JSON before crossing the FFI boundary.
+- **#332 — `default-features = false` Rust build broken.** Bare `#[serde(...)]` and `#[derive(Serialize, Deserialize)]` on core types in `src/types/{document,tables,result,warnings}.rs` and `src/options/conversion.rs` are now feature-gated behind `#[cfg_attr(feature = "serde", ...)]`. CI now runs a `cargo check --no-default-features` matrix to prevent regressions.
+- **#331 — visitor `element_start`/`element_end` events mispaired for hyphenated/namespaced custom tags.** The `repair_with_html5ever` fallback re-parsed under HTML5 semantics, which discard XML-style self-closing on unknown elements. The repair path now pre-expands XML self-closing tags on non-void elements to explicit open+close pairs before the HTML5 parse.
 - **PHP visitor marshaling** — visitor callbacks now correctly marshal arguments and handle array return values; `setVisitor()` method added to `ConversionOptions`.
-
 - **Elixir metadata serialization** — metadata maps now serialize as JSON instead of Elixir debug format.
-
 - **WASM Vitest environment** — WASM module loading now correctly handles Node.js module format in Vitest test environments.
-
 - **R e2e result wrapping** — `result_is_r_list` configured to suppress `jsonlite` double-wrapping of conversion results.
 
-- **Ruby `rb-sys` build isolation** — fixed panics during `bundle exec rake compile` by preventing rb-sys from being invoked via bundler exec in certain environments.
-
-- **Java pom.xml** — removed duplicate `jspecify` dependency entry introduced during dependabot merge.
-
 ### Changed
 
-- **pnpm v11** — migrated from pnpm v10 to v11; updated `pnpm-workspace.yaml` with `onlyBuiltDependencies: [esbuild]` and `ignoredBuiltDependencies: [wasm-pack]` for the new opt-in build script policy.
-
-- **Dependencies updated** — bumped `org.jetbrains:annotations` 26.0.0 → 26.1.0 and other cross-language dependency updates via `task update` / `task upgrade`.
+- **pnpm v11** — migrated from pnpm v10 to v11; `pnpm-workspace.yaml` declares `onlyBuiltDependencies: [esbuild]` and `ignoredBuiltDependencies: [wasm-pack]` for the new opt-in build script policy.
+- **Cross-language dependency bumps** — `org.jetbrains:annotations` 26.0.0 → 26.1.0, plus updates across all language toolchains via `task upgrade`.
 
 ## [3.3.3] - 2026-04-23
 

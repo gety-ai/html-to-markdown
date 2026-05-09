@@ -323,6 +323,96 @@ pub fn normalize_bogus_comment_endings(input: &str) -> Cow<'_, str> {
     }
 }
 
+/// Normalize closing tags whose `>` appears on a subsequent line.
+///
+/// Some HTML formatters (JSX-style) write closing tags as:
+///
+/// ```html
+/// </a
+/// >
+/// ```
+///
+/// The `tl` parser does not handle end-tags with a newline before the closing
+/// `>`, leaving the element unclosed so all subsequent siblings become children
+/// of the open element.  This pass collapses such patterns to a single-line
+/// closing tag (`</a>`) before the document reaches `tl`.
+///
+/// Only the whitespace between the tag name and the closing `>` is normalised;
+/// the rest of the document is untouched.
+pub fn normalize_split_closing_tags(input: &str) -> Cow<'_, str> {
+    let bytes = input.as_bytes();
+    let len = bytes.len();
+
+    // Fast path: need both '</' and '\n' to have any candidates.
+    if len < 4 || !bytes.contains(&b'\n') {
+        return Cow::Borrowed(input);
+    }
+
+    let mut idx = 0;
+    let mut last = 0;
+    let mut output: Option<String> = None;
+
+    while idx + 2 < len {
+        // Look for `</`
+        if bytes[idx] != b'<' || bytes[idx + 1] != b'/' {
+            idx += 1;
+            continue;
+        }
+
+        // Scan tag name: ASCII letters, digits, hyphens (HTML5 allows hyphens in custom elements)
+        let name_start = idx + 2;
+        let mut name_end = name_start;
+        while name_end < len && (bytes[name_end].is_ascii_alphanumeric() || bytes[name_end] == b'-') {
+            name_end += 1;
+        }
+
+        if name_end == name_start {
+            // No tag name — not a closing tag we care about.
+            idx += 1;
+            continue;
+        }
+
+        // After the tag name, skip any whitespace.  If there is a newline in
+        // that whitespace before the `>`, we need to rewrite.
+        let ws_start = name_end;
+        let mut ws_end = ws_start;
+        let mut has_newline = false;
+        while ws_end < len && bytes[ws_end].is_ascii_whitespace() {
+            if bytes[ws_end] == b'\n' || bytes[ws_end] == b'\r' {
+                has_newline = true;
+            }
+            ws_end += 1;
+        }
+
+        if !has_newline || ws_end >= len || bytes[ws_end] != b'>' {
+            // Either no whitespace newline, or the `>` is not the next char.
+            idx += 1;
+            continue;
+        }
+
+        // We have `</tagname [whitespace-with-newline]>` — rewrite to `</tagname>`.
+        let tag_name = &input[name_start..name_end];
+        let out = output.get_or_insert_with(|| String::with_capacity(len));
+        out.push_str(&input[last..idx]);
+        out.push_str("</");
+        out.push_str(tag_name);
+        out.push('>');
+
+        idx = ws_end + 1; // advance past the `>`
+        last = idx;
+    }
+
+    match output {
+        Some(mut out) => {
+            if last < len {
+                out.push_str(&input[last..]);
+            }
+            Cow::Owned(out)
+        }
+        None => Cow::Borrowed(input),
+    }
+}
+
 /// Preprocess HTML to normalize tags and fix common issues.
 pub fn preprocess_html(input: &str) -> Cow<'_, str> {
     const SELF_CLOSING: [(&[u8], &str); 3] = [(b"<br/>", "<br>"), (b"<hr/>", "<hr>"), (b"<img/>", "<img>")];
@@ -788,7 +878,7 @@ fn tag_has_hidden_attribute(tag: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{normalize_bogus_comment_endings, sanitize_markdown_url};
+    use super::{normalize_bogus_comment_endings, normalize_split_closing_tags, sanitize_markdown_url};
 
     // ── normalize_bogus_comment_endings ───────────────────────────────────────
 
@@ -838,6 +928,52 @@ mod tests {
     #[test]
     fn normalize_bogus_comment_endings_empty_input() {
         let result = normalize_bogus_comment_endings("");
+        assert_eq!(result.as_ref(), "");
+    }
+
+    // ── normalize_split_closing_tags ──────────────────────────────────────────
+
+    #[test]
+    fn normalize_split_closing_tags_collapses_newline_before_close_bracket() {
+        let input = "<a href=\"#x\">text</a\n>";
+        let result = normalize_split_closing_tags(input);
+        assert_eq!(result.as_ref(), "<a href=\"#x\">text</a>");
+    }
+
+    #[test]
+    fn normalize_split_closing_tags_collapses_indented_newline_before_close_bracket() {
+        let input = "<a href=\"#x\">text</a\n  >";
+        let result = normalize_split_closing_tags(input);
+        assert_eq!(result.as_ref(), "<a href=\"#x\">text</a>");
+    }
+
+    #[test]
+    fn normalize_split_closing_tags_leaves_well_formed_closing_tags_unchanged() {
+        let input = "<a href=\"#x\">text</a>";
+        let result = normalize_split_closing_tags(input);
+        assert_eq!(result.as_ref(), input);
+    }
+
+    #[test]
+    fn normalize_split_closing_tags_handles_multiple_split_closing_tags() {
+        let input = "<li><a href=\"#a\">A</a\n  >\n<a href=\"#b\">B</a\n>";
+        let result = normalize_split_closing_tags(input);
+        assert_eq!(result.as_ref(), "<li><a href=\"#a\">A</a>\n<a href=\"#b\">B</a>");
+    }
+
+    #[test]
+    fn normalize_split_closing_tags_does_not_collapse_inline_whitespace() {
+        // Only newlines trigger the normalisation; spaces alone must not.
+        let input = "<a href=\"#x\">text</a >";
+        let result = normalize_split_closing_tags(input);
+        // A space before > is actually valid HTML and tl handles it fine.
+        // We must not touch it to avoid over-normalising.
+        assert_eq!(result.as_ref(), input);
+    }
+
+    #[test]
+    fn normalize_split_closing_tags_empty_input() {
+        let result = normalize_split_closing_tags("");
         assert_eq!(result.as_ref(), "");
     }
 

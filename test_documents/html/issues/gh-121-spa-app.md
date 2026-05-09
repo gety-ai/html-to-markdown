@@ -3,8 +3,9 @@
 ![STS Appraisal logo](assets/img/icon/sts.svg)
 
 - [Team Appraisal](/team-appraisal)
-  - [Team](/team-appraisal/team)
-  - [Pending](/team-appraisal/pending)
+
+  * [Team](/team-appraisal/team)
+  * [Pending](/team-appraisal/pending)
 
 - [My Appraisals](/my-appraisal)
 - [My Feedbacks](/my-feedbacks)
@@ -15,7 +16,6 @@
 
 ### Pending Appraisals
 
-_The system collects colleagues who work together in a
-project, if you have ever not worked directly with any
-Reviewee then you are able to select 'Cannot
-review'._
+*The system collects colleagues who work together in a project, if you
+ have ever not worked directly with any Reviewee then you are able to
+ select 'Cannot review'.*

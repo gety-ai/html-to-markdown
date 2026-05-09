@@ -161,8 +161,10 @@ fn nested_tables_do_not_double_escape_pipes() {
 
     let markdown = convert(html, Some(default_options())).expect("conversion should succeed");
     assert!(
-        markdown.contains("| Inner A | Inner B |"),
-        "nested table structure should be preserved"
+        markdown
+            .lines()
+            .any(|line| line.contains("Inner A") && line.contains("Inner B")),
+        "nested table structure should be preserved: {markdown}"
     );
     assert!(
         markdown.contains("Inner \\| pipe"),

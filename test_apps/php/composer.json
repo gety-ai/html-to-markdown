@@ -8,7 +8,7 @@
     "localphp": false
   },
   "require": {
-    "kreuzberg-dev/html-to-markdown": ">=3.4.0-rc.45"
+    "kreuzberg-dev/html-to-markdown": ">=3.4.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^13.1",

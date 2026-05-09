@@ -198,9 +198,13 @@ fn test_strikethrough() {
 fn test_simple_table() {
     let html = "<table><tr><th>Header</th></tr><tr><td>Cell</td></tr></table>";
     let result = convert(html, None).unwrap();
-    assert!(result.contains("| Header |"));
-    assert!(result.contains("| --- |"));
-    assert!(result.contains("| Cell |"));
+    assert!(result.contains("| Header |"), "header row missing: {result}");
+    // Separator uses at least as many dashes as the widest cell ("Header" = 6).
+    assert!(
+        result.lines().any(|l| l.starts_with("| ----")),
+        "separator row missing: {result}"
+    );
+    assert!(result.contains("| Cell"), "cell row missing: {result}");
 }
 
 #[test]
@@ -221,7 +225,10 @@ fn test_table_rowspan() {
         ..Default::default()
     };
     let result = convert(html, Some(options)).unwrap();
-    let expected = "\n\n| Header 1 | Header 2 |\n| --- | --- |\n| Spanning cell | First row content<br>Second line |\n|  | Next row<br>More content |\n";
+    // Columns are padded to the widest cell per column (rowspan accounted):
+    //   col 0: max("Header 1"=8, "Spanning cell"=13, ""=0) = 13
+    //   col 1: max("Header 2"=8, "First row content<br>Second line"=32, "Next row<br>More content"=24) = 32
+    let expected = "| Header 1      | Header 2                         |\n| ------------- | -------------------------------- |\n| Spanning cell | First row content<br>Second line |\n|               | Next row<br>More content         |\n";
     assert_eq!(result, expected);
 }
 
@@ -534,7 +541,8 @@ fn test_ordered_list_with_heading_and_table() {
 ";
 
     let result = convert(html, None).unwrap();
-    let expected = "1. ### h3\n2. *table*\n\n    | blah |\n    | --- |\n";
+    // Separator dashes match the column width ("blah" = 4 chars → 4 dashes).
+    let expected = "1. ### h3\n2. *table*\n\n    | blah |\n    | ---- |\n";
     assert_eq!(result, expected);
 }
 

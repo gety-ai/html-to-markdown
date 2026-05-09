@@ -10,7 +10,7 @@ use crate::converter::utility::content::collect_tag_attributes;
 use crate::converter::utility::content::normalized_tag_name;
 use std::borrow::Cow;
 
-use super::cell::{collect_table_cells, convert_table_cell, get_colspan_rowspan};
+use super::cell::{cell_text_content, collect_table_cells, convert_table_cell, get_colspan_rowspan};
 
 /// Maximum allowed table columns to prevent unbounded memory usage.
 const MAX_TABLE_COLS: usize = 1000;
@@ -87,6 +87,75 @@ pub fn append_layout_row(
     }
 }
 
+/// Collect the rendered text content of every cell in a row for width calculation.
+///
+/// `rowspan_tracker` mirrors the tracker in `convert_table_row` so that spanned
+/// columns are skipped in the width pre-pass just as they are skipped in rendering.
+/// Pass a shared tracker across all row calls to correctly handle multi-row spans.
+#[allow(clippy::trivially_copy_pass_by_ref)]
+pub fn collect_row_cell_widths(
+    node_handle: &tl::NodeHandle,
+    parser: &tl::Parser,
+    options: &crate::options::ConversionOptions,
+    ctx: &super::super::super::Context,
+    dom_ctx: &super::super::super::DomContext,
+    col_widths: &mut Vec<usize>,
+    rowspan_tracker: &mut Vec<Option<usize>>,
+) {
+    let mut cells = Vec::new();
+    collect_table_cells(node_handle, parser, dom_ctx, &mut cells);
+
+    let mut col = 0usize;
+    let mut cell_iter = cells.iter();
+
+    loop {
+        // Skip columns that are filled by a rowspan from a previous row.
+        while col < rowspan_tracker.len() {
+            if let Some(Some(remaining)) = rowspan_tracker.get_mut(col) {
+                if *remaining > 0 {
+                    *remaining -= 1;
+                    if *remaining == 0 {
+                        rowspan_tracker[col] = None;
+                    }
+                    col += 1;
+                    continue;
+                }
+            }
+            break;
+        }
+
+        let Some(cell_handle) = cell_iter.next() else {
+            break;
+        };
+
+        let text = cell_text_content(cell_handle, parser, options, ctx, dom_ctx);
+        let width = text.chars().count();
+
+        // Grow the widths vec if needed.
+        if col >= col_widths.len() {
+            col_widths.resize(col + 1, 0);
+        }
+        if width > col_widths[col] {
+            col_widths[col] = width;
+        }
+
+        let (colspan, rowspan) = get_colspan_rowspan(cell_handle, parser);
+
+        // Record rowspan for future rows.
+        if rowspan > 1 {
+            if col >= rowspan_tracker.len() {
+                rowspan_tracker.resize(col + 1, None);
+            }
+            rowspan_tracker[col] = Some(rowspan - 1);
+        }
+
+        col = col.saturating_add(colspan);
+    }
+}
+
+/// Minimum separator dash count per column (matches `---`).
+const MIN_SEPARATOR_DASHES: usize = 3;
+
 /// Convert a table row (tr) to Markdown format.
 ///
 /// Processes all cells in a row, handling colspan and rowspan for proper
@@ -107,6 +176,7 @@ pub fn append_layout_row(
 /// * `dom_ctx` - DOM context
 /// * `depth` - Nesting depth
 /// * `is_header` - Whether this is a header row
+/// * `col_widths` - Per-column max content widths for padding (empty = no padding)
 #[allow(clippy::too_many_arguments)]
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 #[allow(clippy::trivially_copy_pass_by_ref)]
@@ -124,6 +194,7 @@ pub fn convert_table_row(
     dom_ctx: &super::super::super::DomContext,
     depth: usize,
     is_header: bool,
+    col_widths: &[usize],
 ) {
     let mut row_text = String::with_capacity(256);
     let mut cells = Vec::new();
@@ -203,7 +274,13 @@ pub fn convert_table_row(
             if col_index < total_cols {
                 if let Some(Some(remaining_rows)) = rowspan_tracker.get_mut(col_index) {
                     if *remaining_rows > 0 {
+                        let width = col_widths.get(col_index).copied();
                         row_text.push(' ');
+                        if let Some(w) = width {
+                            for _ in 0..w {
+                                row_text.push(' ');
+                            }
+                        }
                         row_text.push_str(" |");
                         *remaining_rows -= 1;
                         if *remaining_rows == 0 {
@@ -216,7 +293,8 @@ pub fn convert_table_row(
             }
 
             if let Some(cell_handle) = cell_iter.next() {
-                convert_table_cell(cell_handle, parser, &mut row_text, options, ctx, "", dom_ctx);
+                let col_width = col_widths.get(col_index).copied();
+                convert_table_cell(cell_handle, parser, &mut row_text, options, ctx, "", dom_ctx, col_width);
 
                 let (colspan, rowspan) = get_colspan_rowspan(cell_handle, parser);
 
@@ -230,8 +308,9 @@ pub fn convert_table_row(
             }
         }
     } else {
-        for cell_handle in &cells {
-            convert_table_cell(cell_handle, parser, &mut row_text, options, ctx, "", dom_ctx);
+        for (cell_idx, cell_handle) in cells.iter().enumerate() {
+            let col_width = col_widths.get(cell_idx).copied();
+            convert_table_cell(cell_handle, parser, &mut row_text, options, ctx, "", dom_ctx, col_width);
         }
     }
 
@@ -247,7 +326,10 @@ pub fn convert_table_row(
             if i > 0 {
                 output.push_str(" | ");
             }
-            output.push_str("---");
+            let dash_count = col_widths.get(i).copied().unwrap_or(0).max(MIN_SEPARATOR_DASHES);
+            for _ in 0..dash_count {
+                output.push('-');
+            }
         }
         output.push_str(" |\n");
     }
