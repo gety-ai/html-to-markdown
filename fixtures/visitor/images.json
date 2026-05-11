@@ -1,5 +1,38 @@
 [
   {
+    "id": "visitor_image_bare_string_preserves_case",
+    "description": "Visitor returns bare-string image replacement; mixed-case alt/src preserved (regression guard for issue #350)",
+    "input": {
+      "html": "<img src=\"PhotoOne.JPG\" alt=\"Sunset Over Bay\">"
+    },
+    "visitor": {
+      "callbacks": {
+        "visit_image": {
+          "action": "custom_template",
+          "template": "[image: {alt} -> {src}]",
+          "return_form": "bare_string"
+        }
+      }
+    },
+    "assertions": [
+      {
+        "type": "contains",
+        "field": "content",
+        "value": "[image: Sunset Over Bay -> PhotoOne.JPG]"
+      },
+      {
+        "type": "not_contains",
+        "field": "content",
+        "value": "sunset over bay"
+      },
+      {
+        "type": "not_contains",
+        "field": "content",
+        "value": "photoone.jpg"
+      }
+    ]
+  },
+  {
     "id": "visitor_skip_images",
     "description": "Visitor skips all images from output",
     "input": {

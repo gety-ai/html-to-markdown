@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.15.8"
+alef_version = "0.15.39"
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm", "r"]
 
 [workspace.sync]
@@ -336,6 +336,7 @@ function = "convert"
 options_type = "ConversionOptions"
 wrap_options_in_some = true
 returns_result = true
+visitor_trait = "HtmlVisitor"
 
 [crates.e2e.call.overrides.python]
 module = "html_to_markdown"
