@@ -27,7 +27,7 @@ dev = [ "mypy>=1.19", "ruff>=0.14.8" ]
 [tool.maturin]
 module-name = "html_to_markdown._html_to_markdown"
 manifest-path = "../../crates/html-to-markdown-py/Cargo.toml"
-features = [ "pyo3/extension-module" ]
+features = [ "pyo3/extension-module", "pyo3/abi3-py310" ]
 python-packages = [ "html_to_markdown" ]
 
 [tool.ruff]
