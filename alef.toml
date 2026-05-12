@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.15.42"
+alef_version = "0.15.44"
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm", "r"]
 
 [workspace.sync]
@@ -129,6 +129,8 @@ package_name = "htmltomarkdown"
 
 [crates.java]
 package = "dev.kreuzberg.htmltomarkdown"
+group_id = "dev.kreuzberg"
+artifact_id = "html-to-markdown"
 
 [crates.csharp]
 namespace = "HtmlToMarkdown"

@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>dev.kreuzberg.htmltomarkdown</groupId>
-    <artifactId>html-to-markdown-rs</artifactId>
+    <groupId>dev.kreuzberg</groupId>
+    <artifactId>html-to-markdown</artifactId>
     <version>3.4.0</version>
     <packaging>jar</packaging>
 
-    <name>html-to-markdown-rs</name>
+    <name>html-to-markdown</name>
     <description>High-performance HTML to Markdown converter</description>
     <url>https://github.com/kreuzberg-dev/html-to-markdown</url>
 
@@ -69,12 +69,12 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.21.3</version>
+            <version>2.21.2</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jdk8</artifactId>
-            <version>2.21.3</version>
+            <version>2.21.2</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -160,9 +160,6 @@
                 <version>${spotless-maven-plugin.version}</version>
                 <configuration>
                     <java>
-                        <includes>
-                            <include>src/test/java/**/*.java</include>
-                        </includes>
                         <eclipse>
                             <version>4.31</version>
                             <file>${project.basedir}/eclipse-formatter.xml</file>
@@ -277,7 +274,6 @@
                     <rulesets>
                         <ruleset>/rulesets/java/quickstart.xml</ruleset>
                     </rulesets>
-                    <minimumTokens>120</minimumTokens>
                 </configuration>
                 <executions>
                     <execution>
