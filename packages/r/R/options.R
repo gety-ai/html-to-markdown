@@ -43,7 +43,7 @@
 #' @param infer_dimensions Infer image dimensions from data
 #' @param max_depth Maximum DOM traversal depth. `None` means unlimited
 #' @param exclude_selectors CSS selectors for elements to exclude entirely (element + all content)
-#' @param visitor Optional visitor for custom traversal logic
+#' @param visitor (feature-gated) Optional visitor for custom traversal logic
 #' @return A named list suitable for the `options` argument of [convert()].
 #' @export
 conversion_options <- function(

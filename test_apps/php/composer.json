@@ -2,13 +2,8 @@
   "name": "kreuzberg-dev/e2e-php",
   "description": "E2e tests for PHP bindings",
   "type": "project",
-  "minimum-stability": "RC",
-  "prefer-stable": true,
-  "repositories": {
-    "localphp": false
-  },
   "require": {
-    "kreuzberg-dev/html-to-markdown": ">=3.4.0"
+    "kreuzberg-dev/html-to-markdown-rs": ">=3.2.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^13.1",

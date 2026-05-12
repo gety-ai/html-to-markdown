@@ -12,7 +12,9 @@ defmodule E2eElixir.MixProject do
 
   defp deps do
     [
-      {:html_to_markdown, ">= 3.4.0-rc.41"}
+      {:html_to_markdown, "../../packages/elixir"},
+      {:rustler_precompiled, "~> 0.9"},
+      {:rustler, "~> 0.37.0", runtime: false}
     ]
   end
 end

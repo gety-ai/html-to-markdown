@@ -2942,6 +2942,31 @@ int32_t htm_visit_result_from_i32(int32_t value);
 int32_t htm_visit_result_from_str(const char *name);
 
 /**
+ * Free a heap-allocated `TextDirection` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_text_direction_free(HTMTextDirection *ptr);
+
+/**
+ * Serialize a heap-allocated `TextDirection` to a JSON string.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_text_direction_to_json(const HTMTextDirection *ptr);
+
+/**
+ * Render a heap-allocated `TextDirection` as its string representation
+ * (the unit-variant name as serialized by serde — e.g. `"completed"`,
+ * without surrounding JSON quotes).
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_text_direction_to_string(const HTMTextDirection *ptr);
+
+/**
  * Free a heap-allocated `LinkType` returned by a pointer-returning FFI function.
  * # Safety
  * Pointer must have been returned by this library, or be null.
@@ -2955,6 +2980,229 @@ void htm_link_type_free(HTMLinkType *ptr);
  * The returned string must be freed with `htm_free_string`.
  */
 char *htm_link_type_to_json(const HTMLinkType *ptr);
+
+/**
+ * Render a heap-allocated `LinkType` as its string representation
+ * (the unit-variant name as serialized by serde — e.g. `"completed"`,
+ * without surrounding JSON quotes).
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_link_type_to_string(const HTMLinkType *ptr);
+
+/**
+ * Free a heap-allocated `ImageType` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_image_type_free(HTMImageType *ptr);
+
+/**
+ * Serialize a heap-allocated `ImageType` to a JSON string.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_image_type_to_json(const HTMImageType *ptr);
+
+/**
+ * Render a heap-allocated `ImageType` as its string representation
+ * (the unit-variant name as serialized by serde — e.g. `"completed"`,
+ * without surrounding JSON quotes).
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_image_type_to_string(const HTMImageType *ptr);
+
+/**
+ * Free a heap-allocated `StructuredDataType` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_structured_data_type_free(HTMStructuredDataType *ptr);
+
+/**
+ * Serialize a heap-allocated `StructuredDataType` to a JSON string.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_structured_data_type_to_json(const HTMStructuredDataType *ptr);
+
+/**
+ * Render a heap-allocated `StructuredDataType` as its string representation
+ * (the unit-variant name as serialized by serde — e.g. `"completed"`,
+ * without surrounding JSON quotes).
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_structured_data_type_to_string(const HTMStructuredDataType *ptr);
+
+/**
+ * Free a heap-allocated `PreprocessingPreset` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_preprocessing_preset_free(HTMPreprocessingPreset *ptr);
+
+/**
+ * Free a heap-allocated `HeadingStyle` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_heading_style_free(HTMHeadingStyle *ptr);
+
+/**
+ * Free a heap-allocated `ListIndentType` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_list_indent_type_free(HTMListIndentType *ptr);
+
+/**
+ * Free a heap-allocated `WhitespaceMode` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_whitespace_mode_free(HTMWhitespaceMode *ptr);
+
+/**
+ * Free a heap-allocated `NewlineStyle` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_newline_style_free(HTMNewlineStyle *ptr);
+
+/**
+ * Free a heap-allocated `CodeBlockStyle` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_code_block_style_free(HTMCodeBlockStyle *ptr);
+
+/**
+ * Free a heap-allocated `HighlightStyle` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_highlight_style_free(HTMHighlightStyle *ptr);
+
+/**
+ * Free a heap-allocated `LinkStyle` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_link_style_free(HTMLinkStyle *ptr);
+
+/**
+ * Free a heap-allocated `OutputFormat` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_output_format_free(HTMOutputFormat *ptr);
+
+/**
+ * Free a heap-allocated `NodeContent` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_node_content_free(HTMNodeContent *ptr);
+
+/**
+ * Serialize a heap-allocated `NodeContent` to a JSON string.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_node_content_to_json(const HTMNodeContent *ptr);
+
+/**
+ * Render a heap-allocated `NodeContent` as its string representation
+ * (the unit-variant name as serialized by serde — e.g. `"completed"`,
+ * without surrounding JSON quotes).
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_node_content_to_string(const HTMNodeContent *ptr);
+
+/**
+ * Free a heap-allocated `AnnotationKind` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_annotation_kind_free(HTMAnnotationKind *ptr);
+
+/**
+ * Serialize a heap-allocated `AnnotationKind` to a JSON string.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_annotation_kind_to_json(const HTMAnnotationKind *ptr);
+
+/**
+ * Render a heap-allocated `AnnotationKind` as its string representation
+ * (the unit-variant name as serialized by serde — e.g. `"completed"`,
+ * without surrounding JSON quotes).
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_annotation_kind_to_string(const HTMAnnotationKind *ptr);
+
+/**
+ * Free a heap-allocated `WarningKind` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_warning_kind_free(HTMWarningKind *ptr);
+
+/**
+ * Serialize a heap-allocated `WarningKind` to a JSON string.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_warning_kind_to_json(const HTMWarningKind *ptr);
+
+/**
+ * Render a heap-allocated `WarningKind` as its string representation
+ * (the unit-variant name as serialized by serde — e.g. `"completed"`,
+ * without surrounding JSON quotes).
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_warning_kind_to_string(const HTMWarningKind *ptr);
+
+/**
+ * Free a heap-allocated `NodeType` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_node_type_free(HTMNodeType *ptr);
+
+/**
+ * Serialize a heap-allocated `NodeType` to a JSON string.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_node_type_to_json(const HTMNodeType *ptr);
+
+/**
+ * Render a heap-allocated `NodeType` as its string representation
+ * (the unit-variant name as serialized by serde — e.g. `"completed"`,
+ * without surrounding JSON quotes).
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_node_type_to_string(const HTMNodeType *ptr);
 
 /**
  * Attach a vtable visitor bridge to a `ConversionOptions` options struct.

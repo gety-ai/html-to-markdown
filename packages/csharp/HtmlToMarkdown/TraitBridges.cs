@@ -1122,22 +1122,6 @@ public static class HtmlVisitorRegistry {
         }
     }
 
-    /// <summary>Unregister a HtmlVisitor implementation</summary>
-    public static void Unregister(string name) {
-        if (string.IsNullOrEmpty(name))
-            throw new ArgumentException("Name cannot be empty", nameof(name));
-
-        var result = NativeMethods.UnregisterHtmlVisitor(name, out var outError);
-        if (result != 0) {
-            var errorMsg = Marshal.PtrToStringUTF8(outError) ?? "Unknown error";
-            Marshal.FreeCoTaskMem(outError);
-            throw new InvalidOperationException($"Failed to unregister {name}: {errorMsg}");
-        }
-
-        if (_bridges.TryRemove(name, out var bridge)) {
-            bridge.Dispose();
-        }
-    }
 }
 
 /// <summary>FFI JSON serialization extension methods</summary>
