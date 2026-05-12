@@ -5,14 +5,18 @@
     "input": {
       "html": "<table><tr><th>Header</th></tr><tr><td>Line 1<br>Line 2</td></tr></table>",
       "options": {
-        "brInTables": true
+        "br_in_tables": true
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Header", "Line 1", "Line 2"]
+        "values": [
+          "Header",
+          "Line 1",
+          "Line 2"
+        ]
       }
     ]
   },
@@ -22,14 +26,16 @@
     "input": {
       "html": "<table><tr><th>Col</th></tr><tr><td>A<br>B</td></tr></table>",
       "options": {
-        "brInTables": false
+        "br_in_tables": false
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Col"]
+        "values": [
+          "Col"
+        ]
       }
     ]
   }

@@ -23,7 +23,10 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["First paragraph.", "Second paragraph."]
+        "values": [
+          "First paragraph.",
+          "Second paragraph."
+        ]
       }
     ]
   },
@@ -37,7 +40,11 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["**bold**", "*italic*", "[link](https://example.com)"]
+        "values": [
+          "**bold**",
+          "*italic*",
+          "[link](https://example.com)"
+        ]
       }
     ]
   },
@@ -55,7 +62,11 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Line one.", "Line two.", "Line three."]
+        "values": [
+          "Line one.",
+          "Line two.",
+          "Line three."
+        ]
       }
     ]
   },
@@ -69,7 +80,9 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Nested text"]
+        "values": [
+          "Nested text"
+        ]
       }
     ]
   }

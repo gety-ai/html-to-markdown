@@ -18,7 +18,9 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Name"]
+        "values": [
+          "Name"
+        ]
       }
     ]
   },
@@ -41,7 +43,9 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Message"]
+        "values": [
+          "Message"
+        ]
       }
     ]
   },
@@ -64,7 +68,9 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Color"]
+        "values": [
+          "Color"
+        ]
       }
     ]
   }

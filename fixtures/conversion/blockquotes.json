@@ -9,7 +9,9 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["> Quote text"]
+        "values": [
+          "> Quote text"
+        ]
       }
     ]
   },
@@ -27,7 +29,10 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Outer quote.", "Inner quote."]
+        "values": [
+          "Outer quote.",
+          "Inner quote."
+        ]
       }
     ]
   },
@@ -41,7 +46,10 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["> First paragraph.", "> Second paragraph."]
+        "values": [
+          "> First paragraph.",
+          "> Second paragraph."
+        ]
       }
     ]
   },
@@ -59,7 +67,11 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Quote intro:", "Point one", "Point two"]
+        "values": [
+          "Quote intro:",
+          "Point one",
+          "Point two"
+        ]
       }
     ]
   }

@@ -5,14 +5,19 @@
     "input": {
       "html": "<p>Text with # hash and [brackets] and * star</p>",
       "options": {
-        "escapeAscii": true
+        "escape_ascii": true
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Text", "hash", "brackets", "star"]
+        "values": [
+          "Text",
+          "hash",
+          "brackets",
+          "star"
+        ]
       }
     ]
   }

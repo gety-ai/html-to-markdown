@@ -5,14 +5,17 @@
     "input": {
       "html": "<pre><code>let x = 1;</code></pre>",
       "options": {
-        "codeBlockStyle": "Tildes"
+        "code_block_style": "Tildes"
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["~~~", "let x = 1;"]
+        "values": [
+          "~~~",
+          "let x = 1;"
+        ]
       }
     ]
   },
@@ -22,14 +25,16 @@
     "input": {
       "html": "<pre><code>print('hello')</code></pre>",
       "options": {
-        "codeBlockStyle": "Indented"
+        "code_block_style": "Indented"
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["print('hello')"]
+        "values": [
+          "print('hello')"
+        ]
       },
       {
         "type": "not_contains",
@@ -44,14 +49,17 @@
     "input": {
       "html": "<pre><code>def hello(): pass</code></pre>",
       "options": {
-        "codeLanguage": "python"
+        "code_language": "python"
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["```python", "def hello"]
+        "values": [
+          "```python",
+          "def hello"
+        ]
       }
     ]
   }

@@ -5,14 +5,17 @@
     "input": {
       "html": "<p>First paragraph.</p><p>Second paragraph.</p>",
       "options": {
-        "stripNewlines": true
+        "strip_newlines": true
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["First paragraph.", "Second paragraph."]
+        "values": [
+          "First paragraph.",
+          "Second paragraph."
+        ]
       }
     ]
   },
@@ -22,14 +25,17 @@
     "input": {
       "html": "<p>One</p><p>Two</p>",
       "options": {
-        "convertAsInline": true
+        "convert_as_inline": true
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["One", "Two"]
+        "values": [
+          "One",
+          "Two"
+        ]
       }
     ]
   }

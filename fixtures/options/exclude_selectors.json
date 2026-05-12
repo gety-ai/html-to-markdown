@@ -5,7 +5,9 @@
     "input": {
       "html": "<body><div class=\"cookie-banner\">Accept cookies</div><p>Main content</p></body>",
       "options": {
-        "excludeSelectors": [".cookie-banner"]
+        "exclude_selectors": [
+          ".cookie-banner"
+        ]
       }
     },
     "assertions": [
@@ -27,7 +29,9 @@
     "input": {
       "html": "<body><div id=\"ad-container\">Buy stuff</div><p>Article text</p></body>",
       "options": {
-        "excludeSelectors": ["#ad-container"]
+        "exclude_selectors": [
+          "#ad-container"
+        ]
       }
     },
     "assertions": [
@@ -49,7 +53,9 @@
     "input": {
       "html": "<body><div role=\"complementary\">Sidebar</div><p>Primary text</p></body>",
       "options": {
-        "excludeSelectors": ["[role='complementary']"]
+        "exclude_selectors": [
+          "[role='complementary']"
+        ]
       }
     },
     "assertions": [
@@ -71,7 +77,10 @@
     "input": {
       "html": "<body><nav class=\"nav\">Menu</nav><p>Content</p><footer>Footer</footer></body>",
       "options": {
-        "excludeSelectors": [".nav", "footer"]
+        "exclude_selectors": [
+          ".nav",
+          "footer"
+        ]
       }
     },
     "assertions": [
@@ -98,7 +107,9 @@
     "input": {
       "html": "<body><aside class=\"sidebar\"><h2>Related</h2><p>Sidebar text</p></aside><main><p>Main text</p></main></body>",
       "options": {
-        "excludeSelectors": [".sidebar"]
+        "exclude_selectors": [
+          ".sidebar"
+        ]
       }
     },
     "assertions": [
@@ -125,7 +136,7 @@
     "input": {
       "html": "<p>Hello world</p>",
       "options": {
-        "excludeSelectors": []
+        "exclude_selectors": []
       }
     },
     "assertions": [
@@ -142,8 +153,10 @@
     "input": {
       "html": "<body><div class=\"nav\">Navigation</div><p>Article body</p></body>",
       "options": {
-        "excludeSelectors": [".nav"],
-        "outputFormat": "Plain"
+        "exclude_selectors": [
+          ".nav"
+        ],
+        "output_format": "Plain"
       }
     },
     "assertions": [
@@ -165,7 +178,9 @@
     "input": {
       "html": "<body><div class=\"wrapper\"><p>Inner paragraph</p></div><p>Outer text</p></body>",
       "options": {
-        "excludeSelectors": [".wrapper"]
+        "exclude_selectors": [
+          ".wrapper"
+        ]
       }
     },
     "assertions": [

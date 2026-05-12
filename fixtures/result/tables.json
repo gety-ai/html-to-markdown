@@ -5,7 +5,7 @@
     "input": {
       "html": "<table><thead><tr><th>Name</th><th>Age</th></tr></thead><tbody><tr><td>Alice</td><td>30</td></tr></tbody></table>",
       "options": {
-        "includeDocumentStructure": true
+        "include_document_structure": true
       }
     },
     "assertions": [
@@ -26,7 +26,7 @@
     "input": {
       "html": "<table><tr><th>A</th></tr><tr><td>1</td></tr></table><p>Between</p><table><tr><th>B</th></tr><tr><td>2</td></tr></table>",
       "options": {
-        "includeDocumentStructure": true
+        "include_document_structure": true
       }
     },
     "assertions": [
@@ -43,7 +43,7 @@
     "input": {
       "html": "<p>No tables here</p>",
       "options": {
-        "includeDocumentStructure": true
+        "include_document_structure": true
       }
     },
     "assertions": [

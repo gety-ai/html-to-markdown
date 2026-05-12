@@ -9,7 +9,9 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["**bold**"]
+        "values": [
+          "**bold**"
+        ]
       }
     ]
   },
@@ -23,7 +25,9 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["*italic*"]
+        "values": [
+          "*italic*"
+        ]
       }
     ]
   },
@@ -37,7 +41,9 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["***both***"]
+        "values": [
+          "***both***"
+        ]
       }
     ]
   },
@@ -51,7 +57,9 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["~~strikethrough~~"]
+        "values": [
+          "~~strikethrough~~"
+        ]
       }
     ]
   },
@@ -65,7 +73,9 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["~~deleted text~~"]
+        "values": [
+          "~~deleted text~~"
+        ]
       }
     ]
   },
@@ -79,7 +89,9 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["underlined"]
+        "values": [
+          "underlined"
+        ]
       }
     ]
   },
@@ -97,7 +109,9 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["highlighted"]
+        "values": [
+          "highlighted"
+        ]
       }
     ]
   },
@@ -111,7 +125,11 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["H", "2", "O"]
+        "values": [
+          "H",
+          "2",
+          "O"
+        ]
       }
     ]
   },
@@ -125,7 +143,10 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["x", "2"]
+        "values": [
+          "x",
+          "2"
+        ]
       }
     ]
   }

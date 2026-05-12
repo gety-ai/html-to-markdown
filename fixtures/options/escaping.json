@@ -5,7 +5,7 @@
     "input": {
       "html": "<p>Use 2*3 = 6 in math.</p>",
       "options": {
-        "escapeAsterisks": true
+        "escape_asterisks": true
       }
     },
     "assertions": [
@@ -16,7 +16,11 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["2", "3", "6"]
+        "values": [
+          "2",
+          "3",
+          "6"
+        ]
       }
     ]
   },
@@ -26,7 +30,7 @@
     "input": {
       "html": "<p>The variable_name is defined.</p>",
       "options": {
-        "escapeUnderscores": true
+        "escape_underscores": true
       }
     },
     "assertions": [
@@ -37,7 +41,11 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["variable", "name", "defined."]
+        "values": [
+          "variable",
+          "name",
+          "defined."
+        ]
       }
     ]
   },
@@ -47,7 +55,7 @@
     "input": {
       "html": "<p>Use # and | and ~ in text.</p>",
       "options": {
-        "escapeMisc": true
+        "escape_misc": true
       }
     },
     "assertions": [
@@ -58,7 +66,11 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Use", "and", "in text."]
+        "values": [
+          "Use",
+          "and",
+          "in text."
+        ]
       }
     ]
   }

@@ -19,7 +19,7 @@
     "input": {
       "html": "<div><p>Shallow</p><div><div><div><p>Too deep</p></div></div></div></div>",
       "options": {
-        "maxDepth": 3
+        "max_depth": 3
       }
     },
     "assertions": [
@@ -41,7 +41,7 @@
     "input": {
       "html": "<p>Hello</p>",
       "options": {
-        "maxDepth": 0
+        "max_depth": 0
       }
     },
     "assertions": [

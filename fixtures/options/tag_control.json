@@ -5,14 +5,20 @@
     "input": {
       "html": "<p>Before</p><iframe src='video.html' width='560'></iframe><p>After</p>",
       "options": {
-        "preserveTags": ["iframe"]
+        "preserve_tags": [
+          "iframe"
+        ]
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Before", "After", "<iframe"]
+        "values": [
+          "Before",
+          "After",
+          "<iframe"
+        ]
       }
     ]
   },
@@ -22,14 +28,20 @@
     "input": {
       "html": "<div class='wrapper'><p>Inside div</p></div><p>Outside <span class='hl'>span text</span></p>",
       "options": {
-        "stripTags": ["div", "span"]
+        "strip_tags": [
+          "div",
+          "span"
+        ]
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Inside div", "span text"]
+        "values": [
+          "Inside div",
+          "span text"
+        ]
       }
     ]
   },
@@ -39,14 +51,17 @@
     "input": {
       "html": "<p><a href='https://example.com'>Link</a></p>",
       "options": {
-        "defaultTitle": true
+        "default_title": true
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Link", "https://example.com"]
+        "values": [
+          "Link",
+          "https://example.com"
+        ]
       }
     ]
   },
@@ -63,7 +78,9 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["example.com"]
+        "values": [
+          "example.com"
+        ]
       }
     ]
   },
@@ -73,14 +90,18 @@
     "input": {
       "html": "<p><a href='https://example.com'>Example</a> and <a href='https://other.com'>Other</a></p>",
       "options": {
-        "linkStyle": "Reference"
+        "link_style": "Reference"
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Example", "Other", "example.com"]
+        "values": [
+          "Example",
+          "Other",
+          "example.com"
+        ]
       }
     ]
   }

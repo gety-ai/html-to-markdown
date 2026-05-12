@@ -5,7 +5,7 @@
     "input": {
       "html": "<p>Text   with    extra   spaces.</p>",
       "options": {
-        "whitespaceMode": "Normalized"
+        "whitespace_mode": "Normalized"
       }
     },
     "assertions": [
@@ -16,7 +16,12 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Text", "with", "extra", "spaces."]
+        "values": [
+          "Text",
+          "with",
+          "extra",
+          "spaces."
+        ]
       }
     ]
   },
@@ -26,7 +31,7 @@
     "input": {
       "html": "<p>Preserved   spacing.</p>",
       "options": {
-        "whitespaceMode": "Strict"
+        "whitespace_mode": "Strict"
       }
     },
     "assertions": [
@@ -37,7 +42,10 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Preserved", "spacing."]
+        "values": [
+          "Preserved",
+          "spacing."
+        ]
       }
     ]
   }

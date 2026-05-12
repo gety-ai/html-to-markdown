@@ -5,14 +5,17 @@
     "input": {
       "html": "<p><strong>bold</strong> and <em>italic</em></p>",
       "options": {
-        "strongEmSymbol": "_"
+        "strong_em_symbol": "_"
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["__bold__", "_italic_"]
+        "values": [
+          "__bold__",
+          "_italic_"
+        ]
       }
     ]
   }

@@ -5,7 +5,7 @@
     "input": {
       "html": "<h1>Chapter One</h1><p>Chapter intro.</p><h2>Section One</h2><p>Section content.</p>",
       "options": {
-        "includeDocumentStructure": true
+        "include_document_structure": true
       }
     },
     "assertions": [
@@ -30,7 +30,7 @@
     "input": {
       "html": "<h1>Chapter One</h1><h2>Section A</h2><p>Section A content.</p><h1>Chapter Two</h1><h2>Section B</h2><p>Section B content.</p>",
       "options": {
-        "includeDocumentStructure": true
+        "include_document_structure": true
       }
     },
     "assertions": [
@@ -55,7 +55,7 @@
     "input": {
       "html": "<h1>Top Level</h1><p>Top intro.</p><h2>Mid Level</h2><p>Mid content.</p><h3>Deep Level</h3><p>Deep content.</p>",
       "options": {
-        "includeDocumentStructure": true
+        "include_document_structure": true
       }
     },
     "assertions": [

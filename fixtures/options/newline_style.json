@@ -5,14 +5,17 @@
     "input": {
       "html": "<p>Line one<br>Line two</p>",
       "options": {
-        "newlineStyle": "Backslash"
+        "newline_style": "Backslash"
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Line one", "Line two"]
+        "values": [
+          "Line one",
+          "Line two"
+        ]
       }
     ]
   },
@@ -22,14 +25,17 @@
     "input": {
       "html": "<p>First<br>Second</p>",
       "options": {
-        "newlineStyle": "Spaces"
+        "newline_style": "Spaces"
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["First", "Second"]
+        "values": [
+          "First",
+          "Second"
+        ]
       }
     ]
   }

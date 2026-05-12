@@ -13,7 +13,11 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["&", "<", ">"]
+        "values": [
+          "&",
+          "<",
+          ">"
+        ]
       }
     ]
   },
@@ -31,7 +35,11 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["🌍", "🚀", "⭐"]
+        "values": [
+          "🌍",
+          "🚀",
+          "⭐"
+        ]
       }
     ]
   },
@@ -49,7 +57,11 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["中文内容", "日本語テキスト", "한국어 텍스트"]
+        "values": [
+          "中文内容",
+          "日本語テキスト",
+          "한국어 텍스트"
+        ]
       }
     ]
   },
@@ -67,7 +79,11 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["©", "®", "€"]
+        "values": [
+          "©",
+          "®",
+          "€"
+        ]
       }
     ]
   },
@@ -85,7 +101,10 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["—", "…"]
+        "values": [
+          "—",
+          "…"
+        ]
       }
     ]
   }

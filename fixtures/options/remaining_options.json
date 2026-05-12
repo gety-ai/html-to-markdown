@@ -5,7 +5,7 @@
     "input": {
       "html": "<html><head><title>Test Page</title><meta name='description' content='A test page'></head><body><p>Content</p></body></html>",
       "options": {
-        "extractMetadata": true
+        "extract_metadata": true
       }
     },
     "assertions": [
@@ -31,14 +31,17 @@
     "input": {
       "html": "<p>Before <img src='test.jpg' alt='photo'> After</p>",
       "options": {
-        "skipImages": true
+        "skip_images": true
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Before", "After"]
+        "values": [
+          "Before",
+          "After"
+        ]
       },
       {
         "type": "not_contains",
@@ -53,14 +56,19 @@
     "input": {
       "html": "<p>Text <img src='icon.png' alt='icon'> more text</p>",
       "options": {
-        "keepInlineImagesIn": ["p"]
+        "keep_inline_images_in": [
+          "p"
+        ]
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Text", "more text"]
+        "values": [
+          "Text",
+          "more text"
+        ]
       }
     ]
   },
@@ -70,14 +78,17 @@
     "input": {
       "html": "<ul><li>Outer<ul><li>Inner</li></ul></li></ul>",
       "options": {
-        "listIndentWidth": 4
+        "list_indent_width": 4
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Outer", "Inner"]
+        "values": [
+          "Outer",
+          "Inner"
+        ]
       }
     ]
   },
@@ -85,7 +96,7 @@
     "id": "options_encoding_utf8",
     "description": "UTF-8 encoding hint for special characters",
     "input": {
-      "html": "<p>Caf\u00e9 na\u00efve r\u00e9sum\u00e9</p>",
+      "html": "<p>Café naïve résumé</p>",
       "options": {
         "encoding": "utf-8"
       }
@@ -110,7 +121,9 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Debug test"]
+        "values": [
+          "Debug test"
+        ]
       }
     ]
   }

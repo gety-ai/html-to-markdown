@@ -13,12 +13,19 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Safe content", "More safe content"]
+        "values": [
+          "Safe content",
+          "More safe content"
+        ]
       },
       {
         "type": "not_contains",
         "field": "content",
-        "values": ["<script>", "alert(", "xss"]
+        "values": [
+          "<script>",
+          "alert(",
+          "xss"
+        ]
       }
     ]
   },
@@ -36,12 +43,19 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Click me"]
+        "values": [
+          "Click me"
+        ]
       },
       {
         "type": "not_contains",
         "field": "content",
-        "values": ["onclick", "onmouseover", "alert(", "steal_data"]
+        "values": [
+          "onclick",
+          "onmouseover",
+          "alert(",
+          "steal_data"
+        ]
       }
     ]
   },
@@ -59,12 +73,19 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Before SVG", "After SVG"]
+        "values": [
+          "Before SVG",
+          "After SVG"
+        ]
       },
       {
         "type": "not_contains",
         "field": "content",
-        "values": ["<script>", "alert(", "svg-xss"]
+        "values": [
+          "<script>",
+          "alert(",
+          "svg-xss"
+        ]
       }
     ]
   }

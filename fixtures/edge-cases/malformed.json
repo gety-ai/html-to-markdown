@@ -13,7 +13,9 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["This paragraph is never closed"]
+        "values": [
+          "This paragraph is never closed"
+        ]
       }
     ]
   },
@@ -31,7 +33,9 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["bold and italic"]
+        "values": [
+          "bold and italic"
+        ]
       }
     ]
   },
@@ -49,7 +53,11 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Title", "First paragraph", "Second paragraph"]
+        "values": [
+          "Title",
+          "First paragraph",
+          "Second paragraph"
+        ]
       }
     ]
   },
@@ -63,7 +71,10 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["One", "Two"]
+        "values": [
+          "One",
+          "Two"
+        ]
       }
     ]
   },
@@ -81,7 +92,9 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Deeply nested content"]
+        "values": [
+          "Deeply nested content"
+        ]
       }
     ]
   }

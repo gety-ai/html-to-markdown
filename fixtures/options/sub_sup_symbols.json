@@ -5,14 +5,16 @@
     "input": {
       "html": "<p>H<sub>2</sub>O</p>",
       "options": {
-        "subSymbol": "~"
+        "sub_symbol": "~"
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["~2~"]
+        "values": [
+          "~2~"
+        ]
       }
     ]
   },
@@ -22,14 +24,16 @@
     "input": {
       "html": "<p>x<sup>2</sup></p>",
       "options": {
-        "supSymbol": "^"
+        "sup_symbol": "^"
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["^2^"]
+        "values": [
+          "^2^"
+        ]
       }
     ]
   }

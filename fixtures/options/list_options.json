@@ -5,7 +5,7 @@
     "input": {
       "html": "<ul><li>Parent<ul><li>Child</li></ul></li></ul>",
       "options": {
-        "listIndentType": "Tabs"
+        "list_indent_type": "Tabs"
       }
     },
     "assertions": [
@@ -16,7 +16,10 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Parent", "Child"]
+        "values": [
+          "Parent",
+          "Child"
+        ]
       }
     ]
   },
@@ -33,7 +36,10 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["* Item A", "* Item B"]
+        "values": [
+          "* Item A",
+          "* Item B"
+        ]
       }
     ]
   }

@@ -45,7 +45,7 @@
     "id": "metadata_lang_attribute",
     "description": "Extract language from html lang attribute",
     "input": {
-      "html": "<html lang=\"es\"><head><title>Spanish Page</title></head><body><h1>Hola Mundo</h1><p>Este es un documento en espa\u00f1ol.</p></body></html>",
+      "html": "<html lang=\"es\"><head><title>Spanish Page</title></head><body><h1>Hola Mundo</h1><p>Este es un documento en español.</p></body></html>",
       "options": {
         "extract_metadata": true
       }

@@ -14,7 +14,11 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Navigation", "Content", "Footer"]
+        "values": [
+          "Navigation",
+          "Content",
+          "Footer"
+        ]
       }
     ]
   },
@@ -33,7 +37,10 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Title", "Content"]
+        "values": [
+          "Title",
+          "Content"
+        ]
       },
       {
         "type": "not_contains",
@@ -57,7 +64,10 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["Before", "After"]
+        "values": [
+          "Before",
+          "After"
+        ]
       },
       {
         "type": "not_contains",

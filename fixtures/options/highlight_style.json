@@ -5,14 +5,16 @@
     "input": {
       "html": "<p>Text with <mark>highlighted</mark> here.</p>",
       "options": {
-        "highlightStyle": "DoubleEqual"
+        "highlight_style": "DoubleEqual"
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["==highlighted=="]
+        "values": [
+          "==highlighted=="
+        ]
       }
     ]
   },
@@ -22,14 +24,16 @@
     "input": {
       "html": "<p>Text with <mark>highlighted</mark> text.</p>",
       "options": {
-        "highlightStyle": "Bold"
+        "highlight_style": "Bold"
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["**highlighted**"]
+        "values": [
+          "**highlighted**"
+        ]
       }
     ]
   },
@@ -39,14 +43,16 @@
     "input": {
       "html": "<p>Text with <mark>plain</mark> content.</p>",
       "options": {
-        "highlightStyle": "None"
+        "highlight_style": "None"
       }
     },
     "assertions": [
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["plain"]
+        "values": [
+          "plain"
+        ]
       },
       {
         "type": "not_contains",

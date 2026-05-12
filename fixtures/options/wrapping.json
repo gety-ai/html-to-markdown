@@ -6,7 +6,7 @@
       "html": "<p>This is a long paragraph that should be wrapped at the specified column width when the wrap option is enabled.</p>",
       "options": {
         "wrap": true,
-        "wrapWidth": 40
+        "wrap_width": 40
       }
     },
     "assertions": [
@@ -17,7 +17,9 @@
       {
         "type": "contains_all",
         "field": "content",
-        "values": ["This is a long paragraph"]
+        "values": [
+          "This is a long paragraph"
+        ]
       }
     ]
   },
