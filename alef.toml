@@ -253,7 +253,7 @@ e2e = "cd e2e/r && Rscript -e \"devtools::load_all('../../packages/r'); testthat
 
 [crates.test.wasm]
 precondition = "command -v pnpm >/dev/null 2>&1"
-before = "wasm-pack build crates/html-to-markdown-wasm --release --target bundler && cd e2e/wasm && pnpm install"
+before = "cd crates/html-to-markdown-wasm && pnpm run build:all && cd ../.. && cd e2e/wasm && pnpm install"
 e2e = "cd e2e/wasm && pnpm test"
 
 [crates.test.rust]
@@ -426,8 +426,7 @@ outputFormat = "OutputFormat"
 
 [crates.e2e.call.overrides.ruby]
 module = "html_to_markdown"
-options_type = "Kreuzberg::ConversionOptions"
-result_is_simple = true
+options_type = "HtmlToMarkdownRs::ConversionOptions"
 
 [crates.e2e.call.overrides.ruby.enum_fields]
 headingStyle = "HeadingStyle"

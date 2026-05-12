@@ -20,7 +20,7 @@
 
 use std::cell::RefCell;
 use std::ffi::c_void;
-use std::ffi::{CStr, CString, c_char};
+use std::ffi::{c_char, CStr, CString};
 use std::sync::Arc;
 
 thread_local! {
@@ -593,7 +593,11 @@ pub unsafe extern "C" fn htm_header_metadata_is_valid(
     let obj = unsafe { &*this };
 
     let result = obj.is_valid();
-    if result { 1 } else { 0 }
+    if result {
+        1
+    } else {
+        0
+    }
 }
 
 /// Create a `LinkMetadata` from a JSON string. Returns null on failure.
