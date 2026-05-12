@@ -411,7 +411,6 @@ module = "HtmlToMarkdown"
 class = "HtmlToMarkdown"
 function = "convert"
 options_type = "ConversionOptions"
-result_is_simple = true
 
 [crates.e2e.call.overrides.php.enum_fields]
 headingStyle = "HeadingStyle"
