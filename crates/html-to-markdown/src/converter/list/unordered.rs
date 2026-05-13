@@ -76,7 +76,7 @@ pub fn handle_ul(
         };
 
         let visit_result = {
-            let mut visitor = visitor_handle.borrow_mut();
+            let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_list_start(&node_ctx, false)
         };
         match visit_result {
@@ -155,7 +155,7 @@ pub fn handle_ul(
         let list_content = &output[list_output_start..];
 
         let visit_result = {
-            let mut visitor = visitor_handle.borrow_mut();
+            let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_list_end(&node_ctx, false, list_content)
         };
         match visit_result {

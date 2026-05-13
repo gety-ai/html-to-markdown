@@ -105,7 +105,7 @@ pub fn handle_blockquote(
             is_inline: false,
         };
 
-        let mut visitor_ref = visitor.borrow_mut();
+        let mut visitor_ref = visitor.lock().expect("visitor mutex poisoned");
         match visitor_ref.visit_blockquote(&node_ctx, trimmed_content, ctx.blockquote_depth) {
             VisitResult::Continue => {}
             VisitResult::Custom(custom) => {

@@ -82,7 +82,7 @@ pub fn handle_ol(
         };
 
         let visit_result = {
-            let mut visitor = visitor_handle.borrow_mut();
+            let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_list_start(&node_ctx, true)
         };
         match visit_result {
@@ -161,7 +161,7 @@ pub fn handle_ol(
         let list_content = &output[list_output_start..];
 
         let visit_result = {
-            let mut visitor = visitor_handle.borrow_mut();
+            let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_list_end(&node_ctx, true, list_content)
         };
         match visit_result {

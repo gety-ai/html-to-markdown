@@ -6,8 +6,7 @@
 
 #![cfg(feature = "visitor")]
 
-use std::cell::RefCell;
-use std::rc::Rc;
+use std::sync::{Arc, Mutex};
 
 use html_to_markdown_rs::visitor::{HtmlVisitor, VisitorHandle};
 use html_to_markdown_rs::{ConversionError, ConversionOptions, ConversionResult};
@@ -30,8 +29,8 @@ struct EmptyVisitor;
 
 impl HtmlVisitor for EmptyVisitor {}
 
-fn make_visitor() -> Rc<RefCell<dyn HtmlVisitor>> {
-    Rc::new(RefCell::new(EmptyVisitor))
+fn make_visitor() -> Arc<Mutex<dyn HtmlVisitor>> {
+    Arc::new(Mutex::new(EmptyVisitor))
 }
 
 #[test]

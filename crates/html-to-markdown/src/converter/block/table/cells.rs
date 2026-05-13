@@ -242,7 +242,7 @@ pub fn convert_table_row(
             };
 
             let visit_result = {
-                let mut visitor = visitor_handle.borrow_mut();
+                let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_table_row(&node_ctx, &cell_contents, is_header)
             };
             match visit_result {

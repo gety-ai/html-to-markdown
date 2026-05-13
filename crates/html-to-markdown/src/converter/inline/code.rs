@@ -139,7 +139,7 @@ fn handle_code(
                 };
 
                 let visit_result = {
-                    let mut visitor = visitor_handle.borrow_mut();
+                    let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                     visitor.visit_code_inline(&node_ctx, trimmed)
                 };
                 match visit_result {

@@ -9,8 +9,7 @@
 
 use html_to_markdown_rs::visitor::{HtmlVisitor, NodeContext, VisitResult, VisitorHandle};
 use html_to_markdown_rs::{ConversionError, ConversionOptions, ConversionResult};
-use std::cell::RefCell;
-use std::rc::Rc;
+use std::sync::{Arc, Mutex};
 
 fn convert(
     html: &str,
@@ -158,7 +157,7 @@ fn test_issue_187_content_filter() {
     </article>
     "#;
 
-    let visitor = Rc::new(RefCell::new(ContentFilter::default()));
+    let visitor = Arc::new(Mutex::new(ContentFilter::default()));
     let result = convert(html, None, Some(visitor.clone()))
         .unwrap()
         .content
@@ -166,7 +165,7 @@ fn test_issue_187_content_filter() {
 
     println!("Converted Markdown:\n{result}");
     println!("\nSkipped Elements:");
-    for (tag, info) in &visitor.borrow().skipped_elements {
+    for (tag, info) in &visitor.lock().expect("visitor mutex poisoned").skipped_elements {
         println!("- {tag}: {info}");
     }
 
@@ -190,7 +189,7 @@ fn test_issue_187_content_filter() {
     );
 
     // Verify skipped elements were tracked
-    let borrowed = visitor.borrow();
+    let borrowed = visitor.lock().expect("visitor mutex poisoned");
     assert!(
         borrowed.skipped_elements.iter().any(|(tag, _)| tag == "div"),
         "Should have skipped ad divs"

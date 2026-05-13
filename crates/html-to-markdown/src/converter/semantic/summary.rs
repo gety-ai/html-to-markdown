@@ -55,7 +55,7 @@ pub fn handle_details(
                 is_inline: false,
             };
             let visit_result = {
-                let mut visitor = visitor_handle.borrow_mut();
+                let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_details(&node_ctx, open)
             };
             match visit_result {
@@ -193,7 +193,7 @@ pub fn handle_summary(
                 is_inline: false,
             };
             let visit_result = {
-                let mut visitor = visitor_handle.borrow_mut();
+                let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_summary(&node_ctx, &trimmed)
             };
             match visit_result {

@@ -226,7 +226,7 @@ pub fn process_text_node(
             is_inline: true,
         };
 
-        let mut visitor = visitor_handle.borrow_mut();
+        let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
         match visitor.visit_text(&node_ctx, &processed_text) {
             VisitResult::Continue => processed_text,
             VisitResult::Custom(custom) => {

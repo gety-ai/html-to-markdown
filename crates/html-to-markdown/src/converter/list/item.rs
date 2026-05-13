@@ -280,7 +280,7 @@ pub fn handle_li(
             };
 
             let visit_result = {
-                let mut visitor = visitor_handle.borrow_mut();
+                let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_list_item(&node_ctx, ctx.in_ordered_list, &marker, &text_content)
             };
             match visit_result {

@@ -70,7 +70,7 @@ pub fn handle_figure(
                 is_inline: false,
             };
             let visit_result = {
-                let mut visitor = visitor_handle.borrow_mut();
+                let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_figure_start(&node_ctx)
             };
             match visit_result {
@@ -87,7 +87,7 @@ pub fn handle_figure(
                     let safe_start = start_pos.min(output.len());
                     let figure_output = output[safe_start..].to_owned();
                     let end_result = {
-                        let mut visitor = visitor_handle.borrow_mut();
+                        let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                         visitor.visit_figure_end(&node_ctx, &figure_output)
                     };
                     match end_result {
@@ -186,7 +186,7 @@ pub fn handle_figure(
             let safe_start = figure_start.min(output.len());
             let figure_output = output[safe_start..].to_owned();
             let visit_result = {
-                let mut visitor = visitor_handle.borrow_mut();
+                let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_figure_end(&node_ctx, &figure_output)
             };
             match visit_result {
@@ -275,7 +275,7 @@ pub fn handle_figcaption(
                 is_inline: false,
             };
             let visit_result = {
-                let mut visitor = visitor_handle.borrow_mut();
+                let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_figcaption(&node_ctx, &text)
             };
             match visit_result {

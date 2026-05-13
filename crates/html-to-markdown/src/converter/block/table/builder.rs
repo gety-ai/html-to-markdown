@@ -125,7 +125,7 @@ pub fn handle_table(
             };
 
             let visit_result = {
-                let mut visitor = visitor_handle.borrow_mut();
+                let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_table_start(&node_ctx)
             };
             match visit_result {
@@ -406,7 +406,7 @@ pub fn handle_table(
             let table_content = &output[table_output_start..];
 
             let visit_result = {
-                let mut visitor = visitor_handle.borrow_mut();
+                let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_table_end(&node_ctx, table_content)
             };
             match visit_result {

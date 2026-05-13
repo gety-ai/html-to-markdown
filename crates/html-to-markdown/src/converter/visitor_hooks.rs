@@ -67,7 +67,7 @@ pub fn handle_visitor_element_start(
     };
 
     let visitor_start_result = {
-        let mut visitor = visitor_handle.borrow_mut();
+        let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
         visitor.visit_element_start(&node_ctx)
     };
 
@@ -80,7 +80,7 @@ pub fn handle_visitor_element_start(
             // For custom output, still call visit_element_end (except for tables)
             if !matches!(tag_name, "table") {
                 let element_content = &custom_output;
-                let mut visitor = visitor_handle.borrow_mut();
+                let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 let _ = visitor.visit_element_end(&node_ctx, element_content);
             }
 
@@ -156,7 +156,7 @@ pub fn handle_visitor_element_end(
     let safe_start = crate::converter::utility::content::floor_char_boundary(output, safe_start);
     let element_content = &output[safe_start..];
 
-    let mut visitor = visitor_handle.borrow_mut();
+    let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
     match visitor.visit_element_end(&node_ctx, element_content) {
         VisitResult::Continue => {}
         VisitResult::Custom(custom) => {

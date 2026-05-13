@@ -68,7 +68,7 @@ pub fn handle_form(
                 is_inline: false,
             };
             let visit_result = {
-                let mut visitor = visitor_handle.borrow_mut();
+                let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_form(&node_ctx, action.as_deref(), method.as_deref())
             };
             match visit_result {
@@ -337,7 +337,7 @@ pub fn handle_input(
                 is_inline: true,
             };
             let visit_result = {
-                let mut visitor = visitor_handle.borrow_mut();
+                let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_input(&node_ctx, &input_type, name.as_deref(), value.as_deref())
             };
             match visit_result {
@@ -560,7 +560,7 @@ pub fn handle_button(
                 is_inline: true,
             };
             let visit_result = {
-                let mut visitor = visitor_handle.borrow_mut();
+                let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_button(&node_ctx, &text)
             };
             match visit_result {

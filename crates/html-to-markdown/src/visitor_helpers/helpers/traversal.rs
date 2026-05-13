@@ -4,8 +4,7 @@
 //! safely handling optional visitors and translating `VisitResult` into concrete
 //! control flow decisions.
 
-use std::cell::RefCell;
-use std::rc::Rc;
+use std::sync::{Arc, Mutex};
 
 use crate::error::{ConversionError, Result};
 use crate::visitor::HtmlVisitor;
@@ -25,7 +24,7 @@ use super::content::VisitorDispatch;
 ///
 /// # Parameters
 ///
-/// - `visitor`: Optional visitor (wrapped in Rc<`RefCell`<>>)
+/// - `visitor`: Optional visitor (wrapped in `Arc<Mutex<>>`)
 /// - `callback`: Closure that invokes the appropriate visitor method
 ///
 /// # Returns
@@ -41,7 +40,7 @@ use super::content::VisitorDispatch;
 ///
 /// - If the visitor panics during callback, the panic propagates normally
 /// - If the visitor returns `VisitResult::Error`, this is converted to `Error::Visitor`
-/// - `RefCell` borrow failures panic (should never happen with correct usage)
+/// - `Mutex` lock failures panic on poison (should never happen with correct usage)
 ///
 /// # Performance
 ///
@@ -64,7 +63,7 @@ use super::content::VisitorDispatch;
 /// ```
 #[allow(dead_code)]
 #[inline]
-pub fn dispatch_visitor<F>(visitor: &Option<Rc<RefCell<dyn HtmlVisitor>>>, callback: F) -> Result<VisitorDispatch>
+pub fn dispatch_visitor<F>(visitor: &Option<Arc<Mutex<dyn HtmlVisitor + Send>>>, callback: F) -> Result<VisitorDispatch>
 where
     F: FnOnce(&mut dyn HtmlVisitor) -> VisitResult,
 {
@@ -72,7 +71,7 @@ where
         return Ok(VisitorDispatch::Continue);
     };
 
-    let mut visitor_ref = visitor_rc.borrow_mut();
+    let mut visitor_ref = visitor_rc.lock().expect("visitor mutex poisoned");
     let result = callback(&mut *visitor_ref);
 
     match result {
@@ -119,7 +118,7 @@ mod tests {
 
     #[test]
     fn test_dispatch_visitor_none() {
-        let visitor: Option<Rc<RefCell<dyn HtmlVisitor>>> = None;
+        let visitor: Option<Arc<Mutex<dyn HtmlVisitor + Send>>> = None;
 
         let result = dispatch_visitor(&visitor, |v| {
             let ctx = NodeContext {
@@ -140,7 +139,7 @@ mod tests {
 
     #[test]
     fn test_dispatch_visitor_continue() {
-        let visitor: Rc<RefCell<dyn HtmlVisitor>> = Rc::new(RefCell::new(TestVisitor {
+        let visitor: Arc<Mutex<dyn HtmlVisitor + Send>> = Arc::new(Mutex::new(TestVisitor {
             mode: TestMode::Continue,
         }));
         let visitor_opt = Some(visitor);
@@ -162,7 +161,7 @@ mod tests {
 
     #[test]
     fn test_dispatch_visitor_custom() {
-        let visitor: Rc<RefCell<dyn HtmlVisitor>> = Rc::new(RefCell::new(TestVisitor { mode: TestMode::Custom }));
+        let visitor: Arc<Mutex<dyn HtmlVisitor + Send>> = Arc::new(Mutex::new(TestVisitor { mode: TestMode::Custom }));
         let visitor_opt = Some(visitor);
 
         let ctx = NodeContext {
@@ -183,7 +182,7 @@ mod tests {
 
     #[test]
     fn test_dispatch_visitor_skip() {
-        let visitor: Rc<RefCell<dyn HtmlVisitor>> = Rc::new(RefCell::new(TestVisitor { mode: TestMode::Skip }));
+        let visitor: Arc<Mutex<dyn HtmlVisitor + Send>> = Arc::new(Mutex::new(TestVisitor { mode: TestMode::Skip }));
         let visitor_opt = Some(visitor);
 
         let ctx = NodeContext {
@@ -203,7 +202,7 @@ mod tests {
 
     #[test]
     fn test_dispatch_visitor_preserve_html() {
-        let visitor: Rc<RefCell<dyn HtmlVisitor>> = Rc::new(RefCell::new(TestVisitor {
+        let visitor: Arc<Mutex<dyn HtmlVisitor + Send>> = Arc::new(Mutex::new(TestVisitor {
             mode: TestMode::PreserveHtml,
         }));
         let visitor_opt = Some(visitor);
@@ -225,7 +224,7 @@ mod tests {
 
     #[test]
     fn test_dispatch_visitor_error() {
-        let visitor: Rc<RefCell<dyn HtmlVisitor>> = Rc::new(RefCell::new(TestVisitor { mode: TestMode::Error }));
+        let visitor: Arc<Mutex<dyn HtmlVisitor + Send>> = Arc::new(Mutex::new(TestVisitor { mode: TestMode::Error }));
         let visitor_opt = Some(visitor);
 
         let ctx = NodeContext {

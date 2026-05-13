@@ -107,7 +107,7 @@ pub fn handle_dt(
             is_inline: false,
         };
         let visit_result = {
-            let mut visitor = visitor_handle.borrow_mut();
+            let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_definition_term(&node_ctx, &trimmed)
         };
         match visit_result {
@@ -192,7 +192,7 @@ pub fn handle_dd(
             is_inline: false,
         };
         let visit_result = {
-            let mut visitor = visitor_handle.borrow_mut();
+            let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_definition_description(&node_ctx, &trimmed)
         };
         match visit_result {

@@ -2,7 +2,7 @@
 title: "Python API Reference"
 ---
 
-## Python API Reference <span class="version-badge">v3.4.0</span>
+## Python API Reference <span class="version-badge">v3.4.1</span>
 
 ### Functions
 
@@ -1006,9 +1006,11 @@ Annotations describe formatting (bold, italic, etc.) and links within a node's t
 
 ##### VisitorHandle
 
-Type alias for a visitor handle (Rc-wrapped `RefCell` for interior mutability).
+Type alias for a visitor handle (`Arc`-wrapped `Mutex` for thread-safe shared mutation).
 
-This allows visitors to be passed around and shared while still being mutable.
+`Send + Sync` so that types embedding a `VisitorHandle` (e.g. `ConversionOptions`)
+can be shared across threads — required by callers that stash configs inside
+axum/rmcp/tokio Send-bound contexts.
 
 
 ---

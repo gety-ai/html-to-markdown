@@ -162,7 +162,10 @@ fn walk_plain(
                     parent_tag: None,
                     is_inline: true,
                 };
-                let result = visitor_handle.borrow_mut().visit_text(&node_ctx, text_str);
+                let result = visitor_handle
+                    .lock()
+                    .expect("visitor mutex poisoned")
+                    .visit_text(&node_ctx, text_str);
                 match result {
                     VisitResult::Skip => return,
                     VisitResult::Custom(custom) => {
@@ -219,13 +222,19 @@ fn walk_plain(
                     parent_tag: None,
                     is_inline: !is_block_level_element(tag_str),
                 };
-                let result = visitor_handle.borrow_mut().visit_element_start(&node_ctx);
+                let result = visitor_handle
+                    .lock()
+                    .expect("visitor mutex poisoned")
+                    .visit_element_start(&node_ctx);
                 match result {
                     VisitResult::Skip => return,
                     VisitResult::Custom(custom) => {
                         buf.push_str(&custom);
                         // Still call visit_element_end with the custom content as context.
-                        let end_result = visitor_handle.borrow_mut().visit_element_end(&node_ctx, &custom);
+                        let end_result = visitor_handle
+                            .lock()
+                            .expect("visitor mutex poisoned")
+                            .visit_element_end(&node_ctx, &custom);
                         match end_result {
                             VisitResult::Custom(replacement) => {
                                 let trim_len = buf.len() - custom.len();
@@ -342,7 +351,8 @@ fn walk_plain(
                 let safe_start = element_output_start.min(buf.len());
                 let element_content = &buf[safe_start..];
                 let result = visitor_handle
-                    .borrow_mut()
+                    .lock()
+                    .expect("visitor mutex poisoned")
                     .visit_element_end(&node_ctx, element_content);
                 match result {
                     VisitResult::Custom(custom) => {

@@ -3,8 +3,7 @@
 
 use html_to_markdown_rs::visitor::{HtmlVisitor, NodeContext, VisitResult, VisitorHandle};
 use html_to_markdown_rs::{ConversionError, ConversionOptions, ConversionResult};
-use std::cell::RefCell;
-use std::rc::Rc;
+use std::sync::{Arc, Mutex};
 
 fn convert(
     html: &str,
@@ -40,7 +39,7 @@ impl HtmlVisitor for CodeVisitor {
 #[test]
 fn test_code_block_visitor() {
     let html = "<pre><code class=\"language-rust\">fn main() {}\n</code></pre>";
-    let visitor = Rc::new(RefCell::new(CodeVisitor {
+    let visitor = Arc::new(Mutex::new(CodeVisitor {
         code_blocks: vec![],
         inline_codes: vec![],
     }));
@@ -48,7 +47,7 @@ fn test_code_block_visitor() {
     let result = convert(html, None, Some(visitor.clone()));
     assert!(result.is_ok());
 
-    let visitor_ref = visitor.borrow();
+    let visitor_ref = visitor.lock().expect("visitor mutex poisoned");
     assert_eq!(visitor_ref.code_blocks.len(), 1);
     assert!(visitor_ref.code_blocks[0].contains("rust"));
 }
@@ -56,7 +55,7 @@ fn test_code_block_visitor() {
 #[test]
 fn test_inline_code_visitor() {
     let html = "<p>Use <code>println!</code> to print</p>";
-    let visitor = Rc::new(RefCell::new(CodeVisitor {
+    let visitor = Arc::new(Mutex::new(CodeVisitor {
         code_blocks: vec![],
         inline_codes: vec![],
     }));
@@ -64,7 +63,7 @@ fn test_inline_code_visitor() {
     let result = convert(html, None, Some(visitor.clone()));
     assert!(result.is_ok());
 
-    let visitor_ref = visitor.borrow();
+    let visitor_ref = visitor.lock().expect("visitor mutex poisoned");
     assert_eq!(visitor_ref.inline_codes.len(), 1);
     assert_eq!(visitor_ref.inline_codes[0], "println!");
 }
@@ -81,7 +80,7 @@ fn test_code_block_skip() {
     }
 
     let html = "<pre><code>skipped code</code></pre>";
-    let visitor = Rc::new(RefCell::new(SkipCodeVisitor));
+    let visitor = Arc::new(Mutex::new(SkipCodeVisitor));
 
     let result = convert(html, None, Some(visitor));
     assert!(result.is_ok());
@@ -104,7 +103,7 @@ fn test_code_block_language_detection() {
     ];
 
     for (html, expected_lang) in html_patterns {
-        let visitor = Rc::new(RefCell::new(CodeVisitor {
+        let visitor = Arc::new(Mutex::new(CodeVisitor {
             code_blocks: vec![],
             inline_codes: vec![],
         }));
@@ -112,7 +111,7 @@ fn test_code_block_language_detection() {
         let result = convert(html, None, Some(visitor.clone()));
         assert!(result.is_ok(), "Failed to convert: {html}");
 
-        let visitor_ref = visitor.borrow();
+        let visitor_ref = visitor.lock().expect("visitor mutex poisoned");
         assert_eq!(visitor_ref.code_blocks.len(), 1);
         if expected_lang != "unknown" {
             assert!(visitor_ref.code_blocks[0].starts_with(&format!("[{expected_lang}]")));

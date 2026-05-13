@@ -30,7 +30,7 @@ use super::types::{NodeContext, VisitResult};
 /// - `visit_text` is the most frequently called method (~100+ times per document)
 /// - Return `VisitResult::Continue` quickly for elements you don't need to customize
 /// - Avoid heavy computation in visitor methods; consider caching if needed
-pub trait HtmlVisitor: std::fmt::Debug {
+pub trait HtmlVisitor: std::fmt::Debug + Send {
     /// Visit text nodes (most frequent callback - ~100+ per document).
     ///
     /// # Arguments

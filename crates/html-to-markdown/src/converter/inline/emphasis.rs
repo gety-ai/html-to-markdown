@@ -125,7 +125,7 @@ fn handle_strong(
             };
 
             let visit_result = {
-                let mut visitor = visitor_handle.borrow_mut();
+                let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_strong(&node_ctx, &text_content)
             };
             match visit_result {
@@ -261,7 +261,7 @@ fn handle_emphasis(
             };
 
             let visit_result = {
-                let mut visitor = visitor_handle.borrow_mut();
+                let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_emphasis(&node_ctx, &text_content)
             };
             match visit_result {

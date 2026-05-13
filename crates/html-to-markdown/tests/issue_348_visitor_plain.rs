@@ -5,8 +5,7 @@
 
 #![cfg(feature = "visitor")]
 
-use std::cell::RefCell;
-use std::rc::Rc;
+use std::sync::{Arc, Mutex};
 
 use html_to_markdown_rs::visitor::{HtmlVisitor, VisitResult};
 use html_to_markdown_rs::{ConversionOptions, NodeContext, OutputFormat};
@@ -51,7 +50,7 @@ fn test_visitor_custom_end_result_honoured_for_plain_output() {
     let input = "before <custom>foo</custom> after";
     let options = ConversionOptions {
         output_format: OutputFormat::Plain,
-        visitor: Some(Rc::new(RefCell::new(CustomVisitor::default()))),
+        visitor: Some(Arc::new(Mutex::new(CustomVisitor::default()))),
         ..Default::default()
     };
     let output = html_to_markdown_rs::convert(input, Some(options))
@@ -80,7 +79,7 @@ fn test_visitor_skip_end_result_honoured_for_plain_output() {
     let input = "<p>keep <span>drop this</span> keep</p>";
     let options = ConversionOptions {
         output_format: OutputFormat::Plain,
-        visitor: Some(Rc::new(RefCell::new(DropSpanVisitor))),
+        visitor: Some(Arc::new(Mutex::new(DropSpanVisitor))),
         ..Default::default()
     };
     let output = html_to_markdown_rs::convert(input, Some(options))

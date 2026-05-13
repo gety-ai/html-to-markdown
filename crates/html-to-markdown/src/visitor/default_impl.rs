@@ -2,13 +2,14 @@
 //!
 //! This module provides standard visitor patterns and helpers for common use cases.
 
-use std::cell::RefCell;
-use std::rc::Rc;
+use std::sync::{Arc, Mutex};
 
-/// Type alias for a visitor handle (Rc-wrapped `RefCell` for interior mutability).
+/// Type alias for a visitor handle (`Arc`-wrapped `Mutex` for thread-safe shared mutation).
 ///
-/// This allows visitors to be passed around and shared while still being mutable.
-pub type VisitorHandle = Rc<RefCell<dyn super::traits::HtmlVisitor>>;
+/// `Send + Sync` so that types embedding a `VisitorHandle` (e.g. `ConversionOptions`)
+/// can be shared across threads — required by callers that stash configs inside
+/// axum/rmcp/tokio Send-bound contexts.
+pub type VisitorHandle = Arc<Mutex<dyn super::traits::HtmlVisitor + Send>>;
 
 #[cfg(test)]
 mod tests {
@@ -41,10 +42,10 @@ mod tests {
             text_count: 0,
         };
 
-        let handle = std::rc::Rc::new(std::cell::RefCell::new(visitor));
+        let handle = std::sync::Arc::new(std::sync::Mutex::new(visitor));
 
         {
-            let mut v = handle.borrow_mut();
+            let mut v = handle.lock().expect("visitor mutex poisoned");
             let ctx = NodeContext {
                 node_type: NodeType::Text,
                 tag_name: "p".to_string(),
@@ -57,7 +58,7 @@ mod tests {
             v.visit_text(&ctx, "test");
         }
 
-        let v = handle.borrow();
+        let v = handle.lock().expect("visitor mutex poisoned");
         assert_eq!(v.text_count, 1);
     }
 }

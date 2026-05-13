@@ -99,7 +99,7 @@ pub fn handle_audio(
             is_inline: false,
         };
         let visit_result = {
-            let mut visitor = visitor_handle.borrow_mut();
+            let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_audio(&node_ctx, src_opt)
         };
         match visit_result {
@@ -211,7 +211,7 @@ pub fn handle_video(
             is_inline: false,
         };
         let visit_result = {
-            let mut visitor = visitor_handle.borrow_mut();
+            let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_video(&node_ctx, src_opt)
         };
         match visit_result {
@@ -344,7 +344,7 @@ pub fn handle_iframe(
             is_inline: false,
         };
         let visit_result = {
-            let mut visitor = visitor_handle.borrow_mut();
+            let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_iframe(&node_ctx, src_opt)
         };
         match visit_result {

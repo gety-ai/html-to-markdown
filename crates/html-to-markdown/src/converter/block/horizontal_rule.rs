@@ -49,7 +49,7 @@ pub fn handle(
             is_inline: false,
         };
         let visit_result = {
-            let mut visitor = visitor_handle.borrow_mut();
+            let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_horizontal_rule(&node_ctx)
         };
         match visit_result {

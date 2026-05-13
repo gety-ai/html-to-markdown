@@ -9,8 +9,7 @@
 
 use html_to_markdown_rs::visitor::{HtmlVisitor, NodeContext, NodeType, VisitResult, VisitorHandle};
 use html_to_markdown_rs::{ConversionError, ConversionOptions, ConversionResult};
-use std::cell::RefCell;
-use std::rc::Rc;
+use std::sync::{Arc, Mutex};
 
 /// Test shim that bridges the legacy 3-arg call shape used throughout this file
 /// onto the public 2-arg `convert(html, options)` API. The visitor (if any) is
@@ -38,7 +37,7 @@ fn test_visitor_form_custom_overrides_preprocessing() {
         }
     }
     let html = r#"<div><form action="/submit" method="POST"><label>Name: <input type="text" name="name"></label><button type="submit">Submit</button></form></div>"#;
-    let visitor: VisitorHandle = Rc::new(RefCell::new(FormVisitor));
+    let visitor: VisitorHandle = Arc::new(Mutex::new(FormVisitor));
     let result = convert(html, None, Some(visitor))
         .expect("conversion failed")
         .content
@@ -66,7 +65,7 @@ fn test_visitor_input_custom_inside_preprocessed_form() {
         }
     }
     let html = r#"<form><input type="text" name="username"></form>"#;
-    let visitor: VisitorHandle = Rc::new(RefCell::new(InputVisitor));
+    let visitor: VisitorHandle = Arc::new(Mutex::new(InputVisitor));
     let result = convert(html, None, Some(visitor))
         .expect("conversion failed")
         .content
@@ -91,7 +90,7 @@ fn test_visitor_figure_start_end_both_called() {
         }
     }
     let html = r#"<figure><img src="test.jpg" alt="test"><figcaption>Caption</figcaption></figure>"#;
-    let visitor: VisitorHandle = Rc::new(RefCell::new(FigureVisitor));
+    let visitor: VisitorHandle = Arc::new(Mutex::new(FigureVisitor));
     let result = convert(html, None, Some(visitor))
         .expect("conversion failed")
         .content
@@ -191,7 +190,7 @@ impl HtmlVisitor for ContextCheckingVisitor {
 #[test]
 fn test_custom_visitor_transforms_text() {
     let html = r"<p>Hello world</p>";
-    let visitor = Rc::new(RefCell::new(CustomizingVisitor));
+    let visitor = Arc::new(Mutex::new(CustomizingVisitor));
 
     let result = convert(html, None, Some(visitor))
         .expect("conversion failed")
@@ -204,7 +203,7 @@ fn test_custom_visitor_transforms_text() {
 #[test]
 fn test_custom_visitor_transforms_links() {
     let html = r#"<a href="https://example.com">Example</a>"#;
-    let visitor = Rc::new(RefCell::new(CustomizingVisitor));
+    let visitor = Arc::new(Mutex::new(CustomizingVisitor));
 
     let result = convert(html, None, Some(visitor))
         .expect("conversion failed")
@@ -220,7 +219,7 @@ fn test_custom_visitor_transforms_links() {
 #[test]
 fn test_custom_visitor_transforms_images() {
     let html = r#"<img src="/test.png" alt="Test">"#;
-    let visitor = Rc::new(RefCell::new(CustomizingVisitor));
+    let visitor = Arc::new(Mutex::new(CustomizingVisitor));
 
     let result = convert(html, None, Some(visitor))
         .expect("conversion failed")
@@ -236,7 +235,7 @@ fn test_custom_visitor_transforms_images() {
 #[test]
 fn test_custom_visitor_transforms_headings() {
     let html = r"<h2>My Heading</h2>";
-    let visitor = Rc::new(RefCell::new(CustomizingVisitor));
+    let visitor = Arc::new(Mutex::new(CustomizingVisitor));
 
     let result = convert(html, None, Some(visitor))
         .expect("conversion failed")
@@ -252,7 +251,7 @@ fn test_custom_visitor_transforms_headings() {
 #[test]
 fn test_skipping_visitor_removes_links() {
     let html = r#"<p>Text with <a href="https://example.com">a link</a> inside.</p>"#;
-    let visitor = Rc::new(RefCell::new(SkippingVisitor {
+    let visitor = Arc::new(Mutex::new(SkippingVisitor {
         skip_links: true,
         skip_images: false,
     }));
@@ -271,7 +270,7 @@ fn test_skipping_visitor_removes_links() {
 #[test]
 fn test_skipping_visitor_removes_images() {
     let html = r#"<p>Text <img src="/test.png" alt="Test"> more text</p>"#;
-    let visitor = Rc::new(RefCell::new(SkippingVisitor {
+    let visitor = Arc::new(Mutex::new(SkippingVisitor {
         skip_links: false,
         skip_images: true,
     }));
@@ -290,7 +289,7 @@ fn test_skipping_visitor_removes_images() {
 #[test]
 fn test_preserving_visitor_keeps_html() {
     let html = r#"<a href="https://example.com" class="special">Example</a>"#;
-    let visitor = Rc::new(RefCell::new(PreservingVisitor { preserve_links: true }));
+    let visitor = Arc::new(Mutex::new(PreservingVisitor { preserve_links: true }));
 
     let result = convert(html, None, Some(visitor))
         .expect("conversion failed")
@@ -306,7 +305,7 @@ fn test_preserving_visitor_keeps_html() {
 #[test]
 fn test_visitor_receives_node_context() {
     let html = r#"<h1 id="title" class="main">Title</h1>"#;
-    let visitor = Rc::new(RefCell::new(ContextCheckingVisitor::default()));
+    let visitor = Arc::new(Mutex::new(ContextCheckingVisitor::default()));
 
     let _result = convert(html, None, Some(visitor)).expect("conversion failed");
 }
@@ -329,7 +328,7 @@ fn test_visitor_works_with_complex_document() {
         </html>
     "#;
 
-    let visitor = Rc::new(RefCell::new(CustomizingVisitor));
+    let visitor = Arc::new(Mutex::new(CustomizingVisitor));
 
     let result = convert(html, None, Some(visitor))
         .expect("conversion failed")
@@ -359,7 +358,7 @@ fn test_visitor_with_conversion_options() {
         ..Default::default()
     };
 
-    let visitor = Rc::new(RefCell::new(ContinueVisitor));
+    let visitor = Arc::new(Mutex::new(ContinueVisitor));
 
     let result = convert(html, Some(options), Some(visitor))
         .expect("conversion failed")
@@ -384,7 +383,7 @@ fn test_visitor_continue_result_produces_default_markdown() {
     }
 
     let html = r"<h1>Title</h1>";
-    let visitor = Rc::new(RefCell::new(ContinueVisitor));
+    let visitor = Arc::new(Mutex::new(ContinueVisitor));
 
     let result = convert(html, None, Some(visitor))
         .expect("conversion failed")
@@ -416,7 +415,7 @@ fn test_visitor_skip_vs_continue() {
     }
 
     let html = r#"<p><a href="/first">First</a> and <a href="/second">Second</a></p>"#;
-    let visitor = Rc::new(RefCell::new(SelectiveSkipper { skip_first_link: true }));
+    let visitor = Arc::new(Mutex::new(SelectiveSkipper { skip_first_link: true }));
 
     let result = convert(html, None, Some(visitor))
         .expect("conversion failed")
@@ -430,7 +429,7 @@ fn test_visitor_skip_vs_continue() {
 #[test]
 fn test_multiple_elements_of_same_type() {
     let html = r"<h1>First</h1><h2>Second</h2><h3>Third</h3>";
-    let visitor = Rc::new(RefCell::new(CustomizingVisitor));
+    let visitor = Arc::new(Mutex::new(CustomizingVisitor));
 
     let result = convert(html, None, Some(visitor))
         .expect("conversion failed")
@@ -445,7 +444,7 @@ fn test_multiple_elements_of_same_type() {
 #[test]
 fn test_nested_elements_invoke_visitor() {
     let html = r#"<p>Text with <a href="/url">a <strong>bold</strong> link</a></p>"#;
-    let visitor = Rc::new(RefCell::new(CustomizingVisitor));
+    let visitor = Arc::new(Mutex::new(CustomizingVisitor));
 
     let result = convert(html, None, Some(visitor))
         .expect("conversion failed")
@@ -468,7 +467,7 @@ fn test_visitor_error_stops_conversion() {
     }
 
     let html = "<p>text</p>";
-    let visitor = Rc::new(RefCell::new(ErrorVisitor));
+    let visitor = Arc::new(Mutex::new(ErrorVisitor));
     let result = convert(html, None, Some(visitor));
 
     assert!(result.is_err(), "Should return error when visitor returns Error");
@@ -491,7 +490,7 @@ fn test_visitor_code_block() {
     }
 
     let html = r#"<pre><code class="language-rust">fn main() {}</code></pre>"#;
-    let visitor = Rc::new(RefCell::new(CodeBlockVisitor));
+    let visitor = Arc::new(Mutex::new(CodeBlockVisitor));
     let result = convert(html, None, Some(visitor))
         .expect("conversion failed")
         .content
@@ -515,7 +514,7 @@ fn test_visitor_code_inline() {
     }
 
     let html = r"<p>Use <code>println!</code> macro</p>";
-    let visitor = Rc::new(RefCell::new(InlineCodeVisitor));
+    let visitor = Arc::new(Mutex::new(InlineCodeVisitor));
     let result = convert(html, None, Some(visitor))
         .expect("conversion failed")
         .content
@@ -556,7 +555,7 @@ fn test_visitor_list_callbacks() {
     }
 
     let html = r"<ul><li>First</li><li>Second</li></ul>";
-    let visitor = Rc::new(RefCell::new(ListVisitor::default()));
+    let visitor = Arc::new(Mutex::new(ListVisitor::default()));
     let result = convert(html, None, Some(visitor))
         .expect("conversion failed")
         .content
@@ -603,7 +602,7 @@ fn test_visitor_table_callbacks() {
     }
 
     let html = r"<table><tr><th>Name</th><th>Age</th></tr><tr><td>Alice</td><td>30</td></tr></table>";
-    let visitor = Rc::new(RefCell::new(TableVisitor::default()));
+    let visitor = Arc::new(Mutex::new(TableVisitor::default()));
     let result = convert(html, None, Some(visitor))
         .expect("conversion failed")
         .content
@@ -636,7 +635,7 @@ fn test_visitor_blockquote() {
     }
 
     let html = r"<blockquote>This is a quote</blockquote>";
-    let visitor = Rc::new(RefCell::new(BlockquoteVisitor));
+    let visitor = Arc::new(Mutex::new(BlockquoteVisitor));
     let result = convert(html, None, Some(visitor))
         .expect("conversion failed")
         .content
@@ -668,7 +667,7 @@ fn test_visitor_inline_formatting() {
     }
 
     let html = r"<p><strong>bold</strong> <em>italic</em> <del>struck</del></p>";
-    let visitor = Rc::new(RefCell::new(FormattingVisitor));
+    let visitor = Arc::new(Mutex::new(FormattingVisitor));
     let result = convert(html, None, Some(visitor))
         .expect("conversion failed")
         .content
@@ -701,14 +700,14 @@ fn test_no_double_visit_in_links() {
     }
 
     let html = r#"<a href="/url">link text</a>"#;
-    let visitor = Rc::new(RefCell::new(CountingVisitor::default()));
+    let visitor = Arc::new(Mutex::new(CountingVisitor::default()));
     let _result = convert(html, None, Some(visitor.clone())).expect("conversion failed");
 
     assert_eq!(
-        visitor.borrow().text_visits,
+        visitor.lock().expect("visitor mutex poisoned").text_visits,
         1,
         "Text nodes inside links should only be visited once, got {} visits",
-        visitor.borrow().text_visits
+        visitor.lock().expect("visitor mutex poisoned").text_visits
     );
 }
 
@@ -731,14 +730,14 @@ fn test_no_double_visit_in_headings() {
     }
 
     let html = r"<h1>heading text</h1>";
-    let visitor = Rc::new(RefCell::new(CountingVisitor::default()));
+    let visitor = Arc::new(Mutex::new(CountingVisitor::default()));
     let _result = convert(html, None, Some(visitor.clone())).expect("conversion failed");
 
     assert_eq!(
-        visitor.borrow().text_visits,
+        visitor.lock().expect("visitor mutex poisoned").text_visits,
         1,
         "Text nodes inside headings should only be visited once, got {} visits",
-        visitor.borrow().text_visits
+        visitor.lock().expect("visitor mutex poisoned").text_visits
     );
 }
 
@@ -774,7 +773,7 @@ fn test_visitor_with_skip_images() {
         ..Default::default()
     };
 
-    let visitor = Rc::new(RefCell::new(SkipImageVisitor::default()));
+    let visitor = Arc::new(Mutex::new(SkipImageVisitor::default()));
     let result = convert(html, Some(options), Some(visitor))
         .expect("conversion with skip_images and visitor should succeed")
         .content
@@ -822,12 +821,12 @@ fn test_convert_accepts_visitor_parameter() {
     }
 
     let html = r#"<p>Visit <a href="https://example.com">our site</a> for more info.</p>"#;
-    let visitor = Rc::new(RefCell::new(CountingVisitor::default()));
+    let visitor = Arc::new(Mutex::new(CountingVisitor::default()));
 
     // Test using the main convert() function with visitor parameter
     let _result = convert(html, None, Some(visitor.clone())).expect("convert with visitor should work");
 
-    let borrowed = visitor.borrow();
+    let borrowed = visitor.lock().expect("visitor mutex poisoned");
     assert!(
         borrowed.text_count >= 2,
         "Should visit text nodes, got {} visits",
@@ -869,14 +868,14 @@ fn test_convert_with_inline_images_accepts_visitor() {
     "#;
 
     // Verify visitor callbacks fire via convert_with_visitor
-    let visitor = Rc::new(RefCell::new(ImageTrackingVisitor::default()));
+    let visitor = Arc::new(Mutex::new(ImageTrackingVisitor::default()));
     let markdown = convert(html, None, Some(visitor.clone()))
         .expect("convert should work")
         .content
         .unwrap_or_default();
 
     assert_eq!(
-        visitor.borrow().images_seen,
+        visitor.lock().expect("visitor mutex poisoned").images_seen,
         1,
         "Visitor should count 1 non-data-uri image"
     );
@@ -924,13 +923,13 @@ fn test_visitor_and_metadata_both_work() {
     "#;
 
     // Verify visitor callbacks fire via convert_with_visitor
-    let visitor = Rc::new(RefCell::new(MetadataAwareVisitor::default()));
+    let visitor = Arc::new(Mutex::new(MetadataAwareVisitor::default()));
     let markdown = convert(html, None, Some(visitor.clone()))
         .expect("convert should work")
         .content
         .unwrap_or_default();
 
-    let borrowed = visitor.borrow();
+    let borrowed = visitor.lock().expect("visitor mutex poisoned");
     assert!(
         borrowed.heading_count >= 2,
         "Visitor should see at least 2 headings, got {}",
@@ -1012,14 +1011,14 @@ fn test_convert_with_all_features_and_visitor() {
     "#;
 
     // Verify visitor callbacks fire via convert_with_visitor
-    let visitor = Rc::new(RefCell::new(ComprehensiveVisitor::default()));
+    let visitor = Arc::new(Mutex::new(ComprehensiveVisitor::default()));
     let markdown = convert(html, None, Some(visitor.clone()))
         .expect("convert should work")
         .content
         .unwrap_or_default();
 
     // Verify all visitor callbacks were invoked
-    let borrowed = visitor.borrow();
+    let borrowed = visitor.lock().expect("visitor mutex poisoned");
     assert!(
         borrowed.headings >= 2,
         "Visitor should see at least 2 headings, got {}",
@@ -1061,7 +1060,7 @@ fn test_image_visitor_with_metadata_does_not_panic() {
         ..Default::default()
     };
 
-    let result = convert(html, Some(options), Some(Rc::new(RefCell::new(ImageVisitor))));
+    let result = convert(html, Some(options), Some(Arc::new(Mutex::new(ImageVisitor))));
     assert!(result.is_ok(), "conversion panicked or errored: {:?}", result.err());
 }
 
@@ -1087,7 +1086,7 @@ fn test_element_end_replacement_with_metadata_preserves_subsequent_content() {
         ..Default::default()
     };
 
-    let result = convert(html, Some(options), Some(Rc::new(RefCell::new(FigureReplacingVisitor))));
+    let result = convert(html, Some(options), Some(Arc::new(Mutex::new(FigureReplacingVisitor))));
     assert!(result.is_ok(), "conversion panicked or errored: {:?}", result.err());
     assert!(
         result.unwrap().content.unwrap_or_default().contains("after"),
@@ -1131,11 +1130,11 @@ fn test_issue_331_hyphenated_tags_xml_self_closing_visitor_events() {
 </structured-macro>
 "#;
 
-    let visitor = Rc::new(RefCell::new(EventRecorder::default()));
+    let visitor = Arc::new(Mutex::new(EventRecorder::default()));
     let result = convert(html, None, Some(visitor.clone()));
     assert!(result.is_ok(), "conversion should succeed: {:?}", result.err());
 
-    let events = visitor.borrow().events.clone();
+    let events = visitor.lock().expect("visitor mutex poisoned").events.clone();
 
     // Find the indices of start/end pairs for the two ac:parameter elements.
     // With correct XML self-closing handling:

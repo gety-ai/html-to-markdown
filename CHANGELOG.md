@@ -5,9 +5,11 @@ All notable changes to html-to-markdown will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
 ## [3.4.1] - 2026-05-13
+
+### Changed
+
+- **core**: `ConversionOptions` is now `Send + Sync`. `VisitorHandle` switched from `Rc<RefCell<dyn HtmlVisitor>>` to `Arc<Mutex<dyn HtmlVisitor + Send>>`, allowing `ConversionOptions` to be stashed in axum/tokio/rmcp `Send`-bound contexts. Bindings update bridge constructors to use `Arc::new(Mutex::new(...))` and add `unsafe impl Send + Sync` where required (NAPI, WASM, Magnus, FFI visitor structs).
 
 ### Fixed
 

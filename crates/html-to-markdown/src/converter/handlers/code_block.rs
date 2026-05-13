@@ -95,7 +95,7 @@ pub fn handle_code(
                 };
 
                 let visit_result = {
-                    let mut visitor = visitor_handle.borrow_mut();
+                    let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                     visitor.visit_code_inline(&node_ctx, trimmed)
                 };
                 match visit_result {
@@ -271,7 +271,7 @@ pub fn handle_pre(
             };
 
             let visit_result = {
-                let mut visitor = visitor_handle.borrow_mut();
+                let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_code_block(&node_ctx, language.as_deref(), &processed_content)
             };
             match visit_result {

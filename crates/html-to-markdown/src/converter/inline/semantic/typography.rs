@@ -99,7 +99,7 @@ pub fn handle_subscript(
         };
 
         let visit_result = {
-            let mut visitor = visitor_handle.borrow_mut();
+            let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_subscript(&node_ctx, &text_content)
         };
         match visit_result {
@@ -201,7 +201,7 @@ pub fn handle_superscript(
         };
 
         let visit_result = {
-            let mut visitor = visitor_handle.borrow_mut();
+            let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_superscript(&node_ctx, &text_content)
         };
         match visit_result {
@@ -427,8 +427,7 @@ mod tests {
     use crate::convert;
     use crate::options::ConversionOptions;
     use crate::visitor::{HtmlVisitor, NodeContext, VisitResult};
-    use std::cell::RefCell;
-    use std::rc::Rc;
+    use std::sync::{Arc, Mutex};
 
     #[derive(Debug)]
     struct SubSkipVisitor;
@@ -486,7 +485,7 @@ mod tests {
 
     fn make_visitor<V: HtmlVisitor + 'static>(v: V) -> ConversionOptions {
         ConversionOptions {
-            visitor: Some(Rc::new(RefCell::new(v))),
+            visitor: Some(Arc::new(Mutex::new(v))),
             ..ConversionOptions::default()
         }
     }

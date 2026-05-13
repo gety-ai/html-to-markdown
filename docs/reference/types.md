@@ -330,9 +330,11 @@ A non-fatal warning generated during HTML processing.
 
 #### VisitorHandle
 
-Type alias for a visitor handle (Rc-wrapped `RefCell` for interior mutability).
+Type alias for a visitor handle (`Arc`-wrapped `Mutex` for thread-safe shared mutation).
 
-This allows visitors to be passed around and shared while still being mutable.
+`Send + Sync` so that types embedding a `VisitorHandle` (e.g. `ConversionOptions`)
+can be shared across threads — required by callers that stash configs inside
+axum/rmcp/tokio Send-bound contexts.
 
 *Opaque type — fields are not directly accessible.*
 

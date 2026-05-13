@@ -120,7 +120,7 @@ pub fn handle_graphic(
         };
 
         let visit_result = {
-            let mut visitor = visitor_handle.borrow_mut();
+            let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_image(&node_ctx, &src, &alt, title.as_deref())
         };
         match visit_result {

@@ -73,7 +73,7 @@ pub fn handle(
             is_inline: false,
         };
         let visit_result = {
-            let mut visitor = visitor_handle.borrow_mut();
+            let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_custom_element(&node_ctx, &tag_name, &raw_html)
         };
         match visit_result {
