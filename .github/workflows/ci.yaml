@@ -210,6 +210,10 @@ jobs:
         run: pip install pyyaml jinja2
         shell: bash
 
+      - name: Install rumdl
+        run: pip install 'rumdl==0.1.91'
+        shell: bash
+
       - name: Validate READMEs
         run: task generate:generate-readme:check
         shell: bash
