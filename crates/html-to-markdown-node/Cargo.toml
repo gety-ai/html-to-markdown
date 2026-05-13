@@ -30,3 +30,7 @@ serde_json = "1"
 
 [build-dependencies]
 napi-build = "2"
+
+[lints.clippy]
+let_and_return = "allow"
+field_reassign_with_default = "allow"
