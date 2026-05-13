@@ -1,54 +1,148 @@
 ---
-title: html-to-markdown
-description: "html-to-markdown — Convert HTML to Markdown, Djot, or plain text. Rust core, 12 native language bindings, 150–280 MB/s."
+description: "html-to-markdown — Convert HTML to Markdown, Djot, or plain text. Rust core, 12 language bindings, identical output on every runtime."
 ---
 
-<div class="home-hero" markdown="1">
+# html-to-markdown
 
-<p class="home-lead" markdown="1">
-Convert HTML to Markdown, Djot, or plain text. One Rust core, 12 native language bindings, identical output on every runtime.
-</p>
+Convert HTML to Markdown, Djot, or plain text. One Rust core, 12 language bindings, identical output on every runtime. Part of the [kreuzberg.dev](https://kreuzberg.dev) document intelligence ecosystem.
 
-<div class="home-instruction" markdown="1">
+<div class="hero-badges" markdown>
 
-## Start here
-
-1. **[Install a binding](installation.md)** — add the package to your project (versions, feature flags, and verify steps are on that page).
-2. **[Run a minimal `convert()`](usage.md#basic-conversion)** — open _Usage → Basic conversion_, choose your language tab, and copy the hello-world snippet.
-
-</div>
+[:material-rocket-launch: Get Started](installation.md){ .md-button .md-button--primary }
+[:material-package-variant: Installation](installation.md){ .md-button }
+[:material-github: GitHub](https://github.com/kreuzberg-dev/html-to-markdown){ .md-button }
+[:fontawesome-brands-discord: Discord](https://discord.gg/xt9WY3GnKR){ .md-button }
 
 </div>
 
 ---
 
-## What It Does
+## Why html-to-markdown
 
-<div class="home-feature-grid">
-<article class="home-feature-card">
-<p class="home-feature-card__title">150–280 MB/s throughput</p>
-<p class="home-feature-card__desc">Rust-native parsing and a single-pass DOM walk. 10–80x faster than pure-language alternatives. No JVM, no interpreter overhead.</p>
-</article>
-<article class="home-feature-card">
-<p class="home-feature-card__title">12 language bindings</p>
-<p class="home-feature-card__desc">Rust, Python, TypeScript, Go, Ruby, PHP, Java, C#, Elixir, R, C, and WebAssembly. One core — no per-language conversion logic.</p>
-</article>
-<article class="home-feature-card">
-<p class="home-feature-card__title">Three output formats</p>
-<p class="home-feature-card__desc">CommonMark, Djot, and plain text via <code>output_format</code>. The same options apply to every format.</p>
-</article>
-<article class="home-feature-card">
-<p class="home-feature-card__title">Metadata extraction</p>
-<p class="home-feature-card__desc">Open Graph, Twitter Card, JSON-LD, links, and images in one pass. Enable with <code>extract_metadata: true</code>.</p>
-</article>
-<article class="home-feature-card">
-<p class="home-feature-card__title">Table extraction</p>
-<p class="home-feature-card__desc">HTML tables into <code>result.tables</code> (cells, spans, headers) plus rendered Markdown when applicable.</p>
-</article>
-<article class="home-feature-card">
-<p class="home-feature-card__title">Visitor pattern</p>
-<p class="home-feature-card__desc">40 callbacks to filter nodes or emit custom output. Zero cost when you do not register a visitor.</p>
-</article>
+<div class="grid cards" markdown>
+
+- :material-flash:{ .lg .middle } **Rust core**
+
+    Single-pass DOM walk written in Rust. The same code path runs from Python, the browser, and the CLI — no per-language conversion logic.
+
+- :material-translate:{ .lg .middle } **12 bindings**
+
+    Rust, Python, TypeScript, Go, Ruby, PHP, Java, C#, Elixir, R, C, and WebAssembly. One option name maps to one option name in every language.
+
+- :material-file-document-outline:{ .lg .middle } **Three output formats**
+
+    Markdown (CommonMark) by default, plus Djot and plain text via `output_format`. The same options apply to every format.
+
+- :material-tag-multiple:{ .lg .middle } **Metadata extraction**
+
+    Document title, Open Graph, Twitter Card, JSON-LD, links, and images in one pass. Enabled by default — disable with `extract_metadata: false`.
+
+- :material-table:{ .lg .middle } **Table extraction**
+
+    HTML tables into `result.tables` with structured cells, row/column spans, and header flags, alongside the rendered Markdown.
+
+- :material-puzzle:{ .lg .middle } **Visitor pattern**
+
+    42 element-level callbacks on the `HtmlVisitor` trait to skip, replace, or preserve any node. Zero cost when unused.
+
+</div>
+
+---
+
+## Language Support
+
+| Language               | Install                                                 | API Reference                                  |
+| :--------------------- | :------------------------------------------------------ | :--------------------------------------------- |
+| **Rust**               | `cargo add html-to-markdown-rs`                         | [Reference](reference/api-rust.md)             |
+| **Python**             | `pip install html-to-markdown`                          | [Reference](reference/api-python.md)           |
+| **TypeScript / Node**  | `npm install @kreuzberg/html-to-markdown`               | [Reference](reference/api-typescript.md)       |
+| **Go**                 | `go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3` | [Reference](reference/api-go.md)     |
+| **Ruby**               | `gem install html-to-markdown`                          | [Reference](reference/api-ruby.md)             |
+| **PHP**                | `composer require kreuzberg-dev/html-to-markdown`       | [Reference](reference/api-php.md)              |
+| **Java**               | Maven `dev.kreuzberg:html-to-markdown`                  | [Reference](reference/api-java.md)             |
+| **C#**                 | `dotnet add package KreuzbergDev.HtmlToMarkdown`        | [Reference](reference/api-csharp.md)           |
+| **Elixir**             | `{:html_to_markdown, "~> 3.4"}`                         | [Reference](reference/api-elixir.md)           |
+| **R**                  | `install.packages("htmltomarkdown")`                    | [Reference](reference/api-r.md)                |
+| **C (FFI)**            | Shared library + header                                 | [Reference](reference/api-c.md)                |
+| **WebAssembly**        | `npm install @kreuzberg/html-to-markdown-wasm`          | [Reference](reference/api-wasm.md)             |
+| **CLI**                | `cargo install html-to-markdown-cli`                    | [CLI Guide](cli.md)                            |
+
+---
+
+## Explore the Docs
+
+<div class="grid cards" markdown>
+
+- :material-rocket-launch:{ .lg .middle } **Get Started**
+
+    Install a binding and run your first `convert()` call.
+
+    [:octicons-arrow-right-24: Installation](installation.md)
+
+- :material-book-open-variant:{ .lg .middle } **Guides**
+
+    Visitor pattern, table extraction, error handling.
+
+    [:octicons-arrow-right-24: Visitor pattern](visitor.md)
+
+- :material-puzzle-outline:{ .lg .middle } **Concepts**
+
+    Architecture, conversion pipeline, plugin system.
+
+    [:octicons-arrow-right-24: Architecture](concepts/architecture.md)
+
+- :material-api:{ .lg .middle } **Reference**
+
+    Options reference, generated API docs, per-language guides.
+
+    [:octicons-arrow-right-24: Configuration](configuration.md)
+
+- :material-console:{ .lg .middle } **CLI**
+
+    Every conversion option as a command-line flag.
+
+    [:octicons-arrow-right-24: CLI Guide](cli.md)
+
+- :material-swap-horizontal:{ .lg .middle } **Migration**
+
+    Upgrading from earlier versions.
+
+    [:octicons-arrow-right-24: Migration](migration.md)
+
+</div>
+
+---
+
+## Part of kreuzberg.dev
+
+html-to-markdown ships as a standalone library and as the HTML pipeline inside the [Kreuzberg](https://docs.kreuzberg.dev) document intelligence stack.
+
+<div class="grid cards" markdown>
+
+- :material-file-document-multiple:{ .lg .middle } **[Kreuzberg](https://docs.kreuzberg.dev)**
+
+    Document intelligence core — text, tables, and metadata from 91+ file formats. Uses html-to-markdown for every HTML input.
+
+- :material-cloud:{ .lg .middle } **[Kreuzberg Cloud](https://docs.kreuzberg.cloud)**
+
+    Managed SaaS API for document extraction. Same engine, no infrastructure.
+
+- :material-spider-web:{ .lg .middle } **[kreuzcrawl](https://docs.kreuzcrawl.kreuzberg.dev)**
+
+    Web crawler that pairs with html-to-markdown for crawl-then-convert pipelines.
+
+- :material-robot:{ .lg .middle } **[liter-llm](https://docs.liter-llm.kreuzberg.dev)**
+
+    Universal LLM client — feed it the Markdown out of html-to-markdown.
+
+- :material-code-tags:{ .lg .middle } **[tree-sitter-language-pack](https://docs.tree-sitter-language-pack.kreuzberg.dev)**
+
+    306 Tree-sitter grammars on demand for code intelligence.
+
+- :fontawesome-brands-discord:{ .lg .middle } **[Discord](https://discord.gg/xt9WY3GnKR)**
+
+    Community chat for kreuzberg.dev users and contributors.
+
 </div>
 
 ---
@@ -56,12 +150,5 @@ Convert HTML to Markdown, Djot, or plain text. One Rust core, 12 native language
 ## Getting Help
 
 - **Bugs and feature requests** — [Open an issue on GitHub](https://github.com/kreuzberg-dev/html-to-markdown/issues)
-- **Contributing** — [Read the contributor guide](https://github.com/kreuzberg-dev/html-to-markdown/blob/main/CONTRIBUTING.md)
-
-<div class="home-kreuzberg" markdown="1">
-
-### Part of Kreuzberg
-
-html-to-markdown powers the HTML conversion pipeline in [Kreuzberg](https://docs.kreuzberg.dev), a document intelligence library for extracting text and structured data from PDFs, DOCX, images, and other document formats.
-
-</div>
+- **Community chat** — [Join the Discord](https://discord.gg/xt9WY3GnKR)
+- **Contributing** — [Read the contributor guide](contributing.md)
