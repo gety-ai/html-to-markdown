@@ -154,7 +154,7 @@ repos:
         exclude: ^test_apps/
   # Alef: verify bindings and sync versions
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.15.56
+    rev: v0.15.57
     hooks:
       - id: alef-verify
       - id: alef-sync-versions
