@@ -33,6 +33,8 @@ includes:
     taskfile: ./.task/tools/version-sync.yml
   docs:
     taskfile: ./.task/tools/docs.yml
+  generate:
+    taskfile: ./.task/tools/generate.yml
   _tools:
     taskfile: ./.task/tools/general.yml
     flatten: true
@@ -520,21 +522,6 @@ tasks:
     dir: docs
     cmds:
       - python3 -m http.server 8000
-
-  # === Documentation ===
-  docs:build:
-    desc: "Build documentation site with zensical"
-    cmds:
-      - task: python:install
-      - uv sync --group doc
-      - uv run zensical build --clean --strict
-
-  docs:serve:
-    desc: "Serve documentation site locally with zensical (hot-reload)"
-    cmds:
-      - task: python:install
-      - uv sync --group doc
-      - uv run zensical serve
 
   # === Clean ===
   clean:

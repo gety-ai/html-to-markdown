@@ -63,7 +63,7 @@ High-performance HTML to Markdown conversion powered by Rust. Ships as native bi
 
 ## Highlights
 
-- **150-280 MB/s** throughput (10-80x faster than pure Python alternatives)
+- **Rust-native throughput** with html5ever parsing
 - **12 language bindings** with consistent output across all runtimes
 - **Structured result** — `convert()` returns `ConversionResult` with `content`, `metadata`, `tables`, `images`, and `warnings`
 - **Metadata extraction** — title, headers, links, images, structured data (JSON-LD, Microdata, RDFa)
@@ -141,9 +141,14 @@ println!("{}", result.content.unwrap_or_default());
 | R                    | [htmltomarkdown](https://kreuzberg-dev.r-universe.dev/htmltomarkdown)                                        | `install.packages("htmltomarkdown")`                              |
 | C (FFI)              | [releases](https://github.com/kreuzberg-dev/html-to-markdown/releases)                                       | Pre-built `.so` / `.dll` / `.dylib`                               |
 
-## Part of the Kreuzberg Ecosystem
+## Part of Kreuzberg, Inc
 
-html-to-markdown is developed by [kreuzberg.dev](https://kreuzberg.dev) and powers the HTML conversion pipeline in [Kreuzberg](https://docs.kreuzberg.dev), a document intelligence library for extracting text from PDFs, images, and office documents.
+- [Kreuzberg](https://docs.kreuzberg.dev) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
+- [Kreuzberg Cloud](https://docs.kreuzberg.cloud) — managed extraction API with SDKs, dashboards, and observability.
+- [kreuzcrawl](https://docs.kreuzcrawl.kreuzberg.dev) — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
+- [liter-llm](https://docs.liter-llm.kreuzberg.dev) — universal LLM API client with native bindings for 14 languages and 143 providers.
+- [tree-sitter-language-pack](https://docs.tree-sitter-language-pack.kreuzberg.dev) — tree-sitter grammars and code-intelligence primitives.
+- [Discord](https://discord.gg/xt9WY3GnKR) — community, roadmap, announcements.
 
 ## Contributing
 

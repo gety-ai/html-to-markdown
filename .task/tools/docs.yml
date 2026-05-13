@@ -1,24 +1,27 @@
 version: "3"
 
 tasks:
-  generate-readme:
-    desc: Generate package READMEs using alef
+  build:
+    desc: Build documentation
     cmds:
-      - alef readme
+      - uv run --no-sync --group doc zensical build --clean
 
-  generate-readme:check:
-    desc: Validate READMEs match generated output (CI mode)
+  build:strict:
+    desc: Build documentation in strict mode (CI-equivalent)
     cmds:
-      - alef readme
-      - git diff --exit-code -- packages/*/README.md crates/*/README.md
+      - uv run --no-sync --group doc zensical build --strict --clean
 
-  generate-docs:
-    desc: Generate API reference documentation using alef
+  serve:
+    desc: Serve documentation locally with live reload
     cmds:
-      - alef docs
+      - uv run --no-sync --group doc zensical serve
 
-  generate-docs:check:
-    desc: Validate API docs match generated output (CI mode)
+  lint:links:
+    desc: Check links with lychee
     cmds:
-      - alef docs
-      - git diff --exit-code -- docs/reference/
+      - lychee --offline docs/ README.md
+
+  lint:prose:
+    desc: Lint prose with textlint
+    cmds:
+      - npx textlint 'docs/**/*.md'

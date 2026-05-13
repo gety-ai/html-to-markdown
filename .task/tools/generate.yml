@@ -1,0 +1,24 @@
+version: "3"
+
+tasks:
+  generate-readme:
+    desc: Generate package READMEs using alef
+    cmds:
+      - alef readme
+
+  generate-readme:check:
+    desc: Validate READMEs match generated output (CI mode)
+    cmds:
+      - alef readme
+      - git diff --exit-code -- packages/*/README.md crates/*/README.md
+
+  generate-docs:
+    desc: Generate API reference documentation using alef
+    cmds:
+      - alef docs
+
+  generate-docs:check:
+    desc: Validate API docs match generated output (CI mode)
+    cmds:
+      - alef docs
+      - git diff --exit-code -- docs/reference/
