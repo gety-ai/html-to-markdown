@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.1] - 2026-05-13
+
 ### Fixed
 
 - **R: `convert(html, options)` no longer rejects `ConversionOptions$default()` and `ConversionOptions$builder()$build()`.** The extendr wrappers return an `ExternalPtr<ConversionOptions>`, not an R named list, so `decode_options` raised `"options must be a named list"` for every call that used the convenience constructors. `decode_options` now extracts the wrapper directly before falling back to list decoding.

@@ -157,6 +157,7 @@ artifacts/
 .cache/
 .tmp/
 .wrangler/
+.rumdl_cache/
 [Tt][Oo][Dd][Oo]*
 
 # Generated artifacts
