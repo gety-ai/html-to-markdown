@@ -1,4 +1,8 @@
 <div align="center" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 20px 0;">
+  <!-- Built with -->
+  <a href="https://github.com/kreuzberg-dev/alef">
+    <img src="https://img.shields.io/badge/built%20with-alef%20%D7%90-007ec6" alt="Built with alef">
+  </a>
   <!-- Language Bindings -->
   <a href="https://crates.io/crates/html-to-markdown-rs">
     <img src="https://img.shields.io/crates/v/html-to-markdown-rs?label=Rust&color=007ec6" alt="Rust">
