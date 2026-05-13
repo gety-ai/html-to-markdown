@@ -1,7 +1,7 @@
 ---
 title: "TypeScript API Reference"
 ---
-## TypeScript API Reference <span class="version-badge">v3.4.0-rc.45</span>
+## TypeScript API Reference <span class="version-badge">v3.4.0</span>
 ### Functions
 
 #### convert()
@@ -345,6 +345,14 @@ For a typical element like `<div><p>text</p></div>`:
 - Avoid heavy computation in visitor methods; consider caching if needed
 
 ##### Methods
+###### visitText()
+Visit text nodes (most frequent callback - ~100+ per document).
+
+**Signature:**
+
+```typescript
+visitText(ctx: NodeContext, text: string): VisitResult
+```
 ###### visitElementStart()
 Called before entering any element.
 
@@ -366,14 +374,6 @@ Visitors can inspect or replace this output.
 
 ```typescript
 visitElementEnd(ctx: NodeContext, output: string): VisitResult
-```
-###### visitText()
-Visit text nodes (most frequent callback - ~100+ per document).
-
-**Signature:**
-
-```typescript
-visitText(ctx: NodeContext, text: string): VisitResult
 ```
 ###### visitLink()
 Visit anchor links `<a href="...">`.

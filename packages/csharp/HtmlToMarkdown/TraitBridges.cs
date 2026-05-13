@@ -15,124 +15,124 @@ namespace HtmlToMarkdown;
 public interface IHtmlVisitor {
 
     /// <summary>visit_text</summary>
-    VisitResult VisitText(NodeContext Ctx, string Text);
+    string VisitText(NodeContext Ctx, string Text);
 
     /// <summary>visit_element_start</summary>
-    VisitResult VisitElementStart(NodeContext Ctx);
+    string VisitElementStart(NodeContext Ctx);
 
     /// <summary>visit_element_end</summary>
-    VisitResult VisitElementEnd(NodeContext Ctx, string Output);
+    string VisitElementEnd(NodeContext Ctx, string Output);
 
     /// <summary>visit_link</summary>
-    VisitResult VisitLink(NodeContext Ctx, string Href, string Text, string Title);
+    string VisitLink(NodeContext Ctx, string Href, string Text, string Title);
 
     /// <summary>visit_image</summary>
-    VisitResult VisitImage(NodeContext Ctx, string Src, string Alt, string Title);
+    string VisitImage(NodeContext Ctx, string Src, string Alt, string Title);
 
     /// <summary>visit_heading</summary>
-    VisitResult VisitHeading(NodeContext Ctx, uint Level, string Text, string Id);
+    string VisitHeading(NodeContext Ctx, uint Level, string Text, string Id);
 
     /// <summary>visit_code_block</summary>
-    VisitResult VisitCodeBlock(NodeContext Ctx, string Lang, string Code);
+    string VisitCodeBlock(NodeContext Ctx, string Lang, string Code);
 
     /// <summary>visit_code_inline</summary>
-    VisitResult VisitCodeInline(NodeContext Ctx, string Code);
+    string VisitCodeInline(NodeContext Ctx, string Code);
 
     /// <summary>visit_list_item</summary>
-    VisitResult VisitListItem(NodeContext Ctx, bool Ordered, string Marker, string Text);
+    string VisitListItem(NodeContext Ctx, bool Ordered, string Marker, string Text);
 
     /// <summary>visit_list_start</summary>
-    VisitResult VisitListStart(NodeContext Ctx, bool Ordered);
+    string VisitListStart(NodeContext Ctx, bool Ordered);
 
     /// <summary>visit_list_end</summary>
-    VisitResult VisitListEnd(NodeContext Ctx, bool Ordered, string Output);
+    string VisitListEnd(NodeContext Ctx, bool Ordered, string Output);
 
     /// <summary>visit_table_start</summary>
-    VisitResult VisitTableStart(NodeContext Ctx);
+    string VisitTableStart(NodeContext Ctx);
 
     /// <summary>visit_table_row</summary>
-    VisitResult VisitTableRow(NodeContext Ctx, List<string> Cells, bool IsHeader);
+    string VisitTableRow(NodeContext Ctx, List<string> Cells, bool IsHeader);
 
     /// <summary>visit_table_end</summary>
-    VisitResult VisitTableEnd(NodeContext Ctx, string Output);
+    string VisitTableEnd(NodeContext Ctx, string Output);
 
     /// <summary>visit_blockquote</summary>
-    VisitResult VisitBlockquote(NodeContext Ctx, string Content, ulong Depth);
+    string VisitBlockquote(NodeContext Ctx, string Content, ulong Depth);
 
     /// <summary>visit_strong</summary>
-    VisitResult VisitStrong(NodeContext Ctx, string Text);
+    string VisitStrong(NodeContext Ctx, string Text);
 
     /// <summary>visit_emphasis</summary>
-    VisitResult VisitEmphasis(NodeContext Ctx, string Text);
+    string VisitEmphasis(NodeContext Ctx, string Text);
 
     /// <summary>visit_strikethrough</summary>
-    VisitResult VisitStrikethrough(NodeContext Ctx, string Text);
+    string VisitStrikethrough(NodeContext Ctx, string Text);
 
     /// <summary>visit_underline</summary>
-    VisitResult VisitUnderline(NodeContext Ctx, string Text);
+    string VisitUnderline(NodeContext Ctx, string Text);
 
     /// <summary>visit_subscript</summary>
-    VisitResult VisitSubscript(NodeContext Ctx, string Text);
+    string VisitSubscript(NodeContext Ctx, string Text);
 
     /// <summary>visit_superscript</summary>
-    VisitResult VisitSuperscript(NodeContext Ctx, string Text);
+    string VisitSuperscript(NodeContext Ctx, string Text);
 
     /// <summary>visit_mark</summary>
-    VisitResult VisitMark(NodeContext Ctx, string Text);
+    string VisitMark(NodeContext Ctx, string Text);
 
     /// <summary>visit_line_break</summary>
-    VisitResult VisitLineBreak(NodeContext Ctx);
+    string VisitLineBreak(NodeContext Ctx);
 
     /// <summary>visit_horizontal_rule</summary>
-    VisitResult VisitHorizontalRule(NodeContext Ctx);
+    string VisitHorizontalRule(NodeContext Ctx);
 
     /// <summary>visit_custom_element</summary>
-    VisitResult VisitCustomElement(NodeContext Ctx, string TagName, string Html);
+    string VisitCustomElement(NodeContext Ctx, string TagName, string Html);
 
     /// <summary>visit_definition_list_start</summary>
-    VisitResult VisitDefinitionListStart(NodeContext Ctx);
+    string VisitDefinitionListStart(NodeContext Ctx);
 
     /// <summary>visit_definition_term</summary>
-    VisitResult VisitDefinitionTerm(NodeContext Ctx, string Text);
+    string VisitDefinitionTerm(NodeContext Ctx, string Text);
 
     /// <summary>visit_definition_description</summary>
-    VisitResult VisitDefinitionDescription(NodeContext Ctx, string Text);
+    string VisitDefinitionDescription(NodeContext Ctx, string Text);
 
     /// <summary>visit_definition_list_end</summary>
-    VisitResult VisitDefinitionListEnd(NodeContext Ctx, string Output);
+    string VisitDefinitionListEnd(NodeContext Ctx, string Output);
 
     /// <summary>visit_form</summary>
-    VisitResult VisitForm(NodeContext Ctx, string Action, string Method);
+    string VisitForm(NodeContext Ctx, string Action, string Method);
 
     /// <summary>visit_input</summary>
-    VisitResult VisitInput(NodeContext Ctx, string InputType, string Name, string Value);
+    string VisitInput(NodeContext Ctx, string InputType, string Name, string Value);
 
     /// <summary>visit_button</summary>
-    VisitResult VisitButton(NodeContext Ctx, string Text);
+    string VisitButton(NodeContext Ctx, string Text);
 
     /// <summary>visit_audio</summary>
-    VisitResult VisitAudio(NodeContext Ctx, string Src);
+    string VisitAudio(NodeContext Ctx, string Src);
 
     /// <summary>visit_video</summary>
-    VisitResult VisitVideo(NodeContext Ctx, string Src);
+    string VisitVideo(NodeContext Ctx, string Src);
 
     /// <summary>visit_iframe</summary>
-    VisitResult VisitIframe(NodeContext Ctx, string Src);
+    string VisitIframe(NodeContext Ctx, string Src);
 
     /// <summary>visit_details</summary>
-    VisitResult VisitDetails(NodeContext Ctx, bool Open);
+    string VisitDetails(NodeContext Ctx, bool Open);
 
     /// <summary>visit_summary</summary>
-    VisitResult VisitSummary(NodeContext Ctx, string Text);
+    string VisitSummary(NodeContext Ctx, string Text);
 
     /// <summary>visit_figure_start</summary>
-    VisitResult VisitFigureStart(NodeContext Ctx);
+    string VisitFigureStart(NodeContext Ctx);
 
     /// <summary>visit_figcaption</summary>
-    VisitResult VisitFigcaption(NodeContext Ctx, string Text);
+    string VisitFigcaption(NodeContext Ctx, string Text);
 
     /// <summary>visit_figure_end</summary>
-    VisitResult VisitFigureEnd(NodeContext Ctx, string Output);
+    string VisitFigureEnd(NodeContext Ctx, string Output);
 }
 
 /// <summary>
@@ -501,7 +501,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitText(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -514,7 +514,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var result = _impl.VisitElementStart(managed_Ctx);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -528,7 +528,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Output = Marshal.PtrToStringUTF8(Output) ?? string.Empty;
             var result = _impl.VisitElementEnd(managed_Ctx, managed_Output);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -544,7 +544,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var managed_Title = Marshal.PtrToStringUTF8(Title) ?? string.Empty;
             var result = _impl.VisitLink(managed_Ctx, managed_Href, managed_Text, managed_Title);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -560,7 +560,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Alt = Marshal.PtrToStringUTF8(Alt) ?? string.Empty;
             var managed_Title = Marshal.PtrToStringUTF8(Title) ?? string.Empty;
             var result = _impl.VisitImage(managed_Ctx, managed_Src, managed_Alt, managed_Title);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -575,7 +575,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var managed_Id = Marshal.PtrToStringUTF8(Id) ?? string.Empty;
             var result = _impl.VisitHeading(managed_Ctx, Level, managed_Text, managed_Id);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -590,7 +590,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Lang = Marshal.PtrToStringUTF8(Lang) ?? string.Empty;
             var managed_Code = Marshal.PtrToStringUTF8(Code) ?? string.Empty;
             var result = _impl.VisitCodeBlock(managed_Ctx, managed_Lang, managed_Code);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -604,7 +604,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Code = Marshal.PtrToStringUTF8(Code) ?? string.Empty;
             var result = _impl.VisitCodeInline(managed_Ctx, managed_Code);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -619,7 +619,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Marker = Marshal.PtrToStringUTF8(Marker) ?? string.Empty;
             var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitListItem(managed_Ctx, Ordered, managed_Marker, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -632,7 +632,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var result = _impl.VisitListStart(managed_Ctx, Ordered);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -646,7 +646,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Output = Marshal.PtrToStringUTF8(Output) ?? string.Empty;
             var result = _impl.VisitListEnd(managed_Ctx, Ordered, managed_Output);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -659,7 +659,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var result = _impl.VisitTableStart(managed_Ctx);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -674,7 +674,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var json_Cells = Marshal.PtrToStringUTF8(Cells) ?? "{}";
             var managed_Cells = JsonSerializer.Deserialize<List<string>>(json_Cells)!;
             var result = _impl.VisitTableRow(managed_Ctx, managed_Cells, IsHeader);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -688,7 +688,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Output = Marshal.PtrToStringUTF8(Output) ?? string.Empty;
             var result = _impl.VisitTableEnd(managed_Ctx, managed_Output);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -702,7 +702,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Content = Marshal.PtrToStringUTF8(Content) ?? string.Empty;
             var result = _impl.VisitBlockquote(managed_Ctx, managed_Content, Depth);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -716,7 +716,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitStrong(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -730,7 +730,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitEmphasis(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -744,7 +744,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitStrikethrough(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -758,7 +758,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitUnderline(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -772,7 +772,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitSubscript(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -786,7 +786,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitSuperscript(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -800,7 +800,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitMark(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -813,7 +813,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var result = _impl.VisitLineBreak(managed_Ctx);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -826,7 +826,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var result = _impl.VisitHorizontalRule(managed_Ctx);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -841,7 +841,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_TagName = Marshal.PtrToStringUTF8(TagName) ?? string.Empty;
             var managed_Html = Marshal.PtrToStringUTF8(Html) ?? string.Empty;
             var result = _impl.VisitCustomElement(managed_Ctx, managed_TagName, managed_Html);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -854,7 +854,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var result = _impl.VisitDefinitionListStart(managed_Ctx);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -868,7 +868,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitDefinitionTerm(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -882,7 +882,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitDefinitionDescription(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -896,7 +896,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Output = Marshal.PtrToStringUTF8(Output) ?? string.Empty;
             var result = _impl.VisitDefinitionListEnd(managed_Ctx, managed_Output);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -911,7 +911,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Action = Marshal.PtrToStringUTF8(Action) ?? string.Empty;
             var managed_Method = Marshal.PtrToStringUTF8(Method) ?? string.Empty;
             var result = _impl.VisitForm(managed_Ctx, managed_Action, managed_Method);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -927,7 +927,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Name = Marshal.PtrToStringUTF8(Name) ?? string.Empty;
             var managed_Value = Marshal.PtrToStringUTF8(Value) ?? string.Empty;
             var result = _impl.VisitInput(managed_Ctx, managed_InputType, managed_Name, managed_Value);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -941,7 +941,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitButton(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -955,7 +955,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Src = Marshal.PtrToStringUTF8(Src) ?? string.Empty;
             var result = _impl.VisitAudio(managed_Ctx, managed_Src);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -969,7 +969,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Src = Marshal.PtrToStringUTF8(Src) ?? string.Empty;
             var result = _impl.VisitVideo(managed_Ctx, managed_Src);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -983,7 +983,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Src = Marshal.PtrToStringUTF8(Src) ?? string.Empty;
             var result = _impl.VisitIframe(managed_Ctx, managed_Src);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -996,7 +996,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var result = _impl.VisitDetails(managed_Ctx, Open);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -1010,7 +1010,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitSummary(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -1023,7 +1023,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var result = _impl.VisitFigureStart(managed_Ctx);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -1037,7 +1037,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitFigcaption(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -1051,7 +1051,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Output = Marshal.PtrToStringUTF8(Output) ?? string.Empty;
             var result = _impl.VisitFigureEnd(managed_Ctx, managed_Output);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = Marshal.StringToCoTaskMemUTF8(ToJsonString(result));
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;

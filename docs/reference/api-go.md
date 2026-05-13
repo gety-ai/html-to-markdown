@@ -1,7 +1,7 @@
 ---
 title: "Go API Reference"
 ---
-## Go API Reference <span class="version-badge">v3.4.0-rc.45</span>
+## Go API Reference <span class="version-badge">v3.4.0</span>
 ### Functions
 
 #### Convert()
@@ -345,6 +345,14 @@ For a typical element like `<div><p>text</p></div>`:
 - Avoid heavy computation in visitor methods; consider caching if needed
 
 ##### Methods
+###### VisitText()
+Visit text nodes (most frequent callback - ~100+ per document).
+
+**Signature:**
+
+```go
+func (o *HtmlVisitor) VisitText(ctx NodeContext, text string) VisitResult
+```
 ###### VisitElementStart()
 Called before entering any element.
 
@@ -366,14 +374,6 @@ Visitors can inspect or replace this output.
 
 ```go
 func (o *HtmlVisitor) VisitElementEnd(ctx NodeContext, output string) VisitResult
-```
-###### VisitText()
-Visit text nodes (most frequent callback - ~100+ per document).
-
-**Signature:**
-
-```go
-func (o *HtmlVisitor) VisitText(ctx NodeContext, text string) VisitResult
 ```
 ###### VisitLink()
 Visit anchor links `<a href="...">`.

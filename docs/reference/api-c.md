@@ -1,7 +1,7 @@
 ---
 title: "C API Reference"
 ---
-## C API Reference <span class="version-badge">v3.4.0-rc.45</span>
+## C API Reference <span class="version-badge">v3.4.0</span>
 ### Functions
 
 #### htm_convert()
@@ -345,6 +345,14 @@ For a typical element like `<div><p>text</p></div>`:
 - Avoid heavy computation in visitor methods; consider caching if needed
 
 ##### Methods
+###### htm_visit_text()
+Visit text nodes (most frequent callback - ~100+ per document).
+
+**Signature:**
+
+```c
+HtmVisitResult htm_visit_text(HtmNodeContext ctx, const char* text);
+```
 ###### htm_visit_element_start()
 Called before entering any element.
 
@@ -366,14 +374,6 @@ Visitors can inspect or replace this output.
 
 ```c
 HtmVisitResult htm_visit_element_end(HtmNodeContext ctx, const char* output);
-```
-###### htm_visit_text()
-Visit text nodes (most frequent callback - ~100+ per document).
-
-**Signature:**
-
-```c
-HtmVisitResult htm_visit_text(HtmNodeContext ctx, const char* text);
 ```
 ###### htm_visit_link()
 Visit anchor links `<a href="...">`.

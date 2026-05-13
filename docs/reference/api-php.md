@@ -1,7 +1,7 @@
 ---
 title: "PHP API Reference"
 ---
-## PHP API Reference <span class="version-badge">v3.4.0-rc.45</span>
+## PHP API Reference <span class="version-badge">v3.4.0</span>
 ### Functions
 
 #### convert()
@@ -345,6 +345,14 @@ For a typical element like `<div><p>text</p></div>`:
 - Avoid heavy computation in visitor methods; consider caching if needed
 
 ##### Methods
+###### visitText()
+Visit text nodes (most frequent callback - ~100+ per document).
+
+**Signature:**
+
+```php
+public function visitText(NodeContext $ctx, string $text): VisitResult
+```
 ###### visitElementStart()
 Called before entering any element.
 
@@ -366,14 +374,6 @@ Visitors can inspect or replace this output.
 
 ```php
 public function visitElementEnd(NodeContext $ctx, string $output): VisitResult
-```
-###### visitText()
-Visit text nodes (most frequent callback - ~100+ per document).
-
-**Signature:**
-
-```php
-public function visitText(NodeContext $ctx, string $text): VisitResult
 ```
 ###### visitLink()
 Visit anchor links `<a href="...">`.

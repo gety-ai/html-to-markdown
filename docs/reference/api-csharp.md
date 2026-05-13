@@ -1,7 +1,7 @@
 ---
 title: "C# API Reference"
 ---
-## C# API Reference <span class="version-badge">v3.4.0-rc.45</span>
+## C# API Reference <span class="version-badge">v3.4.0</span>
 ### Functions
 
 #### Convert()
@@ -345,6 +345,14 @@ For a typical element like `<div><p>text</p></div>`:
 - Avoid heavy computation in visitor methods; consider caching if needed
 
 ##### Methods
+###### VisitText()
+Visit text nodes (most frequent callback - ~100+ per document).
+
+**Signature:**
+
+```csharp
+public VisitResult VisitText(NodeContext ctx, string text)
+```
 ###### VisitElementStart()
 Called before entering any element.
 
@@ -366,14 +374,6 @@ Visitors can inspect or replace this output.
 
 ```csharp
 public VisitResult VisitElementEnd(NodeContext ctx, string output)
-```
-###### VisitText()
-Visit text nodes (most frequent callback - ~100+ per document).
-
-**Signature:**
-
-```csharp
-public VisitResult VisitText(NodeContext ctx, string text)
 ```
 ###### VisitLink()
 Visit anchor links `<a href="...">`.

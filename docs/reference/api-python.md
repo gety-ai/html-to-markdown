@@ -1,7 +1,7 @@
 ---
 title: "Python API Reference"
 ---
-## Python API Reference <span class="version-badge">v3.4.0-rc.45</span>
+## Python API Reference <span class="version-badge">v3.4.0</span>
 ### Functions
 
 #### convert()
@@ -349,6 +349,14 @@ For a typical element like `<div><p>text</p></div>`:
 - Avoid heavy computation in visitor methods; consider caching if needed
 
 ##### Methods
+###### visit_text()
+Visit text nodes (most frequent callback - ~100+ per document).
+
+**Signature:**
+
+```python
+def visit_text(self, ctx: NodeContext, text: str) -> VisitResult
+```
 ###### visit_element_start()
 Called before entering any element.
 
@@ -370,14 +378,6 @@ Visitors can inspect or replace this output.
 
 ```python
 def visit_element_end(self, ctx: NodeContext, output: str) -> VisitResult
-```
-###### visit_text()
-Visit text nodes (most frequent callback - ~100+ per document).
-
-**Signature:**
-
-```python
-def visit_text(self, ctx: NodeContext, text: str) -> VisitResult
 ```
 ###### visit_link()
 Visit anchor links `<a href="...">`.

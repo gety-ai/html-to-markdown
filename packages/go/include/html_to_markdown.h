@@ -161,7 +161,11 @@ typedef struct HTMHtmVisitorCallbacks {
    */
   void *user_data;
   /**
-   * Visit text nodes.
+   * Visit text nodes (most frequent callback - ~100+ per document).
+   *
+   * # Arguments
+   * - `ctx`: Node context (will have `node_type: NodeType::Text`)
+   * - `text`: The raw text content (HTML entities already decoded)
    */
   int32_t (*visit_text)(const struct HTMHtmNodeContext *ctx,
                         void *user_data,
@@ -170,13 +174,19 @@ typedef struct HTMHtmVisitorCallbacks {
                         uintptr_t *out_len);
   /**
    * Called before entering any element.
+   *
+   * This is the first callback invoked for every HTML element, allowing
+   * visitors to implement generic element handling before tag-specific logic.
    */
   int32_t (*visit_element_start)(const struct HTMHtmNodeContext *ctx,
                                  void *user_data,
                                  char **out_custom,
                                  uintptr_t *out_len);
   /**
-   * Called after exiting any element; receives the default markdown output.
+   * Called after exiting any element.
+   *
+   * Receives the default markdown output that would be generated.
+   * Visitors can inspect or replace this output.
    */
   int32_t (*visit_element_end)(const struct HTMHtmNodeContext *ctx,
                                void *user_data,
@@ -184,7 +194,13 @@ typedef struct HTMHtmVisitorCallbacks {
                                char **out_custom,
                                uintptr_t *out_len);
   /**
-   * Visit anchor links `<a href="...">`.\n    ///\n    /// `title` may be null.
+   * Visit anchor links `<a href="...">`.
+   *
+   * # Arguments
+   * - `ctx`: Node context with link element metadata
+   * - `href`: The link URL (from `href` attribute)
+   * - `text`: The link text content (already converted to markdown)
+   * - `title`: Optional title attribute
    */
   int32_t (*visit_link)(const struct HTMHtmNodeContext *ctx,
                         void *user_data,
@@ -194,7 +210,13 @@ typedef struct HTMHtmVisitorCallbacks {
                         char **out_custom,
                         uintptr_t *out_len);
   /**
-   * Visit images `<img src="...">`.\n    ///\n    /// `title` may be null.
+   * Visit images `<img src="...">`.
+   *
+   * # Arguments
+   * - `ctx`: Node context with image element metadata
+   * - `src`: The image source URL
+   * - `alt`: The alt text
+   * - `title`: Optional title attribute
    */
   int32_t (*visit_image)(const struct HTMHtmNodeContext *ctx,
                          void *user_data,
@@ -204,7 +226,13 @@ typedef struct HTMHtmVisitorCallbacks {
                          char **out_custom,
                          uintptr_t *out_len);
   /**
-   * Visit heading elements `<h1>`\u{2013}`<h6>`.\n    ///\n    /// `id` may be null.
+   * Visit heading elements `<h1>` through `<h6>`.
+   *
+   * # Arguments
+   * - `ctx`: Node context with heading metadata
+   * - `level`: Heading level (1-6)
+   * - `text`: The heading text content
+   * - `id`: Optional id attribute (for anchor links)
    */
   int32_t (*visit_heading)(const struct HTMHtmNodeContext *ctx,
                            void *user_data,
@@ -214,7 +242,12 @@ typedef struct HTMHtmVisitorCallbacks {
                            char **out_custom,
                            uintptr_t *out_len);
   /**
-   * Visit code blocks `<pre><code>`.\n    ///\n    /// `lang` may be null.
+   * Visit code blocks `<pre><code>`.
+   *
+   * # Arguments
+   * - `ctx`: Node context
+   * - `lang`: Optional language specifier (from class attribute)
+   * - `code`: The code content
    */
   int32_t (*visit_code_block)(const struct HTMHtmNodeContext *ctx,
                               void *user_data,
@@ -224,6 +257,10 @@ typedef struct HTMHtmVisitorCallbacks {
                               uintptr_t *out_len);
   /**
    * Visit inline code `<code>`.
+   *
+   * # Arguments
+   * - `ctx`: Node context
+   * - `code`: The code content
    */
   int32_t (*visit_code_inline)(const struct HTMHtmNodeContext *ctx,
                                void *user_data,
@@ -232,6 +269,12 @@ typedef struct HTMHtmVisitorCallbacks {
                                uintptr_t *out_len);
   /**
    * Visit list items `<li>`.
+   *
+   * # Arguments
+   * - `ctx`: Node context
+   * - `ordered`: Whether this is an ordered list item
+   * - `marker`: The list marker (e.g., "-", "1.", "a)")
+   * - `text`: The list item content (already converted)
    */
   int32_t (*visit_list_item)(const struct HTMHtmNodeContext *ctx,
                              void *user_data,
@@ -265,7 +308,12 @@ typedef struct HTMHtmVisitorCallbacks {
                                char **out_custom,
                                uintptr_t *out_len);
   /**
-   * Visit table rows `<tr>`.\n    ///\n    /// Cells are passed as a null-terminated array of null-terminated strings.
+   * Visit table rows `<tr>`.
+   *
+   * # Arguments
+   * - `ctx`: Node context
+   * - `cells`: Cell contents (already converted to markdown)
+   * - `is_header`: Whether this row is in `<thead>`
    */
   int32_t (*visit_table_row)(const struct HTMHtmNodeContext *ctx,
                              void *user_data,
@@ -284,6 +332,11 @@ typedef struct HTMHtmVisitorCallbacks {
                              uintptr_t *out_len);
   /**
    * Visit blockquote elements `<blockquote>`.
+   *
+   * # Arguments
+   * - `ctx`: Node context
+   * - `content`: The blockquote content (already converted)
+   * - `depth`: Nesting depth (for nested blockquotes)
    */
   int32_t (*visit_blockquote)(const struct HTMHtmNodeContext *ctx,
                               void *user_data,
@@ -362,7 +415,12 @@ typedef struct HTMHtmVisitorCallbacks {
                                    char **out_custom,
                                    uintptr_t *out_len);
   /**
-   * Visit custom/unknown elements.
+   * Visit custom elements (web components) or unknown tags.
+   *
+   * # Arguments
+   * - `ctx`: Node context
+   * - `tag_name`: The custom element's tag name
+   * - `html`: The raw HTML of this element
    */
   int32_t (*visit_custom_element)(const struct HTMHtmNodeContext *ctx,
                                   void *user_data,
@@ -402,7 +460,7 @@ typedef struct HTMHtmVisitorCallbacks {
                                        char **out_custom,
                                        uintptr_t *out_len);
   /**
-   * Visit form elements `<form>`.\n    ///\n    /// `action` and `method` may be null.
+   * Visit form elements `<form>`.
    */
   int32_t (*visit_form)(const struct HTMHtmNodeContext *ctx,
                         void *user_data,
@@ -411,7 +469,7 @@ typedef struct HTMHtmVisitorCallbacks {
                         char **out_custom,
                         uintptr_t *out_len);
   /**
-   * Visit input elements `<input>`.\n    ///\n    /// `name` and `value` may be null.
+   * Visit input elements `<input>`.
    */
   int32_t (*visit_input)(const struct HTMHtmNodeContext *ctx,
                          void *user_data,
@@ -429,7 +487,7 @@ typedef struct HTMHtmVisitorCallbacks {
                           char **out_custom,
                           uintptr_t *out_len);
   /**
-   * Visit audio elements `<audio>`.\n    ///\n    /// `src` may be null.
+   * Visit audio elements `<audio>`.
    */
   int32_t (*visit_audio)(const struct HTMHtmNodeContext *ctx,
                          void *user_data,
@@ -437,7 +495,7 @@ typedef struct HTMHtmVisitorCallbacks {
                          char **out_custom,
                          uintptr_t *out_len);
   /**
-   * Visit video elements `<video>`.\n    ///\n    /// `src` may be null.
+   * Visit video elements `<video>`.
    */
   int32_t (*visit_video)(const struct HTMHtmNodeContext *ctx,
                          void *user_data,
@@ -445,7 +503,7 @@ typedef struct HTMHtmVisitorCallbacks {
                          char **out_custom,
                          uintptr_t *out_len);
   /**
-   * Visit iframe elements `<iframe>`.\n    ///\n    /// `src` may be null.
+   * Visit iframe elements `<iframe>`.
    */
   int32_t (*visit_iframe)(const struct HTMHtmNodeContext *ctx,
                           void *user_data,
@@ -453,7 +511,7 @@ typedef struct HTMHtmVisitorCallbacks {
                           char **out_custom,
                           uintptr_t *out_len);
   /**
-   * Visit details elements `<details>`.\n    ///\n    /// `open` is non-zero when the `open` attribute is present.
+   * Visit details elements `<details>`.
    */
   int32_t (*visit_details)(const struct HTMHtmNodeContext *ctx,
                            void *user_data,
@@ -469,7 +527,7 @@ typedef struct HTMHtmVisitorCallbacks {
                            char **out_custom,
                            uintptr_t *out_len);
   /**
-   * Called before processing a figure `<figure>`.
+   * Visit figure elements `<figure>`.
    */
   int32_t (*visit_figure_start)(const struct HTMHtmNodeContext *ctx,
                                 void *user_data,

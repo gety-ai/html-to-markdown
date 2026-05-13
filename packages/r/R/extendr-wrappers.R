@@ -168,3 +168,25 @@ VisitResult <- new.env(parent = emptyenv())
 }
 #' @export
 `[[.VisitResult` <- `$.VisitResult`
+NodeContent <- new.env(parent = emptyenv())
+NodeContent$default <- function() .Call("wrap__NodeContent__default", PACKAGE = "htmltomarkdown")
+NodeContent$from_json <- function(json) .Call("wrap__NodeContent__from_json", json, PACKAGE = "htmltomarkdown")
+#' @export
+`$.NodeContent` <- function(self, name) {
+  func <- NodeContent[[name]]
+  environment(func) <- environment()
+  func
+}
+#' @export
+`[[.NodeContent` <- `$.NodeContent`
+AnnotationKind <- new.env(parent = emptyenv())
+AnnotationKind$default <- function() .Call("wrap__AnnotationKind__default", PACKAGE = "htmltomarkdown")
+AnnotationKind$from_json <- function(json) .Call("wrap__AnnotationKind__from_json", json, PACKAGE = "htmltomarkdown")
+#' @export
+`$.AnnotationKind` <- function(self, name) {
+  func <- AnnotationKind[[name]]
+  environment(func) <- environment()
+  func
+}
+#' @export
+`[[.AnnotationKind` <- `$.AnnotationKind`
