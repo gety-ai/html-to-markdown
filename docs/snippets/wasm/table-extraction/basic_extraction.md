@@ -11,12 +11,12 @@ const html = `
 </table>
 `;
 
-const result = convert(html, { extractTables: true });
+const result = convert(html);
 
 for (const table of result.tables ?? []) {
-  for (let i = 0; i < table.cells.length; i++) {
-    const prefix = table.isHeaderRow[i] ? "Header" : "Row";
-    console.log(`  ${prefix}: ${table.cells[i].join(", ")}`);
+  for (const cell of table.grid.cells ?? []) {
+    const kind = cell.isHeader ? "Header" : "Cell";
+    console.log(`  ${kind} (r${cell.row},c${cell.col}): ${cell.content}`);
   }
 }
 ```

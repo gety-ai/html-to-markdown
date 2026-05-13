@@ -8,15 +8,14 @@ var html = @"
     <tr><td>Bob</td><td>25</td></tr>
 </table>";
 
-var options = new ConversionOptions { ExtractTables = true };
-var result = HtmlToMarkdownConverter.Convert(html, options);
+var result = HtmlToMarkdownConverter.Convert(html);
 
-foreach (var table in result.Tables ?? [])
+foreach (var table in result.Tables)
 {
-    for (int i = 0; i < table.Cells.Count; i++)
+    foreach (var cell in table.Grid.Cells)
     {
-        var prefix = table.IsHeaderRow[i] ? "Header" : "Row";
-        Console.WriteLine($"  {prefix}: {string.Join(", ", table.Cells[i])}");
+        var kind = cell.IsHeader ? "Header" : "Cell";
+        Console.WriteLine($"  {kind} (r{cell.Row},c{cell.Col}): {cell.Content}");
     }
 }
 ```

@@ -1,6 +1,5 @@
 ```php
-use HtmlToMarkdown\Config\ConversionOptions;
-use HtmlToMarkdown\Service\Converter;
+use HtmlToMarkdown\HtmlToMarkdown;
 
 $html = <<<HTML
 <table>
@@ -10,13 +9,12 @@ $html = <<<HTML
 </table>
 HTML;
 
-$converter = Converter::create();
-$result = $converter->convert($html, new ConversionOptions(extractTables: true));
+$result = HtmlToMarkdown::convert($html);
 
-foreach ($result['tables'] as $table) {
-    foreach ($table->cells as $i => $row) {
-        $prefix = $table->isHeaderRow[$i] ? 'Header' : 'Row';
-        echo "  {$prefix}: " . implode(', ', $row) . "\n";
+foreach ($result->tables as $table) {
+    foreach ($table->grid->cells as $cell) {
+        $kind = $cell->isHeader ? 'Header' : 'Cell';
+        echo "  {$kind} (r{$cell->row},c{$cell->col}): {$cell->content}\n";
     }
 }
 ```

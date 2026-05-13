@@ -7,7 +7,7 @@ Every binding wraps the same Rust core. The option names and return shapes are i
 **Package:** `html-to-markdown-rs` on [crates.io](https://crates.io/crates/html-to-markdown-rs)
 
 ```toml
-html-to-markdown-rs = "3.1"
+html-to-markdown-rs = "3.4"
 ```
 
 Option structs follow Rust naming conventions (`snake_case`). Use the builder API via `ConversionOptions::builder()` or construct `ConversionOptions` directly.
@@ -91,35 +91,41 @@ Options are keyword arguments with `snake_case` symbols. `result` is a hash. Err
 
 ## PHP
 
-**Package:** `kreuzberg/html-to-markdown` on Packagist
+**Package:** `kreuzberg-dev/html-to-markdown` on Packagist
+**Requires:** PHP ≥ 8.2
 
 ```bash
-composer require kreuzberg/html-to-markdown
+composer require kreuzberg-dev/html-to-markdown
 ```
 
 ```php
-$converter = new \Kreuzberg\HtmlToMarkdown\Converter();
-$result = $converter->convert('<h1>Title</h1>', ['headingStyle' => 'atx']);
+use HtmlToMarkdown\HtmlToMarkdown;
+use HtmlToMarkdown\ConversionOptions;
+
+$options = ConversionOptions::builder()->headingStyle('atx')->build();
+$result = HtmlToMarkdown::convert('<h1>Title</h1>', $options);
 echo $result->content;
 ```
 
-Options are a plain associative array with `camelCase` keys. `$result` is a value object. Errors throw `\Kreuzberg\HtmlToMarkdown\ConversionException`.
+Classes live in the flat `HtmlToMarkdown\` namespace. `HtmlToMarkdown::convert` returns a `ConversionResult` object (`$result->content`, `$result->metadata`, `$result->tables`). Conversion failures throw `HtmlToMarkdown\HtmlToMarkdownException`.
 
 ## Java
 
 **Maven:** `dev.kreuzberg:html-to-markdown`
+**Requires:** Java ≥ 25
 
 ```xml
 <dependency>
     <groupId>dev.kreuzberg</groupId>
     <artifactId>html-to-markdown</artifactId>
-    <version>3.1.0</version>
+    <version>3.4.0</version>
 </dependency>
 ```
 
 ```java
-import dev.kreuzberg.HtmlToMarkdown;
-import dev.kreuzberg.ConversionOptions;
+import dev.kreuzberg.htmltomarkdown.HtmlToMarkdown;
+import dev.kreuzberg.htmltomarkdown.ConversionOptions;
+import dev.kreuzberg.htmltomarkdown.ConversionResult;
 
 ConversionOptions options = ConversionOptions.builder()
     .headingStyle("atx")
@@ -128,33 +134,34 @@ ConversionResult result = HtmlToMarkdown.convert("<h1>Title</h1>", options);
 System.out.println(result.getContent());
 ```
 
-Uses a builder for options. Errors throw `dev.kreuzberg.ConversionException` (checked). The library ships with native binaries for Linux x86_64, macOS arm64/x86_64, and Windows x86_64.
+Uses a builder for options. Conversion failures throw `dev.kreuzberg.htmltomarkdown.HtmlToMarkdownRsException` and its subtypes (`ParseErrorException`, `ConfigErrorException`, `InvalidInputException`, `PanicException`, `OtherException`). Native binaries ship in the JAR for Linux x86_64, macOS arm64/x86_64, and Windows x86_64.
 
-## C
+## C# (.NET)
 
 **NuGet:** `KreuzbergDev.HtmlToMarkdown`
+**Requires:** .NET 10
 
 ```bash
 dotnet add package KreuzbergDev.HtmlToMarkdown
 ```
 
 ```csharp
-using KreuzbergDev.HtmlToMarkdown;
+using HtmlToMarkdown;
 
 var options = new ConversionOptions { HeadingStyle = "atx" };
 var result = HtmlToMarkdownConverter.Convert("<h1>Title</h1>", options);
 Console.WriteLine(result.Content);
 ```
 
-Option properties are `PascalCase`. Errors throw `ConversionException`. The package targets `netstandard2.0` and above.
+Classes live in the `HtmlToMarkdown` namespace (the `KreuzbergDev.HtmlToMarkdown` prefix is only the NuGet package id). Properties are `PascalCase`. Errors throw `HtmlToMarkdownRsException` and subtypes.
 
 ## Elixir
 
 **Hex:** `html_to_markdown`
-**Requires:** Elixir ~> 1.19
+**Requires:** Elixir ≥ 1.14
 
 ```elixir
-{:html_to_markdown, "~> 3.1"}
+{:html_to_markdown, "~> 3.4"}
 ```
 
 ```elixir
@@ -186,21 +193,25 @@ Options are named function arguments. The returned list matches the `ConversionR
 ## C
 
 **Link against:** `libhtml_to_markdown`
-**Header:** `html_to_markdown.h`
+**Header:** `html_to_markdown.h` (HTM_H, all symbols prefixed `htm_*` / `HTM*`)
 
 Download a pre-built release archive for your platform from the [GitHub releases page](https://github.com/kreuzberg-dev/html-to-markdown/releases), or build from source with `cargo build --release -p html-to-markdown-ffi`.
 
 ```c
 #include "html_to_markdown.h"
 
-HtmlToMarkdownResult result = html_to_markdown_convert("<h1>Title</h1>", NULL);
-if (result.error == NULL) {
-    printf("%s\n", result.content);
+HTMConversionResult *result = htm_convert("<h1>Title</h1>", NULL);
+if (result != NULL) {
+    char *content = htm_conversion_result_content(result);
+    if (content != NULL) {
+        printf("%s\n", content);
+        htm_free_string(content);
+    }
+    htm_conversion_result_free(result);
 }
-html_to_markdown_free_result(result);
 ```
 
-Always call `html_to_markdown_free_result` to release memory owned by the Rust allocator. The C API is a thin synchronous FFI layer. No async mode, no thread-local state.
+Every heap-allocated string must be released with `htm_free_string` and every handle with the matching `htm_*_free` function. The C API is a thin synchronous FFI layer. No async mode, no thread-local state. Conversion errors return `NULL` and set the thread-local error accessible via `htm_last_error_code` / `htm_last_error_context`.
 
 ## WASM
 

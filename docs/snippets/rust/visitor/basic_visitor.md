@@ -1,23 +1,30 @@
 ```rust
-use html_to_markdown_rs::{convert, ConversionOptions, Visitor, VisitResult};
+use html_to_markdown_rs::visitor::{HtmlVisitor, NodeContext, VisitResult, VisitorHandle};
+use html_to_markdown_rs::{ConversionOptions, convert};
+use std::cell::RefCell;
+use std::rc::Rc;
 
+#[derive(Debug)]
 struct LinkRewriter;
 
-impl Visitor for LinkRewriter {
-    fn visit_link(&self, url: &str, text: &str) -> VisitResult {
-        // Rewrite all links to use a tracking prefix
-        VisitResult::Replace(format!("[{text}](https://track.example.com?url={url})"))
+impl HtmlVisitor for LinkRewriter {
+    fn visit_link(
+        &mut self,
+        _ctx: &NodeContext,
+        href: &str,
+        text: &str,
+        _title: Option<&str>,
+    ) -> VisitResult {
+        VisitResult::Custom(format!("[{text}](https://track.example.com?url={href})"))
     }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let html = r#"<a href="https://example.com">Click here</a>"#;
-    let options = ConversionOptions::builder()
-        .visitor(LinkRewriter)
-        .build();
+    let visitor: VisitorHandle = Rc::new(RefCell::new(LinkRewriter));
+    let options = ConversionOptions::builder().visitor(Some(visitor)).build();
     let result = convert(html, Some(options))?;
-    let markdown = result.content.unwrap_or_default();
-    println!("{markdown}");
+    println!("{}", result.content.unwrap_or_default());
     Ok(())
 }
 ```

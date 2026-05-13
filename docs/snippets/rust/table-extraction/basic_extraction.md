@@ -1,7 +1,8 @@
 ```rust
-use html_to_markdown_rs::{convert, ConversionOptions};
+use html_to_markdown_rs::{ConversionOptions, convert};
 
-let html = r#"
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let html = r#"
 <table>
     <tr><th>Name</th><th>Age</th></tr>
     <tr><td>Alice</td><td>30</td></tr>
@@ -9,15 +10,14 @@ let html = r#"
 </table>
 "#;
 
-let options = ConversionOptions::builder()
-    .extract_tables(true)
-    .build();
-let result = convert(html, Some(options))?;
+    let result = convert(html, Some(ConversionOptions::default()))?;
 
-for table in result.tables.unwrap_or_default() {
-    for (i, row) in table.cells.iter().enumerate() {
-        let prefix = if table.is_header_row[i] { "Header" } else { "Row" };
-        println!("  {prefix}: {}", row.join(", "));
+    for table in &result.tables {
+        for cell in &table.grid.cells {
+            let kind = if cell.is_header { "Header" } else { "Cell" };
+            println!("  {kind} (r{},c{}): {}", cell.row, cell.col, cell.content);
+        }
     }
+    Ok(())
 }
 ```

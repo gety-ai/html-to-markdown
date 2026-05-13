@@ -1,14 +1,12 @@
 ```php
-use HtmlToMarkdown\Config\ConversionOptions;
-use HtmlToMarkdown\Service\Converter;
+use HtmlToMarkdown\HtmlToMarkdown;
+use HtmlToMarkdown\ConversionOptions;
 
-$converter = Converter::create();
+$options = ConversionOptions::builder()
+    ->headingStyle('atx')
+    ->listIndentWidth(2)
+    ->build();
 
-$options = new ConversionOptions(
-    headingStyle: 'Atx',
-    listIndentWidth: 2,
-);
-
-$result = $converter->convert('<h1>Hello</h1>', $options);
-$markdown = $result['content'];
+$result = HtmlToMarkdown::convert('<h1>Hello</h1>', $options);
+echo $result->content;
 ```

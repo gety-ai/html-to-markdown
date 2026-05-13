@@ -1,5 +1,5 @@
 ```typescript
-import { convert, ConversionOptions } from "@kreuzberg/html-to-markdown";
+import { convert } from "@kreuzberg/html-to-markdown";
 
 const html = `
 <table>
@@ -9,13 +9,12 @@ const html = `
 </table>
 `;
 
-const options: ConversionOptions = { extractTables: true };
-const result = convert(html, options);
+const result = convert(html);
 
 for (const table of result.tables ?? []) {
-  for (let i = 0; i < table.cells.length; i++) {
-    const prefix = table.isHeaderRow[i] ? "Header" : "Row";
-    console.log(`  ${prefix}: ${table.cells[i].join(", ")}`);
+  for (const cell of table.grid.cells ?? []) {
+    const kind = cell.isHeader ? "Header" : "Cell";
+    console.log(`  ${kind} (r${cell.row},c${cell.col}): ${cell.content}`);
   }
 }
 ```

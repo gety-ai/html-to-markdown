@@ -8,7 +8,7 @@ All options are passed via `ConversionOptions` (builder pattern in Rust, keyword
 
 | Option          | Type                                              | Default      | Description                                                                                |
 | --------------- | ------------------------------------------------- | ------------ | ------------------------------------------------------------------------------------------ |
-| `output_format` | `"markdown"` \| `"djot"` \| `"plain"` \| `"none"` | `"markdown"` | Target output format. Use `"none"` to skip conversion and only extract metadata/structure. |
+| `output_format` | `"markdown"` \| `"djot"` \| `"plain"` | `"markdown"` | Target output format. `"plain"` strips all markup and link targets, returning only visible text. |
 
 ### Headings
 
@@ -29,7 +29,7 @@ All options are passed via `ConversionOptions` (builder pattern in Rust, keyword
 | Option             | Type                                                 | Default          | Description                                                                 |
 | ------------------ | ---------------------------------------------------- | ---------------- | --------------------------------------------------------------------------- |
 | `strong_em_symbol` | `"*"` \| `"_"`                                       | `"*"`            | Symbol used for bold (`**text**`) and italic (`*text*`).                    |
-| `newline_style`    | `"backslash"` \| `"spaces"`                          | `"backslash"`    | How to render `<br>` tags: backslash at end of line or two trailing spaces. |
+| `newline_style`    | `"spaces"` \| `"backslash"`                          | `"spaces"`       | How to render `<br>` tags: two trailing spaces or backslash at end of line. |
 | `sub_symbol`       | `string`                                             | `""`             | Symbol to wrap `<sub>` content (e.g. `"~"` → `~text~`).                     |
 | `sup_symbol`       | `string`                                             | `""`             | Symbol to wrap `<sup>` content (e.g. `"^"` → `^text^`).                     |
 | `highlight_style`  | `"double-equal"` \| `"html"` \| `"bold"` \| `"none"` | `"double-equal"` | Rendering of `<mark>` elements.                                             |
@@ -54,7 +54,7 @@ All options are passed via `ConversionOptions` (builder pattern in Rust, keyword
 
 | Option          | Type                        | Default    | Description                                                                                                                 |
 | --------------- | --------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `autolinks`     | `bool`                      | `false`    | When link text equals the href, emit `<url>` instead of `[url](url)`.                                                       |
+| `autolinks`     | `bool`                      | `true`     | When link text equals the href, emit `<url>` instead of `[url](url)`.                                                       |
 | `default_title` | `bool`                      | `false`    | Use the href as link title when no `title` attribute is present.                                                            |
 | `link_style`    | `"inline"` \| `"reference"` | `"inline"` | `inline` emits `[text](url)`. `reference` emits `[text][1]` with numbered definitions collected at the end of the document. |
 

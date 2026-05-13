@@ -6,15 +6,15 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 
 | Language             | Min version       | Package                                                    |
 | -------------------- | ----------------- | ---------------------------------------------------------- |
-| Rust                 | 1.70              | `html-to-markdown-rs` on crates.io                         |
+| Rust                 | 1.85              | `html-to-markdown-rs` on crates.io                         |
 | Python               | 3.10              | `html-to-markdown` on PyPI                                 |
 | TypeScript / Node.js | Node.js 18        | `@kreuzberg/html-to-markdown` on npm                       |
 | Go                   | 1.26              | `github.com/kreuzberg-dev/html-to-markdown/packages/go/v3` |
 | Ruby                 | 3.2               | `html-to-markdown` on RubyGems                             |
 | PHP                  | 8.2               | `kreuzberg-dev/html-to-markdown` on Packagist              |
-| Java                 | 22                | `dev.kreuzberg:html-to-markdown` on Maven Central          |
+| Java                 | 25                | `dev.kreuzberg:html-to-markdown` on Maven Central          |
 | C#                   | .NET Standard 2.0 | `KreuzbergDev.HtmlToMarkdown` on NuGet                     |
-| Elixir               | 1.19              | `html_to_markdown` on Hex                                  |
+| Elixir               | 1.14              | `html_to_markdown` on Hex                                  |
 | R                    | 4.0               | `htmltomarkdown` on CRAN                                   |
 | C                    | —                 | `libhtml_to_markdown` (GitHub Releases)                    |
 | WebAssembly          | —                 | `@kreuzberg/html-to-markdown-wasm` on npm                  |
@@ -29,7 +29,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 
     ```toml
     [dependencies]
-    html-to-markdown-rs = "3.1"
+    html-to-markdown-rs = "3.4"
     ```
 
     Or via `cargo add`:
@@ -64,10 +64,10 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 
     ```toml
     # With visitor support
-    html-to-markdown-rs = { version = "3.1", features = ["visitor"] }
+    html-to-markdown-rs = { version = "3.4", features = ["visitor"] }
 
     # Everything
-    html-to-markdown-rs = { version = "3.1", features = ["full"] }
+    html-to-markdown-rs = { version = "3.4", features = ["full"] }
     ```
 
 === "Python"
@@ -153,7 +153,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     Or add to your `Gemfile`:
 
     ```ruby
-    gem 'html-to-markdown', '~> 3.1'
+    gem 'html-to-markdown', '~> 3.4'
     ```
 
     **Verify:**
@@ -194,20 +194,20 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     <dependency>
         <groupId>dev.kreuzberg</groupId>
         <artifactId>html-to-markdown</artifactId>
-        <version>3.1.0</version>
+        <version>3.4.0</version>
     </dependency>
     ```
 
     **Gradle** — add to `build.gradle`:
 
     ```groovy
-    implementation 'dev.kreuzberg:html-to-markdown:3.1.0'
+    implementation 'dev.kreuzberg:html-to-markdown:3.4.0'
     ```
 
     Or Kotlin DSL (`build.gradle.kts`):
 
     ```kotlin
-    implementation("dev.kreuzberg:html-to-markdown:3.1.0")
+    implementation("dev.kreuzberg:html-to-markdown:3.4.0")
     ```
 
     **Verify:**
@@ -224,7 +224,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     }
     ```
 
-    Requires Java 22+. The JAR extracts the native `libhtml_to_markdown` shared library at startup. No separate install step is needed — the library is bundled for Linux x86_64, macOS arm64/x86_64, and Windows x64.
+    Requires Java 25+. The JAR extracts the native `libhtml_to_markdown` shared library at startup. No separate install step is needed — the library is bundled for Linux x86_64, macOS arm64/x86_64, and Windows x64.
 
 === "C#"
 
@@ -253,7 +253,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     ```elixir
     def deps do
       [
-        {:html_to_markdown, "~> 3.1"}
+        {:html_to_markdown, "~> 3.4"}
       ]
     end
     ```
@@ -272,7 +272,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     # # Hello
     ```
 
-    Requires Elixir 1.19+. Uses Rustler NIFs — precompiled NIF binaries are fetched automatically via `RustlerPrecompiled`. Set `RUSTLER_PRECOMPILED_GLOBAL_CACHE_PATH` to control cache location.
+    Requires Elixir 1.14+. Uses Rustler NIFs — precompiled NIF binaries are fetched automatically via `RustlerPrecompiled`. Set `RUSTLER_PRECOMPILED_GLOBAL_CACHE_PATH` to control cache location.
 
 === "R"
 
@@ -315,12 +315,17 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     #include <stdio.h>
 
     int main(void) {
-        HtmlToMarkdownResult r = html_to_markdown_convert("<h1>Hello</h1>", NULL);
-        if (r.error == NULL) {
-            printf("%s\n", r.content);
-            // # Hello
+        HTMConversionResult *result = htm_convert("<h1>Hello</h1>", NULL);
+        if (result == NULL) {
+            fprintf(stderr, "convert failed: %s\n", htm_last_error_context());
+            return 1;
         }
-        html_to_markdown_free_result(r);
+        char *content = htm_conversion_result_content(result);
+        if (content != NULL) {
+            printf("%s\n", content);
+            htm_free_string(content);
+        }
+        htm_conversion_result_free(result);
         return 0;
     }
     ```
@@ -331,7 +336,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     gcc main.c -lhtml_to_markdown -L./target/release -o main
     ```
 
-    Always call `html_to_markdown_free_result` after every call. Memory returned across the FFI boundary is owned by the Rust allocator and must not be freed with `free()`.
+    Every heap-allocated string returned across the FFI must be released with `htm_free_string`, and every result/options handle must be released with the matching `htm_*_free` function. The memory belongs to the Rust allocator — do not call `free()` directly.
 
 === "WASM"
 

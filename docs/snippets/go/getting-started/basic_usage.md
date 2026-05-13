@@ -5,13 +5,13 @@ import (
     "fmt"
     "log"
 
-    "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown"
+    htmltomarkdown "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
 )
 
 func main() {
     html := "<h1>Hello World</h1><p>This is a paragraph.</p>"
 
-    result, err := htmltomarkdown.Convert(html)
+    result, err := htmltomarkdown.Convert(html, nil)
     if err != nil {
         log.Fatal(err)
     }

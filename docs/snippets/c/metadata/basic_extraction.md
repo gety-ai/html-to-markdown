@@ -1,21 +1,31 @@
 ```c
 #include "html_to_markdown.h"
 #include <stdio.h>
-#include <string.h>
 
 int main(void) {
-    const char *html = "<html><head><title>Page</title></head>"
-                       "<body><h1>Hello</h1></body></html>";
-    const char *options_json = "{\"extract_metadata\":true}";
+    const char *html =
+        "<html><head><title>Page</title></head><body><h1>Hello</h1></body></html>";
 
-    /* Returns JSON: {"content":"...","metadata":{...},"tables":null} */
-    char *json = html_to_markdown_convert_with_len(
-        html, strlen(html), options_json, strlen(options_json));
-    if (json) {
-        /* Parse JSON to access content and metadata fields */
-        printf("%s\n", json);
-        html_to_markdown_free_string(json);
+    /* extract_metadata is true by default. */
+    HTMConversionResult *result = htm_convert(html, NULL);
+    if (result == NULL) {
+        fprintf(stderr, "convert failed: %s\n", htm_last_error_context());
+        return 1;
     }
+
+    HTMHtmlMetadata *meta = htm_conversion_result_metadata(result);
+    if (meta != NULL) {
+        HTMDocumentMetadata *doc = htm_html_metadata_document(meta);
+        char *title = htm_document_metadata_title(doc);
+        if (title != NULL) {
+            printf("Title: %s\n", title);
+            htm_free_string(title);
+        }
+        htm_document_metadata_free(doc);
+        htm_html_metadata_free(meta);
+    }
+
+    htm_conversion_result_free(result);
     return 0;
 }
 ```

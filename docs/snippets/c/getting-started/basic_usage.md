@@ -3,14 +3,20 @@
 #include <stdio.h>
 
 int main(void) {
-    const char *html = "<h1>Hello</h1><p>World</p>";
-    /* Returns JSON: {"content":"...","metadata":null,"tables":null} */
-    char *json = html_to_markdown_convert(html, NULL);
-    if (json) {
-        /* Parse JSON to extract content field */
-        printf("%s\n", json);
-        html_to_markdown_free_string(json);
+    HTMConversionResult *result = htm_convert("<h1>Hello</h1><p>World</p>", NULL);
+    if (result == NULL) {
+        fprintf(stderr, "convert failed (code %d): %s\n",
+                htm_last_error_code(), htm_last_error_context());
+        return 1;
     }
+
+    char *content = htm_conversion_result_content(result);
+    if (content != NULL) {
+        printf("%s\n", content);
+        htm_free_string(content);
+    }
+
+    htm_conversion_result_free(result);
     return 0;
 }
 ```

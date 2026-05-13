@@ -1,5 +1,10 @@
 ```go
-import "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown"
+import (
+    "fmt"
+    "log"
+
+    htmltomarkdown "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
+)
 
 html := `
 <table>
@@ -9,19 +14,18 @@ html := `
 </table>
 `
 
-opts := htmltomarkdown.ConversionOptions{ExtractTables: true}
-result, err := htmltomarkdown.Convert(html, opts)
+result, err := htmltomarkdown.Convert(html, nil)
 if err != nil {
     log.Fatal(err)
 }
 
 for _, table := range result.Tables {
-    for i, row := range table.Cells {
-        prefix := "Row"
-        if table.IsHeaderRow[i] {
-            prefix = "Header"
+    for _, cell := range table.Grid.Cells {
+        kind := "Cell"
+        if cell.IsHeader {
+            kind = "Header"
         }
-        fmt.Printf("  %s: %v\n", prefix, row)
+        fmt.Printf("  %s (r%d,c%d): %s\n", kind, cell.Row, cell.Col, cell.Content)
     }
 }
 ```

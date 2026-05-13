@@ -1,29 +1,24 @@
 ```php
-use HtmlToMarkdown\Visitor\AbstractVisitor;
-use HtmlToMarkdown\Visitor\NodeContext;
-use HtmlToMarkdown\Visitor\VisitResult;
-use HtmlToMarkdown\Config\ConversionOptions;
-use HtmlToMarkdown\Service\Converter;
+use HtmlToMarkdown\HtmlToMarkdown;
+use HtmlToMarkdown\ConversionOptions;
 
-class CustomVisitor extends AbstractVisitor
-{
-    public function visitImage(NodeContext $context, string $src, string $alt, ?string $title): array
-    {
-        // Skip all images
-        return VisitResult::skip();
+// Visitors are duck-typed: define any subset of visit_* methods.
+// Each method returns either 'skip', ['custom' => '...'], or null/'continue'.
+$visitor = new class {
+    public function visit_link($ctx, $href, $text, $title) {
+        return ['custom' => "[{$text}]({$href})"];
     }
 
-    public function visitLink(NodeContext $context, string $href, string $text, ?string $title): array
-    {
-        // Custom link handling
-        return VisitResult::custom("[{$text}]({$href})");
+    public function visit_image($ctx, $src, $alt, $title) {
+        return 'skip';
     }
-}
+};
 
-$converter = Converter::create();
-$result = $converter->convert(
+$options = ConversionOptions::builder()->visitor($visitor)->build();
+
+$result = HtmlToMarkdown::convert(
     '<a href="/page">Link</a><img src="pic.png" alt="pic">',
-    new ConversionOptions(visitor: new CustomVisitor())
+    $options
 );
-$markdown = $result['content'];
+echo $result->content;
 ```

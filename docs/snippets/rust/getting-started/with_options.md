@@ -1,5 +1,5 @@
 ```rust
-use html_to_markdown_rs::{convert, ConversionOptions};
+use html_to_markdown_rs::{ConversionOptions, HeadingStyle, convert};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let options = ConversionOptions::builder()
@@ -7,8 +7,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .skip_images(true)
         .build();
     let result = convert("<h1>Hello</h1><img src='pic.jpg'>", Some(options))?;
-    let markdown = result.content.unwrap_or_default();
-    println!("{markdown}");
+    println!("{}", result.content.unwrap_or_default());
     Ok(())
 }
 ```
