@@ -107,6 +107,7 @@ npm install @kreuzberg/html-to-markdown-wasm
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
+
 | Document | Size | Latency | Throughput |
 |----------|------|---------|------------|
 | Lists (Timeline) | 129KB | 0.58ms | 222 MB/s |
@@ -325,7 +326,7 @@ const markdown = result.content;
 
 - **Discord:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
 
-## Part of Kreuzberg, Inc
+## Part of Kreuzberg.dev
 
 - [Kreuzberg](https://github.com/kreuzberg-dev/kreuzberg) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
 - [Kreuzberg Cloud](https://github.com/kreuzberg-dev/kreuzberg-cloud) — managed extraction API with SDKs, dashboards, and observability.

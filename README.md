@@ -145,7 +145,7 @@ println!("{}", result.content.unwrap_or_default());
 | R                    | [htmltomarkdown](https://kreuzberg-dev.r-universe.dev/htmltomarkdown)                                        | `install.packages("htmltomarkdown")`                              |
 | C (FFI)              | [releases](https://github.com/kreuzberg-dev/html-to-markdown/releases)                                       | Pre-built `.so` / `.dll` / `.dylib`                               |
 
-## Part of Kreuzberg, Inc
+## Part of Kreuzberg.dev
 
 - [Kreuzberg](https://github.com/kreuzberg-dev/kreuzberg) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
 - [Kreuzberg Cloud](https://github.com/kreuzberg-dev/kreuzberg-cloud) — managed extraction API with SDKs, dashboards, and observability.
