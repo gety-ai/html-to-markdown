@@ -107,7 +107,6 @@ npm install @kreuzberg/html-to-markdown-wasm
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
-
 | Document | Size | Latency | Throughput |
 |----------|------|---------|------------|
 | Lists (Timeline) | 129KB | 0.58ms | 222 MB/s |

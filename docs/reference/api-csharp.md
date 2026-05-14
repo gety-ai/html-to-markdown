@@ -1,7 +1,6 @@
 ---
 title: "C# API Reference"
 ---
-
 ## C# API Reference <span class="version-badge">v3.4.1</span>
 
 ### Functions
@@ -20,7 +19,6 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 ```csharp
 public static ConversionResult Convert(string html, ConversionOptions? options = null)
 ```
-
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -94,7 +92,6 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 ```csharp
 public ConversionOptions CreateDefault()
 ```
-
 ###### Builder()
 
 Create a new builder with default values.
@@ -104,7 +101,6 @@ Create a new builder with default values.
 ```csharp
 public ConversionOptionsBuilder Builder()
 ```
-
 ###### ApplyUpdate()
 
 Apply a partial update to these conversion options.
@@ -114,7 +110,6 @@ Apply a partial update to these conversion options.
 ```csharp
 public void ApplyUpdate(ConversionOptionsUpdate update)
 ```
-
 ###### FromUpdate()
 
 Create from a partial update, applying to defaults.
@@ -124,7 +119,6 @@ Create from a partial update, applying to defaults.
 ```csharp
 public ConversionOptions FromUpdate(ConversionOptionsUpdate update)
 ```
-
 ###### From()
 
 **Signature:**
@@ -171,7 +165,6 @@ Set the list of HTML tag names whose content is stripped from output.
 ```csharp
 public ConversionOptionsBuilder StripTags(List<string> tags)
 ```
-
 ###### PreserveTags()
 
 Set the list of HTML tag names that are preserved verbatim in output.
@@ -181,7 +174,6 @@ Set the list of HTML tag names that are preserved verbatim in output.
 ```csharp
 public ConversionOptionsBuilder PreserveTags(List<string> tags)
 ```
-
 ###### KeepInlineImagesIn()
 
 Set the list of HTML tag names whose `<img>` children are kept inline.
@@ -191,7 +183,6 @@ Set the list of HTML tag names whose `<img>` children are kept inline.
 ```csharp
 public ConversionOptionsBuilder KeepInlineImagesIn(List<string> tags)
 ```
-
 ###### ExcludeSelectors()
 
 Set the list of CSS selectors for elements to exclude entirely from output.
@@ -201,7 +192,6 @@ Set the list of CSS selectors for elements to exclude entirely from output.
 ```csharp
 public ConversionOptionsBuilder ExcludeSelectors(List<string> selectors)
 ```
-
 ###### Visitor()
 
 Set the visitor used during conversion.
@@ -211,7 +201,6 @@ Set the visitor used during conversion.
 ```csharp
 public ConversionOptionsBuilder Visitor(VisitorHandle visitor)
 ```
-
 ###### Preprocessing()
 
 Set the pre-processing options applied to the HTML before conversion.
@@ -221,7 +210,6 @@ Set the pre-processing options applied to the HTML before conversion.
 ```csharp
 public ConversionOptionsBuilder Preprocessing(PreprocessingOptions preprocessing)
 ```
-
 ###### Build()
 
 Build the final `ConversionOptions`.
@@ -363,31 +351,30 @@ Implement this trait to customize the conversion behavior for any HTML element t
 All methods have default implementations that return `VisitResult.Continue`, allowing
 selective override of only the elements you care about.
 
-## Method Naming Convention
+# Method Naming Convention
 
 - `visit_*_start`: Called before entering an element (pre-order traversal)
 - `visit_*_end`: Called after exiting an element (post-order traversal)
 - `visit_*`: Called for specific element types (e.g., `visit_link`, `visit_image`)
 
-## Execution Order
+# Execution Order
 
 For a typical element like `<div><p>text</p></div>`:
-
 1. `visit_element_start` for `<div>`
 2. `visit_element_start` for `<p>`
 3. `visit_text` for "text"
 4. `visit_element_end` for `<p>`
 5. `visit_element_end` for `</div>`
 
-## Performance Notes
+# Performance Notes
 
 - `visit_text` is the most frequently called method (~100+ times per document)
 - Return `VisitResult.Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-### Methods
+##### Methods
 
-#### VisitText()
+###### VisitText()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -396,8 +383,7 @@ Visit text nodes (most frequent callback - ~100+ per document).
 ```csharp
 public VisitResult VisitText(NodeContext ctx, string text)
 ```
-
-##### VisitElementStart()
+###### VisitElementStart()
 
 Called before entering any element.
 
@@ -409,7 +395,6 @@ visitors to implement generic element handling before tag-specific logic.
 ```csharp
 public VisitResult VisitElementStart(NodeContext ctx)
 ```
-
 ###### VisitElementEnd()
 
 Called after exiting any element.
@@ -422,7 +407,6 @@ Visitors can inspect or replace this output.
 ```csharp
 public VisitResult VisitElementEnd(NodeContext ctx, string output)
 ```
-
 ###### VisitLink()
 
 Visit anchor links `<a href="...">`.
@@ -432,7 +416,6 @@ Visit anchor links `<a href="...">`.
 ```csharp
 public VisitResult VisitLink(NodeContext ctx, string href, string text, string title)
 ```
-
 ###### VisitImage()
 
 Visit images `<img src="...">`.
@@ -442,7 +425,6 @@ Visit images `<img src="...">`.
 ```csharp
 public VisitResult VisitImage(NodeContext ctx, string src, string alt, string title)
 ```
-
 ###### VisitHeading()
 
 Visit heading elements `<h1>` through `<h6>`.
@@ -452,7 +434,6 @@ Visit heading elements `<h1>` through `<h6>`.
 ```csharp
 public VisitResult VisitHeading(NodeContext ctx, uint level, string text, string id)
 ```
-
 ###### VisitCodeBlock()
 
 Visit code blocks `<pre><code>`.
@@ -462,7 +443,6 @@ Visit code blocks `<pre><code>`.
 ```csharp
 public VisitResult VisitCodeBlock(NodeContext ctx, string lang, string code)
 ```
-
 ###### VisitCodeInline()
 
 Visit inline code `<code>`.
@@ -472,7 +452,6 @@ Visit inline code `<code>`.
 ```csharp
 public VisitResult VisitCodeInline(NodeContext ctx, string code)
 ```
-
 ###### VisitListItem()
 
 Visit list items `<li>`.
@@ -482,7 +461,6 @@ Visit list items `<li>`.
 ```csharp
 public VisitResult VisitListItem(NodeContext ctx, bool ordered, string marker, string text)
 ```
-
 ###### VisitListStart()
 
 Called before processing a list `<ul>` or `<ol>`.
@@ -492,7 +470,6 @@ Called before processing a list `<ul>` or `<ol>`.
 ```csharp
 public VisitResult VisitListStart(NodeContext ctx, bool ordered)
 ```
-
 ###### VisitListEnd()
 
 Called after processing a list `</ul>` or `</ol>`.
@@ -502,7 +479,6 @@ Called after processing a list `</ul>` or `</ol>`.
 ```csharp
 public VisitResult VisitListEnd(NodeContext ctx, bool ordered, string output)
 ```
-
 ###### VisitTableStart()
 
 Called before processing a table `<table>`.
@@ -512,7 +488,6 @@ Called before processing a table `<table>`.
 ```csharp
 public VisitResult VisitTableStart(NodeContext ctx)
 ```
-
 ###### VisitTableRow()
 
 Visit table rows `<tr>`.
@@ -522,7 +497,6 @@ Visit table rows `<tr>`.
 ```csharp
 public VisitResult VisitTableRow(NodeContext ctx, List<string> cells, bool isHeader)
 ```
-
 ###### VisitTableEnd()
 
 Called after processing a table `</table>`.
@@ -532,7 +506,6 @@ Called after processing a table `</table>`.
 ```csharp
 public VisitResult VisitTableEnd(NodeContext ctx, string output)
 ```
-
 ###### VisitBlockquote()
 
 Visit blockquote elements `<blockquote>`.
@@ -542,7 +515,6 @@ Visit blockquote elements `<blockquote>`.
 ```csharp
 public VisitResult VisitBlockquote(NodeContext ctx, string content, nuint depth)
 ```
-
 ###### VisitStrong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
@@ -552,7 +524,6 @@ Visit strong/bold elements `<strong>`, `<b>`.
 ```csharp
 public VisitResult VisitStrong(NodeContext ctx, string text)
 ```
-
 ###### VisitEmphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
@@ -562,7 +533,6 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 ```csharp
 public VisitResult VisitEmphasis(NodeContext ctx, string text)
 ```
-
 ###### VisitStrikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
@@ -572,7 +542,6 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 ```csharp
 public VisitResult VisitStrikethrough(NodeContext ctx, string text)
 ```
-
 ###### VisitUnderline()
 
 Visit underline elements `<u>`, `<ins>`.
@@ -582,7 +551,6 @@ Visit underline elements `<u>`, `<ins>`.
 ```csharp
 public VisitResult VisitUnderline(NodeContext ctx, string text)
 ```
-
 ###### VisitSubscript()
 
 Visit subscript elements `<sub>`.
@@ -592,7 +560,6 @@ Visit subscript elements `<sub>`.
 ```csharp
 public VisitResult VisitSubscript(NodeContext ctx, string text)
 ```
-
 ###### VisitSuperscript()
 
 Visit superscript elements `<sup>`.
@@ -602,7 +569,6 @@ Visit superscript elements `<sup>`.
 ```csharp
 public VisitResult VisitSuperscript(NodeContext ctx, string text)
 ```
-
 ###### VisitMark()
 
 Visit mark/highlight elements `<mark>`.
@@ -612,7 +578,6 @@ Visit mark/highlight elements `<mark>`.
 ```csharp
 public VisitResult VisitMark(NodeContext ctx, string text)
 ```
-
 ###### VisitLineBreak()
 
 Visit line break elements `<br>`.
@@ -622,7 +587,6 @@ Visit line break elements `<br>`.
 ```csharp
 public VisitResult VisitLineBreak(NodeContext ctx)
 ```
-
 ###### VisitHorizontalRule()
 
 Visit horizontal rule elements `<hr>`.
@@ -632,7 +596,6 @@ Visit horizontal rule elements `<hr>`.
 ```csharp
 public VisitResult VisitHorizontalRule(NodeContext ctx)
 ```
-
 ###### VisitCustomElement()
 
 Visit custom elements (web components) or unknown tags.
@@ -642,7 +605,6 @@ Visit custom elements (web components) or unknown tags.
 ```csharp
 public VisitResult VisitCustomElement(NodeContext ctx, string tagName, string html)
 ```
-
 ###### VisitDefinitionListStart()
 
 Visit definition list `<dl>`.
@@ -652,7 +614,6 @@ Visit definition list `<dl>`.
 ```csharp
 public VisitResult VisitDefinitionListStart(NodeContext ctx)
 ```
-
 ###### VisitDefinitionTerm()
 
 Visit definition term `<dt>`.
@@ -662,7 +623,6 @@ Visit definition term `<dt>`.
 ```csharp
 public VisitResult VisitDefinitionTerm(NodeContext ctx, string text)
 ```
-
 ###### VisitDefinitionDescription()
 
 Visit definition description `<dd>`.
@@ -672,7 +632,6 @@ Visit definition description `<dd>`.
 ```csharp
 public VisitResult VisitDefinitionDescription(NodeContext ctx, string text)
 ```
-
 ###### VisitDefinitionListEnd()
 
 Called after processing a definition list `</dl>`.
@@ -682,7 +641,6 @@ Called after processing a definition list `</dl>`.
 ```csharp
 public VisitResult VisitDefinitionListEnd(NodeContext ctx, string output)
 ```
-
 ###### VisitForm()
 
 Visit form elements `<form>`.
@@ -692,7 +650,6 @@ Visit form elements `<form>`.
 ```csharp
 public VisitResult VisitForm(NodeContext ctx, string action, string method)
 ```
-
 ###### VisitInput()
 
 Visit input elements `<input>`.
@@ -702,7 +659,6 @@ Visit input elements `<input>`.
 ```csharp
 public VisitResult VisitInput(NodeContext ctx, string inputType, string name, string value)
 ```
-
 ###### VisitButton()
 
 Visit button elements `<button>`.
@@ -712,7 +668,6 @@ Visit button elements `<button>`.
 ```csharp
 public VisitResult VisitButton(NodeContext ctx, string text)
 ```
-
 ###### VisitAudio()
 
 Visit audio elements `<audio>`.
@@ -722,7 +677,6 @@ Visit audio elements `<audio>`.
 ```csharp
 public VisitResult VisitAudio(NodeContext ctx, string src)
 ```
-
 ###### VisitVideo()
 
 Visit video elements `<video>`.
@@ -732,7 +686,6 @@ Visit video elements `<video>`.
 ```csharp
 public VisitResult VisitVideo(NodeContext ctx, string src)
 ```
-
 ###### VisitIframe()
 
 Visit iframe elements `<iframe>`.
@@ -742,7 +695,6 @@ Visit iframe elements `<iframe>`.
 ```csharp
 public VisitResult VisitIframe(NodeContext ctx, string src)
 ```
-
 ###### VisitDetails()
 
 Visit details elements `<details>`.
@@ -752,7 +704,6 @@ Visit details elements `<details>`.
 ```csharp
 public VisitResult VisitDetails(NodeContext ctx, bool open)
 ```
-
 ###### VisitSummary()
 
 Visit summary elements `<summary>`.
@@ -762,7 +713,6 @@ Visit summary elements `<summary>`.
 ```csharp
 public VisitResult VisitSummary(NodeContext ctx, string text)
 ```
-
 ###### VisitFigureStart()
 
 Visit figure elements `<figure>`.
@@ -772,7 +722,6 @@ Visit figure elements `<figure>`.
 ```csharp
 public VisitResult VisitFigureStart(NodeContext ctx)
 ```
-
 ###### VisitFigcaption()
 
 Visit figcaption elements `<figcaption>`.
@@ -782,7 +731,6 @@ Visit figcaption elements `<figcaption>`.
 ```csharp
 public VisitResult VisitFigcaption(NodeContext ctx, string text)
 ```
-
 ###### VisitFigureEnd()
 
 Called after processing a figure `</figure>`.
@@ -795,7 +743,7 @@ public VisitResult VisitFigureEnd(NodeContext ctx, string output)
 
 ---
 
-##### ImageMetadata
+#### ImageMetadata
 
 Image metadata with source and dimensions.
 
@@ -814,7 +762,7 @@ for image analysis and optimization.
 
 ---
 
-##### LinkMetadata
+#### LinkMetadata
 
 Hyperlink metadata with categorization and attributes.
 
@@ -829,7 +777,7 @@ Represents `<a>` elements with parsed href values, text content, and link type c
 | `Rel` | `List<string>` | — | Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") |
 | `Attributes` | `Dictionary<string, string>` | — | Additional HTML attributes |
 
-###### Methods
+##### Methods
 
 ###### ClassifyLink()
 
@@ -847,7 +795,7 @@ public LinkType ClassifyLink(string href)
 
 ---
 
-##### NodeContext
+#### NodeContext
 
 Context information passed to all visitor methods.
 
@@ -867,7 +815,7 @@ including its type, attributes, position in the DOM tree, and parent context.
 
 ---
 
-##### PreprocessingOptions
+#### PreprocessingOptions
 
 HTML preprocessing options for document cleanup before conversion.
 
@@ -878,7 +826,7 @@ HTML preprocessing options for document cleanup before conversion.
 | `RemoveNavigation` | `bool` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `RemoveForms` | `bool` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-###### Methods
+##### Methods
 
 ###### CreateDefault()
 
@@ -887,7 +835,6 @@ HTML preprocessing options for document cleanup before conversion.
 ```csharp
 public PreprocessingOptions CreateDefault()
 ```
-
 ###### ApplyUpdate()
 
 Apply a partial update to these preprocessing options.
@@ -900,7 +847,6 @@ Unspecified fields (None) are left unchanged.
 ```csharp
 public void ApplyUpdate(PreprocessingOptionsUpdate update)
 ```
-
 ###### FromUpdate()
 
 Create new preprocessing options from a partial update.
@@ -917,7 +863,6 @@ New `PreprocessingOptions` with specified updates applied to defaults
 ```csharp
 public PreprocessingOptions FromUpdate(PreprocessingOptionsUpdate update)
 ```
-
 ###### From()
 
 **Signature:**
@@ -928,7 +873,7 @@ public PreprocessingOptions From(PreprocessingOptionsUpdate update)
 
 ---
 
-##### ProcessingWarning
+#### ProcessingWarning
 
 A non-fatal warning generated during HTML processing.
 
@@ -940,7 +885,7 @@ A non-fatal warning generated during HTML processing.
 
 ---
 
-##### StructuredData
+#### StructuredData
 
 Structured data block (JSON-LD, Microdata, or RDFa).
 
@@ -956,7 +901,7 @@ JSON-LD blocks are collected as raw JSON strings for flexibility.
 
 ---
 
-##### TableData
+#### TableData
 
 A top-level extracted table with both structured data and markdown representation.
 
@@ -968,7 +913,7 @@ A top-level extracted table with both structured data and markdown representatio
 
 ---
 
-##### TableGrid
+#### TableGrid
 
 A structured table grid with cell-level data including spans.
 
@@ -981,7 +926,7 @@ A structured table grid with cell-level data including spans.
 
 ---
 
-##### TextAnnotation
+#### TextAnnotation
 
 An inline text annotation with byte-range offsets.
 
@@ -996,7 +941,7 @@ Annotations describe formatting (bold, italic, etc.) and links within a node's t
 
 ---
 
-##### VisitorHandle
+#### VisitorHandle
 
 Type alias for a visitor handle (`Arc`-wrapped `Mutex` for thread-safe shared mutation).
 
@@ -1007,9 +952,9 @@ axum/rmcp/tokio Send-bound contexts.
 
 ---
 
-#### Enums
+### Enums
 
-##### TextDirection
+#### TextDirection
 
 Text directionality of document content.
 
@@ -1024,7 +969,7 @@ Corresponds to the HTML `dir` attribute and `bdi` element directionality.
 
 ---
 
-##### LinkType
+#### LinkType
 
 Link classification based on href value and document context.
 
@@ -1042,7 +987,7 @@ Used to categorize links during extraction for filtering and analysis.
 
 ---
 
-##### ImageType
+#### ImageType
 
 Image source classification for proper handling and processing.
 
@@ -1058,7 +1003,7 @@ Determines whether an image is embedded (data URI), inline SVG, external, or rel
 
 ---
 
-##### StructuredDataType
+#### StructuredDataType
 
 Structured data format type.
 
@@ -1073,7 +1018,7 @@ Identifies the schema/format used for structured data markup.
 
 ---
 
-##### PreprocessingPreset
+#### PreprocessingPreset
 
 HTML preprocessing aggressiveness level.
 
@@ -1088,7 +1033,7 @@ Controls the extent of cleanup performed before conversion. Higher levels remove
 
 ---
 
-##### HeadingStyle
+#### HeadingStyle
 
 Heading style options for Markdown output.
 
@@ -1103,7 +1048,7 @@ Controls how headings (h1-h6) are rendered in the output Markdown.
 
 ---
 
-##### ListIndentType
+#### ListIndentType
 
 List indentation character type.
 
@@ -1117,7 +1062,7 @@ Controls whether list items are indented with spaces or tabs.
 
 ---
 
-##### WhitespaceMode
+#### WhitespaceMode
 
 Whitespace handling strategy during conversion.
 
@@ -1131,7 +1076,7 @@ Determines how sequences of whitespace characters (spaces, tabs, newlines) are p
 
 ---
 
-##### NewlineStyle
+#### NewlineStyle
 
 Line break syntax in Markdown output.
 
@@ -1145,7 +1090,7 @@ Controls how soft line breaks (from `<br>` or line breaks in source) are rendere
 
 ---
 
-##### CodeBlockStyle
+#### CodeBlockStyle
 
 Code block fence style in Markdown output.
 
@@ -1160,7 +1105,7 @@ Determines how code blocks (`<pre><code>`) are rendered in Markdown.
 
 ---
 
-##### HighlightStyle
+#### HighlightStyle
 
 Highlight rendering style for `<mark>` elements.
 
@@ -1176,7 +1121,7 @@ Controls how highlighted text is rendered in Markdown output.
 
 ---
 
-##### LinkStyle
+#### LinkStyle
 
 Link rendering style in Markdown output.
 
@@ -1191,7 +1136,7 @@ reference-style `[text][1]` syntax with definitions collected at the end.
 
 ---
 
-##### OutputFormat
+#### OutputFormat
 
 Output format for conversion.
 
@@ -1206,7 +1151,7 @@ Specifies the target markup language format for the conversion output.
 
 ---
 
-##### NodeContent
+#### NodeContent
 
 The semantic content type of a document node.
 
@@ -1231,7 +1176,7 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 
 ---
 
-##### AnnotationKind
+#### AnnotationKind
 
 The type of an inline text annotation.
 
@@ -1252,7 +1197,7 @@ Uses internally tagged representation (`"annotation_type": "bold"`) for JSON ser
 
 ---
 
-##### WarningKind
+#### WarningKind
 
 Categories of processing warnings.
 
@@ -1268,7 +1213,7 @@ Categories of processing warnings.
 
 ---
 
-##### NodeType
+#### NodeType
 
 Node type enumeration covering all HTML element types.
 
@@ -1369,7 +1314,7 @@ providing a coarse-grained classification for visitor dispatch.
 
 ---
 
-##### VisitResult
+#### VisitResult
 
 Result of a visitor callback.
 
@@ -1388,9 +1333,9 @@ preserving HTML, or signaling errors.
 
 ---
 
-#### Errors
+### Errors
 
-##### ConversionError
+#### ConversionError
 
 Errors that can occur during HTML to Markdown conversion.
 

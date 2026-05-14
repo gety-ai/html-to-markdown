@@ -1,7 +1,6 @@
 ---
 title: "Java API Reference"
 ---
-
 ## Java API Reference <span class="version-badge">v3.4.1</span>
 
 ### Functions
@@ -20,7 +19,6 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 ```java
 public static ConversionResult convert(String html, ConversionOptions options) throws Error
 ```
-
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -94,7 +92,6 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 ```java
 public static ConversionOptions defaultOptions()
 ```
-
 ###### builder()
 
 Create a new builder with default values.
@@ -104,7 +101,6 @@ Create a new builder with default values.
 ```java
 public static ConversionOptionsBuilder builder()
 ```
-
 ###### applyUpdate()
 
 Apply a partial update to these conversion options.
@@ -114,7 +110,6 @@ Apply a partial update to these conversion options.
 ```java
 public void applyUpdate(ConversionOptionsUpdate update)
 ```
-
 ###### fromUpdate()
 
 Create from a partial update, applying to defaults.
@@ -124,7 +119,6 @@ Create from a partial update, applying to defaults.
 ```java
 public static ConversionOptions fromUpdate(ConversionOptionsUpdate update)
 ```
-
 ###### from()
 
 **Signature:**
@@ -171,7 +165,6 @@ Set the list of HTML tag names whose content is stripped from output.
 ```java
 public ConversionOptionsBuilder stripTags(List<String> tags)
 ```
-
 ###### preserveTags()
 
 Set the list of HTML tag names that are preserved verbatim in output.
@@ -181,7 +174,6 @@ Set the list of HTML tag names that are preserved verbatim in output.
 ```java
 public ConversionOptionsBuilder preserveTags(List<String> tags)
 ```
-
 ###### keepInlineImagesIn()
 
 Set the list of HTML tag names whose `<img>` children are kept inline.
@@ -191,7 +183,6 @@ Set the list of HTML tag names whose `<img>` children are kept inline.
 ```java
 public ConversionOptionsBuilder keepInlineImagesIn(List<String> tags)
 ```
-
 ###### excludeSelectors()
 
 Set the list of CSS selectors for elements to exclude entirely from output.
@@ -201,7 +192,6 @@ Set the list of CSS selectors for elements to exclude entirely from output.
 ```java
 public ConversionOptionsBuilder excludeSelectors(List<String> selectors)
 ```
-
 ###### visitor()
 
 Set the visitor used during conversion.
@@ -211,7 +201,6 @@ Set the visitor used during conversion.
 ```java
 public ConversionOptionsBuilder visitor(VisitorHandle visitor)
 ```
-
 ###### preprocessing()
 
 Set the pre-processing options applied to the HTML before conversion.
@@ -221,7 +210,6 @@ Set the pre-processing options applied to the HTML before conversion.
 ```java
 public ConversionOptionsBuilder preprocessing(PreprocessingOptions preprocessing)
 ```
-
 ###### build()
 
 Build the final `ConversionOptions`.
@@ -363,31 +351,30 @@ Implement this trait to customize the conversion behavior for any HTML element t
 All methods have default implementations that return `VisitResult.Continue`, allowing
 selective override of only the elements you care about.
 
-## Method Naming Convention
+# Method Naming Convention
 
 - `visit_*_start`: Called before entering an element (pre-order traversal)
 - `visit_*_end`: Called after exiting an element (post-order traversal)
 - `visit_*`: Called for specific element types (e.g., `visit_link`, `visit_image`)
 
-## Execution Order
+# Execution Order
 
 For a typical element like `<div><p>text</p></div>`:
-
 1. `visit_element_start` for `<div>`
 2. `visit_element_start` for `<p>`
 3. `visit_text` for "text"
 4. `visit_element_end` for `<p>`
 5. `visit_element_end` for `</div>`
 
-## Performance Notes
+# Performance Notes
 
 - `visit_text` is the most frequently called method (~100+ times per document)
 - Return `VisitResult.Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-### Methods
+##### Methods
 
-#### visitText()
+###### visitText()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -396,8 +383,7 @@ Visit text nodes (most frequent callback - ~100+ per document).
 ```java
 public VisitResult visitText(NodeContext ctx, String text)
 ```
-
-##### visitElementStart()
+###### visitElementStart()
 
 Called before entering any element.
 
@@ -409,7 +395,6 @@ visitors to implement generic element handling before tag-specific logic.
 ```java
 public VisitResult visitElementStart(NodeContext ctx)
 ```
-
 ###### visitElementEnd()
 
 Called after exiting any element.
@@ -422,7 +407,6 @@ Visitors can inspect or replace this output.
 ```java
 public VisitResult visitElementEnd(NodeContext ctx, String output)
 ```
-
 ###### visitLink()
 
 Visit anchor links `<a href="...">`.
@@ -432,7 +416,6 @@ Visit anchor links `<a href="...">`.
 ```java
 public VisitResult visitLink(NodeContext ctx, String href, String text, String title)
 ```
-
 ###### visitImage()
 
 Visit images `<img src="...">`.
@@ -442,7 +425,6 @@ Visit images `<img src="...">`.
 ```java
 public VisitResult visitImage(NodeContext ctx, String src, String alt, String title)
 ```
-
 ###### visitHeading()
 
 Visit heading elements `<h1>` through `<h6>`.
@@ -452,7 +434,6 @@ Visit heading elements `<h1>` through `<h6>`.
 ```java
 public VisitResult visitHeading(NodeContext ctx, int level, String text, String id)
 ```
-
 ###### visitCodeBlock()
 
 Visit code blocks `<pre><code>`.
@@ -462,7 +443,6 @@ Visit code blocks `<pre><code>`.
 ```java
 public VisitResult visitCodeBlock(NodeContext ctx, String lang, String code)
 ```
-
 ###### visitCodeInline()
 
 Visit inline code `<code>`.
@@ -472,7 +452,6 @@ Visit inline code `<code>`.
 ```java
 public VisitResult visitCodeInline(NodeContext ctx, String code)
 ```
-
 ###### visitListItem()
 
 Visit list items `<li>`.
@@ -482,7 +461,6 @@ Visit list items `<li>`.
 ```java
 public VisitResult visitListItem(NodeContext ctx, boolean ordered, String marker, String text)
 ```
-
 ###### visitListStart()
 
 Called before processing a list `<ul>` or `<ol>`.
@@ -492,7 +470,6 @@ Called before processing a list `<ul>` or `<ol>`.
 ```java
 public VisitResult visitListStart(NodeContext ctx, boolean ordered)
 ```
-
 ###### visitListEnd()
 
 Called after processing a list `</ul>` or `</ol>`.
@@ -502,7 +479,6 @@ Called after processing a list `</ul>` or `</ol>`.
 ```java
 public VisitResult visitListEnd(NodeContext ctx, boolean ordered, String output)
 ```
-
 ###### visitTableStart()
 
 Called before processing a table `<table>`.
@@ -512,7 +488,6 @@ Called before processing a table `<table>`.
 ```java
 public VisitResult visitTableStart(NodeContext ctx)
 ```
-
 ###### visitTableRow()
 
 Visit table rows `<tr>`.
@@ -522,7 +497,6 @@ Visit table rows `<tr>`.
 ```java
 public VisitResult visitTableRow(NodeContext ctx, List<String> cells, boolean isHeader)
 ```
-
 ###### visitTableEnd()
 
 Called after processing a table `</table>`.
@@ -532,7 +506,6 @@ Called after processing a table `</table>`.
 ```java
 public VisitResult visitTableEnd(NodeContext ctx, String output)
 ```
-
 ###### visitBlockquote()
 
 Visit blockquote elements `<blockquote>`.
@@ -542,7 +515,6 @@ Visit blockquote elements `<blockquote>`.
 ```java
 public VisitResult visitBlockquote(NodeContext ctx, String content, long depth)
 ```
-
 ###### visitStrong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
@@ -552,7 +524,6 @@ Visit strong/bold elements `<strong>`, `<b>`.
 ```java
 public VisitResult visitStrong(NodeContext ctx, String text)
 ```
-
 ###### visitEmphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
@@ -562,7 +533,6 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 ```java
 public VisitResult visitEmphasis(NodeContext ctx, String text)
 ```
-
 ###### visitStrikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
@@ -572,7 +542,6 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 ```java
 public VisitResult visitStrikethrough(NodeContext ctx, String text)
 ```
-
 ###### visitUnderline()
 
 Visit underline elements `<u>`, `<ins>`.
@@ -582,7 +551,6 @@ Visit underline elements `<u>`, `<ins>`.
 ```java
 public VisitResult visitUnderline(NodeContext ctx, String text)
 ```
-
 ###### visitSubscript()
 
 Visit subscript elements `<sub>`.
@@ -592,7 +560,6 @@ Visit subscript elements `<sub>`.
 ```java
 public VisitResult visitSubscript(NodeContext ctx, String text)
 ```
-
 ###### visitSuperscript()
 
 Visit superscript elements `<sup>`.
@@ -602,7 +569,6 @@ Visit superscript elements `<sup>`.
 ```java
 public VisitResult visitSuperscript(NodeContext ctx, String text)
 ```
-
 ###### visitMark()
 
 Visit mark/highlight elements `<mark>`.
@@ -612,7 +578,6 @@ Visit mark/highlight elements `<mark>`.
 ```java
 public VisitResult visitMark(NodeContext ctx, String text)
 ```
-
 ###### visitLineBreak()
 
 Visit line break elements `<br>`.
@@ -622,7 +587,6 @@ Visit line break elements `<br>`.
 ```java
 public VisitResult visitLineBreak(NodeContext ctx)
 ```
-
 ###### visitHorizontalRule()
 
 Visit horizontal rule elements `<hr>`.
@@ -632,7 +596,6 @@ Visit horizontal rule elements `<hr>`.
 ```java
 public VisitResult visitHorizontalRule(NodeContext ctx)
 ```
-
 ###### visitCustomElement()
 
 Visit custom elements (web components) or unknown tags.
@@ -642,7 +605,6 @@ Visit custom elements (web components) or unknown tags.
 ```java
 public VisitResult visitCustomElement(NodeContext ctx, String tagName, String html)
 ```
-
 ###### visitDefinitionListStart()
 
 Visit definition list `<dl>`.
@@ -652,7 +614,6 @@ Visit definition list `<dl>`.
 ```java
 public VisitResult visitDefinitionListStart(NodeContext ctx)
 ```
-
 ###### visitDefinitionTerm()
 
 Visit definition term `<dt>`.
@@ -662,7 +623,6 @@ Visit definition term `<dt>`.
 ```java
 public VisitResult visitDefinitionTerm(NodeContext ctx, String text)
 ```
-
 ###### visitDefinitionDescription()
 
 Visit definition description `<dd>`.
@@ -672,7 +632,6 @@ Visit definition description `<dd>`.
 ```java
 public VisitResult visitDefinitionDescription(NodeContext ctx, String text)
 ```
-
 ###### visitDefinitionListEnd()
 
 Called after processing a definition list `</dl>`.
@@ -682,7 +641,6 @@ Called after processing a definition list `</dl>`.
 ```java
 public VisitResult visitDefinitionListEnd(NodeContext ctx, String output)
 ```
-
 ###### visitForm()
 
 Visit form elements `<form>`.
@@ -692,7 +650,6 @@ Visit form elements `<form>`.
 ```java
 public VisitResult visitForm(NodeContext ctx, String action, String method)
 ```
-
 ###### visitInput()
 
 Visit input elements `<input>`.
@@ -702,7 +659,6 @@ Visit input elements `<input>`.
 ```java
 public VisitResult visitInput(NodeContext ctx, String inputType, String name, String value)
 ```
-
 ###### visitButton()
 
 Visit button elements `<button>`.
@@ -712,7 +668,6 @@ Visit button elements `<button>`.
 ```java
 public VisitResult visitButton(NodeContext ctx, String text)
 ```
-
 ###### visitAudio()
 
 Visit audio elements `<audio>`.
@@ -722,7 +677,6 @@ Visit audio elements `<audio>`.
 ```java
 public VisitResult visitAudio(NodeContext ctx, String src)
 ```
-
 ###### visitVideo()
 
 Visit video elements `<video>`.
@@ -732,7 +686,6 @@ Visit video elements `<video>`.
 ```java
 public VisitResult visitVideo(NodeContext ctx, String src)
 ```
-
 ###### visitIframe()
 
 Visit iframe elements `<iframe>`.
@@ -742,7 +695,6 @@ Visit iframe elements `<iframe>`.
 ```java
 public VisitResult visitIframe(NodeContext ctx, String src)
 ```
-
 ###### visitDetails()
 
 Visit details elements `<details>`.
@@ -752,7 +704,6 @@ Visit details elements `<details>`.
 ```java
 public VisitResult visitDetails(NodeContext ctx, boolean open)
 ```
-
 ###### visitSummary()
 
 Visit summary elements `<summary>`.
@@ -762,7 +713,6 @@ Visit summary elements `<summary>`.
 ```java
 public VisitResult visitSummary(NodeContext ctx, String text)
 ```
-
 ###### visitFigureStart()
 
 Visit figure elements `<figure>`.
@@ -772,7 +722,6 @@ Visit figure elements `<figure>`.
 ```java
 public VisitResult visitFigureStart(NodeContext ctx)
 ```
-
 ###### visitFigcaption()
 
 Visit figcaption elements `<figcaption>`.
@@ -782,7 +731,6 @@ Visit figcaption elements `<figcaption>`.
 ```java
 public VisitResult visitFigcaption(NodeContext ctx, String text)
 ```
-
 ###### visitFigureEnd()
 
 Called after processing a figure `</figure>`.
@@ -795,7 +743,7 @@ public VisitResult visitFigureEnd(NodeContext ctx, String output)
 
 ---
 
-##### ImageMetadata
+#### ImageMetadata
 
 Image metadata with source and dimensions.
 
@@ -814,7 +762,7 @@ for image analysis and optimization.
 
 ---
 
-##### LinkMetadata
+#### LinkMetadata
 
 Hyperlink metadata with categorization and attributes.
 
@@ -829,7 +777,7 @@ Represents `<a>` elements with parsed href values, text content, and link type c
 | `rel` | `List<String>` | — | Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") |
 | `attributes` | `Map<String, String>` | — | Additional HTML attributes |
 
-###### Methods
+##### Methods
 
 ###### classifyLink()
 
@@ -847,7 +795,7 @@ public static LinkType classifyLink(String href)
 
 ---
 
-##### NodeContext
+#### NodeContext
 
 Context information passed to all visitor methods.
 
@@ -867,7 +815,7 @@ including its type, attributes, position in the DOM tree, and parent context.
 
 ---
 
-##### PreprocessingOptions
+#### PreprocessingOptions
 
 HTML preprocessing options for document cleanup before conversion.
 
@@ -878,7 +826,7 @@ HTML preprocessing options for document cleanup before conversion.
 | `removeNavigation` | `boolean` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `removeForms` | `boolean` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-###### Methods
+##### Methods
 
 ###### defaultOptions()
 
@@ -887,7 +835,6 @@ HTML preprocessing options for document cleanup before conversion.
 ```java
 public static PreprocessingOptions defaultOptions()
 ```
-
 ###### applyUpdate()
 
 Apply a partial update to these preprocessing options.
@@ -900,7 +847,6 @@ Unspecified fields (None) are left unchanged.
 ```java
 public void applyUpdate(PreprocessingOptionsUpdate update)
 ```
-
 ###### fromUpdate()
 
 Create new preprocessing options from a partial update.
@@ -917,7 +863,6 @@ New `PreprocessingOptions` with specified updates applied to defaults
 ```java
 public static PreprocessingOptions fromUpdate(PreprocessingOptionsUpdate update)
 ```
-
 ###### from()
 
 **Signature:**
@@ -928,7 +873,7 @@ public static PreprocessingOptions from(PreprocessingOptionsUpdate update)
 
 ---
 
-##### ProcessingWarning
+#### ProcessingWarning
 
 A non-fatal warning generated during HTML processing.
 
@@ -940,7 +885,7 @@ A non-fatal warning generated during HTML processing.
 
 ---
 
-##### StructuredData
+#### StructuredData
 
 Structured data block (JSON-LD, Microdata, or RDFa).
 
@@ -956,7 +901,7 @@ JSON-LD blocks are collected as raw JSON strings for flexibility.
 
 ---
 
-##### TableData
+#### TableData
 
 A top-level extracted table with both structured data and markdown representation.
 
@@ -968,7 +913,7 @@ A top-level extracted table with both structured data and markdown representatio
 
 ---
 
-##### TableGrid
+#### TableGrid
 
 A structured table grid with cell-level data including spans.
 
@@ -981,7 +926,7 @@ A structured table grid with cell-level data including spans.
 
 ---
 
-##### TextAnnotation
+#### TextAnnotation
 
 An inline text annotation with byte-range offsets.
 
@@ -996,7 +941,7 @@ Annotations describe formatting (bold, italic, etc.) and links within a node's t
 
 ---
 
-##### VisitorHandle
+#### VisitorHandle
 
 Type alias for a visitor handle (`Arc`-wrapped `Mutex` for thread-safe shared mutation).
 
@@ -1007,9 +952,9 @@ axum/rmcp/tokio Send-bound contexts.
 
 ---
 
-#### Enums
+### Enums
 
-##### TextDirection
+#### TextDirection
 
 Text directionality of document content.
 
@@ -1024,7 +969,7 @@ Corresponds to the HTML `dir` attribute and `bdi` element directionality.
 
 ---
 
-##### LinkType
+#### LinkType
 
 Link classification based on href value and document context.
 
@@ -1042,7 +987,7 @@ Used to categorize links during extraction for filtering and analysis.
 
 ---
 
-##### ImageType
+#### ImageType
 
 Image source classification for proper handling and processing.
 
@@ -1058,7 +1003,7 @@ Determines whether an image is embedded (data URI), inline SVG, external, or rel
 
 ---
 
-##### StructuredDataType
+#### StructuredDataType
 
 Structured data format type.
 
@@ -1073,7 +1018,7 @@ Identifies the schema/format used for structured data markup.
 
 ---
 
-##### PreprocessingPreset
+#### PreprocessingPreset
 
 HTML preprocessing aggressiveness level.
 
@@ -1088,7 +1033,7 @@ Controls the extent of cleanup performed before conversion. Higher levels remove
 
 ---
 
-##### HeadingStyle
+#### HeadingStyle
 
 Heading style options for Markdown output.
 
@@ -1103,7 +1048,7 @@ Controls how headings (h1-h6) are rendered in the output Markdown.
 
 ---
 
-##### ListIndentType
+#### ListIndentType
 
 List indentation character type.
 
@@ -1117,7 +1062,7 @@ Controls whether list items are indented with spaces or tabs.
 
 ---
 
-##### WhitespaceMode
+#### WhitespaceMode
 
 Whitespace handling strategy during conversion.
 
@@ -1131,7 +1076,7 @@ Determines how sequences of whitespace characters (spaces, tabs, newlines) are p
 
 ---
 
-##### NewlineStyle
+#### NewlineStyle
 
 Line break syntax in Markdown output.
 
@@ -1145,7 +1090,7 @@ Controls how soft line breaks (from `<br>` or line breaks in source) are rendere
 
 ---
 
-##### CodeBlockStyle
+#### CodeBlockStyle
 
 Code block fence style in Markdown output.
 
@@ -1160,7 +1105,7 @@ Determines how code blocks (`<pre><code>`) are rendered in Markdown.
 
 ---
 
-##### HighlightStyle
+#### HighlightStyle
 
 Highlight rendering style for `<mark>` elements.
 
@@ -1176,7 +1121,7 @@ Controls how highlighted text is rendered in Markdown output.
 
 ---
 
-##### LinkStyle
+#### LinkStyle
 
 Link rendering style in Markdown output.
 
@@ -1191,7 +1136,7 @@ reference-style `[text][1]` syntax with definitions collected at the end.
 
 ---
 
-##### OutputFormat
+#### OutputFormat
 
 Output format for conversion.
 
@@ -1206,7 +1151,7 @@ Specifies the target markup language format for the conversion output.
 
 ---
 
-##### NodeContent
+#### NodeContent
 
 The semantic content type of a document node.
 
@@ -1231,7 +1176,7 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 
 ---
 
-##### AnnotationKind
+#### AnnotationKind
 
 The type of an inline text annotation.
 
@@ -1252,7 +1197,7 @@ Uses internally tagged representation (`"annotation_type": "bold"`) for JSON ser
 
 ---
 
-##### WarningKind
+#### WarningKind
 
 Categories of processing warnings.
 
@@ -1268,7 +1213,7 @@ Categories of processing warnings.
 
 ---
 
-##### NodeType
+#### NodeType
 
 Node type enumeration covering all HTML element types.
 
@@ -1369,7 +1314,7 @@ providing a coarse-grained classification for visitor dispatch.
 
 ---
 
-##### VisitResult
+#### VisitResult
 
 Result of a visitor callback.
 
@@ -1388,9 +1333,9 @@ preserving HTML, or signaling errors.
 
 ---
 
-#### Errors
+### Errors
 
-##### ConversionError
+#### ConversionError
 
 Errors that can occur during HTML to Markdown conversion.
 
