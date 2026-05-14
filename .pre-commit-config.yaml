@@ -139,6 +139,24 @@ repos:
         files: ^packages/elixir/
       - id: java-verify
         files: ^packages/java/
+      - id: ktfmt
+        files: ^packages/kotlin-android/.*\.kts?$
+        args: ["--kotlinlang-style"]
+      - id: detekt
+        files: ^packages/kotlin-android/.*\.kts?$
+        args: ["--build-upon-default-config"]
+      - id: swift-format
+        files: ^packages/swift/.*\.swift$
+      - id: swiftlint
+        files: ^packages/swift/.*\.swift$
+      - id: dart-format
+        files: ^packages/dart/.*\.dart$
+      - id: dart-analyze
+        files: ^packages/dart/.*\.dart$
+      - id: zig-fmt
+        files: ^packages/zig/.*\.zig$
+      - id: zig-build-check
+        files: ^packages/zig/.*\.zig$
       - id: textlint
         files: ^docs/.*\.md$
         exclude: ^docs/(reference/|api-|snippets/|migration/)
@@ -154,7 +172,7 @@ repos:
         exclude: ^test_apps/
   # Alef: verify bindings and sync versions
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.15.66
+    rev: v0.15.71
     hooks:
       - id: alef-verify
       - id: alef-sync-versions

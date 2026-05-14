@@ -1,0 +1,3 @@
+rust_root: .
+rust_input: crate
+dart_output: ../lib/src/html_to_markdown_rs_bridge_generated

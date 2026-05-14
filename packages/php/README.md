@@ -89,7 +89,6 @@ composer require kreuzberg-dev/html-to-markdown
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
-
 | Document | Size | Ops/sec |
 |----------|------|---------|
 | Lists (Timeline) | 129KB | 3346 |
