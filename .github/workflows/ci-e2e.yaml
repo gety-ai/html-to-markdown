@@ -1,4 +1,4 @@
-name: CI
+name: CI E2E
 
 on:
   push:
@@ -7,68 +7,62 @@ on:
       - "crates/**"
       - "packages/**"
       - "e2e/**"
+      - "fixtures/**"
+      - "alef.toml"
       - "tools/**"
       - "scripts/**"
-      - "fixtures/**"
-      - ".github/**"
-      - ".cargo/config.toml"
-      - ".pre-commit-config.yaml"
-      - ".golangci.yml"
-      - "alef.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "Taskfile.yaml"
+      - ".task/**"
       - "pyproject.toml"
       - "uv.lock"
       - "uv.toml"
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
       - "package.json"
-      - "Cargo.toml"
-      - "Cargo.lock"
-      - "Taskfile.yaml"
-      - ".task/**"
-      - "rustfmt.toml"
-      - "rust-toolchain.toml"
       - "Gemfile"
       - "Gemfile.lock"
       - "composer.json"
       - "composer.lock"
       - "go.mod"
       - "go.sum"
+      - "rust-toolchain.toml"
+      - ".cargo/config.toml"
+      - ".github/workflows/ci-e2e.yaml"
   pull_request:
     branches: [main]
     paths:
       - "crates/**"
       - "packages/**"
       - "e2e/**"
+      - "fixtures/**"
+      - "alef.toml"
       - "tools/**"
       - "scripts/**"
-      - "fixtures/**"
-      - ".github/**"
-      - ".cargo/config.toml"
-      - ".pre-commit-config.yaml"
-      - ".golangci.yml"
-      - "alef.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "Taskfile.yaml"
+      - ".task/**"
       - "pyproject.toml"
       - "uv.lock"
       - "uv.toml"
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
       - "package.json"
-      - "Cargo.toml"
-      - "Cargo.lock"
-      - "Taskfile.yaml"
-      - ".task/**"
-      - "rustfmt.toml"
-      - "rust-toolchain.toml"
       - "Gemfile"
       - "Gemfile.lock"
       - "composer.json"
       - "composer.lock"
       - "go.mod"
       - "go.sum"
+      - "rust-toolchain.toml"
+      - ".cargo/config.toml"
+      - ".github/workflows/ci-e2e.yaml"
   workflow_dispatch: {}
 
 concurrency:
-  group: ci-${{ github.event.pull_request.number || github.ref }}
+  group: ci-e2e-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 env:
@@ -83,175 +77,7 @@ env:
 permissions:
   contents: read
 
-# --- Stage 1: Validate ---
-
 jobs:
-  validate:
-    name: "Validate"
-    runs-on: ubuntu-24.04-arm
-    timeout-minutes: 60
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
-
-      - name: Install Task
-        uses: kreuzberg-dev/actions/install-task@v1 # v1
-
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
-        with:
-          components: rustfmt, clippy, llvm-tools-preview
-
-      - name: Setup Python
-        uses: kreuzberg-dev/actions/setup-python-env@v1 # v1
-        with:
-          python-version: "3.13"
-
-      - name: Setup Node Workspace
-        uses: kreuzberg-dev/actions/setup-node-workspace@v1 # v1
-
-      - name: Setup Go
-        uses: actions/setup-go@v6 # v6
-        with:
-          go-version: ${{ env.GO_VERSION }}
-          cache-dependency-path: packages/go/go.sum
-
-      - name: Install golangci-lint
-        uses: golangci/golangci-lint-action@v9
-        with:
-          install-only: true
-
-      - name: Setup Java
-        uses: actions/setup-java@v5 # v5
-        with:
-          distribution: temurin
-          java-version: "25"
-
-      - name: Setup Elixir
-        uses: kreuzberg-dev/actions/setup-elixir@v1 # v1
-
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1 # v1
-        with:
-          ruby-version: "3.4"
-          bundler-cache: false
-
-      - name: Setup PHP
-        uses: kreuzberg-dev/actions/setup-php@v1 # v1
-
-      - name: Setup R
-        uses: kreuzberg-dev/actions/setup-r@v1 # v1
-        with:
-          install-deps-script: scripts/ci/r/install-deps.sh
-
-      - name: Install C/C++ tools
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends cppcheck clang-format
-
-      - name: Install Alef
-        uses: kreuzberg-dev/actions/install-alef@v1
-
-      - name: Install All Binding Dependencies
-        run: alef setup
-        shell: bash
-
-      - name: Run Lint Checks
-        run: task lint:check
-        shell: bash
-
-      - name: Check Code Formatting
-        run: task format:check
-        shell: bash
-
-      - name: Install alef
-        uses: kreuzberg-dev/actions/install-alef@v1
-
-      - name: Pre-populate alef-hooks cache
-        # The alef pre-commit hook (kreuzberg-dev/alef) reads the binary
-        # version from alef's own alef.toml in the hook repo, then expects
-        # the binary at ~/.cache/alef-hooks/<ver>/alef-<triple>/alef. The
-        # release tarball extracts to alef-<triple>/alef (one level deeper),
-        # so the hook fails to locate it. Copy the just-installed binary
-        # into the expected path so the hook skips download/extract.
-        shell: bash
-        env:
-          HOOK_ALEF_VERSION: "0.14.30"
-        run: |
-          case "$(uname -s)-$(uname -m)" in
-            Linux-x86_64) target=alef-x86_64-unknown-linux-gnu ;;
-            Linux-aarch64) target=alef-aarch64-unknown-linux-gnu ;;
-            Darwin-arm64) target=alef-aarch64-apple-darwin ;;
-            Darwin-x86_64) target=alef-x86_64-apple-darwin ;;
-            *) echo "Unsupported platform"; exit 1 ;;
-          esac
-          dest="${HOME}/.cache/alef-hooks/${HOOK_ALEF_VERSION}/${target}"
-          mkdir -p "${dest}"
-          cp "$(command -v alef)" "${dest}/alef"
-          chmod +x "${dest}/alef"
-          ls -la "${dest}"
-
-      - name: Run Pre-commit Hooks
-        uses: j178/prek-action@v2 # v2
-        env:
-          # Skip hooks that fail in CI for infrastructure reasons unrelated
-          # to our code (and pass locally):
-          # - mypy: upstream INTERNAL ERROR on the runner mypy 2.0.0 build
-          # - cppcheck: shared-hooks expect 2.20.0; runner ships 2.13.0
-          # - shellcheck: shared-hooks tarball extraction conflicts with
-          #   pre-cached files in the runner image
-          # - govulncheck: requires go.mod at runner cwd; our Go module
-          #   lives under packages/go (verified in publish workflow)
-          SKIP: mypy,cppcheck,shellcheck,govulncheck
-        with:
-          extra-args: --all-files
-
-      - name: Install Python README Dependencies
-        run: pip install pyyaml jinja2
-        shell: bash
-
-      - name: Install rumdl
-        run: pip install 'rumdl==0.1.91'
-        shell: bash
-
-      - name: Validate READMEs
-        run: task generate:generate-readme:check
-        shell: bash
-
-  validate-rust:
-    name: "Validate: Rust"
-    runs-on: ubuntu-24.04-arm
-    timeout-minutes: 60
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
-
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
-        with:
-          components: rustfmt, clippy, llvm-tools-preview
-
-      - name: Install Task
-        uses: kreuzberg-dev/actions/install-task@v1 # v1
-
-      - name: Check Rust Formatting
-        run: task rust:lint:check
-        shell: bash
-
-      - name: Run Clippy
-        run: task rust:lint:check
-        shell: bash
-
-      - name: Check feature flags (html-to-markdown)
-        shell: bash
-        env:
-          RUSTFLAGS: "-D warnings"
-        run: |
-          cargo check -p html-to-markdown-rs --no-default-features
-          cargo check -p html-to-markdown-rs --no-default-features --features visitor
-          cargo check -p html-to-markdown-rs --no-default-features --features metadata
-          cargo check -p html-to-markdown-rs --no-default-features --features inline-images
-
   changes:
     name: "Detect Changes"
     runs-on: ubuntu-24.04-arm
@@ -295,6 +121,7 @@ jobs:
             ffi:
               - 'crates/html-to-markdown-ffi/**'
               - 'crates/html-to-markdown/**'
+              - 'e2e/c/**'
               - 'Cargo.toml'
               - 'Cargo.lock'
             python:
@@ -355,10 +182,8 @@ jobs:
               - 'e2e/wasm/**'
               - 'fixtures/**'
 
-  # --- Stage 2: Core Builds ---
-
   build-ffi:
-    needs: [validate, validate-rust, changes]
+    needs: [changes]
     name: "Build: FFI (${{ matrix.runner }})"
     if: |
       github.event_name == 'workflow_dispatch' ||
@@ -431,89 +256,8 @@ jobs:
         if: always() && steps.checkout.outcome == 'success'
         uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
 
-  rust-tests:
-    needs: [validate, validate-rust, changes]
-    name: "Test: Rust (${{ matrix.os }})"
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.core == 'true' ||
-      needs.changes.outputs.rust == 'true'
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
-        id: checkout
-
-      - name: Set up Python
-        uses: actions/setup-python@v6 # v6
-        with:
-          python-version: "3.13"
-
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
-        with:
-          components: rustfmt, clippy, llvm-tools-preview
-          cache-key-prefix: rust-tests-${{ matrix.os }}
-
-      - name: Install Task
-        uses: kreuzberg-dev/actions/install-task@v1 # v1
-
-      - name: Run Rust Tests
-        env:
-          RUST_BACKTRACE: full
-        run: task rust:test:ci
-        shell: bash
-
-      - name: Run E2E Tests
-        run: task rust:e2e:test
-        shell: bash
-
-      - name: Cleanup Rust cache
-        if: always() && steps.checkout.outcome == 'success'
-        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
-
-  rust-coverage:
-    needs: [validate, validate-rust, changes]
-    name: "Coverage: Rust"
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.core == 'true' ||
-      needs.changes.outputs.rust == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
-
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
-        with:
-          components: rustfmt, clippy, llvm-tools-preview
-
-      - name: Install Task
-        uses: kreuzberg-dev/actions/install-task@v1 # v1
-
-      - name: Generate Rust Coverage
-        run: task rust:coverage
-        shell: bash
-
-      - name: Upload Coverage Artifacts
-        if: always()
-        uses: actions/upload-artifact@v7 # v7
-        with:
-          name: coverage-report-${{ github.sha }}
-          path: rust-coverage.lcov
-          retention-days: 7
-
-  # --- Stage 3: Language Builds ---
-
   build-python:
-    needs: [rust-tests, changes]
+    needs: [changes]
     name: "Build: Python (${{ matrix.os }})"
     if: |
       github.event_name == 'workflow_dispatch' ||
@@ -579,7 +323,7 @@ jobs:
         uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
 
   build-node:
-    needs: [rust-tests, changes]
+    needs: [changes]
     name: "Build: Node (${{ matrix.os }}, ${{ matrix.runtime }})"
     if: |
       github.event_name == 'workflow_dispatch' ||
@@ -650,7 +394,7 @@ jobs:
         uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
 
   build-ruby:
-    needs: [rust-tests, changes]
+    needs: [changes]
     name: "Build: Ruby (${{ matrix.os }}, ruby-${{ matrix.ruby }})"
     if: |
       github.event_name == 'workflow_dispatch' ||
@@ -715,7 +459,7 @@ jobs:
         uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
 
   build-php:
-    needs: [rust-tests, changes]
+    needs: [changes]
     name: "Build: PHP"
     if: |
       github.event_name == 'workflow_dispatch' ||
@@ -778,7 +522,7 @@ jobs:
         uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
 
   build-java:
-    needs: [rust-tests, changes]
+    needs: [changes]
     name: "Build: Java (${{ matrix.os }})"
     if: |
       github.event_name == 'workflow_dispatch' ||
@@ -813,7 +557,7 @@ jobs:
         uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
 
   build-wasm:
-    needs: [rust-tests, changes]
+    needs: [changes]
     name: "Build: WASM"
     if: |
       github.event_name == 'workflow_dispatch' ||
@@ -852,8 +596,6 @@ jobs:
       - name: Cleanup Rust cache
         if: always() && steps.checkout.outcome == 'success'
         uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
-
-  # --- Stage 4: Language Tests ---
 
   test-python:
     needs: [build-python]
@@ -1290,10 +1032,10 @@ jobs:
         shell: bash
 
   test-r:
-    needs: [rust-tests, changes]
+    needs: [changes]
     name: "Test: R"
     if: |
-      always() && !cancelled() && needs.rust-tests.result != 'skipped' &&
+      always() && !cancelled() &&
       (github.event_name == 'workflow_dispatch' ||
        needs.changes.outputs.r == 'true' ||
        needs.changes.outputs.core == 'true')

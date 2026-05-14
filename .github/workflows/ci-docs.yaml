@@ -1,4 +1,4 @@
-name: Deploy Documentation
+name: CI Docs
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - "docs/**"
       - "zensical.toml"
       - "pyproject.toml"
-      - ".github/workflows/deploy-docs.yaml"
+      - ".github/workflows/ci-docs.yaml"
   workflow_dispatch:
 
 permissions:
@@ -16,7 +16,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: ci-docs-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: false
 
 jobs:
