@@ -543,48 +543,12 @@ jobs:
           node-version: "24"
 
       - name: Build native module
-        # Inline: html-to-markdown's per-platform staging is too quirky for the
-        # generic build-node-napi action — we stage into npm/<platform>/, gate
-        # napi-cross for arm64 Linux, and tarball the result so the publish
-        # job can reassemble the optionalDependencies tree downstream.
-        if: runner.os != 'Windows'
-        env:
-          TARGET: ${{ matrix.target }}
-          USE_NAPI_CROSS: ${{ matrix.use_napi_cross }}
-        shell: bash
-        run: |
-          pnpm install --filter ./crates/html-to-markdown-node...
-          rm -rf crates/html-to-markdown-node/npm
-          cd crates/html-to-markdown-node
-          pnpm exec napi create-npm-dirs
-          if [[ "${USE_NAPI_CROSS}" == "true" ]]; then
-            pnpm exec napi build --release --target "${TARGET}" --platform --use-napi-cross --js index.js --dts index.d.ts
-          else
-            pnpm exec napi build --release --target "${TARGET}" --platform --js index.js --dts index.d.ts
-          fi
-          pnpm exec napi artifacts --dir . --npm-dir npm
-          cd ../..
-          tar -czf "node-bindings-${TARGET}.tar.gz" -C crates/html-to-markdown-node npm
-
-      - name: Build native module (Windows)
-        if: runner.os == 'Windows'
-        env:
-          TARGET: ${{ matrix.target }}
-          USE_NAPI_CROSS: ${{ matrix.use_napi_cross }}
-        shell: pwsh
-        run: |
-          pnpm install --filter ./crates/html-to-markdown-node...
-          if (Test-Path "crates/html-to-markdown-node/npm") { Remove-Item -Recurse -Force "crates/html-to-markdown-node/npm" }
-          Push-Location "crates/html-to-markdown-node"
-          pnpm exec napi create-npm-dirs
-          if ($env:USE_NAPI_CROSS -eq "true") {
-            pnpm exec napi build --release --target $env:TARGET --platform --use-napi-cross --js index.js --dts index.d.ts
-          } else {
-            pnpm exec napi build --release --target $env:TARGET --platform --js index.js --dts index.d.ts
-          }
-          pnpm exec napi artifacts --dir . --npm-dir npm
-          Pop-Location
-          tar -czf "node-bindings-$env:TARGET.tar.gz" -C "crates/html-to-markdown-node" npm
+        uses: kreuzberg-dev/actions/build-node-napi@v1
+        with:
+          crate-dir: crates/html-to-markdown-node
+          target: ${{ matrix.target }}
+          use-napi-cross: ${{ matrix.use_napi_cross }}
+          pack-target-tarball: node-bindings-${{ matrix.target }}.tar.gz
 
       - uses: actions/upload-artifact@v7
         with:
