@@ -1,6 +1,7 @@
 ---
 title: "Rust API Reference"
 ---
+
 ## Rust API Reference <span class="version-badge">v3.4.1</span>
 
 ### Functions
@@ -19,6 +20,7 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 ```rust
 pub fn convert(html: &str, options: Option<ConversionOptions>) -> Result<ConversionResult, Error>
 ```
+
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -92,6 +94,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 ```rust
 pub fn default() -> ConversionOptions
 ```
+
 ###### builder()
 
 Create a new builder with default values.
@@ -101,6 +104,7 @@ Create a new builder with default values.
 ```rust
 pub fn builder() -> ConversionOptionsBuilder
 ```
+
 ###### apply_update()
 
 Apply a partial update to these conversion options.
@@ -110,6 +114,7 @@ Apply a partial update to these conversion options.
 ```rust
 pub fn apply_update(&self, update: ConversionOptionsUpdate)
 ```
+
 ###### from_update()
 
 Create from a partial update, applying to defaults.
@@ -119,6 +124,7 @@ Create from a partial update, applying to defaults.
 ```rust
 pub fn from_update(update: ConversionOptionsUpdate) -> ConversionOptions
 ```
+
 ###### from()
 
 **Signature:**
@@ -165,6 +171,7 @@ Set the list of HTML tag names whose content is stripped from output.
 ```rust
 pub fn strip_tags(&self, tags: Vec<String>) -> ConversionOptionsBuilder
 ```
+
 ###### preserve_tags()
 
 Set the list of HTML tag names that are preserved verbatim in output.
@@ -174,6 +181,7 @@ Set the list of HTML tag names that are preserved verbatim in output.
 ```rust
 pub fn preserve_tags(&self, tags: Vec<String>) -> ConversionOptionsBuilder
 ```
+
 ###### keep_inline_images_in()
 
 Set the list of HTML tag names whose `<img>` children are kept inline.
@@ -183,6 +191,7 @@ Set the list of HTML tag names whose `<img>` children are kept inline.
 ```rust
 pub fn keep_inline_images_in(&self, tags: Vec<String>) -> ConversionOptionsBuilder
 ```
+
 ###### exclude_selectors()
 
 Set the list of CSS selectors for elements to exclude entirely from output.
@@ -192,6 +201,7 @@ Set the list of CSS selectors for elements to exclude entirely from output.
 ```rust
 pub fn exclude_selectors(&self, selectors: Vec<String>) -> ConversionOptionsBuilder
 ```
+
 ###### visitor()
 
 Set the visitor used during conversion.
@@ -201,6 +211,7 @@ Set the visitor used during conversion.
 ```rust
 pub fn visitor(&self, visitor: Option<VisitorHandle>) -> ConversionOptionsBuilder
 ```
+
 ###### preprocessing()
 
 Set the pre-processing options applied to the HTML before conversion.
@@ -210,6 +221,7 @@ Set the pre-processing options applied to the HTML before conversion.
 ```rust
 pub fn preprocessing(&self, preprocessing: PreprocessingOptions) -> ConversionOptionsBuilder
 ```
+
 ###### build()
 
 Build the final `ConversionOptions`.
@@ -351,30 +363,31 @@ Implement this trait to customize the conversion behavior for any HTML element t
 All methods have default implementations that return `VisitResult.Continue`, allowing
 selective override of only the elements you care about.
 
-# Method Naming Convention
+## Method Naming Convention
 
 - `visit_*_start`: Called before entering an element (pre-order traversal)
 - `visit_*_end`: Called after exiting an element (post-order traversal)
 - `visit_*`: Called for specific element types (e.g., `visit_link`, `visit_image`)
 
-# Execution Order
+## Execution Order
 
 For a typical element like `<div><p>text</p></div>`:
+
 1. `visit_element_start` for `<div>`
 2. `visit_element_start` for `<p>`
 3. `visit_text` for "text"
 4. `visit_element_end` for `<p>`
 5. `visit_element_end` for `</div>`
 
-# Performance Notes
+## Performance Notes
 
 - `visit_text` is the most frequently called method (~100+ times per document)
 - Return `VisitResult.Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-##### Methods
+### Methods
 
-###### visit_text()
+#### visit_text()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -383,7 +396,8 @@ Visit text nodes (most frequent callback - ~100+ per document).
 ```rust
 pub fn visit_text(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
-###### visit_element_start()
+
+##### visit_element_start()
 
 Called before entering any element.
 
@@ -395,6 +409,7 @@ visitors to implement generic element handling before tag-specific logic.
 ```rust
 pub fn visit_element_start(&self, ctx: NodeContext) -> VisitResult
 ```
+
 ###### visit_element_end()
 
 Called after exiting any element.
@@ -407,6 +422,7 @@ Visitors can inspect or replace this output.
 ```rust
 pub fn visit_element_end(&self, ctx: NodeContext, output: &str) -> VisitResult
 ```
+
 ###### visit_link()
 
 Visit anchor links `<a href="...">`.
@@ -416,6 +432,7 @@ Visit anchor links `<a href="...">`.
 ```rust
 pub fn visit_link(&self, ctx: NodeContext, href: &str, text: &str, title: Option<String>) -> VisitResult
 ```
+
 ###### visit_image()
 
 Visit images `<img src="...">`.
@@ -425,6 +442,7 @@ Visit images `<img src="...">`.
 ```rust
 pub fn visit_image(&self, ctx: NodeContext, src: &str, alt: &str, title: Option<String>) -> VisitResult
 ```
+
 ###### visit_heading()
 
 Visit heading elements `<h1>` through `<h6>`.
@@ -434,6 +452,7 @@ Visit heading elements `<h1>` through `<h6>`.
 ```rust
 pub fn visit_heading(&self, ctx: NodeContext, level: u32, text: &str, id: Option<String>) -> VisitResult
 ```
+
 ###### visit_code_block()
 
 Visit code blocks `<pre><code>`.
@@ -443,6 +462,7 @@ Visit code blocks `<pre><code>`.
 ```rust
 pub fn visit_code_block(&self, ctx: NodeContext, lang: Option<String>, code: &str) -> VisitResult
 ```
+
 ###### visit_code_inline()
 
 Visit inline code `<code>`.
@@ -452,6 +472,7 @@ Visit inline code `<code>`.
 ```rust
 pub fn visit_code_inline(&self, ctx: NodeContext, code: &str) -> VisitResult
 ```
+
 ###### visit_list_item()
 
 Visit list items `<li>`.
@@ -461,6 +482,7 @@ Visit list items `<li>`.
 ```rust
 pub fn visit_list_item(&self, ctx: NodeContext, ordered: bool, marker: &str, text: &str) -> VisitResult
 ```
+
 ###### visit_list_start()
 
 Called before processing a list `<ul>` or `<ol>`.
@@ -470,6 +492,7 @@ Called before processing a list `<ul>` or `<ol>`.
 ```rust
 pub fn visit_list_start(&self, ctx: NodeContext, ordered: bool) -> VisitResult
 ```
+
 ###### visit_list_end()
 
 Called after processing a list `</ul>` or `</ol>`.
@@ -479,6 +502,7 @@ Called after processing a list `</ul>` or `</ol>`.
 ```rust
 pub fn visit_list_end(&self, ctx: NodeContext, ordered: bool, output: &str) -> VisitResult
 ```
+
 ###### visit_table_start()
 
 Called before processing a table `<table>`.
@@ -488,6 +512,7 @@ Called before processing a table `<table>`.
 ```rust
 pub fn visit_table_start(&self, ctx: NodeContext) -> VisitResult
 ```
+
 ###### visit_table_row()
 
 Visit table rows `<tr>`.
@@ -497,6 +522,7 @@ Visit table rows `<tr>`.
 ```rust
 pub fn visit_table_row(&self, ctx: NodeContext, cells: Vec<String>, is_header: bool) -> VisitResult
 ```
+
 ###### visit_table_end()
 
 Called after processing a table `</table>`.
@@ -506,6 +532,7 @@ Called after processing a table `</table>`.
 ```rust
 pub fn visit_table_end(&self, ctx: NodeContext, output: &str) -> VisitResult
 ```
+
 ###### visit_blockquote()
 
 Visit blockquote elements `<blockquote>`.
@@ -515,6 +542,7 @@ Visit blockquote elements `<blockquote>`.
 ```rust
 pub fn visit_blockquote(&self, ctx: NodeContext, content: &str, depth: usize) -> VisitResult
 ```
+
 ###### visit_strong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
@@ -524,6 +552,7 @@ Visit strong/bold elements `<strong>`, `<b>`.
 ```rust
 pub fn visit_strong(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
+
 ###### visit_emphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
@@ -533,6 +562,7 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 ```rust
 pub fn visit_emphasis(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
+
 ###### visit_strikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
@@ -542,6 +572,7 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 ```rust
 pub fn visit_strikethrough(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
+
 ###### visit_underline()
 
 Visit underline elements `<u>`, `<ins>`.
@@ -551,6 +582,7 @@ Visit underline elements `<u>`, `<ins>`.
 ```rust
 pub fn visit_underline(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
+
 ###### visit_subscript()
 
 Visit subscript elements `<sub>`.
@@ -560,6 +592,7 @@ Visit subscript elements `<sub>`.
 ```rust
 pub fn visit_subscript(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
+
 ###### visit_superscript()
 
 Visit superscript elements `<sup>`.
@@ -569,6 +602,7 @@ Visit superscript elements `<sup>`.
 ```rust
 pub fn visit_superscript(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
+
 ###### visit_mark()
 
 Visit mark/highlight elements `<mark>`.
@@ -578,6 +612,7 @@ Visit mark/highlight elements `<mark>`.
 ```rust
 pub fn visit_mark(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
+
 ###### visit_line_break()
 
 Visit line break elements `<br>`.
@@ -587,6 +622,7 @@ Visit line break elements `<br>`.
 ```rust
 pub fn visit_line_break(&self, ctx: NodeContext) -> VisitResult
 ```
+
 ###### visit_horizontal_rule()
 
 Visit horizontal rule elements `<hr>`.
@@ -596,6 +632,7 @@ Visit horizontal rule elements `<hr>`.
 ```rust
 pub fn visit_horizontal_rule(&self, ctx: NodeContext) -> VisitResult
 ```
+
 ###### visit_custom_element()
 
 Visit custom elements (web components) or unknown tags.
@@ -605,6 +642,7 @@ Visit custom elements (web components) or unknown tags.
 ```rust
 pub fn visit_custom_element(&self, ctx: NodeContext, tag_name: &str, html: &str) -> VisitResult
 ```
+
 ###### visit_definition_list_start()
 
 Visit definition list `<dl>`.
@@ -614,6 +652,7 @@ Visit definition list `<dl>`.
 ```rust
 pub fn visit_definition_list_start(&self, ctx: NodeContext) -> VisitResult
 ```
+
 ###### visit_definition_term()
 
 Visit definition term `<dt>`.
@@ -623,6 +662,7 @@ Visit definition term `<dt>`.
 ```rust
 pub fn visit_definition_term(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
+
 ###### visit_definition_description()
 
 Visit definition description `<dd>`.
@@ -632,6 +672,7 @@ Visit definition description `<dd>`.
 ```rust
 pub fn visit_definition_description(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
+
 ###### visit_definition_list_end()
 
 Called after processing a definition list `</dl>`.
@@ -641,6 +682,7 @@ Called after processing a definition list `</dl>`.
 ```rust
 pub fn visit_definition_list_end(&self, ctx: NodeContext, output: &str) -> VisitResult
 ```
+
 ###### visit_form()
 
 Visit form elements `<form>`.
@@ -650,6 +692,7 @@ Visit form elements `<form>`.
 ```rust
 pub fn visit_form(&self, ctx: NodeContext, action: Option<String>, method: Option<String>) -> VisitResult
 ```
+
 ###### visit_input()
 
 Visit input elements `<input>`.
@@ -659,6 +702,7 @@ Visit input elements `<input>`.
 ```rust
 pub fn visit_input(&self, ctx: NodeContext, input_type: &str, name: Option<String>, value: Option<String>) -> VisitResult
 ```
+
 ###### visit_button()
 
 Visit button elements `<button>`.
@@ -668,6 +712,7 @@ Visit button elements `<button>`.
 ```rust
 pub fn visit_button(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
+
 ###### visit_audio()
 
 Visit audio elements `<audio>`.
@@ -677,6 +722,7 @@ Visit audio elements `<audio>`.
 ```rust
 pub fn visit_audio(&self, ctx: NodeContext, src: Option<String>) -> VisitResult
 ```
+
 ###### visit_video()
 
 Visit video elements `<video>`.
@@ -686,6 +732,7 @@ Visit video elements `<video>`.
 ```rust
 pub fn visit_video(&self, ctx: NodeContext, src: Option<String>) -> VisitResult
 ```
+
 ###### visit_iframe()
 
 Visit iframe elements `<iframe>`.
@@ -695,6 +742,7 @@ Visit iframe elements `<iframe>`.
 ```rust
 pub fn visit_iframe(&self, ctx: NodeContext, src: Option<String>) -> VisitResult
 ```
+
 ###### visit_details()
 
 Visit details elements `<details>`.
@@ -704,6 +752,7 @@ Visit details elements `<details>`.
 ```rust
 pub fn visit_details(&self, ctx: NodeContext, open: bool) -> VisitResult
 ```
+
 ###### visit_summary()
 
 Visit summary elements `<summary>`.
@@ -713,6 +762,7 @@ Visit summary elements `<summary>`.
 ```rust
 pub fn visit_summary(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
+
 ###### visit_figure_start()
 
 Visit figure elements `<figure>`.
@@ -722,6 +772,7 @@ Visit figure elements `<figure>`.
 ```rust
 pub fn visit_figure_start(&self, ctx: NodeContext) -> VisitResult
 ```
+
 ###### visit_figcaption()
 
 Visit figcaption elements `<figcaption>`.
@@ -731,6 +782,7 @@ Visit figcaption elements `<figcaption>`.
 ```rust
 pub fn visit_figcaption(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
+
 ###### visit_figure_end()
 
 Called after processing a figure `</figure>`.
@@ -743,7 +795,7 @@ pub fn visit_figure_end(&self, ctx: NodeContext, output: &str) -> VisitResult
 
 ---
 
-#### ImageMetadata
+##### ImageMetadata
 
 Image metadata with source and dimensions.
 
@@ -762,7 +814,7 @@ for image analysis and optimization.
 
 ---
 
-#### LinkMetadata
+##### LinkMetadata
 
 Hyperlink metadata with categorization and attributes.
 
@@ -777,7 +829,7 @@ Represents `<a>` elements with parsed href values, text content, and link type c
 | `rel` | `Vec<String>` | — | Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") |
 | `attributes` | `HashMap<String, String>` | — | Additional HTML attributes |
 
-##### Methods
+###### Methods
 
 ###### classify_link()
 
@@ -795,7 +847,7 @@ pub fn classify_link(href: &str) -> LinkType
 
 ---
 
-#### NodeContext
+##### NodeContext
 
 Context information passed to all visitor methods.
 
@@ -815,7 +867,7 @@ including its type, attributes, position in the DOM tree, and parent context.
 
 ---
 
-#### PreprocessingOptions
+##### PreprocessingOptions
 
 HTML preprocessing options for document cleanup before conversion.
 
@@ -826,7 +878,7 @@ HTML preprocessing options for document cleanup before conversion.
 | `remove_navigation` | `bool` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `remove_forms` | `bool` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-##### Methods
+###### Methods
 
 ###### default()
 
@@ -835,6 +887,7 @@ HTML preprocessing options for document cleanup before conversion.
 ```rust
 pub fn default() -> PreprocessingOptions
 ```
+
 ###### apply_update()
 
 Apply a partial update to these preprocessing options.
@@ -847,6 +900,7 @@ Unspecified fields (None) are left unchanged.
 ```rust
 pub fn apply_update(&self, update: PreprocessingOptionsUpdate)
 ```
+
 ###### from_update()
 
 Create new preprocessing options from a partial update.
@@ -863,6 +917,7 @@ New `PreprocessingOptions` with specified updates applied to defaults
 ```rust
 pub fn from_update(update: PreprocessingOptionsUpdate) -> PreprocessingOptions
 ```
+
 ###### from()
 
 **Signature:**
@@ -873,7 +928,7 @@ pub fn from(update: PreprocessingOptionsUpdate) -> PreprocessingOptions
 
 ---
 
-#### ProcessingWarning
+##### ProcessingWarning
 
 A non-fatal warning generated during HTML processing.
 
@@ -885,7 +940,7 @@ A non-fatal warning generated during HTML processing.
 
 ---
 
-#### StructuredData
+##### StructuredData
 
 Structured data block (JSON-LD, Microdata, or RDFa).
 
@@ -901,7 +956,7 @@ JSON-LD blocks are collected as raw JSON strings for flexibility.
 
 ---
 
-#### TableData
+##### TableData
 
 A top-level extracted table with both structured data and markdown representation.
 
@@ -913,7 +968,7 @@ A top-level extracted table with both structured data and markdown representatio
 
 ---
 
-#### TableGrid
+##### TableGrid
 
 A structured table grid with cell-level data including spans.
 
@@ -926,7 +981,7 @@ A structured table grid with cell-level data including spans.
 
 ---
 
-#### TextAnnotation
+##### TextAnnotation
 
 An inline text annotation with byte-range offsets.
 
@@ -941,7 +996,7 @@ Annotations describe formatting (bold, italic, etc.) and links within a node's t
 
 ---
 
-#### VisitorHandle
+##### VisitorHandle
 
 Type alias for a visitor handle (`Arc`-wrapped `Mutex` for thread-safe shared mutation).
 
@@ -952,9 +1007,9 @@ axum/rmcp/tokio Send-bound contexts.
 
 ---
 
-### Enums
+#### Enums
 
-#### TextDirection
+##### TextDirection
 
 Text directionality of document content.
 
@@ -969,7 +1024,7 @@ Corresponds to the HTML `dir` attribute and `bdi` element directionality.
 
 ---
 
-#### LinkType
+##### LinkType
 
 Link classification based on href value and document context.
 
@@ -987,7 +1042,7 @@ Used to categorize links during extraction for filtering and analysis.
 
 ---
 
-#### ImageType
+##### ImageType
 
 Image source classification for proper handling and processing.
 
@@ -1003,7 +1058,7 @@ Determines whether an image is embedded (data URI), inline SVG, external, or rel
 
 ---
 
-#### StructuredDataType
+##### StructuredDataType
 
 Structured data format type.
 
@@ -1018,7 +1073,7 @@ Identifies the schema/format used for structured data markup.
 
 ---
 
-#### PreprocessingPreset
+##### PreprocessingPreset
 
 HTML preprocessing aggressiveness level.
 
@@ -1033,7 +1088,7 @@ Controls the extent of cleanup performed before conversion. Higher levels remove
 
 ---
 
-#### HeadingStyle
+##### HeadingStyle
 
 Heading style options for Markdown output.
 
@@ -1048,7 +1103,7 @@ Controls how headings (h1-h6) are rendered in the output Markdown.
 
 ---
 
-#### ListIndentType
+##### ListIndentType
 
 List indentation character type.
 
@@ -1062,7 +1117,7 @@ Controls whether list items are indented with spaces or tabs.
 
 ---
 
-#### WhitespaceMode
+##### WhitespaceMode
 
 Whitespace handling strategy during conversion.
 
@@ -1076,7 +1131,7 @@ Determines how sequences of whitespace characters (spaces, tabs, newlines) are p
 
 ---
 
-#### NewlineStyle
+##### NewlineStyle
 
 Line break syntax in Markdown output.
 
@@ -1090,7 +1145,7 @@ Controls how soft line breaks (from `<br>` or line breaks in source) are rendere
 
 ---
 
-#### CodeBlockStyle
+##### CodeBlockStyle
 
 Code block fence style in Markdown output.
 
@@ -1105,7 +1160,7 @@ Determines how code blocks (`<pre><code>`) are rendered in Markdown.
 
 ---
 
-#### HighlightStyle
+##### HighlightStyle
 
 Highlight rendering style for `<mark>` elements.
 
@@ -1121,7 +1176,7 @@ Controls how highlighted text is rendered in Markdown output.
 
 ---
 
-#### LinkStyle
+##### LinkStyle
 
 Link rendering style in Markdown output.
 
@@ -1136,7 +1191,7 @@ reference-style `[text][1]` syntax with definitions collected at the end.
 
 ---
 
-#### OutputFormat
+##### OutputFormat
 
 Output format for conversion.
 
@@ -1151,7 +1206,7 @@ Specifies the target markup language format for the conversion output.
 
 ---
 
-#### NodeContent
+##### NodeContent
 
 The semantic content type of a document node.
 
@@ -1176,7 +1231,7 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 
 ---
 
-#### AnnotationKind
+##### AnnotationKind
 
 The type of an inline text annotation.
 
@@ -1197,7 +1252,7 @@ Uses internally tagged representation (`"annotation_type": "bold"`) for JSON ser
 
 ---
 
-#### WarningKind
+##### WarningKind
 
 Categories of processing warnings.
 
@@ -1213,7 +1268,7 @@ Categories of processing warnings.
 
 ---
 
-#### NodeType
+##### NodeType
 
 Node type enumeration covering all HTML element types.
 
@@ -1314,7 +1369,7 @@ providing a coarse-grained classification for visitor dispatch.
 
 ---
 
-#### VisitResult
+##### VisitResult
 
 Result of a visitor callback.
 
@@ -1333,9 +1388,9 @@ preserving HTML, or signaling errors.
 
 ---
 
-### Errors
+#### Errors
 
-#### ConversionError
+##### ConversionError
 
 Errors that can occur during HTML to Markdown conversion.
 
