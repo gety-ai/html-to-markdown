@@ -162,16 +162,6 @@ jobs:
 
       - name: Run Pre-commit Hooks
         uses: j178/prek-action@v2 # v2
-        env:
-          # Skip hooks that fail in CI for infrastructure reasons unrelated
-          # to our code (and pass locally):
-          # - mypy: upstream INTERNAL ERROR on the runner mypy 2.0.0 build
-          # - cppcheck: shared-hooks expect 2.20.0; runner ships 2.13.0
-          # - shellcheck: shared-hooks tarball extraction conflicts with
-          #   pre-cached files in the runner image
-          # - govulncheck: requires go.mod at runner cwd; our Go module
-          #   lives under packages/go (verified in publish workflow)
-          SKIP: mypy,cppcheck,shellcheck,govulncheck
         with:
           extra-args: --all-files
 
