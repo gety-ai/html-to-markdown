@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Swift binding** — `HtmlToMarkdown` Swift Package on Swift Package Index. SPM-only (no CocoaPods); macOS 13+, iOS 16+; powered by `swift-bridge`.
 - **Dart binding** — `h2m` on pub.dev. Built with `flutter_rust_bridge` 2.12; supports Flutter Android/iOS targets plus server Dart on Linux/macOS/Windows. Package name `h2m` because `html_to_markdown` and `html-to-markdown` are taken on pub.dev.
 - **Zig binding** — published via GitHub Releases (`build.zig.zon` + tarball SHA-256 in release notes). Requires Zig 0.16+; links the existing `html_to_markdown_ffi` C library — no separate Rust bridge crate.
+- **ffi**: `htm_visitor_handle_from_callbacks` exports a vtable-style visitor-handle constructor for zig and other C consumers. Wraps a `HtmVisitorCallbacks` struct into the `VisitorHandle` shape expected by `htm_conversion_options_builder_visitor`.
 
 ## [3.4.1] - 2026-05-13
 

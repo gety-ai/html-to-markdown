@@ -3266,7 +3266,7 @@ char *htm_node_type_to_string(const HTMNodeType *ptr);
  * Attach a vtable visitor bridge to a `ConversionOptions` options struct.
  *
  * The `HtmHtmlVisitorBridge` encapsulates a set of C function pointers that receive visit
- * callbacks during HTML-to-Markdown conversion.  Call this setter before `htm_convert`
+ * callbacks during generated conversion.  Call this setter before `htm_convert`
  * to activate visitor callbacks.  Pass `visitor = null` to clear a previously attached visitor.
  *
  * Neither pointer is consumed: the caller retains ownership of both `options` and `visitor`
@@ -3283,7 +3283,7 @@ void htm_options_set_visitor(HTMConversionOptions *options,
                              struct HTMHtmHtmlVisitorBridge *visitor);
 
 /**
- * Convert HTML to Markdown.
+ * Run conversion.
  *
  * Returns a heap-allocated [`ConversionResult`] on success, or null on failure.
  * Check `htm_last_error_code` / `htm_last_error_context` for error details.
@@ -3325,6 +3325,27 @@ HTMConversionResult *htm_convert(const char *html,
 struct HTMHtmVisitor *htm_visitor_create(const struct HTMHtmVisitorCallbacks *callbacks);
 
 /**
+ * Construct a `VisitorHandle` (the runtime-wrapped trait object passed via
+ * `ConversionOptions.visitor`) from a `HtmVisitorCallbacks` vtable.
+ *
+ * The returned handle owns a copy of the callbacks struct and is suitable
+ * for passing into `htm_conversion_options_builder_visitor`. Release with
+ * `htm_visitor_handle_free`.
+ *
+ * Returns null on null input.
+ *
+ * # Safety
+ *
+ * `callbacks` must point to a valid, fully initialised `HtmVisitorCallbacks`.
+ * The resulting `VisitorHandle` retains an owned copy of the vtable's
+ * function pointers and `user_data` — callers must ensure those remain
+ * valid for the lifetime of the returned handle. The handle may be shared
+ * across threads (it is `Send + Sync`); the callbacks therefore must be
+ * safe to invoke from any thread.
+ */
+HTMVisitorHandle *htm_visitor_handle_from_callbacks(const struct HTMHtmVisitorCallbacks *callbacks);
+
+/**
  * Free a visitor handle previously returned by `htm_visitor_create`.
  *
  * After this call the pointer is invalid and must not be used.
@@ -3355,7 +3376,7 @@ void htm_options_set_visitor_handle(HTMConversionOptions *options,
                                     struct HTMHtmVisitor *visitor);
 
 /**
- * Convert HTML to Markdown using a callback-based visitor.
+ * Run conversion using a callback-based visitor.
  *
  * Returns a heap-allocated `ConversionResult` on success, or null on failure.
  * Check `htm_last_error_code` / `htm_last_error_context` for error details.
