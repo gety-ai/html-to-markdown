@@ -1368,11 +1368,19 @@ class _$AnnotationKind_LinkImpl extends AnnotationKind_Link {
   const _$AnnotationKind_LinkImpl({required this.url, required this.title})
       : super._();
 
-  /// The link URL.
+  /// The URL from the `href` attribute, copied verbatim from the source HTML.
+  ///
+  /// No URL decoding or normalization is performed: percent-encoded sequences, relative
+  /// paths, and protocol-relative URLs (`//example.com`) are all preserved exactly as
+  /// written in the source. Callers that need an absolute URL must resolve it against the
+  /// document base URL themselves.
   @override
   final String url;
 
-  /// Optional link title attribute.
+  /// The `title` attribute of the `<a>` element, if present.
+  ///
+  /// `None` when the `<a>` tag has no `title="..."` attribute. When present, the value
+  /// is copied verbatim — HTML entities within the title are not decoded.
   @override
   final String title;
 
@@ -1513,10 +1521,18 @@ abstract class AnnotationKind_Link extends AnnotationKind {
       required final String title}) = _$AnnotationKind_LinkImpl;
   const AnnotationKind_Link._() : super._();
 
-  /// The link URL.
+  /// The URL from the `href` attribute, copied verbatim from the source HTML.
+  ///
+  /// No URL decoding or normalization is performed: percent-encoded sequences, relative
+  /// paths, and protocol-relative URLs (`//example.com`) are all preserved exactly as
+  /// written in the source. Callers that need an absolute URL must resolve it against the
+  /// document base URL themselves.
   String get url;
 
-  /// Optional link title attribute.
+  /// The `title` attribute of the `<a>` element, if present.
+  ///
+  /// `None` when the `<a>` tag has no `title="..."` attribute. When present, the value
+  /// is copied verbatim — HTML entities within the title are not decoded.
   String get title;
 
   /// Create a copy of AnnotationKind

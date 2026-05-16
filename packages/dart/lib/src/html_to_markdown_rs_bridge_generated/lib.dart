@@ -192,12 +192,20 @@ sealed class AnnotationKind with _$AnnotationKind {
   /// Highlighted / marked text.
   const factory AnnotationKind.highlight() = AnnotationKind_Highlight;
 
-  /// A hyperlink.
+  /// A hyperlink sourced from an `<a href="...">` element.
   const factory AnnotationKind.link({
-    /// The link URL.
+    /// The URL from the `href` attribute, copied verbatim from the source HTML.
+    ///
+    /// No URL decoding or normalization is performed: percent-encoded sequences, relative
+    /// paths, and protocol-relative URLs (`//example.com`) are all preserved exactly as
+    /// written in the source. Callers that need an absolute URL must resolve it against the
+    /// document base URL themselves.
     required String url,
 
-    /// Optional link title attribute.
+    /// The `title` attribute of the `<a>` element, if present.
+    ///
+    /// `None` when the `<a>` tag has no `title="..."` attribute. When present, the value
+    /// is copied verbatim — HTML entities within the title are not decoded.
     required String title,
   }) = AnnotationKind_Link;
 }
@@ -282,7 +290,15 @@ class ConversionOptions {
   /// extraction into `result.tables` runs unconditionally.
   final bool extractMetadata;
 
-  /// Controls how whitespace is normalised during conversion.
+  /// Controls how whitespace sequences are normalised in the converted output.
+  ///
+  /// - [`WhitespaceMode::Normalized`] (default) — collapses consecutive whitespace characters
+  ///   (spaces, tabs, newlines) to a single space, matching browser rendering behaviour.
+  /// - [`WhitespaceMode::Strict`] — preserves all whitespace exactly as it appears in the
+  ///   source HTML, including runs of spaces and embedded newlines.
+  ///
+  /// Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted
+  /// content outside `<pre>` tags). For most documents `Normalized` produces cleaner output.
   final WhitespaceMode whitespaceMode;
 
   /// Strip all newlines from the output, producing a single-line result.
@@ -291,7 +307,11 @@ class ConversionOptions {
   /// Wrap long lines at [`wrap_width`](Self::wrap_width) characters.
   final bool wrap;
 
-  /// Maximum line width when [`wrap`](Self::wrap) is enabled (default `80`).
+  /// Maximum output line width in characters when [`wrap`](Self::wrap) is `true` (default `80`).
+  ///
+  /// Lines are broken at word boundaries so that no line exceeds this length. A value of `0`
+  /// is treated as "no limit" — equivalent to leaving [`wrap`](Self::wrap) disabled. Has no
+  /// effect when `wrap` is `false`.
   final PlatformInt64 wrapWidth;
 
   /// Treat the entire document as inline content (no block-level wrappers).
@@ -312,7 +332,15 @@ class ConversionOptions {
   /// HTML tag names whose `<img>` children are kept inline instead of block.
   final List<String> keepInlineImagesIn;
 
-  /// Pre-processing options applied to the HTML before conversion.
+  /// Options for the HTML pre-processing pass applied before conversion begins.
+  ///
+  /// Pre-processing runs before the HTML is handed to the converter and can perform operations
+  /// such as unwrapping redundant wrapper elements, removing tracking pixels, and normalising
+  /// vendor-specific markup. See [`PreprocessingOptions`] for the full set of knobs.
+  ///
+  /// Defaults to [`PreprocessingOptions::default()`], which enables the standard cleaning
+  /// passes. Set individual fields on [`PreprocessingOptions`] (or construct via
+  /// [`ConversionOptions::builder`]) to opt in or out of specific passes.
   final PreprocessingOptions preprocessing;
 
   /// Expected character encoding of the input HTML (default `"utf-8"`).
@@ -797,7 +825,17 @@ class ConversionResult {
 
   /// Structured document tree with semantic elements.
   ///
-  /// Populated when `include_document_structure` is `true` in options.
+  /// Populated when `ConversionOptions::include_document_structure` is `true`. `None`
+  /// otherwise (the default), which avoids the overhead of building the tree.
+  ///
+  /// When present, the tree mirrors the converted document: headings open
+  /// `Group` sections, paragraphs and list items carry
+  /// inline `TextAnnotation`s, and tables reference the same
+  /// `TableGrid` data exposed in [`Self::tables`].
+  ///
+  /// Note: this field is independent of the `metadata` feature flag. Document structure
+  /// collection is always available at runtime; it is gated only by the runtime option, not
+  /// by a compile-time feature.
   final DocumentStructure? document;
 
   /// Extracted HTML metadata (title, OG, links, images, structured data).
@@ -962,7 +1000,16 @@ class DocumentNode {
   /// Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text.
   final List<TextAnnotation> annotations;
 
-  /// Format-specific attributes (e.g. class, id, data-* attributes).
+  /// Format-specific attributes preserved from the source HTML element.
+  ///
+  /// Keys are lowercased attribute names as they appear in the HTML (e.g. `"class"`, `"id"`,
+  /// `"data-foo"`). Values are the raw attribute strings, copied verbatim from the source —
+  /// no HTML entity decoding is applied here.
+  ///
+  /// The map is `None` when no attributes are present (omitted entirely in serialized output).
+  /// Not every HTML attribute is preserved: only attributes that carry semantic or structural
+  /// significance for the node type are collected. For example, heading nodes capture the `"id"`
+  /// attribute for anchor linking; other element-level attributes may be silently dropped.
   final Map<String, String>? attributes;
 
   const DocumentNode({
@@ -1993,7 +2040,21 @@ enum PreprocessingPreset {
   ;
 }
 
-/// A non-fatal warning generated during HTML processing.
+/// A non-fatal diagnostic produced during HTML conversion.
+///
+/// Warnings indicate that conversion completed but some content may have been handled
+/// differently than expected — for example, an image that could not be extracted, a truncated
+/// input, or malformed HTML that was repaired with best-effort parsing.
+///
+/// Conversion always succeeds (returns `ConversionResult`) even when warnings are
+/// present. Callers should inspect `warnings` and decide how to
+/// handle them based on their tolerance for partial results:
+///
+/// - **Logging pipelines**: emit each warning at `WARN` level and continue.
+/// - **Strict pipelines**: treat any warning as a hard error by checking
+///   `result.warnings.is_empty()` before using the output.
+///
+/// See [`WarningKind`] for the full taxonomy of warning categories.
 class ProcessingWarning {
   /// Human-readable warning message.
   final String message;
@@ -2112,7 +2173,20 @@ class TableGrid {
   /// Number of columns.
   final PlatformInt64 cols;
 
-  /// All cells in the table (may be fewer than rows*cols due to spans).
+  /// All cells in the table as a flat, sparse list.
+  ///
+  /// The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells
+  /// that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear
+  /// in the list. Only the top-left "origin" cell of a span is present, with its `row_span`
+  /// and `col_span` fields set accordingly.
+  ///
+  /// To reconstruct the full visual grid, iterate over all cells and mark the rectangular
+  /// region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any
+  /// `(row, col)` position that is not the origin of any cell is covered by a span from an
+  /// earlier cell.
+  ///
+  /// The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 || cols == 0`)
+  /// produces an empty vec.
   final List<GridCell> cells;
 
   const TableGrid({
@@ -2134,9 +2208,20 @@ class TableGrid {
           cells == other.cells;
 }
 
-/// An inline text annotation with byte-range offsets.
+/// A styling or semantic annotation that applies to a byte range within a node's text.
 ///
-/// Annotations describe formatting (bold, italic, etc.) and links within a node's text content.
+/// Unlike [`DocumentNode`], which captures block-level structure (headings, paragraphs, etc.),
+/// a `TextAnnotation` describes inline-level markup — bold, italic, links, code spans, and
+/// similar — that spans a contiguous run of bytes inside `DocumentNode::content`'s text field.
+///
+/// Byte offsets (`start`..`end`) are into the UTF-8 encoded text of the parent node. The range
+/// follows Rust slice conventions: `start` is inclusive and `end` is exclusive, so the annotated
+/// text is `text[start as usize..end as usize]`.
+///
+/// Multiple annotations on the same node can overlap (e.g. bold-italic text), and they are
+/// stored in the order they are encountered during DOM traversal.
+///
+/// See [`AnnotationKind`] for the full list of supported annotation types.
 class TextAnnotation {
   /// Start byte offset (inclusive) into the parent node's text.
   final PlatformInt64 start;

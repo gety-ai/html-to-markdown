@@ -58,6 +58,7 @@ repos:
     hooks:
       - id: cargo-sort
         args: [-w]
+        exclude: ^(e2e/rust/|test_apps/rust/|packages/dart/rust/)Cargo\.toml$
       - id: cargo-fmt
         args: ["--all"]
       - id: cargo-check
@@ -221,6 +222,7 @@ repos:
         files: ^packages/dart/.*\.dart$
       - id: dart-analyze
         files: ^packages/dart/.*\.dart$
+        exclude: ^(test_apps/|e2e/dart/)
       - id: zig-fmt
         files: ^packages/zig/.*\.zig$
       - id: zig-build-check
@@ -240,7 +242,7 @@ repos:
         exclude: ^test_apps/
   # Alef: verify bindings and sync versions
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.16.20
+    rev: v0.16.21
     hooks:
       - id: alef-verify
       - id: alef-sync-versions
