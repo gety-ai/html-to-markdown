@@ -1,7 +1,7 @@
 .{
-    .name = .html_to_markdown,
-    .version = "3.4.1",
-    .fingerprint = 0xfb281859a224aa08,
+    .name = .html_to_markdown_rs,
+    .version = "3.5.0",
+    .fingerprint = 0x9867ae0a5bf2d542,
     .minimum_zig_version = "0.16.0",
     .dependencies = .{},
     .paths = .{

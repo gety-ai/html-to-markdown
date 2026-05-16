@@ -61,7 +61,7 @@ publishing {
             afterEvaluate { from(components["release"]) }
             groupId = "dev.kreuzberg"
             artifactId = "html-to-markdown-android"
-            version = "0.0.0"
+            version = "3.5.0"
         }
     }
 }

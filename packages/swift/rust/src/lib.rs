@@ -572,6 +572,29 @@ mod ffi {
         #[swift_bridge(swift_name = "nodeContextFromJson")]
         fn node_context_from_json(json: String) -> Result<NodeContext, String>;
     }
+    extern "Rust" {
+
+        #[swift_bridge(swift_name = "headerMetadataFromJson")]
+        fn header_metadata_from_json(json: String) -> Result<HeaderMetadata, String>;
+        #[swift_bridge(swift_name = "linkMetadataFromJson")]
+        fn link_metadata_from_json(json: String) -> Result<LinkMetadata, String>;
+        #[swift_bridge(swift_name = "imageMetadataFromJson")]
+        fn image_metadata_from_json(json: String) -> Result<ImageMetadata, String>;
+        #[swift_bridge(swift_name = "structuredDataFromJson")]
+        fn structured_data_from_json(json: String) -> Result<StructuredData, String>;
+        #[swift_bridge(swift_name = "documentStructureFromJson")]
+        fn document_structure_from_json(json: String) -> Result<DocumentStructure, String>;
+        #[swift_bridge(swift_name = "documentNodeFromJson")]
+        fn document_node_from_json(json: String) -> Result<DocumentNode, String>;
+        #[swift_bridge(swift_name = "textAnnotationFromJson")]
+        fn text_annotation_from_json(json: String) -> Result<TextAnnotation, String>;
+        #[swift_bridge(swift_name = "gridCellFromJson")]
+        fn grid_cell_from_json(json: String) -> Result<GridCell, String>;
+        #[swift_bridge(swift_name = "tableDataFromJson")]
+        fn table_data_from_json(json: String) -> Result<TableData, String>;
+        #[swift_bridge(swift_name = "processingWarningFromJson")]
+        fn processing_warning_from_json(json: String) -> Result<ProcessingWarning, String>;
+    }
 }
 
 pub struct DocumentMetadata(pub html_to_markdown_rs::metadata::DocumentMetadata);
@@ -3187,5 +3210,65 @@ pub fn preprocessing_options_update_from_json(json: String) -> Result<Preprocess
 pub fn node_context_from_json(json: String) -> Result<NodeContext, String> {
     serde_json::from_str::<html_to_markdown_rs::NodeContext>(&json)
         .map(NodeContext)
+        .map_err(|e| e.to_string())
+}
+
+pub fn header_metadata_from_json(json: String) -> Result<HeaderMetadata, String> {
+    serde_json::from_str::<html_to_markdown_rs::metadata::HeaderMetadata>(&json)
+        .map(HeaderMetadata)
+        .map_err(|e| e.to_string())
+}
+
+pub fn link_metadata_from_json(json: String) -> Result<LinkMetadata, String> {
+    serde_json::from_str::<html_to_markdown_rs::metadata::LinkMetadata>(&json)
+        .map(LinkMetadata)
+        .map_err(|e| e.to_string())
+}
+
+pub fn image_metadata_from_json(json: String) -> Result<ImageMetadata, String> {
+    serde_json::from_str::<html_to_markdown_rs::metadata::ImageMetadata>(&json)
+        .map(ImageMetadata)
+        .map_err(|e| e.to_string())
+}
+
+pub fn structured_data_from_json(json: String) -> Result<StructuredData, String> {
+    serde_json::from_str::<html_to_markdown_rs::metadata::StructuredData>(&json)
+        .map(StructuredData)
+        .map_err(|e| e.to_string())
+}
+
+pub fn document_structure_from_json(json: String) -> Result<DocumentStructure, String> {
+    serde_json::from_str::<html_to_markdown_rs::DocumentStructure>(&json)
+        .map(DocumentStructure)
+        .map_err(|e| e.to_string())
+}
+
+pub fn document_node_from_json(json: String) -> Result<DocumentNode, String> {
+    serde_json::from_str::<html_to_markdown_rs::DocumentNode>(&json)
+        .map(DocumentNode)
+        .map_err(|e| e.to_string())
+}
+
+pub fn text_annotation_from_json(json: String) -> Result<TextAnnotation, String> {
+    serde_json::from_str::<html_to_markdown_rs::TextAnnotation>(&json)
+        .map(TextAnnotation)
+        .map_err(|e| e.to_string())
+}
+
+pub fn grid_cell_from_json(json: String) -> Result<GridCell, String> {
+    serde_json::from_str::<html_to_markdown_rs::GridCell>(&json)
+        .map(GridCell)
+        .map_err(|e| e.to_string())
+}
+
+pub fn table_data_from_json(json: String) -> Result<TableData, String> {
+    serde_json::from_str::<html_to_markdown_rs::TableData>(&json)
+        .map(TableData)
+        .map_err(|e| e.to_string())
+}
+
+pub fn processing_warning_from_json(json: String) -> Result<ProcessingWarning, String> {
+    serde_json::from_str::<html_to_markdown_rs::ProcessingWarning>(&json)
+        .map(ProcessingWarning)
         .map_err(|e| e.to_string())
 }

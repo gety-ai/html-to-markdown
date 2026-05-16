@@ -1368,8 +1368,11 @@ class _$AnnotationKind_LinkImpl extends AnnotationKind_Link {
   const _$AnnotationKind_LinkImpl({required this.url, required this.title})
       : super._();
 
+  /// The link URL.
   @override
   final String url;
+
+  /// Optional link title attribute.
   @override
   final String title;
 
@@ -1510,7 +1513,10 @@ abstract class AnnotationKind_Link extends AnnotationKind {
       required final String title}) = _$AnnotationKind_LinkImpl;
   const AnnotationKind_Link._() : super._();
 
+  /// The link URL.
   String get url;
+
+  /// Optional link title attribute.
   String get title;
 
   /// Create a copy of AnnotationKind
@@ -1697,8 +1703,11 @@ class _$NodeContent_HeadingImpl extends NodeContent_Heading {
   const _$NodeContent_HeadingImpl({required this.level, required this.text})
       : super._();
 
+  /// Heading level (1-6).
   @override
   final int level;
+
+  /// The heading text content.
   @override
   final String text;
 
@@ -1867,7 +1876,10 @@ abstract class NodeContent_Heading extends NodeContent {
       required final String text}) = _$NodeContent_HeadingImpl;
   const NodeContent_Heading._() : super._();
 
+  /// Heading level (1-6).
   int get level;
+
+  /// The heading text content.
   String get text;
 
   /// Create a copy of NodeContent
@@ -1916,6 +1928,7 @@ class __$$NodeContent_ParagraphImplCopyWithImpl<$Res>
 class _$NodeContent_ParagraphImpl extends NodeContent_Paragraph {
   const _$NodeContent_ParagraphImpl({required this.text}) : super._();
 
+  /// The paragraph text content.
   @override
   final String text;
 
@@ -2082,6 +2095,7 @@ abstract class NodeContent_Paragraph extends NodeContent {
       _$NodeContent_ParagraphImpl;
   const NodeContent_Paragraph._() : super._();
 
+  /// The paragraph text content.
   String get text;
 
   /// Create a copy of NodeContent
@@ -2129,6 +2143,7 @@ class __$$NodeContent_ListImplCopyWithImpl<$Res>
 class _$NodeContent_ListImpl extends NodeContent_List {
   const _$NodeContent_ListImpl({required this.ordered}) : super._();
 
+  /// Whether this is an ordered list.
   @override
   final bool ordered;
 
@@ -2295,6 +2310,7 @@ abstract class NodeContent_List extends NodeContent {
       _$NodeContent_ListImpl;
   const NodeContent_List._() : super._();
 
+  /// Whether this is an ordered list.
   bool get ordered;
 
   /// Create a copy of NodeContent
@@ -2342,6 +2358,7 @@ class __$$NodeContent_ListItemImplCopyWithImpl<$Res>
 class _$NodeContent_ListItemImpl extends NodeContent_ListItem {
   const _$NodeContent_ListItemImpl({required this.text}) : super._();
 
+  /// The list item text content.
   @override
   final String text;
 
@@ -2509,6 +2526,7 @@ abstract class NodeContent_ListItem extends NodeContent {
       _$NodeContent_ListItemImpl;
   const NodeContent_ListItem._() : super._();
 
+  /// The list item text content.
   String get text;
 
   /// Create a copy of NodeContent
@@ -2556,6 +2574,7 @@ class __$$NodeContent_TableImplCopyWithImpl<$Res>
 class _$NodeContent_TableImpl extends NodeContent_Table {
   const _$NodeContent_TableImpl({required this.grid}) : super._();
 
+  /// The table grid structure.
   @override
   final TableGrid grid;
 
@@ -2722,6 +2741,7 @@ abstract class NodeContent_Table extends NodeContent {
       _$NodeContent_TableImpl;
   const NodeContent_Table._() : super._();
 
+  /// The table grid structure.
   TableGrid get grid;
 
   /// Create a copy of NodeContent
@@ -2781,10 +2801,15 @@ class _$NodeContent_ImageImpl extends NodeContent_Image {
       {required this.description, required this.src, required this.imageIndex})
       : super._();
 
+  /// Alt text or caption.
   @override
   final String description;
+
+  /// Image source URL.
   @override
   final String src;
+
+  /// Index into `ConversionResult.images` when image extraction is enabled.
   @override
   final int imageIndex;
 
@@ -2957,8 +2982,13 @@ abstract class NodeContent_Image extends NodeContent {
       required final int imageIndex}) = _$NodeContent_ImageImpl;
   const NodeContent_Image._() : super._();
 
+  /// Alt text or caption.
   String get description;
+
+  /// Image source URL.
   String get src;
+
+  /// Index into `ConversionResult.images` when image extraction is enabled.
   int get imageIndex;
 
   /// Create a copy of NodeContent
@@ -3012,8 +3042,11 @@ class _$NodeContent_CodeImpl extends NodeContent_Code {
   const _$NodeContent_CodeImpl({required this.text, required this.language})
       : super._();
 
+  /// The code text content.
   @override
   final String text;
+
+  /// Programming language (from class="language-*" or similar).
   @override
   final String language;
 
@@ -3183,7 +3216,10 @@ abstract class NodeContent_Code extends NodeContent {
       required final String language}) = _$NodeContent_CodeImpl;
   const NodeContent_Code._() : super._();
 
+  /// The code text content.
   String get text;
+
+  /// Programming language (from class="language-*" or similar).
   String get language;
 
   /// Create a copy of NodeContent
@@ -3595,8 +3631,11 @@ class _$NodeContent_DefinitionItemImpl extends NodeContent_DefinitionItem {
       {required this.term, required this.definition})
       : super._();
 
+  /// The term being defined.
   @override
   final String term;
+
+  /// The definition text.
   @override
   final String definition;
 
@@ -3766,7 +3805,10 @@ abstract class NodeContent_DefinitionItem extends NodeContent {
       required final String definition}) = _$NodeContent_DefinitionItemImpl;
   const NodeContent_DefinitionItem._() : super._();
 
+  /// The term being defined.
   String get term;
+
+  /// The definition text.
   String get definition;
 
   /// Create a copy of NodeContent
@@ -3821,8 +3863,11 @@ class _$NodeContent_RawBlockImpl extends NodeContent_RawBlock {
       {required this.format, required this.content})
       : super._();
 
+  /// The format of the raw content (e.g. "html", "css", "javascript").
   @override
   final String format;
+
+  /// The raw content.
   @override
   final String content;
 
@@ -3992,7 +4037,10 @@ abstract class NodeContent_RawBlock extends NodeContent {
       required final String content}) = _$NodeContent_RawBlockImpl;
   const NodeContent_RawBlock._() : super._();
 
+  /// The format of the raw content (e.g. "html", "css", "javascript").
   String get format;
+
+  /// The raw content.
   String get content;
 
   /// Create a copy of NodeContent
@@ -4044,7 +4092,10 @@ class _$NodeContent_MetadataBlockImpl extends NodeContent_MetadataBlock {
       : _entries = entries,
         super._();
 
+  /// Key-value metadata pairs.
   final List<String> _entries;
+
+  /// Key-value metadata pairs.
   @override
   List<String> get entries {
     if (_entries is EqualUnmodifiableListView) return _entries;
@@ -4216,6 +4267,7 @@ abstract class NodeContent_MetadataBlock extends NodeContent {
       {required final List<String> entries}) = _$NodeContent_MetadataBlockImpl;
   const NodeContent_MetadataBlock._() : super._();
 
+  /// Key-value metadata pairs.
   List<String> get entries;
 
   /// Create a copy of NodeContent
@@ -4277,10 +4329,15 @@ class _$NodeContent_GroupImpl extends NodeContent_Group {
       required this.headingText})
       : super._();
 
+  /// Optional section label.
   @override
   final String label;
+
+  /// The heading level that created this group.
   @override
   final int headingLevel;
+
+  /// The heading text that created this group.
   @override
   final String headingText;
 
@@ -4454,8 +4511,13 @@ abstract class NodeContent_Group extends NodeContent {
       required final String headingText}) = _$NodeContent_GroupImpl;
   const NodeContent_Group._() : super._();
 
+  /// Optional section label.
   String get label;
+
+  /// The heading level that created this group.
   int get headingLevel;
+
+  /// The heading text that created this group.
   String get headingText;
 
   /// Create a copy of NodeContent

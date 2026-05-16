@@ -84,14 +84,7 @@ lint.ignore = [
   "TRY",
 ]
 lint.per-file-ignores."e2e/python/**/*.*" = [ "D", "INP001", "PT018", "S" ]
-lint.per-file-ignores."packages/python/tests/**/*.*" = [
-  "ARG",
-  "D",
-  "PD",
-  "PT006",
-  "PT013",
-  "S",
-]
+lint.per-file-ignores."packages/python/tests/**/*.*" = [ "ARG", "D", "PD", "PT006", "PT013", "S" ]
 lint.per-file-ignores."packages/python/tests/benchmark_*_test.py" = [ "T201" ]
 lint.per-file-ignores."scripts/*.py" = [ "INP001", "S607", "T201" ]
 lint.isort.known-first-party = [ "html_to_markdown", "tests" ]

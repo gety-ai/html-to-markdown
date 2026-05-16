@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.16.16"
+alef_version = "0.16.20"
 languages = [
   "python",
   "node",
@@ -209,13 +209,7 @@ functions = []
 methods = []
 
 [crates.include]
-types = [
-  "ConversionOptions",
-  "ConversionResult",
-  "HtmlVisitor",
-  "NodeContext",
-  "VisitResult",
-]
+types = ["ConversionOptions", "ConversionResult", "HtmlVisitor", "NodeContext", "VisitResult"]
 functions = ["convert"]
 
 [crates.lint.python]

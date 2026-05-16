@@ -168,68 +168,210 @@ abstract class VisitorHandle implements RustOpaqueInterface {}
 sealed class AnnotationKind with _$AnnotationKind {
   const AnnotationKind._();
 
+  /// Bold / strong emphasis.
   const factory AnnotationKind.bold() = AnnotationKind_Bold;
+
+  /// Italic / emphasis.
   const factory AnnotationKind.italic() = AnnotationKind_Italic;
+
+  /// Underline.
   const factory AnnotationKind.underline() = AnnotationKind_Underline;
+
+  /// Strikethrough / deleted text.
   const factory AnnotationKind.strikethrough() = AnnotationKind_Strikethrough;
+
+  /// Inline code.
   const factory AnnotationKind.code() = AnnotationKind_Code;
+
+  /// Subscript text.
   const factory AnnotationKind.subscript() = AnnotationKind_Subscript;
+
+  /// Superscript text.
   const factory AnnotationKind.superscript() = AnnotationKind_Superscript;
+
+  /// Highlighted / marked text.
   const factory AnnotationKind.highlight() = AnnotationKind_Highlight;
+
+  /// A hyperlink.
   const factory AnnotationKind.link({
+    /// The link URL.
     required String url,
+
+    /// Optional link title attribute.
     required String title,
   }) = AnnotationKind_Link;
 }
 
+/// Code block fence style in Markdown output.
+///
+/// Determines how code blocks (`<pre><code>`) are rendered in Markdown.
 enum CodeBlockStyle {
+  /// Indented code blocks (4 spaces). `CommonMark` standard.
   indented,
+
+  /// Fenced code blocks with backticks (```). Default (GFM). Supports language hints.
   backticks,
+
+  /// Fenced code blocks with tildes (~~~). Supports language hints.
   tildes,
   ;
 }
 
+/// Main conversion options for HTML to Markdown conversion.
+///
+/// Use [`ConversionOptions::builder()`] to construct, or [`Default::default()`] for defaults.
+///
+/// # Example
+///
+/// ```text
+/// use html_to_markdown_rs::ConversionOptions;
+///
+/// let options = ConversionOptions::builder()
+///     .heading_style(HeadingStyle::Atx)
+///     .wrap(true)
+///     .wrap_width(100)
+///     .build();
+/// ```
 class ConversionOptions {
+  /// Heading style to use in Markdown output (ATX `#` or Setext underline).
   final HeadingStyle headingStyle;
+
+  /// How to indent nested list items (spaces or tab).
   final ListIndentType listIndentType;
+
+  /// Number of spaces (or tabs) to use for each level of list indentation.
   final PlatformInt64 listIndentWidth;
+
+  /// Bullet character(s) to use for unordered list items (e.g. `"-"`, `"*"`).
   final String bullets;
+
+  /// Character used for bold/italic emphasis markers (`*` or `_`).
   final String strongEmSymbol;
+
+  /// Escape `*` characters in plain text to avoid unintended bold/italic.
   final bool escapeAsterisks;
+
+  /// Escape `_` characters in plain text to avoid unintended bold/italic.
   final bool escapeUnderscores;
+
+  /// Escape miscellaneous Markdown metacharacters (`[]()#` etc.) in plain text.
   final bool escapeMisc;
+
+  /// Escape ASCII characters that have special meaning in certain Markdown dialects.
   final bool escapeAscii;
+
+  /// Default language annotation for fenced code blocks that have no language hint.
   final String codeLanguage;
+
+  /// Automatically convert bare URLs into Markdown autolinks.
   final bool autolinks;
+
+  /// Emit a default title when no `<title>` tag is present.
   final bool defaultTitle;
+
+  /// Render `<br>` elements inside table cells as literal line breaks.
   final bool brInTables;
+
+  /// Style used for `<mark>` / highlighted text (e.g. `==text==`).
   final HighlightStyle highlightStyle;
+
+  /// Populate `result.metadata` with `<head>` / `<meta>` extraction
+  /// (title, description, Open Graph, Twitter Card, JSON-LD, …).
+  ///
+  /// Default `true`. Disabling skips the metadata pass only — table
+  /// extraction into `result.tables` runs unconditionally.
   final bool extractMetadata;
+
+  /// Controls how whitespace is normalised during conversion.
   final WhitespaceMode whitespaceMode;
+
+  /// Strip all newlines from the output, producing a single-line result.
   final bool stripNewlines;
+
+  /// Wrap long lines at [`wrap_width`](Self::wrap_width) characters.
   final bool wrap;
+
+  /// Maximum line width when [`wrap`](Self::wrap) is enabled (default `80`).
   final PlatformInt64 wrapWidth;
+
+  /// Treat the entire document as inline content (no block-level wrappers).
   final bool convertAsInline;
+
+  /// Markdown notation for subscript text (e.g. `"~"`).
   final String subSymbol;
+
+  /// Markdown notation for superscript text (e.g. `"^"`).
   final String supSymbol;
+
+  /// How to encode hard line breaks (`<br>`) in Markdown.
   final NewlineStyle newlineStyle;
+
+  /// Style used for fenced code blocks (backticks or tilde).
   final CodeBlockStyle codeBlockStyle;
+
+  /// HTML tag names whose `<img>` children are kept inline instead of block.
   final List<String> keepInlineImagesIn;
+
+  /// Pre-processing options applied to the HTML before conversion.
   final PreprocessingOptions preprocessing;
+
+  /// Expected character encoding of the input HTML (default `"utf-8"`).
   final String encoding;
+
+  /// Emit debug information during conversion.
   final bool debug;
+
+  /// HTML tag names whose content is stripped from the output entirely.
   final List<String> stripTags;
+
+  /// HTML tag names that are preserved verbatim in the output.
   final List<String> preserveTags;
+
+  /// Skip conversion of `<img>` elements (omit images from output).
   final bool skipImages;
+
+  /// Link rendering style (inline or reference).
   final LinkStyle linkStyle;
+
+  /// Target output format (Markdown, plain text, etc.).
   final OutputFormat outputFormat;
+
+  /// Include structured document tree in result.
   final bool includeDocumentStructure;
+
+  /// Extract inline images from data URIs and SVGs.
   final bool extractImages;
+
+  /// Maximum decoded image size in bytes (default 5MB).
   final PlatformInt64 maxImageSize;
+
+  /// Capture SVG elements as images.
   final bool captureSvg;
+
+  /// Infer image dimensions from data.
   final bool inferDimensions;
+
+  /// Maximum DOM traversal depth. `None` means unlimited.
+  /// When set, subtrees beyond this depth are silently truncated.
   final PlatformInt64? maxDepth;
+
+  /// CSS selectors for elements to exclude entirely (element + all content).
+  ///
+  /// Unlike `strip_tags` (which removes the tag wrapper but keeps children),
+  /// excluded elements and all their descendants are dropped from the output.
+  /// Supports any CSS selector that `tl` supports: tag names, `.class`,
+  /// `#id`, `[attribute]`, etc.
+  ///
+  /// Invalid selectors are silently skipped at conversion time.
+  ///
+  /// Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]`
   final List<String> excludeSelectors;
+
+  /// Optional visitor for custom traversal logic.
+  ///
+  /// When set, the visitor's callbacks are invoked for matching HTML elements
+  /// during conversion, allowing custom output, skipping, or HTML preservation.
+  /// See `HtmlVisitor`.
   final VisitorHandle? visitor;
 
   const ConversionOptions({
@@ -368,47 +510,132 @@ class ConversionOptions {
           visitor == other.visitor;
 }
 
+/// Partial update for `ConversionOptions`.
+///
+/// Uses `Option<T>` fields for selective updates. Bindings use this to construct
+/// options from language-native types. Prefer [`ConversionOptionsBuilder`] for Rust code.
 class ConversionOptionsUpdate {
+  /// Optional override for [`ConversionOptions::heading_style`].
   final HeadingStyle? headingStyle;
+
+  /// Optional override for [`ConversionOptions::list_indent_type`].
   final ListIndentType? listIndentType;
+
+  /// Optional override for [`ConversionOptions::list_indent_width`].
   final PlatformInt64? listIndentWidth;
+
+  /// Optional override for [`ConversionOptions::bullets`].
   final String? bullets;
+
+  /// Optional override for [`ConversionOptions::strong_em_symbol`].
   final String? strongEmSymbol;
+
+  /// Optional override for [`ConversionOptions::escape_asterisks`].
   final bool? escapeAsterisks;
+
+  /// Optional override for [`ConversionOptions::escape_underscores`].
   final bool? escapeUnderscores;
+
+  /// Optional override for [`ConversionOptions::escape_misc`].
   final bool? escapeMisc;
+
+  /// Optional override for [`ConversionOptions::escape_ascii`].
   final bool? escapeAscii;
+
+  /// Optional override for [`ConversionOptions::code_language`].
   final String? codeLanguage;
+
+  /// Optional override for [`ConversionOptions::autolinks`].
   final bool? autolinks;
+
+  /// Optional override for [`ConversionOptions::default_title`].
   final bool? defaultTitle;
+
+  /// Optional override for [`ConversionOptions::br_in_tables`].
   final bool? brInTables;
+
+  /// Optional override for [`ConversionOptions::highlight_style`].
   final HighlightStyle? highlightStyle;
+
+  /// Optional override for [`ConversionOptions::extract_metadata`].
   final bool? extractMetadata;
+
+  /// Optional override for [`ConversionOptions::whitespace_mode`].
   final WhitespaceMode? whitespaceMode;
+
+  /// Optional override for [`ConversionOptions::strip_newlines`].
   final bool? stripNewlines;
+
+  /// Optional override for [`ConversionOptions::wrap`].
   final bool? wrap;
+
+  /// Optional override for [`ConversionOptions::wrap_width`].
   final PlatformInt64? wrapWidth;
+
+  /// Optional override for [`ConversionOptions::convert_as_inline`].
   final bool? convertAsInline;
+
+  /// Optional override for [`ConversionOptions::sub_symbol`].
   final String? subSymbol;
+
+  /// Optional override for [`ConversionOptions::sup_symbol`].
   final String? supSymbol;
+
+  /// Optional override for [`ConversionOptions::newline_style`].
   final NewlineStyle? newlineStyle;
+
+  /// Optional override for [`ConversionOptions::code_block_style`].
   final CodeBlockStyle? codeBlockStyle;
+
+  /// Optional override for [`ConversionOptions::keep_inline_images_in`].
   final List<String>? keepInlineImagesIn;
+
+  /// Optional override for [`ConversionOptions::preprocessing`].
   final PreprocessingOptionsUpdate? preprocessing;
+
+  /// Optional override for [`ConversionOptions::encoding`].
   final String? encoding;
+
+  /// Optional override for [`ConversionOptions::debug`].
   final bool? debug;
+
+  /// Optional override for [`ConversionOptions::strip_tags`].
   final List<String>? stripTags;
+
+  /// Optional override for [`ConversionOptions::preserve_tags`].
   final List<String>? preserveTags;
+
+  /// Optional override for [`ConversionOptions::skip_images`].
   final bool? skipImages;
+
+  /// Optional override for [`ConversionOptions::link_style`].
   final LinkStyle? linkStyle;
+
+  /// Optional override for [`ConversionOptions::output_format`].
   final OutputFormat? outputFormat;
+
+  /// Optional override for [`ConversionOptions::include_document_structure`].
   final bool? includeDocumentStructure;
+
+  /// Optional override for [`ConversionOptions::extract_images`].
   final bool? extractImages;
+
+  /// Optional override for [`ConversionOptions::max_image_size`].
   final PlatformInt64? maxImageSize;
+
+  /// Optional override for [`ConversionOptions::capture_svg`].
   final bool? captureSvg;
+
+  /// Optional override for [`ConversionOptions::infer_dimensions`].
   final bool? inferDimensions;
+
+  /// Optional override for [`ConversionOptions::max_depth`].
   final PlatformInt64? maxDepth;
+
+  /// Optional override for [`ConversionOptions::exclude_selectors`].
   final List<String>? excludeSelectors;
+
+  /// Optional override for [`ConversionOptions::visitor`].
   final VisitorHandle? visitor;
 
   const ConversionOptionsUpdate({
@@ -547,12 +774,44 @@ class ConversionOptionsUpdate {
           visitor == other.visitor;
 }
 
+/// The primary result of HTML conversion and extraction.
+///
+/// Contains the converted text output, optional structured document tree,
+/// metadata, extracted tables, images, and processing warnings.
+///
+/// # Example
+///
+/// ```text
+/// use html_to_markdown_rs::{convert, ConversionOptions};
+///
+/// let result = convert("<h1>Hello</h1><p>World</p>", None)?;
+/// assert!(result.content.is_some());
+/// assert!(result.warnings.is_empty());
+/// ```
 class ConversionResult {
+  /// Converted text output (markdown, djot, or plain text).
+  ///
+  /// `None` when `output_format` is set to `OutputFormat::None`,
+  /// indicating extraction-only mode.
   final String? content;
+
+  /// Structured document tree with semantic elements.
+  ///
+  /// Populated when `include_document_structure` is `true` in options.
   final DocumentStructure? document;
+
+  /// Extracted HTML metadata (title, OG, links, images, structured data).
   final HtmlMetadata metadata;
+
+  /// Extracted tables with structured cell data and markdown representation.
   final List<TableData> tables;
+
+  /// Extracted inline images (data URIs and SVGs).
+  ///
+  /// Populated when `extract_images` is `true` in options.
   final List<String> images;
+
+  /// Non-fatal processing warnings.
   final List<ProcessingWarning> warnings;
 
   const ConversionResult({
@@ -586,17 +845,58 @@ class ConversionResult {
           warnings == other.warnings;
 }
 
+/// Document-level metadata extracted from `<head>` and top-level elements.
+///
+/// Contains all metadata typically used by search engines, social media platforms,
+/// and browsers for document indexing and presentation.
+///
+/// # Examples
+///
+/// ```
+/// let doc = DocumentMetadata {
+///     title: Some("My Article".to_string()),
+///     description: Some("A great article about Rust".to_string()),
+///     keywords: vec!["rust".to_string(), "programming".to_string()],
+///     ..Default::default()
+/// };
+///
+/// assert_eq!(doc.title, Some("My Article".to_string()));
+/// ```
 class DocumentMetadata {
+  /// Document title from `<title>` tag
   final String? title;
+
+  /// Document description from `<meta name="description">` tag
   final String? description;
+
+  /// Document keywords from `<meta name="keywords">` tag, split on commas
   final List<String> keywords;
+
+  /// Document author from `<meta name="author">` tag
   final String? author;
+
+  /// Canonical URL from `<link rel="canonical">` tag
   final String? canonicalUrl;
+
+  /// Base URL from `<base href="">` tag for resolving relative URLs
   final String? baseHref;
+
+  /// Document language from `lang` attribute
   final String? language;
+
+  /// Document text direction from `dir` attribute
   final TextDirection? textDirection;
+
+  /// Open Graph metadata (og:* properties) for social media
+  /// Keys like "title", "description", "image", "url", etc.
   final Map<String, String> openGraph;
+
+  /// Twitter Card metadata (twitter:* properties)
+  /// Keys like "card", "site", "creator", "title", "description", "image", etc.
   final Map<String, String> twitterCard;
+
+  /// Additional meta tags not covered by specific fields
+  /// Keys are meta name/property attributes, values are content
   final Map<String, String> metaTags;
 
   const DocumentMetadata({
@@ -645,12 +945,24 @@ class DocumentMetadata {
           metaTags == other.metaTags;
 }
 
+/// A single node in the document tree.
 class DocumentNode {
+  /// Deterministic node identifier.
   final String id;
+
+  /// The semantic content of this node.
   final NodeContent content;
+
+  /// Index of the parent node (None for root nodes).
   final PlatformInt64? parent;
+
+  /// Indices of child nodes in reading order.
   final Int64List children;
+
+  /// Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text.
   final List<TextAnnotation> annotations;
+
+  /// Format-specific attributes (e.g. class, id, data-* attributes).
   final Map<String, String>? attributes;
 
   const DocumentNode({
@@ -684,8 +996,14 @@ class DocumentNode {
           attributes == other.attributes;
 }
 
+/// A structured document tree representing the semantic content of an HTML document.
+///
+/// Uses a flat node array with index-based parent/child references for efficient traversal.
 class DocumentStructure {
+  /// All nodes in document reading order.
   final List<DocumentNode> nodes;
+
+  /// The source format (always "html" for this crate).
   final String? sourceFormat;
 
   const DocumentStructure({
@@ -705,12 +1023,24 @@ class DocumentStructure {
           sourceFormat == other.sourceFormat;
 }
 
+/// A single cell in a table grid.
 class GridCell {
+  /// The text content of the cell.
   final String content;
+
+  /// 0-indexed row position.
   final PlatformInt64 row;
+
+  /// 0-indexed column position.
   final PlatformInt64 col;
+
+  /// Number of rows this cell spans (default 1).
   final PlatformInt64 rowSpan;
+
+  /// Number of columns this cell spans (default 1).
   final PlatformInt64 colSpan;
+
+  /// Whether this is a header cell (`<th>`).
   final bool isHeader;
 
   const GridCell({
@@ -744,11 +1074,39 @@ class GridCell {
           isHeader == other.isHeader;
 }
 
+/// Header element metadata with hierarchy tracking.
+///
+/// Captures heading elements (h1-h6) with their text content, identifiers,
+/// and position in the document structure.
+///
+/// # Examples
+///
+/// ```
+/// let header = HeaderMetadata {
+///     level: 1,
+///     text: "Main Title".to_string(),
+///     id: Some("main-title".to_string()),
+///     depth: 0,
+///     html_offset: 145,
+/// };
+///
+/// assert_eq!(header.level, 1);
+/// assert!(header.is_valid());
+/// ```
 class HeaderMetadata {
+  /// Header level: 1 (h1) through 6 (h6)
   final PlatformInt64 level;
+
+  /// Normalized text content of the header
   final String text;
+
+  /// HTML id attribute if present
   final String? id;
+
+  /// Document tree depth at the header element
   final PlatformInt64 depth;
+
+  /// Byte offset in original HTML document
   final PlatformInt64 htmlOffset;
 
   const HeaderMetadata({
@@ -779,26 +1137,71 @@ class HeaderMetadata {
           htmlOffset == other.htmlOffset;
 }
 
+/// Heading style options for Markdown output.
+///
+/// Controls how headings (h1-h6) are rendered in the output Markdown.
 enum HeadingStyle {
+  /// Underlined style (=== for h1, --- for h2).
   underlined,
+
+  /// ATX style (# for h1, ## for h2, etc.). Default.
   atx,
+
+  /// ATX closed style (# title #, with closing hashes).
   atxClosed,
   ;
 }
 
+/// Highlight rendering style for `<mark>` elements.
+///
+/// Controls how highlighted text is rendered in Markdown output.
 enum HighlightStyle {
+  /// Double equals syntax (==text==). Default. Pandoc-compatible.
   doubleEqual,
+
+  /// Preserve as HTML (==text==). Original HTML tag.
   html,
+
+  /// Render as bold (**text**). Uses strong emphasis.
   bold,
+
+  /// Strip formatting, render as plain text. No markup.
   none,
   ;
 }
 
+/// Comprehensive metadata extraction result from HTML document.
+///
+/// Contains all extracted metadata types in a single structure,
+/// suitable for serialization and transmission across language boundaries.
+///
+/// # Examples
+///
+/// ```
+/// let metadata = HtmlMetadata {
+///     document: Default::default(),
+///     headers: Vec::new(),
+///     links: Vec::new(),
+///     images: Vec::new(),
+///     structured_data: Vec::new(),
+/// };
+///
+/// assert!(metadata.headers.is_empty());
+/// ```
 class HtmlMetadata {
+  /// Document-level metadata (title, description, canonical, etc.)
   final DocumentMetadata document;
+
+  /// Extracted header elements with hierarchy
   final List<HeaderMetadata> headers;
+
+  /// Extracted hyperlinks with type classification
   final List<LinkMetadata> links;
+
+  /// Extracted images with source and dimensions
   final List<ImageMetadata> images;
+
+  /// Extracted structured data blocks
   final List<StructuredData> structuredData;
 
   const HtmlMetadata({
@@ -829,12 +1232,42 @@ class HtmlMetadata {
           structuredData == other.structuredData;
 }
 
+/// Image metadata with source and dimensions.
+///
+/// Captures `<img>` elements and inline `<svg>` elements with metadata
+/// for image analysis and optimization.
+///
+/// # Examples
+///
+/// ```
+/// let img = ImageMetadata {
+///     src: "https://example.com/image.jpg".to_string(),
+///     alt: Some("An example image".to_string()),
+///     title: Some("Example".to_string()),
+///     dimensions: Some((800, 600)),
+///     image_type: ImageType::External,
+///     attributes: Default::default(),
+/// };
+///
+/// assert_eq!(img.image_type, ImageType::External);
+/// ```
 class ImageMetadata {
+  /// Image source (URL, data URI, or SVG content identifier)
   final String src;
+
+  /// Alternative text from alt attribute (for accessibility)
   final String? alt;
+
+  /// Title attribute (often shown as tooltip)
   final String? title;
+
+  /// Image dimensions as (width, height) if available
   final Int64List? dimensions;
+
+  /// Image type classification
   final ImageType imageType;
+
+  /// Additional HTML attributes
   final Map<String, String> attributes;
 
   const ImageMetadata({
@@ -868,20 +1301,60 @@ class ImageMetadata {
           attributes == other.attributes;
 }
 
+/// Image source classification for proper handling and processing.
+///
+/// Determines whether an image is embedded (data URI), inline SVG, external, or relative.
 enum ImageType {
+  /// Data URI embedded image (base64 or other encoding)
   dataUri,
+
+  /// Inline SVG element
   inlineSvg,
+
+  /// External image URL (http/https)
   external_,
+
+  /// Relative image path
   relative,
   ;
 }
 
+/// Hyperlink metadata with categorization and attributes.
+///
+/// Represents `<a>` elements with parsed href values, text content, and link type classification.
+///
+/// # Examples
+///
+/// ```
+/// let link = LinkMetadata {
+///     href: "https://example.com".to_string(),
+///     text: "Example".to_string(),
+///     title: Some("Visit Example".to_string()),
+///     link_type: LinkType::External,
+///     rel: vec!["nofollow".to_string()],
+///     attributes: Default::default(),
+/// };
+///
+/// assert_eq!(link.link_type, LinkType::External);
+/// assert_eq!(link.text, "Example");
+/// ```
 class LinkMetadata {
+  /// The href URL value
   final String href;
+
+  /// Link text content (normalized, concatenated if mixed with elements)
   final String text;
+
+  /// Optional title attribute (often shown as tooltip)
   final String? title;
+
+  /// Link type classification
   final LinkType linkType;
+
+  /// Rel attribute values (e.g., "nofollow", "stylesheet", "canonical")
   final List<String> rel;
+
+  /// Additional HTML attributes
   final Map<String, String> attributes;
 
   const LinkMetadata({
@@ -915,30 +1388,63 @@ class LinkMetadata {
           attributes == other.attributes;
 }
 
+/// Link rendering style in Markdown output.
+///
+/// Controls whether links and images use inline `[text](url)` syntax or
+/// reference-style `[text][1]` syntax with definitions collected at the end.
 enum LinkStyle {
+  /// Inline links: `[text](url)`. Default.
   inline,
+
+  /// Reference-style links: `[text][1]` with `[1]: url` at end of document.
   reference,
   ;
 }
 
+/// Link classification based on href value and document context.
+///
+/// Used to categorize links during extraction for filtering and analysis.
 enum LinkType {
+  /// Anchor link within same document (href starts with #)
   anchor,
+
+  /// Internal link within same domain
   internal,
+
+  /// External link to different domain
   external_,
+
+  /// Email link (mailto:)
   email,
+
+  /// Phone link (tel:)
   phone,
+
+  /// Other protocol or unclassifiable
   other,
   ;
 }
 
+/// List indentation character type.
+///
+/// Controls whether list items are indented with spaces or tabs.
 enum ListIndentType {
+  /// Use spaces for indentation. Default. Width controlled by `list_indent_width`.
   spaces,
+
+  /// Use tabs for indentation.
   tabs,
   ;
 }
 
+/// Line break syntax in Markdown output.
+///
+/// Controls how soft line breaks (from `<br>` or line breaks in source) are rendered.
 enum NewlineStyle {
+  /// Two trailing spaces at end of line. Default. Standard Markdown syntax.
   spaces,
+
+  /// Backslash at end of line. Alternative Markdown syntax.
   backslash,
   ;
 }
@@ -947,58 +1453,127 @@ enum NewlineStyle {
 sealed class NodeContent with _$NodeContent {
   const NodeContent._();
 
+  /// A heading element (h1-h6).
   const factory NodeContent.heading({
+    /// Heading level (1-6).
     required PlatformInt64 level,
+
+    /// The heading text content.
     required String text,
   }) = NodeContent_Heading;
+
+  /// A paragraph of text.
   const factory NodeContent.paragraph({
+    /// The paragraph text content.
     required String text,
   }) = NodeContent_Paragraph;
+
+  /// A list container (ordered or unordered). Children are `ListItem` nodes.
   const factory NodeContent.list({
+    /// Whether this is an ordered list.
     required bool ordered,
   }) = NodeContent_List;
+
+  /// A single list item.
   const factory NodeContent.listItem({
+    /// The list item text content.
     required String text,
   }) = NodeContent_ListItem;
+
+  /// A table with structured cell data.
   const factory NodeContent.table({
+    /// The table grid structure.
     required TableGrid grid,
   }) = NodeContent_Table;
+
+  /// An image element.
   const factory NodeContent.image({
+    /// Alt text or caption.
     required String description,
+
+    /// Image source URL.
     required String src,
+
+    /// Index into `ConversionResult.images` when image extraction is enabled.
     required PlatformInt64 imageIndex,
   }) = NodeContent_Image;
+
+  /// A code block or inline code.
   const factory NodeContent.code({
+    /// The code text content.
     required String text,
+
+    /// Programming language (from class="language-*" or similar).
     required String language,
   }) = NodeContent_Code;
+
+  /// A block quote container.
   const factory NodeContent.quote() = NodeContent_Quote;
+
+  /// A definition list container.
   const factory NodeContent.definitionList() = NodeContent_DefinitionList;
+
+  /// A definition list entry with term and description.
   const factory NodeContent.definitionItem({
+    /// The term being defined.
     required String term,
+
+    /// The definition text.
     required String definition,
   }) = NodeContent_DefinitionItem;
+
+  /// A raw block preserved as-is (e.g. `<script>`, `<style>` content).
   const factory NodeContent.rawBlock({
+    /// The format of the raw content (e.g. "html", "css", "javascript").
     required String format,
+
+    /// The raw content.
     required String content,
   }) = NodeContent_RawBlock;
+
+  /// A block of key-value metadata pairs (from `<head>` meta tags).
   const factory NodeContent.metadataBlock({
+    /// Key-value metadata pairs.
     required List<String> entries,
   }) = NodeContent_MetadataBlock;
+
+  /// A section grouping container (auto-generated from heading hierarchy).
   const factory NodeContent.group({
+    /// Optional section label.
     required String label,
+
+    /// The heading level that created this group.
     required PlatformInt64 headingLevel,
+
+    /// The heading text that created this group.
     required String headingText,
   }) = NodeContent_Group;
 }
 
+/// Context information passed to all visitor methods.
+///
+/// Provides comprehensive metadata about the current node being visited,
+/// including its type, attributes, position in the DOM tree, and parent context.
 class NodeContext {
+  /// Coarse-grained node type classification
   final NodeType nodeType;
+
+  /// Raw HTML tag name (e.g., "div", "h1", "custom-element")
   final String tagName;
+
+  /// All HTML attributes as key-value pairs
   final Map<String, String> attributes;
+
+  /// Depth in the DOM tree (0 = root)
   final PlatformInt64 depth;
+
+  /// Index among siblings (0-based)
   final PlatformInt64 indexInParent;
+
+  /// Parent element's tag name (None if root)
   final String? parentTag;
+
+  /// Whether this element is treated as inline vs block
   final bool isInline;
 
   const NodeContext({
@@ -1035,109 +1610,304 @@ class NodeContext {
           isInline == other.isInline;
 }
 
+/// Node type enumeration covering all HTML element types.
+///
+/// This enum categorizes all HTML elements that the converter recognizes,
+/// providing a coarse-grained classification for visitor dispatch.
 enum NodeType {
+  /// Text node (most frequent - 100+ per document)
   text,
+
+  /// Generic element node
   element,
+
+  /// Heading elements (h1-h6)
   heading,
+
+  /// Paragraph element
   paragraph,
+
+  /// Generic div container
   div,
+
+  /// Blockquote element
   blockquote,
+
+  /// Preformatted text block
   pre,
+
+  /// Horizontal rule
   hr,
+
+  /// Ordered or unordered list (ul, ol)
   list,
+
+  /// List item (li)
   listItem,
+
+  /// Definition list (dl)
   definitionList,
+
+  /// Definition term (dt)
   definitionTerm,
+
+  /// Definition description (dd)
   definitionDescription,
+
+  /// Table element
   table,
+
+  /// Table row (tr)
   tableRow,
+
+  /// Table cell (td, th)
   tableCell,
+
+  /// Table header cell (th)
   tableHeader,
+
+  /// Table body (tbody)
   tableBody,
+
+  /// Table head (thead)
   tableHead,
+
+  /// Table foot (tfoot)
   tableFoot,
+
+  /// Anchor link (a)
   link,
+
+  /// Image (img)
   image,
+
+  /// Strong/bold (strong, b)
   strong,
+
+  /// Emphasis/italic (em, i)
   em,
+
+  /// Inline code (code)
   code,
+
+  /// Strikethrough (s, del, strike)
   strikethrough,
+
+  /// Underline (u, ins)
   underline,
+
+  /// Subscript (sub)
   subscript,
+
+  /// Superscript (sup)
   superscript,
+
+  /// Mark/highlight (mark)
   mark,
+
+  /// Small text (small)
   small,
+
+  /// Line break (br)
   br,
+
+  /// Span element
   span,
+
+  /// Article element
   article,
+
+  /// Section element
   section,
+
+  /// Navigation element
   nav,
+
+  /// Aside element
   aside,
+
+  /// Header element
   header,
+
+  /// Footer element
   footer,
+
+  /// Main element
   main,
+
+  /// Figure element
   figure,
+
+  /// Figure caption
   figcaption,
+
+  /// Time element
   time,
+
+  /// Details element
   details,
+
+  /// Summary element
   summary,
+
+  /// Form element
   form,
+
+  /// Input element
   input,
+
+  /// Select element
   select,
+
+  /// Option element
   option,
+
+  /// Button element
   button,
+
+  /// Textarea element
   textarea,
+
+  /// Label element
   label,
+
+  /// Fieldset element
   fieldset,
+
+  /// Legend element
   legend,
+
+  /// Audio element
   audio,
+
+  /// Video element
   video,
+
+  /// Picture element
   picture,
+
+  /// Source element
   source,
+
+  /// Iframe element
   iframe,
+
+  /// SVG element
   svg,
+
+  /// Canvas element
   canvas,
+
+  /// Ruby annotation
   ruby,
+
+  /// Ruby text
   rt,
+
+  /// Ruby parenthesis
   rp,
+
+  /// Abbreviation
   abbr,
+
+  /// Keyboard input
   kbd,
+
+  /// Sample output
   samp,
+
+  /// Variable
   var_,
+
+  /// Citation
   cite,
+
+  /// Quote
   q,
+
+  /// Deleted text
   del,
+
+  /// Inserted text
   ins,
+
+  /// Data element
   data,
+
+  /// Meter element
   meter,
+
+  /// Progress element
   progress,
+
+  /// Output element
   output,
+
+  /// Template element
   template,
+
+  /// Slot element
   slot,
+
+  /// HTML root element
   html,
+
+  /// Head element
   head,
+
+  /// Body element
   body,
+
+  /// Title element
   title,
+
+  /// Meta element
   meta,
+
+  /// Link element (not anchor)
   linkTag,
+
+  /// Style element
   style,
+
+  /// Script element
   script,
+
+  /// Base element
   base,
+
+  /// Custom element (web components) or unknown tag
   custom,
   ;
 }
 
+/// Output format for conversion.
+///
+/// Specifies the target markup language format for the conversion output.
 enum OutputFormat {
+  /// Standard Markdown (CommonMark compatible). Default.
   markdown,
+
+  /// Djot lightweight markup language.
   djot,
+
+  /// Plain text output (no markup, visible text only).
   plain,
   ;
 }
 
+/// HTML preprocessing options for document cleanup before conversion.
 class PreprocessingOptions {
+  /// Enable HTML preprocessing globally
   final bool enabled;
+
+  /// Preprocessing preset level (Minimal, Standard, Aggressive)
   final PreprocessingPreset preset;
+
+  /// Remove navigation elements (nav, breadcrumbs, menus, sidebars)
   final bool removeNavigation;
+
+  /// Remove form elements (forms, inputs, buttons, etc.)
   final bool removeForms;
 
   const PreprocessingOptions({
@@ -1165,10 +1935,22 @@ class PreprocessingOptions {
           removeForms == other.removeForms;
 }
 
+/// Partial update for `PreprocessingOptions`.
+///
+/// This struct uses `Option<T>` to represent optional fields that can be selectively updated.
+/// Only specified fields (Some values) will override existing options; None values leave the
+/// corresponding fields unchanged when applied via [`PreprocessingOptions::apply_update`].
 class PreprocessingOptionsUpdate {
+  /// Optional global preprocessing enablement override
   final bool? enabled;
+
+  /// Optional preprocessing preset level override (Minimal, Standard, Aggressive)
   final PreprocessingPreset? preset;
+
+  /// Optional navigation element removal override (nav, breadcrumbs, menus, sidebars)
   final bool? removeNavigation;
+
+  /// Optional form element removal override (forms, inputs, buttons, etc.)
   final bool? removeForms;
 
   const PreprocessingOptionsUpdate({
@@ -1196,15 +1978,27 @@ class PreprocessingOptionsUpdate {
           removeForms == other.removeForms;
 }
 
+/// HTML preprocessing aggressiveness level.
+///
+/// Controls the extent of cleanup performed before conversion. Higher levels remove more elements.
 enum PreprocessingPreset {
+  /// Minimal cleanup. Remove only essential noise (scripts, styles).
   minimal,
+
+  /// Standard cleanup. Default. Removes navigation, forms, and other auxiliary content.
   standard,
+
+  /// Aggressive cleanup. Remove extensive non-content elements and structure.
   aggressive,
   ;
 }
 
+/// A non-fatal warning generated during HTML processing.
 class ProcessingWarning {
+  /// Human-readable warning message.
   final String message;
+
+  /// The category of warning.
   final WarningKind kind;
 
   const ProcessingWarning({
@@ -1224,9 +2018,30 @@ class ProcessingWarning {
           kind == other.kind;
 }
 
+/// Structured data block (JSON-LD, Microdata, or RDFa).
+///
+/// Represents machine-readable structured data found in the document.
+/// JSON-LD blocks are collected as raw JSON strings for flexibility.
+///
+/// # Examples
+///
+/// ```
+/// let schema = StructuredData {
+///     data_type: StructuredDataType::JsonLd,
+///     raw_json: r#"{"@context":"https://schema.org","@type":"Article"}"#.to_string(),
+///     schema_type: Some("Article".to_string()),
+/// };
+///
+/// assert_eq!(schema.data_type, StructuredDataType::JsonLd);
+/// ```
 class StructuredData {
+  /// Type of structured data (JSON-LD, Microdata, RDFa)
   final StructuredDataType dataType;
+
+  /// Raw JSON string (for JSON-LD) or serialized representation
   final String rawJson;
+
+  /// Schema type if detectable (e.g., "Article", "Event", "Product")
   final String? schemaType;
 
   const StructuredData({
@@ -1249,15 +2064,27 @@ class StructuredData {
           schemaType == other.schemaType;
 }
 
+/// Structured data format type.
+///
+/// Identifies the schema/format used for structured data markup.
 enum StructuredDataType {
+  /// JSON-LD (JSON for Linking Data) script blocks
   jsonLd,
+
+  /// HTML5 Microdata attributes (itemscope, itemtype, itemprop)
   microdata,
+
+  /// RDF in Attributes (RDFa) markup
   rdFa,
   ;
 }
 
+/// A top-level extracted table with both structured data and markdown representation.
 class TableData {
+  /// The structured table grid.
   final TableGrid grid;
+
+  /// The markdown rendering of this table.
   final String markdown;
 
   const TableData({
@@ -1277,9 +2104,15 @@ class TableData {
           markdown == other.markdown;
 }
 
+/// A structured table grid with cell-level data including spans.
 class TableGrid {
+  /// Number of rows.
   final PlatformInt64 rows;
+
+  /// Number of columns.
   final PlatformInt64 cols;
+
+  /// All cells in the table (may be fewer than rows*cols due to spans).
   final List<GridCell> cells;
 
   const TableGrid({
@@ -1301,9 +2134,17 @@ class TableGrid {
           cells == other.cells;
 }
 
+/// An inline text annotation with byte-range offsets.
+///
+/// Annotations describe formatting (bold, italic, etc.) and links within a node's text content.
 class TextAnnotation {
+  /// Start byte offset (inclusive) into the parent node's text.
   final PlatformInt64 start;
+
+  /// End byte offset (exclusive) into the parent node's text.
   final PlatformInt64 end;
+
+  /// The type of annotation.
   final AnnotationKind kind;
 
   const TextAnnotation({
@@ -1325,9 +2166,17 @@ class TextAnnotation {
           kind == other.kind;
 }
 
+/// Text directionality of document content.
+///
+/// Corresponds to the HTML `dir` attribute and `bdi` element directionality.
 enum TextDirection {
+  /// Left-to-right text flow (default for Latin scripts)
   leftToRight,
+
+  /// Right-to-left text flow (Hebrew, Arabic, Urdu, etc.)
   rightToLeft,
+
+  /// Automatic directionality detection
   auto,
   ;
 }
@@ -1336,29 +2185,65 @@ enum TextDirection {
 sealed class VisitResult with _$VisitResult {
   const VisitResult._();
 
+  /// Continue with default conversion behavior
   const factory VisitResult.continue_() = VisitResult_Continue;
+
+  /// Replace default output with custom markdown
+  ///
+  /// The visitor takes full responsibility for the markdown output
+  /// of this node and its children.
   const factory VisitResult.custom({
     required String field0,
   }) = VisitResult_Custom;
+
+  /// Skip this element entirely (don't output anything)
+  ///
+  /// The element and all its children are ignored in the output.
   const factory VisitResult.skip() = VisitResult_Skip;
+
+  /// Preserve original HTML (don't convert to markdown)
+  ///
+  /// The element's raw HTML is included verbatim in the output.
   const factory VisitResult.preserveHtml() = VisitResult_PreserveHtml;
+
+  /// Stop conversion with an error
+  ///
+  /// The conversion process halts and returns this error message.
   const factory VisitResult.error({
     required String field0,
   }) = VisitResult_Error;
 }
 
+/// Categories of processing warnings.
 enum WarningKind {
+  /// An image could not be extracted (e.g. invalid data URI, unsupported format).
   imageExtractionFailed,
+
+  /// The input encoding was not recognized; fell back to UTF-8.
   encodingFallback,
+
+  /// The input was truncated due to size limits.
   truncatedInput,
+
+  /// The HTML was malformed but processing continued with best effort.
   malformedHtml,
+
+  /// Sanitization was applied to remove potentially unsafe content.
   sanitizationApplied,
+
+  /// DOM traversal was truncated because max_depth was exceeded.
   depthLimitExceeded,
   ;
 }
 
+/// Whitespace handling strategy during conversion.
+///
+/// Determines how sequences of whitespace characters (spaces, tabs, newlines) are processed.
 enum WhitespaceMode {
+  /// Collapse multiple whitespace characters to single spaces. Default. Matches browser behavior.
   normalized,
+
+  /// Preserve all whitespace exactly as it appears in the HTML.
   strict,
   ;
 }
