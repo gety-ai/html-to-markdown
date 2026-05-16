@@ -39,7 +39,20 @@ pub struct StructureCollector {
 }
 
 impl StructureCollector {
-    /// Create a new empty collector.
+    /// Create a new empty collector ready to accumulate nodes for a single conversion pass.
+    ///
+    /// The intended lifecycle is:
+    ///
+    /// 1. Create one `StructureCollector` (or wrap it in a [`StructureCollectorHandle`]) at the
+    ///    start of a conversion.
+    /// 2. Thread the handle through the converter context; individual element handlers call the
+    ///    `push_*` methods as they encounter headings, paragraphs, lists, tables, and so on.
+    /// 3. Call [`Self::finish`] exactly once to consume the collector and obtain the completed
+    ///    [`super::document::DocumentStructure`] together with the flat list of extracted
+    ///    [`super::tables::TableData`] entries.
+    ///
+    /// `StructureCollector` is not `Send` (it uses `Rc<RefCell<…>>` handles internally) and must
+    /// not be shared across threads. Create a fresh collector per conversion.
     pub fn new() -> Self {
         Self {
             nodes: Vec::new(),
