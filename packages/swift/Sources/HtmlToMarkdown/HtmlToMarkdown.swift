@@ -41,7 +41,43 @@ public typealias DocumentMetadata = RustBridge.DocumentMetadata
 /// assert_eq!(header.level, 1);
 /// assert!(header.is_valid());
 /// ```
-public typealias HeaderMetadata = RustBridge.HeaderMetadata
+public struct HeaderMetadata: Codable, Sendable, Hashable {
+    public let level: UInt8
+    public let text: String
+    public let id: String?
+    public let depth: UInt
+    public let htmlOffset: UInt
+    public init(level: UInt8, text: String, id: String? = nil, depth: UInt, htmlOffset: UInt) {
+        self.level = level
+        self.text = text
+        self.id = id
+        self.depth = depth
+        self.htmlOffset = htmlOffset
+    }
+    private enum CodingKeys: String, CodingKey {
+        case level = "level"
+        case text = "text"
+        case id = "id"
+        case depth = "depth"
+        case htmlOffset = "html_offset"
+    }
+}
+
+// MARK: - Internal FFI conversions for HeaderMetadata
+internal extension HeaderMetadata {
+    init(_ rb: RustBridge.HeaderMetadata) throws {
+        self.level = rb.level()
+        self.text = rb.text().toString()
+        self.id = rb.id()?.toString()
+        self.depth = rb.depth()
+        self.htmlOffset = rb.html_offset()
+    }
+    func intoRust() throws -> RustBridge.HeaderMetadata {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "{}"
+        return try RustBridge.headerMetadataFromJson(json)
+    }
+}
 
 /// Hyperlink metadata with categorization and attributes.
 ///
@@ -189,7 +225,47 @@ public typealias ConversionResult = RustBridge.ConversionResult
 public typealias TableGrid = RustBridge.TableGrid
 
 /// A single cell in a table grid.
-public typealias GridCell = RustBridge.GridCell
+public struct GridCell: Codable, Sendable, Hashable {
+    public let content: String
+    public let row: UInt32
+    public let col: UInt32
+    public let rowSpan: UInt32
+    public let colSpan: UInt32
+    public let isHeader: Bool
+    public init(content: String, row: UInt32, col: UInt32, rowSpan: UInt32, colSpan: UInt32, isHeader: Bool) {
+        self.content = content
+        self.row = row
+        self.col = col
+        self.rowSpan = rowSpan
+        self.colSpan = colSpan
+        self.isHeader = isHeader
+    }
+    private enum CodingKeys: String, CodingKey {
+        case content = "content"
+        case row = "row"
+        case col = "col"
+        case rowSpan = "row_span"
+        case colSpan = "col_span"
+        case isHeader = "is_header"
+    }
+}
+
+// MARK: - Internal FFI conversions for GridCell
+internal extension GridCell {
+    init(_ rb: RustBridge.GridCell) throws {
+        self.content = rb.content().toString()
+        self.row = rb.row()
+        self.col = rb.col()
+        self.rowSpan = rb.row_span()
+        self.colSpan = rb.col_span()
+        self.isHeader = rb.is_header()
+    }
+    func intoRust() throws -> RustBridge.GridCell {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "{}"
+        return try RustBridge.gridCellFromJson(json)
+    }
+}
 
 /// A top-level extracted table with both structured data and markdown representation.
 public typealias TableData = RustBridge.TableData
@@ -229,7 +305,7 @@ public enum LinkType {
     /// Anchor link within same document (href starts with #)
     case anchor
     /// Internal link within same domain
-    case internal_
+    case `internal`
     /// External link to different domain
     case external
     /// Email link (mailto:)
@@ -359,7 +435,7 @@ public enum AnnotationKind {
     /// Inline code.
     case code
     /// Subscript text.
-    case subscript_
+    case `subscript`
     /// Superscript text.
     case superscript
     /// Highlighted / marked text.
@@ -444,7 +520,7 @@ public enum NodeType {
     /// Underline (u, ins)
     case underline
     /// Subscript (sub)
-    case subscript_
+    case `subscript`
     /// Superscript (sup)
     case superscript
     /// Mark/highlight (mark)
@@ -524,7 +600,7 @@ public enum NodeType {
     /// Sample output
     case samp
     /// Variable
-    case var_
+    case `var`
     /// Citation
     case cite
     /// Quote
@@ -574,7 +650,7 @@ public enum NodeType {
 /// preserving HTML, or signaling errors.
 public enum VisitResult {
     /// Continue with default conversion behavior
-    case continue_
+    case `continue`
     /// Replace default output with custom markdown
     ///
     /// The visitor takes full responsibility for the markdown output
@@ -618,250 +694,301 @@ public enum ConversionError: Swift.Error {
 // Opaque RustBridge types forward to RustBridge.
 
 public func conversionOptionsFromJson(_ json: String) throws -> ConversionOptions {
-                     let data = json.data(using: .utf8) ?? Data()
-                     return try JSONDecoder().decode(ConversionOptions.self, from: data)
+    return try RustBridge.conversionOptionsFromJson(json)
 }
 
 public func conversionOptionsUpdateFromJson(_ json: String) throws -> ConversionOptionsUpdate {
-                     let data = json.data(using: .utf8) ?? Data()
-                     return try JSONDecoder().decode(ConversionOptionsUpdate.self, from: data)
-}
-
-public func preprocessingOptionsFromJson(_ json: String) throws -> PreprocessingOptions {
-                     let data = json.data(using: .utf8) ?? Data()
-                     return try JSONDecoder().decode(PreprocessingOptions.self, from: data)
+    return try RustBridge.conversionOptionsUpdateFromJson(json)
 }
 
 public func preprocessingOptionsUpdateFromJson(_ json: String) throws -> PreprocessingOptionsUpdate {
-                     let data = json.data(using: .utf8) ?? Data()
-                     return try JSONDecoder().decode(PreprocessingOptionsUpdate.self, from: data)
+    return try RustBridge.preprocessingOptionsUpdateFromJson(json)
 }
 
 public func nodeContextFromJson(_ json: String) throws -> NodeContext {
-                     let data = json.data(using: .utf8) ?? Data()
-                     return try JSONDecoder().decode(NodeContext.self, from: data)
+    return try RustBridge.nodeContextFromJson(json)
 }
 
 /// Swift protocol that Swift classes implement to provide visitor callbacks.
 /// Conform to this protocol to intercept HTML→Markdown conversion events.
 public protocol HtmlVisitorProtocol: AnyObject {
-    func visitText(_ ctx: String, _ text: String) -> VisitResult
-    func visitElementStart(_ ctx: String) -> VisitResult
-    func visitElementEnd(_ ctx: String, _ output: String) -> VisitResult
-    func visitLink(_ ctx: String, _ href: String, _ text: String, _ title: String?) -> VisitResult
-    func visitImage(_ ctx: String, _ src: String, _ alt: String, _ title: String?) -> VisitResult
-    func visitHeading(_ ctx: String, _ level: UInt32, _ text: String, _ id: String?) -> VisitResult
-    func visitCodeBlock(_ ctx: String, _ lang: String?, _ code: String) -> VisitResult
-    func visitCodeInline(_ ctx: String, _ code: String) -> VisitResult
-    func visitListItem(_ ctx: String, _ ordered: Bool, _ marker: String, _ text: String) -> VisitResult
-    func visitListStart(_ ctx: String, _ ordered: Bool) -> VisitResult
-    func visitListEnd(_ ctx: String, _ ordered: Bool, _ output: String) -> VisitResult
-    func visitTableStart(_ ctx: String) -> VisitResult
-    func visitTableRow(_ ctx: String, _ cells: RustVec<String>, _ isHeader: Bool) -> VisitResult
-    func visitTableEnd(_ ctx: String, _ output: String) -> VisitResult
-    func visitBlockquote(_ ctx: String, _ content: String, _ depth: Int) -> VisitResult
-    func visitStrong(_ ctx: String, _ text: String) -> VisitResult
-    func visitEmphasis(_ ctx: String, _ text: String) -> VisitResult
-    func visitStrikethrough(_ ctx: String, _ text: String) -> VisitResult
-    func visitUnderline(_ ctx: String, _ text: String) -> VisitResult
-    func visitSubscript(_ ctx: String, _ text: String) -> VisitResult
-    func visitSuperscript(_ ctx: String, _ text: String) -> VisitResult
-    func visitMark(_ ctx: String, _ text: String) -> VisitResult
-    func visitLineBreak(_ ctx: String) -> VisitResult
-    func visitHorizontalRule(_ ctx: String) -> VisitResult
-    func visitCustomElement(_ ctx: String, _ tagName: String, _ html: String) -> VisitResult
-    func visitDefinitionListStart(_ ctx: String) -> VisitResult
-    func visitDefinitionTerm(_ ctx: String, _ text: String) -> VisitResult
-    func visitDefinitionDescription(_ ctx: String, _ text: String) -> VisitResult
-    func visitDefinitionListEnd(_ ctx: String, _ output: String) -> VisitResult
-    func visitForm(_ ctx: String, _ action: String?, _ method: String?) -> VisitResult
-    func visitInput(_ ctx: String, _ inputType: String, _ name: String?, _ value: String?) -> VisitResult
-    func visitButton(_ ctx: String, _ text: String) -> VisitResult
-    func visitAudio(_ ctx: String, _ src: String?) -> VisitResult
-    func visitVideo(_ ctx: String, _ src: String?) -> VisitResult
-    func visitIframe(_ ctx: String, _ src: String?) -> VisitResult
-    func visitDetails(_ ctx: String, _ open: Bool) -> VisitResult
-    func visitSummary(_ ctx: String, _ text: String) -> VisitResult
-    func visitFigureStart(_ ctx: String) -> VisitResult
-    func visitFigcaption(_ ctx: String, _ text: String) -> VisitResult
-    func visitFigureEnd(_ ctx: String, _ output: String) -> VisitResult
+    func visitText(_ ctx: NodeContext, _ text: String) -> VisitResult
+    func visitElementStart(_ ctx: NodeContext) -> VisitResult
+    func visitElementEnd(_ ctx: NodeContext, _ output: String) -> VisitResult
+    func visitLink(_ ctx: NodeContext, _ href: String, _ text: String, _ title: String?) -> VisitResult
+    func visitImage(_ ctx: NodeContext, _ src: String, _ alt: String, _ title: String?) -> VisitResult
+    func visitHeading(_ ctx: NodeContext, _ level: UInt32, _ text: String, _ id: String?) -> VisitResult
+    func visitCodeBlock(_ ctx: NodeContext, _ lang: String?, _ code: String) -> VisitResult
+    func visitCodeInline(_ ctx: NodeContext, _ code: String) -> VisitResult
+    func visitListItem(_ ctx: NodeContext, _ ordered: Bool, _ marker: String, _ text: String) -> VisitResult
+    func visitListStart(_ ctx: NodeContext, _ ordered: Bool) -> VisitResult
+    func visitListEnd(_ ctx: NodeContext, _ ordered: Bool, _ output: String) -> VisitResult
+    func visitTableStart(_ ctx: NodeContext) -> VisitResult
+    func visitTableRow(_ ctx: NodeContext, _ cells: RustVec<RustString>, _ isHeader: Bool) -> VisitResult
+    func visitTableEnd(_ ctx: NodeContext, _ output: String) -> VisitResult
+    func visitBlockquote(_ ctx: NodeContext, _ content: String, _ depth: Int) -> VisitResult
+    func visitStrong(_ ctx: NodeContext, _ text: String) -> VisitResult
+    func visitEmphasis(_ ctx: NodeContext, _ text: String) -> VisitResult
+    func visitStrikethrough(_ ctx: NodeContext, _ text: String) -> VisitResult
+    func visitUnderline(_ ctx: NodeContext, _ text: String) -> VisitResult
+    func visitSubscript(_ ctx: NodeContext, _ text: String) -> VisitResult
+    func visitSuperscript(_ ctx: NodeContext, _ text: String) -> VisitResult
+    func visitMark(_ ctx: NodeContext, _ text: String) -> VisitResult
+    func visitLineBreak(_ ctx: NodeContext) -> VisitResult
+    func visitHorizontalRule(_ ctx: NodeContext) -> VisitResult
+    func visitCustomElement(_ ctx: NodeContext, _ tagName: String, _ html: String) -> VisitResult
+    func visitDefinitionListStart(_ ctx: NodeContext) -> VisitResult
+    func visitDefinitionTerm(_ ctx: NodeContext, _ text: String) -> VisitResult
+    func visitDefinitionDescription(_ ctx: NodeContext, _ text: String) -> VisitResult
+    func visitDefinitionListEnd(_ ctx: NodeContext, _ output: String) -> VisitResult
+    func visitForm(_ ctx: NodeContext, _ action: String?, _ method: String?) -> VisitResult
+    func visitInput(_ ctx: NodeContext, _ inputType: String, _ name: String?, _ value: String?) -> VisitResult
+    func visitButton(_ ctx: NodeContext, _ text: String) -> VisitResult
+    func visitAudio(_ ctx: NodeContext, _ src: String?) -> VisitResult
+    func visitVideo(_ ctx: NodeContext, _ src: String?) -> VisitResult
+    func visitIframe(_ ctx: NodeContext, _ src: String?) -> VisitResult
+    func visitDetails(_ ctx: NodeContext, _ open: Bool) -> VisitResult
+    func visitSummary(_ ctx: NodeContext, _ text: String) -> VisitResult
+    func visitFigureStart(_ ctx: NodeContext) -> VisitResult
+    func visitFigcaption(_ ctx: NodeContext, _ text: String) -> VisitResult
+    func visitFigureEnd(_ ctx: NodeContext, _ output: String) -> VisitResult
 }
 
 /// Default implementation: every method returns `.continue_` so conforming
 /// types only need to implement the callbacks they care about.
 public extension HtmlVisitorProtocol {
-    func visitText(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
-    func visitElementStart(_ _ctx: String) -> VisitResult { return .continue_ }
-    func visitElementEnd(_ _ctx: String, _ _output: String) -> VisitResult { return .continue_ }
-    func visitLink(_ _ctx: String, _ _href: String, _ _text: String, _ _title: String?) -> VisitResult { return .continue_ }
-    func visitImage(_ _ctx: String, _ _src: String, _ _alt: String, _ _title: String?) -> VisitResult { return .continue_ }
-    func visitHeading(_ _ctx: String, _ _level: UInt32, _ _text: String, _ _id: String?) -> VisitResult { return .continue_ }
-    func visitCodeBlock(_ _ctx: String, _ _lang: String?, _ _code: String) -> VisitResult { return .continue_ }
-    func visitCodeInline(_ _ctx: String, _ _code: String) -> VisitResult { return .continue_ }
-    func visitListItem(_ _ctx: String, _ _ordered: Bool, _ _marker: String, _ _text: String) -> VisitResult { return .continue_ }
-    func visitListStart(_ _ctx: String, _ _ordered: Bool) -> VisitResult { return .continue_ }
-    func visitListEnd(_ _ctx: String, _ _ordered: Bool, _ _output: String) -> VisitResult { return .continue_ }
-    func visitTableStart(_ _ctx: String) -> VisitResult { return .continue_ }
-    func visitTableRow(_ _ctx: String, _ _cells: RustVec<String>, _ _isHeader: Bool) -> VisitResult { return .continue_ }
-    func visitTableEnd(_ _ctx: String, _ _output: String) -> VisitResult { return .continue_ }
-    func visitBlockquote(_ _ctx: String, _ _content: String, _ _depth: Int) -> VisitResult { return .continue_ }
-    func visitStrong(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
-    func visitEmphasis(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
-    func visitStrikethrough(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
-    func visitUnderline(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
-    func visitSubscript(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
-    func visitSuperscript(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
-    func visitMark(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
-    func visitLineBreak(_ _ctx: String) -> VisitResult { return .continue_ }
-    func visitHorizontalRule(_ _ctx: String) -> VisitResult { return .continue_ }
-    func visitCustomElement(_ _ctx: String, _ _tagName: String, _ _html: String) -> VisitResult { return .continue_ }
-    func visitDefinitionListStart(_ _ctx: String) -> VisitResult { return .continue_ }
-    func visitDefinitionTerm(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
-    func visitDefinitionDescription(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
-    func visitDefinitionListEnd(_ _ctx: String, _ _output: String) -> VisitResult { return .continue_ }
-    func visitForm(_ _ctx: String, _ _action: String?, _ _method: String?) -> VisitResult { return .continue_ }
-    func visitInput(_ _ctx: String, _ _inputType: String, _ _name: String?, _ _value: String?) -> VisitResult { return .continue_ }
-    func visitButton(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
-    func visitAudio(_ _ctx: String, _ _src: String?) -> VisitResult { return .continue_ }
-    func visitVideo(_ _ctx: String, _ _src: String?) -> VisitResult { return .continue_ }
-    func visitIframe(_ _ctx: String, _ _src: String?) -> VisitResult { return .continue_ }
-    func visitDetails(_ _ctx: String, _ _open: Bool) -> VisitResult { return .continue_ }
-    func visitSummary(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
-    func visitFigureStart(_ _ctx: String) -> VisitResult { return .continue_ }
-    func visitFigcaption(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
-    func visitFigureEnd(_ _ctx: String, _ _output: String) -> VisitResult { return .continue_ }
+    func visitText(_ _ctx: NodeContext, _ _text: String) -> VisitResult { return .continue_ }
+    func visitElementStart(_ _ctx: NodeContext) -> VisitResult { return .continue_ }
+    func visitElementEnd(_ _ctx: NodeContext, _ _output: String) -> VisitResult { return .continue_ }
+    func visitLink(_ _ctx: NodeContext, _ _href: String, _ _text: String, _ _title: String?) -> VisitResult { return .continue_ }
+    func visitImage(_ _ctx: NodeContext, _ _src: String, _ _alt: String, _ _title: String?) -> VisitResult { return .continue_ }
+    func visitHeading(_ _ctx: NodeContext, _ _level: UInt32, _ _text: String, _ _id: String?) -> VisitResult { return .continue_ }
+    func visitCodeBlock(_ _ctx: NodeContext, _ _lang: String?, _ _code: String) -> VisitResult { return .continue_ }
+    func visitCodeInline(_ _ctx: NodeContext, _ _code: String) -> VisitResult { return .continue_ }
+    func visitListItem(_ _ctx: NodeContext, _ _ordered: Bool, _ _marker: String, _ _text: String) -> VisitResult { return .continue_ }
+    func visitListStart(_ _ctx: NodeContext, _ _ordered: Bool) -> VisitResult { return .continue_ }
+    func visitListEnd(_ _ctx: NodeContext, _ _ordered: Bool, _ _output: String) -> VisitResult { return .continue_ }
+    func visitTableStart(_ _ctx: NodeContext) -> VisitResult { return .continue_ }
+    func visitTableRow(_ _ctx: NodeContext, _ _cells: RustVec<RustString>, _ _isHeader: Bool) -> VisitResult { return .continue_ }
+    func visitTableEnd(_ _ctx: NodeContext, _ _output: String) -> VisitResult { return .continue_ }
+    func visitBlockquote(_ _ctx: NodeContext, _ _content: String, _ _depth: Int) -> VisitResult { return .continue_ }
+    func visitStrong(_ _ctx: NodeContext, _ _text: String) -> VisitResult { return .continue_ }
+    func visitEmphasis(_ _ctx: NodeContext, _ _text: String) -> VisitResult { return .continue_ }
+    func visitStrikethrough(_ _ctx: NodeContext, _ _text: String) -> VisitResult { return .continue_ }
+    func visitUnderline(_ _ctx: NodeContext, _ _text: String) -> VisitResult { return .continue_ }
+    func visitSubscript(_ _ctx: NodeContext, _ _text: String) -> VisitResult { return .continue_ }
+    func visitSuperscript(_ _ctx: NodeContext, _ _text: String) -> VisitResult { return .continue_ }
+    func visitMark(_ _ctx: NodeContext, _ _text: String) -> VisitResult { return .continue_ }
+    func visitLineBreak(_ _ctx: NodeContext) -> VisitResult { return .continue_ }
+    func visitHorizontalRule(_ _ctx: NodeContext) -> VisitResult { return .continue_ }
+    func visitCustomElement(_ _ctx: NodeContext, _ _tagName: String, _ _html: String) -> VisitResult { return .continue_ }
+    func visitDefinitionListStart(_ _ctx: NodeContext) -> VisitResult { return .continue_ }
+    func visitDefinitionTerm(_ _ctx: NodeContext, _ _text: String) -> VisitResult { return .continue_ }
+    func visitDefinitionDescription(_ _ctx: NodeContext, _ _text: String) -> VisitResult { return .continue_ }
+    func visitDefinitionListEnd(_ _ctx: NodeContext, _ _output: String) -> VisitResult { return .continue_ }
+    func visitForm(_ _ctx: NodeContext, _ _action: String?, _ _method: String?) -> VisitResult { return .continue_ }
+    func visitInput(_ _ctx: NodeContext, _ _inputType: String, _ _name: String?, _ _value: String?) -> VisitResult { return .continue_ }
+    func visitButton(_ _ctx: NodeContext, _ _text: String) -> VisitResult { return .continue_ }
+    func visitAudio(_ _ctx: NodeContext, _ _src: String?) -> VisitResult { return .continue_ }
+    func visitVideo(_ _ctx: NodeContext, _ _src: String?) -> VisitResult { return .continue_ }
+    func visitIframe(_ _ctx: NodeContext, _ _src: String?) -> VisitResult { return .continue_ }
+    func visitDetails(_ _ctx: NodeContext, _ _open: Bool) -> VisitResult { return .continue_ }
+    func visitSummary(_ _ctx: NodeContext, _ _text: String) -> VisitResult { return .continue_ }
+    func visitFigureStart(_ _ctx: NodeContext) -> VisitResult { return .continue_ }
+    func visitFigcaption(_ _ctx: NodeContext, _ _text: String) -> VisitResult { return .continue_ }
+    func visitFigureEnd(_ _ctx: NodeContext, _ _output: String) -> VisitResult { return .continue_ }
 }
 
-/// Opaque wrapper that swift-bridge retains on the Rust side.
-/// Each `alef_*` method is called by the Rust extern "Swift" machinery;
-/// it delegates to the inner `HtmlVisitorProtocol` conformer.
-public final class SwiftHtmlVisitorBox {
+/// Internal adapter: wraps a `HtmlVisitorProtocol` conformer as a `_SwiftHtmlVisitorBoxDelegate`.
+/// Converts swift-bridge raw types (RustString, UInt, etc.) to user-friendly Swift
+/// types before dispatching, and serialises the `VisitResult` return to JSON.
+private final class _HtmlVisitorProtocolAdapter: _SwiftHtmlVisitorBoxDelegate {
     private let inner: any HtmlVisitorProtocol
-    public init(_ inner: any HtmlVisitorProtocol) { self.inner = inner }
-    public func alef_visit_text(_ ctx: String, _ text: String) -> VisitResult {
-        return inner.visitText(ctx, text)
+    init(_ inner: any HtmlVisitorProtocol) { self.inner = inner }
+    func visit_text(_ ctx: RustString, _ text: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitText(ctx_decoded, text.toString()))
     }
-    public func alef_visit_element_start(_ ctx: String) -> VisitResult {
-        return inner.visitElementStart(ctx)
+    func visit_element_start(_ ctx: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitElementStart(ctx_decoded))
     }
-    public func alef_visit_element_end(_ ctx: String, _ output: String) -> VisitResult {
-        return inner.visitElementEnd(ctx, output)
+    func visit_element_end(_ ctx: RustString, _ output: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitElementEnd(ctx_decoded, output.toString()))
     }
-    public func alef_visit_link(_ ctx: String, _ href: String, _ text: String, _ title: String?) -> VisitResult {
-        return inner.visitLink(ctx, href, text, title)
+    func visit_link(_ ctx: RustString, _ href: RustString, _ text: RustString, _ title: RustString?) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitLink(ctx_decoded, href.toString(), text.toString(), title?.toString()))
     }
-    public func alef_visit_image(_ ctx: String, _ src: String, _ alt: String, _ title: String?) -> VisitResult {
-        return inner.visitImage(ctx, src, alt, title)
+    func visit_image(_ ctx: RustString, _ src: RustString, _ alt: RustString, _ title: RustString?) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitImage(ctx_decoded, src.toString(), alt.toString(), title?.toString()))
     }
-    public func alef_visit_heading(_ ctx: String, _ level: UInt32, _ text: String, _ id: String?) -> VisitResult {
-        return inner.visitHeading(ctx, level, text, id)
+    func visit_heading(_ ctx: RustString, _ level: UInt32, _ text: RustString, _ id: RustString?) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitHeading(ctx_decoded, level, text.toString(), id?.toString()))
     }
-    public func alef_visit_code_block(_ ctx: String, _ lang: String?, _ code: String) -> VisitResult {
-        return inner.visitCodeBlock(ctx, lang, code)
+    func visit_code_block(_ ctx: RustString, _ lang: RustString?, _ code: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitCodeBlock(ctx_decoded, lang?.toString(), code.toString()))
     }
-    public func alef_visit_code_inline(_ ctx: String, _ code: String) -> VisitResult {
-        return inner.visitCodeInline(ctx, code)
+    func visit_code_inline(_ ctx: RustString, _ code: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitCodeInline(ctx_decoded, code.toString()))
     }
-    public func alef_visit_list_item(_ ctx: String, _ ordered: Bool, _ marker: String, _ text: String) -> VisitResult {
-        return inner.visitListItem(ctx, ordered, marker, text)
+    func visit_list_item(_ ctx: RustString, _ ordered: Bool, _ marker: RustString, _ text: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitListItem(ctx_decoded, ordered, marker.toString(), text.toString()))
     }
-    public func alef_visit_list_start(_ ctx: String, _ ordered: Bool) -> VisitResult {
-        return inner.visitListStart(ctx, ordered)
+    func visit_list_start(_ ctx: RustString, _ ordered: Bool) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitListStart(ctx_decoded, ordered))
     }
-    public func alef_visit_list_end(_ ctx: String, _ ordered: Bool, _ output: String) -> VisitResult {
-        return inner.visitListEnd(ctx, ordered, output)
+    func visit_list_end(_ ctx: RustString, _ ordered: Bool, _ output: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitListEnd(ctx_decoded, ordered, output.toString()))
     }
-    public func alef_visit_table_start(_ ctx: String) -> VisitResult {
-        return inner.visitTableStart(ctx)
+    func visit_table_start(_ ctx: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitTableStart(ctx_decoded))
     }
-    public func alef_visit_table_row(_ ctx: String, _ cells: RustVec<String>, _ is_header: Bool) -> VisitResult {
-        return inner.visitTableRow(ctx, cells, is_header)
+    func visit_table_row(_ ctx: RustString, _ cells: RustVec<RustString>, _ is_header: Bool) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitTableRow(ctx_decoded, cells, is_header))
     }
-    public func alef_visit_table_end(_ ctx: String, _ output: String) -> VisitResult {
-        return inner.visitTableEnd(ctx, output)
+    func visit_table_end(_ ctx: RustString, _ output: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitTableEnd(ctx_decoded, output.toString()))
     }
-    public func alef_visit_blockquote(_ ctx: String, _ content: String, _ depth: Int) -> VisitResult {
-        return inner.visitBlockquote(ctx, content, depth)
+    func visit_blockquote(_ ctx: RustString, _ content: RustString, _ depth: UInt) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitBlockquote(ctx_decoded, content.toString(), Int(depth)))
     }
-    public func alef_visit_strong(_ ctx: String, _ text: String) -> VisitResult {
-        return inner.visitStrong(ctx, text)
+    func visit_strong(_ ctx: RustString, _ text: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitStrong(ctx_decoded, text.toString()))
     }
-    public func alef_visit_emphasis(_ ctx: String, _ text: String) -> VisitResult {
-        return inner.visitEmphasis(ctx, text)
+    func visit_emphasis(_ ctx: RustString, _ text: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitEmphasis(ctx_decoded, text.toString()))
     }
-    public func alef_visit_strikethrough(_ ctx: String, _ text: String) -> VisitResult {
-        return inner.visitStrikethrough(ctx, text)
+    func visit_strikethrough(_ ctx: RustString, _ text: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitStrikethrough(ctx_decoded, text.toString()))
     }
-    public func alef_visit_underline(_ ctx: String, _ text: String) -> VisitResult {
-        return inner.visitUnderline(ctx, text)
+    func visit_underline(_ ctx: RustString, _ text: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitUnderline(ctx_decoded, text.toString()))
     }
-    public func alef_visit_subscript(_ ctx: String, _ text: String) -> VisitResult {
-        return inner.visitSubscript(ctx, text)
+    func visit_subscript(_ ctx: RustString, _ text: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitSubscript(ctx_decoded, text.toString()))
     }
-    public func alef_visit_superscript(_ ctx: String, _ text: String) -> VisitResult {
-        return inner.visitSuperscript(ctx, text)
+    func visit_superscript(_ ctx: RustString, _ text: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitSuperscript(ctx_decoded, text.toString()))
     }
-    public func alef_visit_mark(_ ctx: String, _ text: String) -> VisitResult {
-        return inner.visitMark(ctx, text)
+    func visit_mark(_ ctx: RustString, _ text: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitMark(ctx_decoded, text.toString()))
     }
-    public func alef_visit_line_break(_ ctx: String) -> VisitResult {
-        return inner.visitLineBreak(ctx)
+    func visit_line_break(_ ctx: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitLineBreak(ctx_decoded))
     }
-    public func alef_visit_horizontal_rule(_ ctx: String) -> VisitResult {
-        return inner.visitHorizontalRule(ctx)
+    func visit_horizontal_rule(_ ctx: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitHorizontalRule(ctx_decoded))
     }
-    public func alef_visit_custom_element(_ ctx: String, _ tag_name: String, _ html: String) -> VisitResult {
-        return inner.visitCustomElement(ctx, tag_name, html)
+    func visit_custom_element(_ ctx: RustString, _ tag_name: RustString, _ html: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitCustomElement(ctx_decoded, tag_name.toString(), html.toString()))
     }
-    public func alef_visit_definition_list_start(_ ctx: String) -> VisitResult {
-        return inner.visitDefinitionListStart(ctx)
+    func visit_definition_list_start(_ ctx: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitDefinitionListStart(ctx_decoded))
     }
-    public func alef_visit_definition_term(_ ctx: String, _ text: String) -> VisitResult {
-        return inner.visitDefinitionTerm(ctx, text)
+    func visit_definition_term(_ ctx: RustString, _ text: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitDefinitionTerm(ctx_decoded, text.toString()))
     }
-    public func alef_visit_definition_description(_ ctx: String, _ text: String) -> VisitResult {
-        return inner.visitDefinitionDescription(ctx, text)
+    func visit_definition_description(_ ctx: RustString, _ text: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitDefinitionDescription(ctx_decoded, text.toString()))
     }
-    public func alef_visit_definition_list_end(_ ctx: String, _ output: String) -> VisitResult {
-        return inner.visitDefinitionListEnd(ctx, output)
+    func visit_definition_list_end(_ ctx: RustString, _ output: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitDefinitionListEnd(ctx_decoded, output.toString()))
     }
-    public func alef_visit_form(_ ctx: String, _ action: String?, _ method: String?) -> VisitResult {
-        return inner.visitForm(ctx, action, method)
+    func visit_form(_ ctx: RustString, _ action: RustString?, _ method: RustString?) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitForm(ctx_decoded, action?.toString(), method?.toString()))
     }
-    public func alef_visit_input(_ ctx: String, _ input_type: String, _ name: String?, _ value: String?) -> VisitResult {
-        return inner.visitInput(ctx, input_type, name, value)
+    func visit_input(_ ctx: RustString, _ input_type: RustString, _ name: RustString?, _ value: RustString?) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitInput(ctx_decoded, input_type.toString(), name?.toString(), value?.toString()))
     }
-    public func alef_visit_button(_ ctx: String, _ text: String) -> VisitResult {
-        return inner.visitButton(ctx, text)
+    func visit_button(_ ctx: RustString, _ text: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitButton(ctx_decoded, text.toString()))
     }
-    public func alef_visit_audio(_ ctx: String, _ src: String?) -> VisitResult {
-        return inner.visitAudio(ctx, src)
+    func visit_audio(_ ctx: RustString, _ src: RustString?) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitAudio(ctx_decoded, src?.toString()))
     }
-    public func alef_visit_video(_ ctx: String, _ src: String?) -> VisitResult {
-        return inner.visitVideo(ctx, src)
+    func visit_video(_ ctx: RustString, _ src: RustString?) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitVideo(ctx_decoded, src?.toString()))
     }
-    public func alef_visit_iframe(_ ctx: String, _ src: String?) -> VisitResult {
-        return inner.visitIframe(ctx, src)
+    func visit_iframe(_ ctx: RustString, _ src: RustString?) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitIframe(ctx_decoded, src?.toString()))
     }
-    public func alef_visit_details(_ ctx: String, _ open: Bool) -> VisitResult {
-        return inner.visitDetails(ctx, open)
+    func visit_details(_ ctx: RustString, _ open: Bool) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitDetails(ctx_decoded, open))
     }
-    public func alef_visit_summary(_ ctx: String, _ text: String) -> VisitResult {
-        return inner.visitSummary(ctx, text)
+    func visit_summary(_ ctx: RustString, _ text: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitSummary(ctx_decoded, text.toString()))
     }
-    public func alef_visit_figure_start(_ ctx: String) -> VisitResult {
-        return inner.visitFigureStart(ctx)
+    func visit_figure_start(_ ctx: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitFigureStart(ctx_decoded))
     }
-    public func alef_visit_figcaption(_ ctx: String, _ text: String) -> VisitResult {
-        return inner.visitFigcaption(ctx, text)
+    func visit_figcaption(_ ctx: RustString, _ text: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitFigcaption(ctx_decoded, text.toString()))
     }
-    public func alef_visit_figure_end(_ ctx: String, _ output: String) -> VisitResult {
-        return inner.visitFigureEnd(ctx, output)
+    func visit_figure_end(_ ctx: RustString, _ output: RustString) -> String {
+        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitFigureEnd(ctx_decoded, output.toString()))
     }
+}
+
+/// Serialise a `VisitResult` to a JSON string matching Rust serde defaults.
+private func visit_result_toJson(_ result: VisitResult) -> String {
+    switch result {
+    case .`continue`: return "\"Continue\""
+    case .custom(let v): return "{\"Custom\":\"\(jsonEscapeStr(v))\"}"
+    case .skip: return "\"Skip\""
+    case .preserveHtml: return "\"PreserveHtml\""
+    case .error(let v): return "{\"Error\":\"\(jsonEscapeStr(v))\"}"
+    }
+}
+
+/// Escape a Swift String for embedding in a JSON string literal.
+private func jsonEscapeStr(_ s: String) -> String {
+    s.replacingOccurrences(of: "\\", with: "\\\\")
+     .replacingOccurrences(of: "\"", with: "\\\"")
+     .replacingOccurrences(of: "\n", with: "\\n")
+     .replacingOccurrences(of: "\r", with: "\\r")
+     .replacingOccurrences(of: "\t", with: "\\t")
 }
 
 /// Wrap a `HtmlVisitorProtocol` conformer in an opaque `VisitorHandle` handle
 /// that can be passed to `conversionOptionsFromJsonWithVisitor(...)` on the Rust side.
 public func makeHtmlVisitorHandle(_ visitor: any HtmlVisitorProtocol) -> VisitorHandle {
-    return RustBridge.makeHtmlVisitorHandle(SwiftHtmlVisitorBox(visitor))
+    return RustBridge.makeHtmlVisitorHandle(SwiftHtmlVisitorBox(_HtmlVisitorProtocolAdapter(visitor)))
 }

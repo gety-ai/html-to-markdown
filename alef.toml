@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.16.13"
+alef_version = "0.16.16"
 languages = [
   "python",
   "node",
@@ -185,7 +185,7 @@ style = "frb"
 features = ["full"]
 
 [crates.zig]
-module_name = "html_to_markdown"
+module_name = "html_to_markdown_rs"
 
 [crates.output]
 python = "crates/html-to-markdown-py/src/"

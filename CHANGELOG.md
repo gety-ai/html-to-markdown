@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **wasm: `NodeContent::MetadataBlock { entries }` round-trips correctly as `[[k,v],...]`** — the `entries: Vec<(String, String)>` field is now stored as `JsValue` in the wasm binding struct and serialized/deserialized via `serde_wasm_bindgen` instead of `Vec<String>`, preserving the nested-array wire format that serde produces for tuple vecs.
+
 ### Added
 
 - **Kotlin Android binding** — `dev.kreuzberg:html-to-markdown-android` on Maven Central. Standalone Android library (AAR) with bundled `libhtml_to_markdown_ffi.so` for `arm64-v8a` and `x86_64` ABIs; minSdk 21, compileSdk 35. JVM Kotlin users continue to consume the existing Java package (`dev.kreuzberg:html-to-markdown`) directly — Kotlin/JVM treats Java classes as native and Panama FFM is unavailable on Android, which is why Android needs its own package.

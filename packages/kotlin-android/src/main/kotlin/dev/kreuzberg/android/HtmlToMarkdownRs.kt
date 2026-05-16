@@ -2,6 +2,19 @@
 
 package dev.kreuzberg.android
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
 object HtmlToMarkdownRs {
-    fun convert(html: String, options: String = ""): String = HtmlToMarkdownRsBridge.nativeConvert(html, options)
+    private val mapper = jacksonObjectMapper()
+
+    fun convert(html: String, options: ConversionOptions? = null): ConversionResult {
+        val resultJson = HtmlToMarkdownRsBridge.nativeConvert(html, options?.let { mapper.writeValueAsString(it) } ?: "")
+        return mapper.readValue(resultJson, ConversionResult::class.java)
+    }
+
+    suspend fun convertAsync(html: String, options: ConversionOptions? = null): ConversionResult =
+        withContext(Dispatchers.IO) { convert(html, options) }
+
 }

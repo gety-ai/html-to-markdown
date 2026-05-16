@@ -8,6 +8,31 @@
 #' @useDynLib htmltomarkdown, .registration = TRUE
 NULL
 
+#' Convert HTML to Markdown, returning a [`ConversionResult`] with content, metadata, images,
+#'
+#' and warnings.
+#'
+#' # Arguments
+#'
+#' * `html` — the HTML string to convert.
+#' * `options` — optional conversion options. Defaults to [`ConversionOptions::default`].
+#'
+#' # Example
+#'
+#' ```
+#' use html_to_markdown_rs::convert;
+#'
+#' let html = "<h1>Hello World</h1>";
+#' let result = convert(html, None).unwrap();
+#' assert!(result.content.as_deref().unwrap_or("").contains("Hello World"));
+#' ```
+#'
+#' # Errors
+#'
+#' Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
+#' @param html Character string.
+#' @param options ConversionOptions object (list with class attribute).
+#' @return ConversionResult object (list with class attribute).
 #' @export
 convert <- function(html, options) .Call("wrap__convert", html, options, PACKAGE = "htmltomarkdown")
 DocumentMetadata <- new.env(parent = emptyenv())
@@ -59,7 +84,6 @@ StructuredData <- new.env(parent = emptyenv())
 `[[.StructuredData` <- `$.StructuredData`
 ConversionOptions <- new.env(parent = emptyenv())
 ConversionOptions$default <- function() .Call("wrap__ConversionOptions__default", PACKAGE = "htmltomarkdown")
-ConversionOptions$builder <- function() .Call("wrap__ConversionOptions__builder", PACKAGE = "htmltomarkdown")
 ConversionOptions$from_json <- function(json) .Call("wrap__ConversionOptions__from_json", json, PACKAGE = "htmltomarkdown")
 #' @export
 `$.ConversionOptions` <- function(self, name) {
@@ -69,20 +93,6 @@ ConversionOptions$from_json <- function(json) .Call("wrap__ConversionOptions__fr
 }
 #' @export
 `[[.ConversionOptions` <- `$.ConversionOptions`
-ConversionOptionsBuilder <- new.env(parent = emptyenv())
-ConversionOptionsBuilder$strip_tags <- function(tags) .Call("wrap__ConversionOptionsBuilder__strip_tags", self, tags, PACKAGE = "htmltomarkdown")
-ConversionOptionsBuilder$preserve_tags <- function(tags) .Call("wrap__ConversionOptionsBuilder__preserve_tags", self, tags, PACKAGE = "htmltomarkdown")
-ConversionOptionsBuilder$keep_inline_images_in <- function(tags) .Call("wrap__ConversionOptionsBuilder__keep_inline_images_in", self, tags, PACKAGE = "htmltomarkdown")
-ConversionOptionsBuilder$exclude_selectors <- function(selectors) .Call("wrap__ConversionOptionsBuilder__exclude_selectors", self, selectors, PACKAGE = "htmltomarkdown")
-ConversionOptionsBuilder$build <- function() .Call("wrap__ConversionOptionsBuilder__build", self, PACKAGE = "htmltomarkdown")
-#' @export
-`$.ConversionOptionsBuilder` <- function(self, name) {
-  func <- ConversionOptionsBuilder[[name]]
-  environment(func) <- environment()
-  func
-}
-#' @export
-`[[.ConversionOptionsBuilder` <- `$.ConversionOptionsBuilder`
 ConversionOptionsUpdate <- new.env(parent = emptyenv())
 ConversionOptionsUpdate$from_json <- function(json) .Call("wrap__ConversionOptionsUpdate__from_json", json, PACKAGE = "htmltomarkdown")
 #' @export

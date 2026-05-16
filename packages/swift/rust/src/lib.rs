@@ -190,45 +190,6 @@ mod ffi {
     }
 
     extern "Rust" {
-        type ConversionOptionsBuilder;
-    }
-
-    extern "Rust" {
-        #[swift_bridge(swift_name = "conversionOptionsBuilderStripTags")]
-        fn conversion_options_builder_strip_tags(
-            client: &ConversionOptionsBuilder,
-            tags: Vec<String>,
-        ) -> ConversionOptionsBuilder;
-        #[swift_bridge(swift_name = "conversionOptionsBuilderPreserveTags")]
-        fn conversion_options_builder_preserve_tags(
-            client: &ConversionOptionsBuilder,
-            tags: Vec<String>,
-        ) -> ConversionOptionsBuilder;
-        #[swift_bridge(swift_name = "conversionOptionsBuilderKeepInlineImagesIn")]
-        fn conversion_options_builder_keep_inline_images_in(
-            client: &ConversionOptionsBuilder,
-            tags: Vec<String>,
-        ) -> ConversionOptionsBuilder;
-        #[swift_bridge(swift_name = "conversionOptionsBuilderExcludeSelectors")]
-        fn conversion_options_builder_exclude_selectors(
-            client: &ConversionOptionsBuilder,
-            selectors: Vec<String>,
-        ) -> ConversionOptionsBuilder;
-        #[swift_bridge(swift_name = "conversionOptionsBuilderVisitor")]
-        fn conversion_options_builder_visitor(
-            client: &ConversionOptionsBuilder,
-            visitor: Option<VisitorHandle>,
-        ) -> ConversionOptionsBuilder;
-        #[swift_bridge(swift_name = "conversionOptionsBuilderPreprocessing")]
-        fn conversion_options_builder_preprocessing(
-            client: &ConversionOptionsBuilder,
-            preprocessing: PreprocessingOptions,
-        ) -> ConversionOptionsBuilder;
-        #[swift_bridge(swift_name = "conversionOptionsBuilderBuild")]
-        fn conversion_options_builder_build(client: &ConversionOptionsBuilder) -> ConversionOptions;
-    }
-
-    extern "Rust" {
         type ConversionOptionsUpdate;
         #[swift_bridge(init)]
         fn new(
@@ -606,8 +567,6 @@ mod ffi {
         fn conversion_options_from_json(json: String) -> Result<ConversionOptions, String>;
         #[swift_bridge(swift_name = "conversionOptionsUpdateFromJson")]
         fn conversion_options_update_from_json(json: String) -> Result<ConversionOptionsUpdate, String>;
-        #[swift_bridge(swift_name = "preprocessingOptionsFromJson")]
-        fn preprocessing_options_from_json(json: String) -> Result<PreprocessingOptions, String>;
         #[swift_bridge(swift_name = "preprocessingOptionsUpdateFromJson")]
         fn preprocessing_options_update_from_json(json: String) -> Result<PreprocessingOptionsUpdate, String>;
         #[swift_bridge(swift_name = "nodeContextFromJson")]
@@ -1193,48 +1152,6 @@ impl ConversionOptions {
     pub fn visitor(&self) -> Option<VisitorHandle> {
         self.0.visitor.clone().map(VisitorHandle)
     }
-}
-
-pub struct ConversionOptionsBuilder(pub html_to_markdown_rs::options::ConversionOptionsBuilder);
-
-pub fn conversion_options_builder_strip_tags(
-    client: &ConversionOptionsBuilder,
-    tags: Vec<String>,
-) -> ConversionOptionsBuilder {
-    ConversionOptionsBuilder(client.0.clone().strip_tags(tags))
-}
-pub fn conversion_options_builder_preserve_tags(
-    client: &ConversionOptionsBuilder,
-    tags: Vec<String>,
-) -> ConversionOptionsBuilder {
-    ConversionOptionsBuilder(client.0.clone().preserve_tags(tags))
-}
-pub fn conversion_options_builder_keep_inline_images_in(
-    client: &ConversionOptionsBuilder,
-    tags: Vec<String>,
-) -> ConversionOptionsBuilder {
-    ConversionOptionsBuilder(client.0.clone().keep_inline_images_in(tags))
-}
-pub fn conversion_options_builder_exclude_selectors(
-    client: &ConversionOptionsBuilder,
-    selectors: Vec<String>,
-) -> ConversionOptionsBuilder {
-    ConversionOptionsBuilder(client.0.clone().exclude_selectors(selectors))
-}
-pub fn conversion_options_builder_visitor(
-    client: &ConversionOptionsBuilder,
-    visitor: Option<VisitorHandle>,
-) -> ConversionOptionsBuilder {
-    ConversionOptionsBuilder(client.0.clone().visitor(visitor.map(|v| v.0)))
-}
-pub fn conversion_options_builder_preprocessing(
-    client: &ConversionOptionsBuilder,
-    preprocessing: PreprocessingOptions,
-) -> ConversionOptionsBuilder {
-    ConversionOptionsBuilder(client.0.clone().preprocessing(preprocessing.0))
-}
-pub fn conversion_options_builder_build(client: &ConversionOptionsBuilder) -> ConversionOptions {
-    ConversionOptions(client.0.clone().build())
 }
 
 pub struct ConversionOptionsUpdate(pub html_to_markdown_rs::options::ConversionOptionsUpdate);
@@ -3210,6 +3127,22 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for SwiftHtmlVisitorWrapper {
     }
 }
 
+impl From<html_to_markdown_rs::visitor::VisitorHandle> for VisitorHandle {
+    fn from(v: html_to_markdown_rs::visitor::VisitorHandle) -> Self {
+        Self(v)
+    }
+}
+impl From<VisitorHandle> for html_to_markdown_rs::visitor::VisitorHandle {
+    fn from(v: VisitorHandle) -> Self {
+        v.0
+    }
+}
+impl From<html_to_markdown_rs::options::ConversionOptions> for ConversionOptions {
+    fn from(v: html_to_markdown_rs::options::ConversionOptions) -> Self {
+        Self(v)
+    }
+}
+
 /// Construct a `VisitorHandle` from a Swift `SwiftHtmlVisitorBox` handle.
 /// Called by Swift e2e tests via `makeHtmlVisitorHandle(...)` to build a
 /// `VisitorHandle` that can be passed to the options-with-visitor helper.
@@ -3242,12 +3175,6 @@ pub fn conversion_options_from_json(json: String) -> Result<ConversionOptions, S
 pub fn conversion_options_update_from_json(json: String) -> Result<ConversionOptionsUpdate, String> {
     serde_json::from_str::<html_to_markdown_rs::options::ConversionOptionsUpdate>(&json)
         .map(ConversionOptionsUpdate)
-        .map_err(|e| e.to_string())
-}
-
-pub fn preprocessing_options_from_json(json: String) -> Result<PreprocessingOptions, String> {
-    serde_json::from_str::<html_to_markdown_rs::options::PreprocessingOptions>(&json)
-        .map(PreprocessingOptions)
         .map_err(|e| e.to_string())
 }
 

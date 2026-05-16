@@ -13,7 +13,6 @@
 typedef struct HTMAnnotationKind HTMAnnotationKind;
 typedef struct HTMCodeBlockStyle HTMCodeBlockStyle;
 typedef struct HTMConversionOptions HTMConversionOptions;
-typedef struct HTMConversionOptionsBuilder HTMConversionOptionsBuilder;
 typedef struct HTMConversionOptionsUpdate HTMConversionOptionsUpdate;
 typedef struct HTMConversionResult HTMConversionResult;
 typedef struct HTMDocumentMetadata HTMDocumentMetadata;
@@ -1216,31 +1215,6 @@ char *htm_link_metadata_rel(const HTMLinkMetadata *ptr);
 char *htm_link_metadata_attributes(const HTMLinkMetadata *ptr);
 
 /**
- * Classify a link based on href value.
- *
- * # Arguments
- *
- * * `href` - The href attribute value
- *
- * # Returns
- *
- * Appropriate [`LinkType`] based on protocol and content.
- *
- * # Examples
- *
- * ```
- * assert_eq!(LinkMetadata::classify_link("#section"), LinkType::Anchor);
- * assert_eq!(LinkMetadata::classify_link("mailto:test@example.com"), LinkType::Email);
- * assert_eq!(LinkMetadata::classify_link("tel:+1234567890"), LinkType::Phone);
- * assert_eq!(LinkMetadata::classify_link("https://example.com"), LinkType::External);
- * ```
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-HTMLinkType *htm_link_metadata_classify_link(const char *href);
-
-/**
  * Create a `ImageMetadata` from a JSON string. Returns null on failure.
  * # Safety
  * JSON string must be valid UTF-8 and null-terminated.
@@ -1718,105 +1692,11 @@ HTMVisitorHandle *htm_conversion_options_visitor(const HTMConversionOptions *ptr
 HTMConversionOptions *htm_conversion_options_default(void);
 
 /**
- * Create a new builder with default values.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-HTMConversionOptionsBuilder *htm_conversion_options_builder(void);
-
-/**
- * Apply a partial update to these conversion options.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-void htm_conversion_options_apply_update(HTMConversionOptions *this_,
-                                         const HTMConversionOptionsUpdate *update);
-
-/**
- * Create from a partial update, applying to defaults.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-HTMConversionOptions *htm_conversion_options_from_update(const HTMConversionOptionsUpdate *update);
-
-/**
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.
  * Returned pointers must be freed with the appropriate free function.
  */
 HTMConversionOptions *htm_conversion_options_from(const HTMConversionOptionsUpdate *update);
-
-/**
- * Free a `ConversionOptionsBuilder` handle.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void htm_conversion_options_builder_free(HTMConversionOptionsBuilder *ptr);
-
-/**
- * Set the list of HTML tag names whose content is stripped from output.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-HTMConversionOptionsBuilder *htm_conversion_options_builder_strip_tags(HTMConversionOptionsBuilder *this_,
-                                                                       const char *tags);
-
-/**
- * Set the list of HTML tag names that are preserved verbatim in output.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-HTMConversionOptionsBuilder *htm_conversion_options_builder_preserve_tags(HTMConversionOptionsBuilder *this_,
-                                                                          const char *tags);
-
-/**
- * Set the list of HTML tag names whose `<img>` children are kept inline.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-HTMConversionOptionsBuilder *htm_conversion_options_builder_keep_inline_images_in(HTMConversionOptionsBuilder *this_,
-                                                                                  const char *tags);
-
-/**
- * Set the list of CSS selectors for elements to exclude entirely from output.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-HTMConversionOptionsBuilder *htm_conversion_options_builder_exclude_selectors(HTMConversionOptionsBuilder *this_,
-                                                                              const char *selectors);
-
-/**
- * Set the visitor used during conversion.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-HTMConversionOptionsBuilder *htm_conversion_options_builder_visitor(HTMConversionOptionsBuilder *this_,
-                                                                    const HTMVisitorHandle *visitor);
-
-/**
- * Set the pre-processing options applied to the HTML before conversion.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-HTMConversionOptionsBuilder *htm_conversion_options_builder_preprocessing(HTMConversionOptionsBuilder *this_,
-                                                                          const HTMPreprocessingOptions *preprocessing);
-
-/**
- * Build the final [`ConversionOptions`].
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-HTMConversionOptions *htm_conversion_options_builder_build(HTMConversionOptionsBuilder *this_);
 
 /**
  * Create a `ConversionOptionsUpdate` from a JSON string. Returns null on failure.
@@ -2177,41 +2057,6 @@ int32_t htm_preprocessing_options_remove_forms(const HTMPreprocessingOptions *pt
  * Returned pointers must be freed with the appropriate free function.
  */
 HTMPreprocessingOptions *htm_preprocessing_options_default(void);
-
-/**
- * Apply a partial update to these preprocessing options.
- *
- * Any specified fields in the update will override the current values.
- * Unspecified fields (None) are left unchanged.
- *
- * # Arguments
- *
- * * `update` - Partial preprocessing options update
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-void htm_preprocessing_options_apply_update(HTMPreprocessingOptions *this_,
-                                            const HTMPreprocessingOptionsUpdate *update);
-
-/**
- * Create new preprocessing options from a partial update.
- *
- * Creates a new `PreprocessingOptions` struct with defaults, then applies the update.
- * Fields not specified in the update keep their default values.
- *
- * # Arguments
- *
- * * `update` - Partial preprocessing options update
- *
- * # Returns
- *
- * New `PreprocessingOptions` with specified updates applied to defaults
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-HTMPreprocessingOptions *htm_preprocessing_options_from_update(const HTMPreprocessingOptionsUpdate *update);
 
 /**
  * # Safety

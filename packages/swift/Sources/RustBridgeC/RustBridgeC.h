@@ -257,18 +257,6 @@ void* __swift_bridge__$Vec_ConversionOptions$get_mut(void* vec_ptr, uintptr_t in
 uintptr_t __swift_bridge__$Vec_ConversionOptions$len(void* vec_ptr);
 void* __swift_bridge__$Vec_ConversionOptions$as_ptr(void* vec_ptr);
 
-typedef struct ConversionOptionsBuilder ConversionOptionsBuilder;
-void __swift_bridge__$ConversionOptionsBuilder$_free(void* self);
-
-void* __swift_bridge__$Vec_ConversionOptionsBuilder$new(void);
-void __swift_bridge__$Vec_ConversionOptionsBuilder$drop(void* vec_ptr);
-void __swift_bridge__$Vec_ConversionOptionsBuilder$push(void* vec_ptr, void* item_ptr);
-void* __swift_bridge__$Vec_ConversionOptionsBuilder$pop(void* vec_ptr);
-void* __swift_bridge__$Vec_ConversionOptionsBuilder$get(void* vec_ptr, uintptr_t index);
-void* __swift_bridge__$Vec_ConversionOptionsBuilder$get_mut(void* vec_ptr, uintptr_t index);
-uintptr_t __swift_bridge__$Vec_ConversionOptionsBuilder$len(void* vec_ptr);
-void* __swift_bridge__$Vec_ConversionOptionsBuilder$as_ptr(void* vec_ptr);
-
 typedef struct ConversionOptionsUpdate ConversionOptionsUpdate;
 void __swift_bridge__$ConversionOptionsUpdate$_free(void* self);
 
@@ -733,13 +721,6 @@ bool __swift_bridge__$ConversionOptions$infer_dimensions(void* self);
 struct __private__OptionUsize __swift_bridge__$ConversionOptions$max_depth(void* self);
 void* __swift_bridge__$ConversionOptions$exclude_selectors(void* self);
 void* __swift_bridge__$ConversionOptions$visitor(void* self);
-void* __swift_bridge__$conversion_options_builder_strip_tags(void* client, void* tags);
-void* __swift_bridge__$conversion_options_builder_preserve_tags(void* client, void* tags);
-void* __swift_bridge__$conversion_options_builder_keep_inline_images_in(void* client, void* tags);
-void* __swift_bridge__$conversion_options_builder_exclude_selectors(void* client, void* selectors);
-void* __swift_bridge__$conversion_options_builder_visitor(void* client, void* visitor);
-void* __swift_bridge__$conversion_options_builder_preprocessing(void* client, void* preprocessing);
-void* __swift_bridge__$conversion_options_builder_build(void* client);
 void* __swift_bridge__$ConversionOptionsUpdate$new(void* heading_style, void* list_indent_type, struct __private__OptionUsize list_indent_width, void* bullets, void* strong_em_symbol, struct __private__OptionBool escape_asterisks, struct __private__OptionBool escape_underscores, struct __private__OptionBool escape_misc, struct __private__OptionBool escape_ascii, void* code_language, struct __private__OptionBool autolinks, struct __private__OptionBool default_title, struct __private__OptionBool br_in_tables, void* highlight_style, struct __private__OptionBool extract_metadata, void* whitespace_mode, struct __private__OptionBool strip_newlines, struct __private__OptionBool wrap, struct __private__OptionUsize wrap_width, struct __private__OptionBool convert_as_inline, void* sub_symbol, void* sup_symbol, void* newline_style, void* code_block_style, void* keep_inline_images_in, void* preprocessing, void* encoding, struct __private__OptionBool debug, void* strip_tags, void* preserve_tags, struct __private__OptionBool skip_images, void* link_style, void* output_format, struct __private__OptionBool include_document_structure, struct __private__OptionBool extract_images, struct __private__OptionU64 max_image_size, struct __private__OptionBool capture_svg, struct __private__OptionBool infer_dimensions, void* max_depth, void* exclude_selectors, void* visitor);
 void* __swift_bridge__$ConversionOptionsUpdate$heading_style(void* self);
 void* __swift_bridge__$ConversionOptionsUpdate$list_indent_type(void* self);
@@ -854,7 +835,6 @@ void* __swift_bridge__$make_html_visitor_handle(void* swift_box);
 struct __private__ResultPtrAndPtr __swift_bridge__$conversion_options_from_json_with_visitor(void* json, void* visitor);
 struct __private__ResultPtrAndPtr __swift_bridge__$conversion_options_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$conversion_options_update_from_json(void* json);
-struct __private__ResultPtrAndPtr __swift_bridge__$preprocessing_options_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$preprocessing_options_update_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$node_context_from_json(void* json);
 

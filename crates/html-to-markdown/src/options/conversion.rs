@@ -187,6 +187,7 @@ impl Default for ConversionOptions {
 impl ConversionOptions {
     /// Create a new builder with default values.
     #[must_use]
+    #[cfg_attr(alef, alef(skip))]
     pub fn builder() -> ConversionOptionsBuilder {
         ConversionOptionsBuilder(Self::default())
     }
@@ -198,6 +199,7 @@ impl ConversionOptions {
 ///
 /// All fields start with default values. Call `.build()` to produce the final options.
 #[derive(Debug, Clone)]
+#[cfg_attr(alef, alef(skip))]
 pub struct ConversionOptionsBuilder(ConversionOptions);
 
 macro_rules! builder_setter {
@@ -222,6 +224,7 @@ macro_rules! builder_setter_into {
     };
 }
 
+#[cfg_attr(alef, alef(skip))]
 impl ConversionOptionsBuilder {
     // Output control
     builder_setter!(output_format, OutputFormat);
@@ -428,6 +431,7 @@ pub struct ConversionOptionsUpdate {
 
 impl ConversionOptions {
     /// Apply a partial update to these conversion options.
+    #[cfg_attr(alef, alef(skip))]
     pub fn apply_update(&mut self, update: ConversionOptionsUpdate) {
         macro_rules! apply {
             ($field:ident) => {
@@ -486,6 +490,7 @@ impl ConversionOptions {
 
     /// Create from a partial update, applying to defaults.
     #[must_use]
+    #[cfg_attr(alef, alef(skip))]
     pub fn from_update(update: ConversionOptionsUpdate) -> Self {
         let mut options = Self::default();
         options.apply_update(update);

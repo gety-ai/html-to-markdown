@@ -21,20 +21,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   });
 
   CrossPlatformFinalizerArg
-      get rust_arc_decrement_strong_count_ConversionOptionsBuilderPtr => wire
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConversionOptionsBuilder;
-
-  CrossPlatformFinalizerArg
       get rust_arc_decrement_strong_count_VisitorHandlePtr => wire
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle;
 
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw);
-
-  @protected
-  ConversionOptionsBuilder
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConversionOptionsBuilder(
-          dynamic raw);
 
   @protected
   VisitorHandle
@@ -118,11 +109,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Map<String, String> dco_decode_Map_String_String_None(dynamic raw);
 
   @protected
-  ConversionOptionsBuilder
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConversionOptionsBuilder(
-          dynamic raw);
-
-  @protected
   VisitorHandle
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
           dynamic raw);
@@ -173,10 +159,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   OutputFormat dco_decode_box_autoadd_output_format(dynamic raw);
-
-  @protected
-  PreprocessingOptions dco_decode_box_autoadd_preprocessing_options(
-      dynamic raw);
 
   @protected
   PreprocessingOptionsUpdate
@@ -431,11 +413,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
 
   @protected
-  ConversionOptionsBuilder
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConversionOptionsBuilder(
-          SseDeserializer deserializer);
-
-  @protected
   VisitorHandle
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
           SseDeserializer deserializer);
@@ -446,11 +423,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   Map<String, String> sse_decode_Map_String_String_None(
       SseDeserializer deserializer);
-
-  @protected
-  ConversionOptionsBuilder
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConversionOptionsBuilder(
-          SseDeserializer deserializer);
 
   @protected
   VisitorHandle
@@ -510,10 +482,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   OutputFormat sse_decode_box_autoadd_output_format(
-      SseDeserializer deserializer);
-
-  @protected
-  PreprocessingOptions sse_decode_box_autoadd_preprocessing_options(
       SseDeserializer deserializer);
 
   @protected
@@ -801,11 +769,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConversionOptionsBuilder(
-          ConversionOptionsBuilder self, SseSerializer serializer);
-
-  @protected
-  void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
           VisitorHandle self, SseSerializer serializer);
 
@@ -908,11 +871,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConversionOptionsBuilder(
-          ConversionOptionsBuilder self, SseSerializer serializer);
-
-  @protected
-  void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
           VisitorHandle self, SseSerializer serializer);
 
@@ -973,10 +931,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_output_format(
       OutputFormat self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_box_autoadd_preprocessing_options(
-      PreprocessingOptions self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_preprocessing_options_update(
@@ -1279,18 +1233,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 class RustLibWire implements BaseWire {
   RustLibWire.fromExternalLibrary(ExternalLibrary lib);
 
-  void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConversionOptionsBuilder(
-          int ptr) =>
-      wasmModule
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConversionOptionsBuilder(
-              ptr);
-
-  void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConversionOptionsBuilder(
-          int ptr) =>
-      wasmModule
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConversionOptionsBuilder(
-              ptr);
-
   void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
           int ptr) =>
       wasmModule
@@ -1310,14 +1252,6 @@ external RustLibWasmModule get wasmModule;
 @JS()
 @anonymous
 extension type RustLibWasmModule._(JSObject _) implements JSObject {
-  external void
-      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConversionOptionsBuilder(
-          int ptr);
-
-  external void
-      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerConversionOptionsBuilder(
-          int ptr);
-
   external void
       rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
           int ptr);

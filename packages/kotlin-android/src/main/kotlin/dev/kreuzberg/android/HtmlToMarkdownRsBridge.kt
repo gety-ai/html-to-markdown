@@ -7,13 +7,4 @@ object HtmlToMarkdownRsBridge {
     init { System.loadLibrary("htm_jni") }
 
     external fun nativeConvert(html: String, options: String): String
-
-    // JNI external funs for client instance methods.
-    external fun nativeConversionOptionsBuilderStripTags(handle: Long, requestJson: String): String
-    external fun nativeConversionOptionsBuilderPreserveTags(handle: Long, requestJson: String): String
-    external fun nativeConversionOptionsBuilderKeepInlineImagesIn(handle: Long, requestJson: String): String
-    external fun nativeConversionOptionsBuilderExcludeSelectors(handle: Long, requestJson: String): String
-    external fun nativeConversionOptionsBuilderPreprocessing(handle: Long, requestJson: String): String
-    external fun nativeConversionOptionsBuilderBuild(handle: Long): String
-    external fun nativeFreeConversionOptionsBuilder(handle: Long)
 }

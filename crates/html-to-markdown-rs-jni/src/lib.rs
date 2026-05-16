@@ -10,6 +10,8 @@
 #![allow(unused_variables)]
 #![allow(unused_mut)]
 #![allow(dead_code)]
+#![allow(clippy::let_unit_value)]
+#![allow(clippy::unused_unit)]
 
 use futures_util::StreamExt;
 use futures_util::stream::BoxStream;
@@ -44,6 +46,24 @@ fn string_to_jstring(env: &mut JNIEnv, s: &str) -> jstring {
 
 fn throw_jni_error(env: &mut JNIEnv, msg: &str) {
     let _ = env.throw_new(ERROR_CLASS, msg);
+}
+
+fn run_or_throw<T, F>(env: &mut JNIEnv, f: F) -> Option<T>
+where
+    F: FnOnce() -> T + std::panic::UnwindSafe,
+{
+    match std::panic::catch_unwind(f) {
+        Ok(v) => Some(v),
+        Err(payload) => {
+            let msg = payload
+                .downcast_ref::<String>()
+                .cloned()
+                .or_else(|| payload.downcast_ref::<&str>().map(|s| (*s).to_string()))
+                .unwrap_or_else(|| "panic in native code".to_string());
+            throw_jni_error(env, &format!("native panic: {msg}"));
+            None
+        }
+    }
 }
 
 #[unsafe(no_mangle)]
@@ -90,197 +110,5 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_android_HtmlToMarkdownRsBridge_
             };
             string_to_jstring(&mut env, &s)
         }
-    }
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_dev_kreuzberg_android_HtmlToMarkdownRsBridge_nativeConversionOptionsBuilderStripTags(
-    mut env: JNIEnv,
-    _class: JClass,
-    handle: jlong,
-    request_json: JString,
-) -> jlong {
-    // SAFETY: handle was allocated by the matching constructor shim and remains
-    // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
-    // ensures the handle outlives this call.
-    let client: core_crate::ConversionOptionsBuilder =
-        unsafe { (*(handle as *const core_crate::ConversionOptionsBuilder)).clone() };
-    let req_str = match jstring_to_string(&mut env, request_json) {
-        Ok(s) => s,
-        Err(e) => {
-            throw_jni_error(&mut env, &format!("{e}"));
-            return 0;
-        }
-    };
-    let tags_vec: Vec<String> = match serde_json::from_str(&req_str) {
-        Ok(v) => v,
-        Err(e) => {
-            throw_jni_error(&mut env, &format!("request deserialize: {e}"));
-            return 0;
-        }
-    };
-    let tags = tags_vec.clone();
-    let v = client.strip_tags(tags);
-    Box::into_raw(Box::new(v)) as jlong
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_dev_kreuzberg_android_HtmlToMarkdownRsBridge_nativeConversionOptionsBuilderPreserveTags(
-    mut env: JNIEnv,
-    _class: JClass,
-    handle: jlong,
-    request_json: JString,
-) -> jlong {
-    // SAFETY: handle was allocated by the matching constructor shim and remains
-    // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
-    // ensures the handle outlives this call.
-    let client: core_crate::ConversionOptionsBuilder =
-        unsafe { (*(handle as *const core_crate::ConversionOptionsBuilder)).clone() };
-    let req_str = match jstring_to_string(&mut env, request_json) {
-        Ok(s) => s,
-        Err(e) => {
-            throw_jni_error(&mut env, &format!("{e}"));
-            return 0;
-        }
-    };
-    let tags_vec: Vec<String> = match serde_json::from_str(&req_str) {
-        Ok(v) => v,
-        Err(e) => {
-            throw_jni_error(&mut env, &format!("request deserialize: {e}"));
-            return 0;
-        }
-    };
-    let tags = tags_vec.clone();
-    let v = client.preserve_tags(tags);
-    Box::into_raw(Box::new(v)) as jlong
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_dev_kreuzberg_android_HtmlToMarkdownRsBridge_nativeConversionOptionsBuilderKeepInlineImagesIn(
-    mut env: JNIEnv,
-    _class: JClass,
-    handle: jlong,
-    request_json: JString,
-) -> jlong {
-    // SAFETY: handle was allocated by the matching constructor shim and remains
-    // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
-    // ensures the handle outlives this call.
-    let client: core_crate::ConversionOptionsBuilder =
-        unsafe { (*(handle as *const core_crate::ConversionOptionsBuilder)).clone() };
-    let req_str = match jstring_to_string(&mut env, request_json) {
-        Ok(s) => s,
-        Err(e) => {
-            throw_jni_error(&mut env, &format!("{e}"));
-            return 0;
-        }
-    };
-    let tags_vec: Vec<String> = match serde_json::from_str(&req_str) {
-        Ok(v) => v,
-        Err(e) => {
-            throw_jni_error(&mut env, &format!("request deserialize: {e}"));
-            return 0;
-        }
-    };
-    let tags = tags_vec.clone();
-    let v = client.keep_inline_images_in(tags);
-    Box::into_raw(Box::new(v)) as jlong
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_dev_kreuzberg_android_HtmlToMarkdownRsBridge_nativeConversionOptionsBuilderExcludeSelectors(
-    mut env: JNIEnv,
-    _class: JClass,
-    handle: jlong,
-    request_json: JString,
-) -> jlong {
-    // SAFETY: handle was allocated by the matching constructor shim and remains
-    // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
-    // ensures the handle outlives this call.
-    let client: core_crate::ConversionOptionsBuilder =
-        unsafe { (*(handle as *const core_crate::ConversionOptionsBuilder)).clone() };
-    let req_str = match jstring_to_string(&mut env, request_json) {
-        Ok(s) => s,
-        Err(e) => {
-            throw_jni_error(&mut env, &format!("{e}"));
-            return 0;
-        }
-    };
-    let selectors_vec: Vec<String> = match serde_json::from_str(&req_str) {
-        Ok(v) => v,
-        Err(e) => {
-            throw_jni_error(&mut env, &format!("request deserialize: {e}"));
-            return 0;
-        }
-    };
-    let selectors = selectors_vec.clone();
-    let v = client.exclude_selectors(selectors);
-    Box::into_raw(Box::new(v)) as jlong
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_dev_kreuzberg_android_HtmlToMarkdownRsBridge_nativeConversionOptionsBuilderPreprocessing(
-    mut env: JNIEnv,
-    _class: JClass,
-    handle: jlong,
-    request_json: JString,
-) -> jlong {
-    // SAFETY: handle was allocated by the matching constructor shim and remains
-    // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
-    // ensures the handle outlives this call.
-    let client: core_crate::ConversionOptionsBuilder =
-        unsafe { (*(handle as *const core_crate::ConversionOptionsBuilder)).clone() };
-    let req_str = match jstring_to_string(&mut env, request_json) {
-        Ok(s) => s,
-        Err(e) => {
-            throw_jni_error(&mut env, &format!("{e}"));
-            return 0;
-        }
-    };
-    let preprocessing: core_crate::PreprocessingOptions = match serde_json::from_str(&req_str) {
-        Ok(v) => v,
-        Err(e) => {
-            throw_jni_error(&mut env, &format!("request deserialize: {e}"));
-            return 0;
-        }
-    };
-    let v = client.preprocessing(preprocessing);
-    Box::into_raw(Box::new(v)) as jlong
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_dev_kreuzberg_android_HtmlToMarkdownRsBridge_nativeConversionOptionsBuilderBuild(
-    mut env: JNIEnv,
-    _class: JClass,
-    handle: jlong,
-) -> jstring {
-    // SAFETY: handle was allocated by the matching constructor shim and remains
-    // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
-    // ensures the handle outlives this call.
-    let client: core_crate::ConversionOptionsBuilder =
-        unsafe { (*(handle as *const core_crate::ConversionOptionsBuilder)).clone() };
-    let v = client.build();
-    let s = match serde_json::to_string(&v) {
-        Ok(s) => s,
-        Err(e) => {
-            throw_jni_error(&mut env, &format!("serialize: {e}"));
-            return std::ptr::null_mut();
-        }
-    };
-    string_to_jstring(&mut env, &s)
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_dev_kreuzberg_android_HtmlToMarkdownRsBridge_nativeFreeConversionOptionsBuilder(
-    _env: JNIEnv,
-    _class: JClass,
-    handle: jlong,
-) {
-    if handle == 0 {
-        return;
-    }
-    // SAFETY: `handle` was allocated by the matching constructor shim and
-    // ownership is transferred back here for drop via Box::from_raw.
-    unsafe {
-        let _ = Box::from_raw(handle as *mut core_crate::ConversionOptionsBuilder);
     }
 }

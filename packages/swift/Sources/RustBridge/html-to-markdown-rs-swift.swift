@@ -1,26 +1,5 @@
 import RustBridgeC
 
-public func conversionOptionsBuilderStripTags<GenericIntoRustString: IntoRustString>(_ client: ConversionOptionsBuilderRef, _ tags: RustVec<GenericIntoRustString>) -> ConversionOptionsBuilder {
-    ConversionOptionsBuilder(ptr: __swift_bridge__$conversion_options_builder_strip_tags(client.ptr, { let val = tags; val.isOwned = false; return val.ptr }()))
-}
-public func conversionOptionsBuilderPreserveTags<GenericIntoRustString: IntoRustString>(_ client: ConversionOptionsBuilderRef, _ tags: RustVec<GenericIntoRustString>) -> ConversionOptionsBuilder {
-    ConversionOptionsBuilder(ptr: __swift_bridge__$conversion_options_builder_preserve_tags(client.ptr, { let val = tags; val.isOwned = false; return val.ptr }()))
-}
-public func conversionOptionsBuilderKeepInlineImagesIn<GenericIntoRustString: IntoRustString>(_ client: ConversionOptionsBuilderRef, _ tags: RustVec<GenericIntoRustString>) -> ConversionOptionsBuilder {
-    ConversionOptionsBuilder(ptr: __swift_bridge__$conversion_options_builder_keep_inline_images_in(client.ptr, { let val = tags; val.isOwned = false; return val.ptr }()))
-}
-public func conversionOptionsBuilderExcludeSelectors<GenericIntoRustString: IntoRustString>(_ client: ConversionOptionsBuilderRef, _ selectors: RustVec<GenericIntoRustString>) -> ConversionOptionsBuilder {
-    ConversionOptionsBuilder(ptr: __swift_bridge__$conversion_options_builder_exclude_selectors(client.ptr, { let val = selectors; val.isOwned = false; return val.ptr }()))
-}
-public func conversionOptionsBuilderVisitor(_ client: ConversionOptionsBuilderRef, _ visitor: Optional<VisitorHandle>) -> ConversionOptionsBuilder {
-    ConversionOptionsBuilder(ptr: __swift_bridge__$conversion_options_builder_visitor(client.ptr, { if let val = visitor { val.isOwned = false; return val.ptr } else { return nil } }()))
-}
-public func conversionOptionsBuilderPreprocessing(_ client: ConversionOptionsBuilderRef, _ preprocessing: PreprocessingOptions) -> ConversionOptionsBuilder {
-    ConversionOptionsBuilder(ptr: __swift_bridge__$conversion_options_builder_preprocessing(client.ptr, {preprocessing.isOwned = false; return preprocessing.ptr;}()))
-}
-public func conversionOptionsBuilderBuild(_ client: ConversionOptionsBuilderRef) -> ConversionOptions {
-    ConversionOptions(ptr: __swift_bridge__$conversion_options_builder_build(client.ptr))
-}
 public func convert<GenericIntoRustString: IntoRustString>(_ html: GenericIntoRustString, _ options: Optional<ConversionOptions>) throws -> ConversionResult {
     try { let val = __swift_bridge__$convert({ let rustString = html.intoRustString(); rustString.isOwned = false; return rustString.ptr }(), { if let val = options { val.isOwned = false; return val.ptr } else { return nil } }()); if val.is_ok { return ConversionResult(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
@@ -238,9 +217,6 @@ public func conversionOptionsFromJson<GenericIntoRustString: IntoRustString>(_ j
 }
 public func conversionOptionsUpdateFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> ConversionOptionsUpdate {
     try { let val = __swift_bridge__$conversion_options_update_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return ConversionOptionsUpdate(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
-}
-public func preprocessingOptionsFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> PreprocessingOptions {
-    try { let val = __swift_bridge__$preprocessing_options_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return PreprocessingOptions(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
 public func preprocessingOptionsUpdateFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> PreprocessingOptionsUpdate {
     try { let val = __swift_bridge__$preprocessing_options_update_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return PreprocessingOptionsUpdate(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
@@ -1100,81 +1076,6 @@ extension ConversionOptions: Vectorizable {
 
     public static func vecOfSelfLen(vecPtr: UnsafeMutableRawPointer) -> UInt {
         __swift_bridge__$Vec_ConversionOptions$len(vecPtr)
-    }
-}
-
-
-public class ConversionOptionsBuilder: ConversionOptionsBuilderRefMut {
-    var isOwned: Bool = true
-
-    public override init(ptr: UnsafeMutableRawPointer) {
-        super.init(ptr: ptr)
-    }
-
-    deinit {
-        if isOwned {
-            __swift_bridge__$ConversionOptionsBuilder$_free(ptr)
-        }
-    }
-}
-public class ConversionOptionsBuilderRefMut: ConversionOptionsBuilderRef {
-    public override init(ptr: UnsafeMutableRawPointer) {
-        super.init(ptr: ptr)
-    }
-}
-public class ConversionOptionsBuilderRef {
-    var ptr: UnsafeMutableRawPointer
-
-    public init(ptr: UnsafeMutableRawPointer) {
-        self.ptr = ptr
-    }
-}
-extension ConversionOptionsBuilder: Vectorizable {
-    public static func vecOfSelfNew() -> UnsafeMutableRawPointer {
-        __swift_bridge__$Vec_ConversionOptionsBuilder$new()
-    }
-
-    public static func vecOfSelfFree(vecPtr: UnsafeMutableRawPointer) {
-        __swift_bridge__$Vec_ConversionOptionsBuilder$drop(vecPtr)
-    }
-
-    public static func vecOfSelfPush(vecPtr: UnsafeMutableRawPointer, value: ConversionOptionsBuilder) {
-        __swift_bridge__$Vec_ConversionOptionsBuilder$push(vecPtr, {value.isOwned = false; return value.ptr;}())
-    }
-
-    public static func vecOfSelfPop(vecPtr: UnsafeMutableRawPointer) -> Optional<Self> {
-        let pointer = __swift_bridge__$Vec_ConversionOptionsBuilder$pop(vecPtr)
-        if pointer == nil {
-            return nil
-        } else {
-            return (ConversionOptionsBuilder(ptr: pointer!) as! Self)
-        }
-    }
-
-    public static func vecOfSelfGet(vecPtr: UnsafeMutableRawPointer, index: UInt) -> Optional<ConversionOptionsBuilderRef> {
-        let pointer = __swift_bridge__$Vec_ConversionOptionsBuilder$get(vecPtr, index)
-        if pointer == nil {
-            return nil
-        } else {
-            return ConversionOptionsBuilderRef(ptr: pointer!)
-        }
-    }
-
-    public static func vecOfSelfGetMut(vecPtr: UnsafeMutableRawPointer, index: UInt) -> Optional<ConversionOptionsBuilderRefMut> {
-        let pointer = __swift_bridge__$Vec_ConversionOptionsBuilder$get_mut(vecPtr, index)
-        if pointer == nil {
-            return nil
-        } else {
-            return ConversionOptionsBuilderRefMut(ptr: pointer!)
-        }
-    }
-
-    public static func vecOfSelfAsPtr(vecPtr: UnsafeMutableRawPointer) -> UnsafePointer<ConversionOptionsBuilderRef> {
-        UnsafePointer<ConversionOptionsBuilderRef>(OpaquePointer(__swift_bridge__$Vec_ConversionOptionsBuilder$as_ptr(vecPtr)))
-    }
-
-    public static func vecOfSelfLen(vecPtr: UnsafeMutableRawPointer) -> UInt {
-        __swift_bridge__$Vec_ConversionOptionsBuilder$len(vecPtr)
     }
 }
 

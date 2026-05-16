@@ -42,6 +42,7 @@ pub const ConversionError = error {
     Panic,
     InvalidInput,
     Other,
+    OutOfMemory,
 };
 
 /// Document-level metadata extracted from `<head>` and top-level elements.
@@ -49,17 +50,17 @@ pub const ConversionError = error {
 /// Contains all metadata typically used by search engines, social media platforms,
 /// and browsers for document indexing and presentation.
 pub const DocumentMetadata = struct {
-    title: ?[:0]const u8,
-    description: ?[:0]const u8,
-    keywords: []const [:0]const u8,
-    author: ?[:0]const u8,
-    canonical_url: ?[:0]const u8,
-    base_href: ?[:0]const u8,
-    language: ?[:0]const u8,
+    title: ?[]const u8,
+    description: ?[]const u8,
+    keywords: []const []const u8,
+    author: ?[]const u8,
+    canonical_url: ?[]const u8,
+    base_href: ?[]const u8,
+    language: ?[]const u8,
     text_direction: ?TextDirection,
-    open_graph: std.StringHashMap([:0]const u8),
-    twitter_card: std.StringHashMap([:0]const u8),
-    meta_tags: std.StringHashMap([:0]const u8),
+    open_graph: std.StringHashMap([]const u8),
+    twitter_card: std.StringHashMap([]const u8),
+    meta_tags: std.StringHashMap([]const u8),
 };
 
 /// Header element metadata with hierarchy tracking.
@@ -68,8 +69,8 @@ pub const DocumentMetadata = struct {
 /// and position in the document structure.
 pub const HeaderMetadata = struct {
     level: u8,
-    text: [:0]const u8,
-    id: ?[:0]const u8,
+    text: []const u8,
+    id: ?[]const u8,
     depth: u64,
     html_offset: u64,
 };
@@ -78,12 +79,12 @@ pub const HeaderMetadata = struct {
 ///
 /// Represents `<a>` elements with parsed href values, text content, and link type classification.
 pub const LinkMetadata = struct {
-    href: [:0]const u8,
-    text: [:0]const u8,
-    title: ?[:0]const u8,
+    href: []const u8,
+    text: []const u8,
+    title: ?[]const u8,
     link_type: LinkType,
-    rel: []const [:0]const u8,
-    attributes: std.StringHashMap([:0]const u8),
+    rel: []const []const u8,
+    attributes: std.StringHashMap([]const u8),
 };
 
 /// Image metadata with source and dimensions.
@@ -91,12 +92,12 @@ pub const LinkMetadata = struct {
 /// Captures `<img>` elements and inline `<svg>` elements with metadata
 /// for image analysis and optimization.
 pub const ImageMetadata = struct {
-    src: [:0]const u8,
-    alt: ?[:0]const u8,
-    title: ?[:0]const u8,
+    src: []const u8,
+    alt: ?[]const u8,
+    title: ?[]const u8,
     dimensions: ?[]const u32,
     image_type: ImageType,
-    attributes: std.StringHashMap([:0]const u8),
+    attributes: std.StringHashMap([]const u8),
 };
 
 /// Structured data block (JSON-LD, Microdata, or RDFa).
@@ -105,8 +106,8 @@ pub const ImageMetadata = struct {
 /// JSON-LD blocks are collected as raw JSON strings for flexibility.
 pub const StructuredData = struct {
     data_type: StructuredDataType,
-    raw_json: [:0]const u8,
-    schema_type: ?[:0]const u8,
+    raw_json: []const u8,
+    schema_type: ?[]const u8,
 };
 
 /// Comprehensive metadata extraction result from HTML document.
@@ -128,13 +129,13 @@ pub const ConversionOptions = struct {
     heading_style: HeadingStyle,
     list_indent_type: ListIndentType,
     list_indent_width: u64,
-    bullets: [:0]const u8,
-    strong_em_symbol: [:0]const u8,
+    bullets: []const u8,
+    strong_em_symbol: []const u8,
     escape_asterisks: bool,
     escape_underscores: bool,
     escape_misc: bool,
     escape_ascii: bool,
-    code_language: [:0]const u8,
+    code_language: []const u8,
     autolinks: bool,
     default_title: bool,
     br_in_tables: bool,
@@ -145,16 +146,16 @@ pub const ConversionOptions = struct {
     wrap: bool,
     wrap_width: u64,
     convert_as_inline: bool,
-    sub_symbol: [:0]const u8,
-    sup_symbol: [:0]const u8,
+    sub_symbol: []const u8,
+    sup_symbol: []const u8,
     newline_style: NewlineStyle,
     code_block_style: CodeBlockStyle,
-    keep_inline_images_in: []const [:0]const u8,
+    keep_inline_images_in: []const []const u8,
     preprocessing: PreprocessingOptions,
-    encoding: [:0]const u8,
+    encoding: []const u8,
     debug: bool,
-    strip_tags: []const [:0]const u8,
-    preserve_tags: []const [:0]const u8,
+    strip_tags: []const []const u8,
+    preserve_tags: []const []const u8,
     skip_images: bool,
     link_style: LinkStyle,
     output_format: OutputFormat,
@@ -164,7 +165,7 @@ pub const ConversionOptions = struct {
     capture_svg: bool,
     infer_dimensions: bool,
     max_depth: ?u64,
-    exclude_selectors: []const [:0]const u8,
+    exclude_selectors: []const []const u8,
     visitor: ?VisitorHandle,
 };
 
@@ -176,13 +177,13 @@ pub const ConversionOptionsUpdate = struct {
     heading_style: ?HeadingStyle,
     list_indent_type: ?ListIndentType,
     list_indent_width: ?u64,
-    bullets: ?[:0]const u8,
-    strong_em_symbol: ?[:0]const u8,
+    bullets: ?[]const u8,
+    strong_em_symbol: ?[]const u8,
     escape_asterisks: ?bool,
     escape_underscores: ?bool,
     escape_misc: ?bool,
     escape_ascii: ?bool,
-    code_language: ?[:0]const u8,
+    code_language: ?[]const u8,
     autolinks: ?bool,
     default_title: ?bool,
     br_in_tables: ?bool,
@@ -193,16 +194,16 @@ pub const ConversionOptionsUpdate = struct {
     wrap: ?bool,
     wrap_width: ?u64,
     convert_as_inline: ?bool,
-    sub_symbol: ?[:0]const u8,
-    sup_symbol: ?[:0]const u8,
+    sub_symbol: ?[]const u8,
+    sup_symbol: ?[]const u8,
     newline_style: ?NewlineStyle,
     code_block_style: ?CodeBlockStyle,
-    keep_inline_images_in: ?[]const [:0]const u8,
+    keep_inline_images_in: ?[]const []const u8,
     preprocessing: ?PreprocessingOptionsUpdate,
-    encoding: ?[:0]const u8,
+    encoding: ?[]const u8,
     debug: ?bool,
-    strip_tags: ?[]const [:0]const u8,
-    preserve_tags: ?[]const [:0]const u8,
+    strip_tags: ?[]const []const u8,
+    preserve_tags: ?[]const []const u8,
     skip_images: ?bool,
     link_style: ?LinkStyle,
     output_format: ?OutputFormat,
@@ -211,8 +212,8 @@ pub const ConversionOptionsUpdate = struct {
     max_image_size: ?u64,
     capture_svg: ?bool,
     infer_dimensions: ?bool,
-    max_depth: ??u64,
-    exclude_selectors: ?[]const [:0]const u8,
+    max_depth: ?u64,
+    exclude_selectors: ?[]const []const u8,
     visitor: ?VisitorHandle,
 };
 
@@ -241,17 +242,17 @@ pub const PreprocessingOptionsUpdate = struct {
 /// Uses a flat node array with index-based parent/child references for efficient traversal.
 pub const DocumentStructure = struct {
     nodes: []const DocumentNode,
-    source_format: ?[:0]const u8,
+    source_format: ?[]const u8,
 };
 
 /// A single node in the document tree.
 pub const DocumentNode = struct {
-    id: [:0]const u8,
+    id: []const u8,
     content: NodeContent,
     parent: ?u32,
     children: []const u32,
     annotations: []const TextAnnotation,
-    attributes: ?std.StringHashMap([:0]const u8),
+    attributes: ?std.StringHashMap([]const u8),
 };
 
 /// An inline text annotation with byte-range offsets.
@@ -268,11 +269,11 @@ pub const TextAnnotation = struct {
 /// Contains the converted text output, optional structured document tree,
 /// metadata, extracted tables, images, and processing warnings.
 pub const ConversionResult = struct {
-    content: ?[:0]const u8,
+    content: ?[]const u8,
     document: ?DocumentStructure,
     metadata: HtmlMetadata,
     tables: []const TableData,
-    images: []const [:0]const u8,
+    images: []const []const u8,
     warnings: []const ProcessingWarning,
 };
 
@@ -285,7 +286,7 @@ pub const TableGrid = struct {
 
 /// A single cell in a table grid.
 pub const GridCell = struct {
-    content: [:0]const u8,
+    content: []const u8,
     row: u32,
     col: u32,
     row_span: u32,
@@ -296,12 +297,12 @@ pub const GridCell = struct {
 /// A top-level extracted table with both structured data and markdown representation.
 pub const TableData = struct {
     grid: TableGrid,
-    markdown: [:0]const u8,
+    markdown: []const u8,
 };
 
 /// A non-fatal warning generated during HTML processing.
 pub const ProcessingWarning = struct {
-    message: [:0]const u8,
+    message: []const u8,
     kind: WarningKind,
 };
 
@@ -311,11 +312,11 @@ pub const ProcessingWarning = struct {
 /// including its type, attributes, position in the DOM tree, and parent context.
 pub const NodeContext = struct {
     node_type: NodeType,
-    tag_name: [:0]const u8,
-    attributes: std.StringHashMap([:0]const u8),
+    tag_name: []const u8,
+    attributes: std.StringHashMap([]const u8),
     depth: u64,
     index_in_parent: u64,
-    parent_tag: ?[:0]const u8,
+    parent_tag: ?[]const u8,
     is_inline: bool,
 };
 
@@ -323,8 +324,8 @@ pub const NodeContext = struct {
 ///
 /// Corresponds to the HTML `dir` attribute and `bdi` element directionality.
 pub const TextDirection = enum {
-    left_to_right,
-    right_to_left,
+    ltr,
+    rtl,
     auto,
 };
 
@@ -356,7 +357,7 @@ pub const ImageType = enum {
 pub const StructuredDataType = enum {
     json_ld,
     microdata,
-    r_d_fa,
+    rdfa,
 };
 
 /// HTML preprocessing aggressiveness level.
@@ -444,36 +445,36 @@ pub const OutputFormat = enum {
 pub const NodeContent = union(enum) {
     heading: struct {
         level: u8,
-        text: [:0]const u8,
+        text: []const u8,
     },
-    paragraph: [:0]const u8,
+    paragraph: []const u8,
     list: bool,
-    list_item: [:0]const u8,
+    list_item: []const u8,
     table: TableGrid,
     image: struct {
-        description: ?[:0]const u8,
-        src: ?[:0]const u8,
+        description: ?[]const u8,
+        src: ?[]const u8,
         image_index: ?u32,
     },
     code: struct {
-        text: [:0]const u8,
-        language: ?[:0]const u8,
+        text: []const u8,
+        language: ?[]const u8,
     },
     quote: void,
     definition_list: void,
     definition_item: struct {
-        term: [:0]const u8,
-        definition: [:0]const u8,
+        term: []const u8,
+        definition: []const u8,
     },
     raw_block: struct {
-        format: [:0]const u8,
-        content: [:0]const u8,
+        format: []const u8,
+        content: []const u8,
     },
-    metadata_block: []const [:0]const u8,
+    metadata_block: []const []const u8,
     group: struct {
-        label: ?[:0]const u8,
+        label: ?[]const u8,
         heading_level: ?u8,
-        heading_text: ?[:0]const u8,
+        heading_text: ?[]const u8,
     },
 };
 
@@ -490,8 +491,8 @@ pub const AnnotationKind = union(enum) {
     superscript: void,
     highlight: void,
     link: struct {
-        url: [:0]const u8,
-        title: ?[:0]const u8,
+        url: []const u8,
+        title: ?[]const u8,
     },
 };
 
@@ -607,10 +608,10 @@ pub const NodeType = enum {
 /// preserving HTML, or signaling errors.
 pub const VisitResult = union(enum) {
     continue_: void,
-    custom: [:0]const u8,
+    custom: []const u8,
     skip: void,
     preserve_html: void,
-    error_: [:0]const u8,
+    error_: []const u8,
 };
 
 /// Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images,
@@ -619,7 +620,7 @@ pub const VisitResult = union(enum) {
 /// **Errors:**
 ///
 /// Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
-pub fn convert(html: []const u8, options: ?[]const u8) (ConversionError||error{OutOfMemory})![]u8 {
+pub fn convert(html: []const u8, options: ?[]const u8) ConversionError![]u8 {
     const html_z = try std.fmt.allocPrintSentinel(
         std.heap.c_allocator, "{s}", .{html}, 0);
     defer std.heap.c_allocator.free(html_z);
@@ -1141,79 +1142,6 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
     };
 }
-
-/// Builder for `ConversionOptions`.
-///
-/// All fields start with default values. Call `.build()` to produce the final options.
-pub const ConversionOptionsBuilder = struct {
-    _handle: *anyopaque,
-
-    /// Set the list of HTML tag names whose content is stripped from output.
-    pub fn strip_tags(self: *ConversionOptionsBuilder, tags: []const u8) error{OutOfMemory}!ConversionOptionsBuilder {
-        const tags_z = try std.heap.c_allocator.dupeZ(u8, tags);
-        defer std.heap.c_allocator.free(tags_z);
-        const _result = c.htm_conversion_options_builder_strip_tags(@as(*c.HTMConversionOptionsBuilder, @ptrCast(self._handle)), tags_z);
-        return ConversionOptionsBuilder{ ._handle = _result.? };
-    }
-
-    /// Set the list of HTML tag names that are preserved verbatim in output.
-    pub fn preserve_tags(self: *ConversionOptionsBuilder, tags: []const u8) error{OutOfMemory}!ConversionOptionsBuilder {
-        const tags_z = try std.heap.c_allocator.dupeZ(u8, tags);
-        defer std.heap.c_allocator.free(tags_z);
-        const _result = c.htm_conversion_options_builder_preserve_tags(@as(*c.HTMConversionOptionsBuilder, @ptrCast(self._handle)), tags_z);
-        return ConversionOptionsBuilder{ ._handle = _result.? };
-    }
-
-    /// Set the list of HTML tag names whose `<img>` children are kept inline.
-    pub fn keep_inline_images_in(self: *ConversionOptionsBuilder, tags: []const u8) error{OutOfMemory}!ConversionOptionsBuilder {
-        const tags_z = try std.heap.c_allocator.dupeZ(u8, tags);
-        defer std.heap.c_allocator.free(tags_z);
-        const _result = c.htm_conversion_options_builder_keep_inline_images_in(@as(*c.HTMConversionOptionsBuilder, @ptrCast(self._handle)), tags_z);
-        return ConversionOptionsBuilder{ ._handle = _result.? };
-    }
-
-    /// Set the list of CSS selectors for elements to exclude entirely from output.
-    pub fn exclude_selectors(self: *ConversionOptionsBuilder, selectors: []const u8) error{OutOfMemory}!ConversionOptionsBuilder {
-        const selectors_z = try std.heap.c_allocator.dupeZ(u8, selectors);
-        defer std.heap.c_allocator.free(selectors_z);
-        const _result = c.htm_conversion_options_builder_exclude_selectors(@as(*c.HTMConversionOptionsBuilder, @ptrCast(self._handle)), selectors_z);
-        return ConversionOptionsBuilder{ ._handle = _result.? };
-    }
-
-    /// Set the visitor used during conversion.
-    pub fn visitor(self: *ConversionOptionsBuilder, value: ?VisitorHandle) error{OutOfMemory}!ConversionOptionsBuilder {
-        const _result = c.htm_conversion_options_builder_visitor(@as(*c.HTMConversionOptionsBuilder, @ptrCast(self._handle)), value);
-        return ConversionOptionsBuilder{ ._handle = _result.? };
-    }
-
-    /// Set the pre-processing options applied to the HTML before conversion.
-    pub fn preprocessing(self: *ConversionOptionsBuilder, value: []const u8) error{OutOfMemory}!ConversionOptionsBuilder {
-        const value_z = try std.heap.c_allocator.dupeZ(u8, value);
-        defer std.heap.c_allocator.free(value_z);
-        const value_handle = c.htm_preprocessing_options_from_json(value_z.ptr);
-        c.htm_preprocessing_options_free(value_handle);
-        const _result = c.htm_conversion_options_builder_preprocessing(@as(*c.HTMConversionOptionsBuilder, @ptrCast(self._handle)), value_handle);
-        return ConversionOptionsBuilder{ ._handle = _result.? };
-    }
-
-    /// Build the final `ConversionOptions`.
-    pub fn build(self: *ConversionOptionsBuilder) error{OutOfMemory}![]u8 {
-        const _result = c.htm_conversion_options_builder_build(@as(*c.HTMConversionOptionsBuilder, @ptrCast(self._handle)));
-        return blk: {
-            const _json_ptr = c.htm_conversion_options_to_json(_result);
-            const _json_slice = std.mem.span(_json_ptr);
-            const owned = try std.heap.c_allocator.dupe(u8, _json_slice);
-            c.htm_free_string(_json_ptr);
-            c.htm_conversion_options_free(_result);
-            break :blk owned;
-        };
-    }
-
-    /// Release the underlying FFI handle. Safe to call once per instance.
-    pub fn free(self: *ConversionOptionsBuilder) void {
-        c.htm_conversion_options_builder_free(@as(*c.HTMConversionOptionsBuilder, @ptrCast(self._handle)));
-    }
-};
 
 /// Type alias for a visitor handle (`Arc`-wrapped `Mutex` for thread-safe shared mutation).
 ///

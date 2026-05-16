@@ -8,23 +8,23 @@ package dev.kreuzberg.android
 sealed class ConversionError(message: String) : Exception(message) {
     data class ParseError(
         val field0: String
-    ) : ConversionError("HTML parsing error: {0}")
+    ) : ConversionError("HTML parsing error: ${field0}")
     data class SanitizationError(
         val field0: String
-    ) : ConversionError("Sanitization error: {0}")
+    ) : ConversionError("Sanitization error: ${field0}")
     data class ConfigError(
         val field0: String
-    ) : ConversionError("Invalid configuration: {0}")
+    ) : ConversionError("Invalid configuration: ${field0}")
     data class IoError(
         val field0: String
-    ) : ConversionError("I/O error: {0}")
+    ) : ConversionError("I/O error: ${field0}")
     data class Panic(
         val field0: String
-    ) : ConversionError("Internal panic: {0}")
+    ) : ConversionError("Internal panic: ${field0}")
     data class InvalidInput(
         val field0: String
-    ) : ConversionError("Invalid input: {0}")
+    ) : ConversionError("Invalid input: ${field0}")
     data class Other(
         val field0: String
-    ) : ConversionError("Conversion error: {0}")
+    ) : ConversionError("Conversion error: ${field0}")
 }

@@ -119,23 +119,6 @@ pub struct ConversionOptions {
     pub visitor: Option<VisitorHandle>,
 }
 
-#[frb(opaque)]
-pub struct ConversionOptionsBuilder {
-    pub(crate) inner: html_to_markdown_rs::options::ConversionOptionsBuilder,
-}
-
-impl From<html_to_markdown_rs::options::ConversionOptionsBuilder> for ConversionOptionsBuilder {
-    fn from(inner: html_to_markdown_rs::options::ConversionOptionsBuilder) -> Self {
-        Self { inner }
-    }
-}
-
-impl From<ConversionOptionsBuilder> for html_to_markdown_rs::options::ConversionOptionsBuilder {
-    fn from(value: ConversionOptionsBuilder) -> Self {
-        value.inner
-    }
-}
-
 #[frb(mirror(ConversionOptionsUpdate))]
 pub struct ConversionOptionsUpdate {
     pub heading_style: Option<HeadingStyle>,
@@ -285,39 +268,6 @@ pub struct NodeContext {
     pub index_in_parent: i64,
     pub parent_tag: Option<String>,
     pub is_inline: bool,
-}
-
-impl ConversionOptionsBuilder {
-    #[frb]
-    pub fn strip_tags(self, tags: Vec<String>) -> ConversionOptionsBuilder {
-        (|v| ConversionOptionsBuilder::from(v))(self.inner.strip_tags(tags))
-    }
-    #[frb]
-    pub fn preserve_tags(self, tags: Vec<String>) -> ConversionOptionsBuilder {
-        (|v| ConversionOptionsBuilder::from(v))(self.inner.preserve_tags(tags))
-    }
-    #[frb]
-    pub fn keep_inline_images_in(self, tags: Vec<String>) -> ConversionOptionsBuilder {
-        (|v| ConversionOptionsBuilder::from(v))(self.inner.keep_inline_images_in(tags))
-    }
-    #[frb]
-    pub fn exclude_selectors(self, selectors: Vec<String>) -> ConversionOptionsBuilder {
-        (|v| ConversionOptionsBuilder::from(v))(self.inner.exclude_selectors(selectors))
-    }
-    #[frb]
-    pub fn visitor(self, visitor: Option<VisitorHandle>) -> ConversionOptionsBuilder {
-        (|v| ConversionOptionsBuilder::from(v))(self.inner.visitor(visitor.map(|h| h.inner)))
-    }
-    #[frb]
-    pub fn preprocessing(self, preprocessing: PreprocessingOptions) -> ConversionOptionsBuilder {
-        (|v| ConversionOptionsBuilder::from(v))(self.inner.preprocessing(unsafe {
-            ::std::mem::transmute::<PreprocessingOptions, html_to_markdown_rs::PreprocessingOptions>(preprocessing)
-        }))
-    }
-    #[frb]
-    pub fn build(self) -> ConversionOptions {
-        (|v| ConversionOptions::from(v))(self.inner.build())
-    }
 }
 
 #[frb(mirror(TextDirection))]
