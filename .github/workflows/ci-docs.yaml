@@ -37,6 +37,7 @@ jobs:
         with:
           working-directory: .
           strict: "true"
+          validate-snippets: "true"
 
   build:
     runs-on: ubuntu-latest

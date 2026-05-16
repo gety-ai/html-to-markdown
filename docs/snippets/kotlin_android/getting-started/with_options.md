@@ -1,12 +1,15 @@
 ```kotlin
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import dev.kreuzberg.android.ConversionOptions
 import dev.kreuzberg.android.HtmlToMarkdownRs
 
-val mapper = ObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+val mapper = ObjectMapper()
+    .registerKotlinModule()
+    .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
 val options = mapper.readValue(
-    "{\"heading_style\":\"atx\",\"list_indent_width\":2,\"wrap\":true}",
+    "{\"heading_style\":\"Atx\",\"list_indent_width\":2,\"wrap\":true}",
     ConversionOptions::class.java,
 )
 
