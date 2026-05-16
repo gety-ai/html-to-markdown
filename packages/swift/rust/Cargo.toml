@@ -16,14 +16,21 @@ ignored = ["async-trait", "serde"]
 
 [lib]
 crate-type = ["cdylib", "staticlib"]
+# The `extern "Swift"` block emits linker references that are only resolvable
+# when the crate is linked into a Swift target. `cargo test --workspace` on
+# pure-Rust runners (e.g. windows-latest) would otherwise fail with
+# undefined `__swift_bridge__$*$alef_visit_*` symbols.
+test = false
+doctest = false
+bench = false
 
 [dependencies]
-html_to_markdown_rs = { path = "../../../crates/html-to-markdown", features = ["full"], package = "html-to-markdown-rs" }
 async-trait = "0.1"
+html_to_markdown_rs = { path = "../../../crates/html-to-markdown", features = ["full"], package = "html-to-markdown-rs" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tokio = { version = "1", features = ["rt", "macros"] }
 swift-bridge = "0.1.59"
+tokio = { version = "1", features = ["rt", "macros"] }
 
 [build-dependencies]
 swift-bridge-build = "0.1.59"
