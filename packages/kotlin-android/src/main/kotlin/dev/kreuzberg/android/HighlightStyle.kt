@@ -8,8 +8,20 @@ package dev.kreuzberg.android
  * Controls how highlighted text is rendered in Markdown output.
  */
 enum class HighlightStyle {
+    /**
+     * Double equals syntax (==text==). Default. Pandoc-compatible.
+     */
     DOUBLE_EQUAL,
+    /**
+     * Preserve as HTML (==text==). Original HTML tag.
+     */
     HTML,
+    /**
+     * Render as bold (**text**). Uses strong emphasis.
+     */
     BOLD,
-    NONE,
+    /**
+     * Strip formatting, render as plain text. No markup.
+     */
+    NONE;
 }

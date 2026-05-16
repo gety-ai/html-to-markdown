@@ -8,8 +8,20 @@ package dev.kreuzberg.android
  * Determines whether an image is embedded (data URI), inline SVG, external, or relative.
  */
 enum class ImageType {
+    /**
+     * Data URI embedded image (base64 or other encoding)
+     */
     DATA_URI,
+    /**
+     * Inline SVG element
+     */
     INLINE_SVG,
+    /**
+     * External image URL (http/https)
+     */
     EXTERNAL,
-    RELATIVE,
+    /**
+     * Relative image path
+     */
+    RELATIVE;
 }

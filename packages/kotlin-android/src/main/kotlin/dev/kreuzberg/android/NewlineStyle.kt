@@ -8,6 +8,12 @@ package dev.kreuzberg.android
  * Controls how soft line breaks (from `<br>` or line breaks in source) are rendered.
  */
 enum class NewlineStyle {
+    /**
+     * Two trailing spaces at end of line. Default. Standard Markdown syntax.
+     */
     SPACES,
-    BACKSLASH,
+    /**
+     * Backslash at end of line. Alternative Markdown syntax.
+     */
+    BACKSLASH;
 }

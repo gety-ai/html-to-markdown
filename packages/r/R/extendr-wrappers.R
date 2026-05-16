@@ -139,17 +139,17 @@ StructuredData <- new.env(parent = emptyenv())
 #' @field br_in_tables Render `<br>` elements inside table cells as literal line breaks.
 #' @field highlight_style Style used for `<mark>` / highlighted text (e.g. `==text==`).
 #' @field extract_metadata Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open Graph, Twitter Card, JSON-LD, …).
-#' @field whitespace_mode Controls how whitespace is normalised during conversion.
+#' @field whitespace_mode Controls how whitespace sequences are normalised in the converted output.
 #' @field strip_newlines Strip all newlines from the output, producing a single-line result.
 #' @field wrap Wrap long lines at [`wrap_width`](Self::wrap_width) characters.
-#' @field wrap_width Maximum line width when [`wrap`](Self::wrap) is enabled (default `80`).
+#' @field wrap_width Maximum output line width in characters when [`wrap`](Self::wrap) is `true` (default `80`).
 #' @field convert_as_inline Treat the entire document as inline content (no block-level wrappers).
 #' @field sub_symbol Markdown notation for subscript text (e.g. `"~"`).
 #' @field sup_symbol Markdown notation for superscript text (e.g. `"^"`).
 #' @field newline_style How to encode hard line breaks (`<br>`) in Markdown.
 #' @field code_block_style Style used for fenced code blocks (backticks or tilde).
 #' @field keep_inline_images_in HTML tag names whose `<img>` children are kept inline instead of block.
-#' @field preprocessing Pre-processing options applied to the HTML before conversion.
+#' @field preprocessing Options for the HTML pre-processing pass applied before conversion begins.
 #' @field encoding Expected character encoding of the input HTML (default `"utf-8"`).
 #' @field debug Emit debug information during conversion.
 #' @field strip_tags HTML tag names whose content is stripped from the output entirely.
@@ -270,9 +270,20 @@ PreprocessingOptionsUpdate$from_json <- function(json) .Call("wrap__Preprocessin
 }
 #' @export
 `[[.PreprocessingOptionsUpdate` <- `$.PreprocessingOptionsUpdate`
-#' An inline text annotation with byte-range offsets
+#' A styling or semantic annotation that applies to a byte range within a node's text
 #'
-#' Annotations describe formatting (bold, italic, etc.) and links within a node's text content.
+#' Unlike [`DocumentNode`], which captures block-level structure (headings, paragraphs, etc.),
+#' a `TextAnnotation` describes inline-level markup — bold, italic, links, code spans, and
+#' similar — that spans a contiguous run of bytes inside `DocumentNode::content`'s text field.
+#'
+#' Byte offsets (`start`..`end`) are into the UTF-8 encoded text of the parent node. The range
+#' follows Rust slice conventions: `start` is inclusive and `end` is exclusive, so the annotated
+#' text is `text[start as usize..end as usize]`.
+#'
+#' Multiple annotations on the same node can overlap (e.g. bold-italic text), and they are
+#' stored in the order they are encountered during DOM traversal.
+#'
+#' See [`AnnotationKind`] for the full list of supported annotation types.
 #' @field start Start byte offset (inclusive) into the parent node's text.
 #' @field end End byte offset (exclusive) into the parent node's text.
 #' @field kind The type of annotation.
@@ -316,7 +327,21 @@ TableData <- new.env(parent = emptyenv())
 }
 #' @export
 `[[.TableData` <- `$.TableData`
-#' A non-fatal warning generated during HTML processing
+#' A non-fatal diagnostic produced during HTML conversion
+#'
+#' Warnings indicate that conversion completed but some content may have been handled
+#' differently than expected — for example, an image that could not be extracted, a truncated
+#' input, or malformed HTML that was repaired with best-effort parsing.
+#'
+#' Conversion always succeeds (returns `ConversionResult`) even when warnings are
+#' present. Callers should inspect `warnings` and decide how to
+#' handle them based on their tolerance for partial results:
+#'
+#' - **Logging pipelines**: emit each warning at `WARN` level and continue.
+#' - **Strict pipelines**: treat any warning as a hard error by checking
+#'   `result.warnings.is_empty()` before using the output.
+#'
+#' See [`WarningKind`] for the full taxonomy of warning categories.
 #' @field message Human-readable warning message.
 #' @field kind The category of warning.
 #' @export

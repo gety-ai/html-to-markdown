@@ -8,7 +8,16 @@ package dev.kreuzberg.android
  * Specifies the target markup language format for the conversion output.
  */
 enum class OutputFormat {
+    /**
+     * Standard Markdown (CommonMark compatible). Default.
+     */
     MARKDOWN,
+    /**
+     * Djot lightweight markup language.
+     */
     DJOT,
-    PLAIN,
+    /**
+     * Plain text output (no markup, visible text only).
+     */
+    PLAIN;
 }

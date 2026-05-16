@@ -8,6 +8,12 @@ package dev.kreuzberg.android
  * Controls whether list items are indented with spaces or tabs.
  */
 enum class ListIndentType {
+    /**
+     * Use spaces for indentation. Default. Width controlled by `list_indent_width`.
+     */
     SPACES,
-    TABS,
+    /**
+     * Use tabs for indentation.
+     */
+    TABS;
 }

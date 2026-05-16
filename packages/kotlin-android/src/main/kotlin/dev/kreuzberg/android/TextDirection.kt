@@ -8,7 +8,16 @@ package dev.kreuzberg.android
  * Corresponds to the HTML `dir` attribute and `bdi` element directionality.
  */
 enum class TextDirection {
+    /**
+     * Left-to-right text flow (default for Latin scripts)
+     */
     LEFT_TO_RIGHT,
+    /**
+     * Right-to-left text flow (Hebrew, Arabic, Urdu, etc.)
+     */
     RIGHT_TO_LEFT,
-    AUTO,
+    /**
+     * Automatic directionality detection
+     */
+    AUTO;
 }

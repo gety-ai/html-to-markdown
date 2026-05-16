@@ -8,7 +8,16 @@ package dev.kreuzberg.android
  * Determines how code blocks (`<pre><code>`) are rendered in Markdown.
  */
 enum class CodeBlockStyle {
+    /**
+     * Indented code blocks (4 spaces). `CommonMark` standard.
+     */
     INDENTED,
+    /**
+     * Fenced code blocks with backticks (```). Default (GFM). Supports language hints.
+     */
     BACKTICKS,
-    TILDES,
+    /**
+     * Fenced code blocks with tildes (~~~). Supports language hints.
+     */
+    TILDES;
 }

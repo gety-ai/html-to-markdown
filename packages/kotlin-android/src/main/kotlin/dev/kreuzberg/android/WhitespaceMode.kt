@@ -8,6 +8,12 @@ package dev.kreuzberg.android
  * Determines how sequences of whitespace characters (spaces, tabs, newlines) are processed.
  */
 enum class WhitespaceMode {
+    /**
+     * Collapse multiple whitespace characters to single spaces. Default. Matches browser behavior.
+     */
     NORMALIZED,
-    STRICT,
+    /**
+     * Preserve all whitespace exactly as it appears in the HTML.
+     */
+    STRICT;
 }

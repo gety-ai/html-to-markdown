@@ -8,7 +8,16 @@ package dev.kreuzberg.android
  * Identifies the schema/format used for structured data markup.
  */
 enum class StructuredDataType {
+    /**
+     * JSON-LD (JSON for Linking Data) script blocks
+     */
     JSON_LD,
+    /**
+     * HTML5 Microdata attributes (itemscope, itemtype, itemprop)
+     */
     MICRODATA,
-    R_D_FA,
+    /**
+     * RDF in Attributes (RDFa) markup
+     */
+    R_D_FA;
 }
