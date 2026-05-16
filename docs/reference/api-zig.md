@@ -1,8 +1,8 @@
 ---
-title: "TypeScript API Reference"
+title: "Zig API Reference"
 ---
 
-## TypeScript API Reference <span class="version-badge">v3.5.0</span>
+## Zig API Reference <span class="version-badge">v3.5.0</span>
 
 ### Functions
 
@@ -17,19 +17,19 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 
 **Signature:**
 
-```typescript
-function convert(html: string, options?: ConversionOptions): ConversionResult
+```zig
+pub fn convert(html: [:0]const u8, options: ?ConversionOptions) Error!ConversionResult
 ```
 
 **Parameters:**
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `html` | `string` | Yes | The html |
-| `options` | `ConversionOptions \| null` | No | The options to use |
+| `html` | `[:0]const u8` | Yes | The html |
+| `options` | `ConversionOptions?` | No | The options to use |
 
 **Returns:** `ConversionResult`
-**Errors:** Throws `Error` with a descriptive message.
+**Errors:** Throws `Error`.
 
 ---
 
@@ -45,45 +45,45 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 |-------|------|---------|-------------|
 | `headingStyle` | `HeadingStyle` | `HeadingStyle.Atx` | Heading style to use in Markdown output (ATX `#` or Setext underline). |
 | `listIndentType` | `ListIndentType` | `ListIndentType.Spaces` | How to indent nested list items (spaces or tab). |
-| `listIndentWidth` | `number` | `2` | Number of spaces (or tabs) to use for each level of list indentation. |
-| `bullets` | `string` | `"-*+"` | Bullet character(s) to use for unordered list items (e.g. `"-"`, `"*"`). |
-| `strongEmSymbol` | `string` | `"*"` | Character used for bold/italic emphasis markers (`*` or `_`). |
-| `escapeAsterisks` | `boolean` | `false` | Escape `*` characters in plain text to avoid unintended bold/italic. |
-| `escapeUnderscores` | `boolean` | `false` | Escape `_` characters in plain text to avoid unintended bold/italic. |
-| `escapeMisc` | `boolean` | `false` | Escape miscellaneous Markdown metacharacters (`[]()#` etc.) in plain text. |
-| `escapeAscii` | `boolean` | `false` | Escape ASCII characters that have special meaning in certain Markdown dialects. |
-| `codeLanguage` | `string` | `""` | Default language annotation for fenced code blocks that have no language hint. |
-| `autolinks` | `boolean` | `true` | Automatically convert bare URLs into Markdown autolinks. |
-| `defaultTitle` | `boolean` | `false` | Emit a default title when no `<title>` tag is present. |
-| `brInTables` | `boolean` | `false` | Render `<br>` elements inside table cells as literal line breaks. |
+| `listIndentWidth` | `u64` | `2` | Number of spaces (or tabs) to use for each level of list indentation. |
+| `bullets` | `[:0]const u8` | `"-*+"` | Bullet character(s) to use for unordered list items (e.g. `"-"`, `"*"`). |
+| `strongEmSymbol` | `[:0]const u8` | `"*"` | Character used for bold/italic emphasis markers (`*` or `_`). |
+| `escapeAsterisks` | `bool` | `false` | Escape `*` characters in plain text to avoid unintended bold/italic. |
+| `escapeUnderscores` | `bool` | `false` | Escape `_` characters in plain text to avoid unintended bold/italic. |
+| `escapeMisc` | `bool` | `false` | Escape miscellaneous Markdown metacharacters (`[]()#` etc.) in plain text. |
+| `escapeAscii` | `bool` | `false` | Escape ASCII characters that have special meaning in certain Markdown dialects. |
+| `codeLanguage` | `[:0]const u8` | `""` | Default language annotation for fenced code blocks that have no language hint. |
+| `autolinks` | `bool` | `true` | Automatically convert bare URLs into Markdown autolinks. |
+| `defaultTitle` | `bool` | `false` | Emit a default title when no `<title>` tag is present. |
+| `brInTables` | `bool` | `false` | Render `<br>` elements inside table cells as literal line breaks. |
 | `highlightStyle` | `HighlightStyle` | `HighlightStyle.DoubleEqual` | Style used for `<mark>` / highlighted text (e.g. `==text==`). |
-| `extractMetadata` | `boolean` | `true` | Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open Graph, Twitter Card, JSON-LD, …). Default `true`. Disabling skips the metadata pass only — table extraction into `result.tables` runs unconditionally. |
+| `extractMetadata` | `bool` | `true` | Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open Graph, Twitter Card, JSON-LD, …). Default `true`. Disabling skips the metadata pass only — table extraction into `result.tables` runs unconditionally. |
 | `whitespaceMode` | `WhitespaceMode` | `WhitespaceMode.Normalized` | Controls how whitespace is normalised during conversion. |
-| `stripNewlines` | `boolean` | `false` | Strip all newlines from the output, producing a single-line result. |
-| `wrap` | `boolean` | `false` | Wrap long lines at `wrap_width` characters. |
-| `wrapWidth` | `number` | `80` | Maximum line width when `wrap` is enabled (default `80`). |
-| `convertAsInline` | `boolean` | `false` | Treat the entire document as inline content (no block-level wrappers). |
-| `subSymbol` | `string` | `""` | Markdown notation for subscript text (e.g. `"~"`). |
-| `supSymbol` | `string` | `""` | Markdown notation for superscript text (e.g. `"^"`). |
+| `stripNewlines` | `bool` | `false` | Strip all newlines from the output, producing a single-line result. |
+| `wrap` | `bool` | `false` | Wrap long lines at `wrap_width` characters. |
+| `wrapWidth` | `u64` | `80` | Maximum line width when `wrap` is enabled (default `80`). |
+| `convertAsInline` | `bool` | `false` | Treat the entire document as inline content (no block-level wrappers). |
+| `subSymbol` | `[:0]const u8` | `""` | Markdown notation for subscript text (e.g. `"~"`). |
+| `supSymbol` | `[:0]const u8` | `""` | Markdown notation for superscript text (e.g. `"^"`). |
 | `newlineStyle` | `NewlineStyle` | `NewlineStyle.Spaces` | How to encode hard line breaks (`<br>`) in Markdown. |
 | `codeBlockStyle` | `CodeBlockStyle` | `CodeBlockStyle.Backticks` | Style used for fenced code blocks (backticks or tilde). |
-| `keepInlineImagesIn` | `Array<string>` | `[]` | HTML tag names whose `<img>` children are kept inline instead of block. |
+| `keepInlineImagesIn` | `[]const [:0]const u8` | `[]` | HTML tag names whose `<img>` children are kept inline instead of block. |
 | `preprocessing` | `PreprocessingOptions` | — | Pre-processing options applied to the HTML before conversion. |
-| `encoding` | `string` | `"utf-8"` | Expected character encoding of the input HTML (default `"utf-8"`). |
-| `debug` | `boolean` | `false` | Emit debug information during conversion. |
-| `stripTags` | `Array<string>` | `[]` | HTML tag names whose content is stripped from the output entirely. |
-| `preserveTags` | `Array<string>` | `[]` | HTML tag names that are preserved verbatim in the output. |
-| `skipImages` | `boolean` | `false` | Skip conversion of `<img>` elements (omit images from output). |
+| `encoding` | `[:0]const u8` | `"utf-8"` | Expected character encoding of the input HTML (default `"utf-8"`). |
+| `debug` | `bool` | `false` | Emit debug information during conversion. |
+| `stripTags` | `[]const [:0]const u8` | `[]` | HTML tag names whose content is stripped from the output entirely. |
+| `preserveTags` | `[]const [:0]const u8` | `[]` | HTML tag names that are preserved verbatim in the output. |
+| `skipImages` | `bool` | `false` | Skip conversion of `<img>` elements (omit images from output). |
 | `linkStyle` | `LinkStyle` | `LinkStyle.Inline` | Link rendering style (inline or reference). |
 | `outputFormat` | `OutputFormat` | `OutputFormat.Markdown` | Target output format (Markdown, plain text, etc.). |
-| `includeDocumentStructure` | `boolean` | `false` | Include structured document tree in result. |
-| `extractImages` | `boolean` | `false` | Extract inline images from data URIs and SVGs. |
-| `maxImageSize` | `number` | `5242880` | Maximum decoded image size in bytes (default 5MB). |
-| `captureSvg` | `boolean` | `false` | Capture SVG elements as images. |
-| `inferDimensions` | `boolean` | `true` | Infer image dimensions from data. |
-| `maxDepth` | `number \| null` | `null` | Maximum DOM traversal depth. `null` means unlimited. When set, subtrees beyond this depth are silently truncated. |
-| `excludeSelectors` | `Array<string>` | `[]` | CSS selectors for elements to exclude entirely (element + all content). Unlike `strip_tags` (which removes the tag wrapper but keeps children), excluded elements and all their descendants are dropped from the output. Supports any CSS selector that `tl` supports: tag names, `.class`, `#id`, `[attribute]`, etc. Invalid selectors are silently skipped at conversion time. Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]` |
-| `visitor` | `VisitorHandle \| null` | `null` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
+| `includeDocumentStructure` | `bool` | `false` | Include structured document tree in result. |
+| `extractImages` | `bool` | `false` | Extract inline images from data URIs and SVGs. |
+| `maxImageSize` | `u64` | `5242880` | Maximum decoded image size in bytes (default 5MB). |
+| `captureSvg` | `bool` | `false` | Capture SVG elements as images. |
+| `inferDimensions` | `bool` | `true` | Infer image dimensions from data. |
+| `maxDepth` | `u64?` | `null` | Maximum DOM traversal depth. `null` means unlimited. When set, subtrees beyond this depth are silently truncated. |
+| `excludeSelectors` | `[]const [:0]const u8` | `[]` | CSS selectors for elements to exclude entirely (element + all content). Unlike `strip_tags` (which removes the tag wrapper but keeps children), excluded elements and all their descendants are dropped from the output. Supports any CSS selector that `tl` supports: tag names, `.class`, `#id`, `[attribute]`, etc. Invalid selectors are silently skipped at conversion time. Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]` |
+| `visitor` | `VisitorHandle?` | `null` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
 ##### Methods
 
@@ -91,16 +91,16 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 
 **Signature:**
 
-```typescript
-static default(): ConversionOptions
+```zig
+pub fn default() ConversionOptions
 ```
 
 ###### from()
 
 **Signature:**
 
-```typescript
-static from(update: ConversionOptionsUpdate): ConversionOptions
+```zig
+pub fn from(update: ConversionOptionsUpdate) ConversionOptions
 ```
 
 ---
@@ -114,12 +114,12 @@ metadata, extracted tables, images, and processing warnings.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `content` | `string \| null` | `null` | Converted text output (markdown, djot, or plain text). `null` when `output_format` is set to `OutputFormat.None`, indicating extraction-only mode. |
-| `document` | `DocumentStructure \| null` | `null` | Structured document tree with semantic elements. Populated when `include_document_structure` is `true` in options. |
+| `content` | `[:0]const u8?` | `null` | Converted text output (markdown, djot, or plain text). `null` when `output_format` is set to `OutputFormat.None`, indicating extraction-only mode. |
+| `document` | `DocumentStructure?` | `null` | Structured document tree with semantic elements. Populated when `include_document_structure` is `true` in options. |
 | `metadata` | `HtmlMetadata` | — | Extracted HTML metadata (title, OG, links, images, structured data). |
-| `tables` | `Array<TableData>` | `[]` | Extracted tables with structured cell data and markdown representation. |
-| `images` | `Array<string>` | `[]` | Extracted inline images (data URIs and SVGs). Populated when `extract_images` is `true` in options. |
-| `warnings` | `Array<ProcessingWarning>` | `[]` | Non-fatal processing warnings. |
+| `tables` | `[]const TableData` | `[]` | Extracted tables with structured cell data and markdown representation. |
+| `images` | `[]const [:0]const u8` | `[]` | Extracted inline images (data URIs and SVGs). Populated when `extract_images` is `true` in options. |
+| `warnings` | `[]const ProcessingWarning` | `[]` | Non-fatal processing warnings. |
 
 
 ---
@@ -133,17 +133,17 @@ and browsers for document indexing and presentation.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `title` | `string \| null` | `null` | Document title from `<title>` tag |
-| `description` | `string \| null` | `null` | Document description from `<meta name="description">` tag |
-| `keywords` | `Array<string>` | `[]` | Document keywords from `<meta name="keywords">` tag, split on commas |
-| `author` | `string \| null` | `null` | Document author from `<meta name="author">` tag |
-| `canonicalUrl` | `string \| null` | `null` | Canonical URL from `<link rel="canonical">` tag |
-| `baseHref` | `string \| null` | `null` | Base URL from `<base href="">` tag for resolving relative URLs |
-| `language` | `string \| null` | `null` | Document language from `lang` attribute |
-| `textDirection` | `TextDirection \| null` | `null` | Document text direction from `dir` attribute |
-| `openGraph` | `Record<string, string>` | `{}` | Open Graph metadata (og:* properties) for social media Keys like "title", "description", "image", "url", etc. |
-| `twitterCard` | `Record<string, string>` | `{}` | Twitter Card metadata (twitter:* properties) Keys like "card", "site", "creator", "title", "description", "image", etc. |
-| `metaTags` | `Record<string, string>` | `{}` | Additional meta tags not covered by specific fields Keys are meta name/property attributes, values are content |
+| `title` | `[:0]const u8?` | `null` | Document title from `<title>` tag |
+| `description` | `[:0]const u8?` | `null` | Document description from `<meta name="description">` tag |
+| `keywords` | `[]const [:0]const u8` | `[]` | Document keywords from `<meta name="keywords">` tag, split on commas |
+| `author` | `[:0]const u8?` | `null` | Document author from `<meta name="author">` tag |
+| `canonicalUrl` | `[:0]const u8?` | `null` | Canonical URL from `<link rel="canonical">` tag |
+| `baseHref` | `[:0]const u8?` | `null` | Base URL from `<base href="">` tag for resolving relative URLs |
+| `language` | `[:0]const u8?` | `null` | Document language from `lang` attribute |
+| `textDirection` | `TextDirection?` | `null` | Document text direction from `dir` attribute |
+| `openGraph` | `std.StringHashMap([:0]const u8)` | `{}` | Open Graph metadata (og:* properties) for social media Keys like "title", "description", "image", "url", etc. |
+| `twitterCard` | `std.StringHashMap([:0]const u8)` | `{}` | Twitter Card metadata (twitter:* properties) Keys like "card", "site", "creator", "title", "description", "image", etc. |
+| `metaTags` | `std.StringHashMap([:0]const u8)` | `{}` | Additional meta tags not covered by specific fields Keys are meta name/property attributes, values are content |
 
 
 ---
@@ -154,12 +154,12 @@ A single node in the document tree.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `id` | `string` | — | Deterministic node identifier. |
+| `id` | `[:0]const u8` | — | Deterministic node identifier. |
 | `content` | `NodeContent` | — | The semantic content of this node. |
-| `parent` | `number \| null` | `null` | Index of the parent node (None for root nodes). |
-| `children` | `Array<number>` | — | Indices of child nodes in reading order. |
-| `annotations` | `Array<TextAnnotation>` | — | Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text. |
-| `attributes` | `Record<string, string> \| null` | `null` | Format-specific attributes (e.g. class, id, data-* attributes). |
+| `parent` | `u32?` | `null` | Index of the parent node (None for root nodes). |
+| `children` | `[]const u32` | — | Indices of child nodes in reading order. |
+| `annotations` | `[]const TextAnnotation` | — | Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text. |
+| `attributes` | `std.StringHashMap([:0]const u8)?` | `null` | Format-specific attributes (e.g. class, id, data-* attributes). |
 
 
 ---
@@ -172,8 +172,8 @@ Uses a flat node array with index-based parent/child references for efficient tr
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `nodes` | `Array<DocumentNode>` | — | All nodes in document reading order. |
-| `sourceFormat` | `string \| null` | `null` | The source format (always "html" for this library). |
+| `nodes` | `[]const DocumentNode` | — | All nodes in document reading order. |
+| `sourceFormat` | `[:0]const u8?` | `null` | The source format (always "html" for this library). |
 
 
 ---
@@ -184,12 +184,12 @@ A single cell in a table grid.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `content` | `string` | — | The text content of the cell. |
-| `row` | `number` | — | 0-indexed row position. |
-| `col` | `number` | — | 0-indexed column position. |
-| `rowSpan` | `number` | — | Number of rows this cell spans (default 1). |
-| `colSpan` | `number` | — | Number of columns this cell spans (default 1). |
-| `isHeader` | `boolean` | — | Whether this is a header cell (`<th>`). |
+| `content` | `[:0]const u8` | — | The text content of the cell. |
+| `row` | `u32` | — | 0-indexed row position. |
+| `col` | `u32` | — | 0-indexed column position. |
+| `rowSpan` | `u32` | — | Number of rows this cell spans (default 1). |
+| `colSpan` | `u32` | — | Number of columns this cell spans (default 1). |
+| `isHeader` | `bool` | — | Whether this is a header cell (`<th>`). |
 
 
 ---
@@ -203,11 +203,11 @@ and position in the document structure.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `level` | `number` | — | Header level: 1 (h1) through 6 (h6) |
-| `text` | `string` | — | Normalized text content of the header |
-| `id` | `string \| null` | `null` | HTML id attribute if present |
-| `depth` | `number` | — | Document tree depth at the header element |
-| `htmlOffset` | `number` | — | Byte offset in original HTML document |
+| `level` | `u8` | — | Header level: 1 (h1) through 6 (h6) |
+| `text` | `[:0]const u8` | — | Normalized text content of the header |
+| `id` | `[:0]const u8?` | `null` | HTML id attribute if present |
+| `depth` | `u64` | — | Document tree depth at the header element |
+| `htmlOffset` | `u64` | — | Byte offset in original HTML document |
 
 ##### Methods
 
@@ -221,8 +221,8 @@ Validate that the header level is within valid range (1-6).
 
 **Signature:**
 
-```typescript
-isValid(): boolean
+```zig
+pub fn isValid(self: *const HeaderMetadata) bool
 ```
 
 ---
@@ -237,10 +237,10 @@ suitable for serialization and transmission across language boundaries.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `document` | `DocumentMetadata` | — | Document-level metadata (title, description, canonical, etc.) |
-| `headers` | `Array<HeaderMetadata>` | `[]` | Extracted header elements with hierarchy |
-| `links` | `Array<LinkMetadata>` | `[]` | Extracted hyperlinks with type classification |
-| `images` | `Array<ImageMetadata>` | `[]` | Extracted images with source and dimensions |
-| `structuredData` | `Array<StructuredData>` | `[]` | Extracted structured data blocks |
+| `headers` | `[]const HeaderMetadata` | `[]` | Extracted header elements with hierarchy |
+| `links` | `[]const LinkMetadata` | `[]` | Extracted hyperlinks with type classification |
+| `images` | `[]const ImageMetadata` | `[]` | Extracted images with source and dimensions |
+| `structuredData` | `[]const StructuredData` | `[]` | Extracted structured data blocks |
 
 
 ---
@@ -283,8 +283,8 @@ Visit text nodes (most frequent callback - ~100+ per document).
 
 **Signature:**
 
-```typescript
-visitText(ctx: NodeContext, text: string): VisitResult
+```zig
+pub fn visitText(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
 ##### visitElementStart()
@@ -296,8 +296,8 @@ visitors to implement generic element handling before tag-specific logic.
 
 **Signature:**
 
-```typescript
-visitElementStart(ctx: NodeContext): VisitResult
+```zig
+pub fn visitElementStart(self: *const HtmlVisitor, ctx: NodeContext) VisitResult
 ```
 
 ###### visitElementEnd()
@@ -309,8 +309,8 @@ Visitors can inspect or replace this output.
 
 **Signature:**
 
-```typescript
-visitElementEnd(ctx: NodeContext, output: string): VisitResult
+```zig
+pub fn visitElementEnd(self: *const HtmlVisitor, ctx: NodeContext, output: [:0]const u8) VisitResult
 ```
 
 ###### visitLink()
@@ -319,8 +319,8 @@ Visit anchor links `<a href="...">`.
 
 **Signature:**
 
-```typescript
-visitLink(ctx: NodeContext, href: string, text: string, title: string): VisitResult
+```zig
+pub fn visitLink(self: *const HtmlVisitor, ctx: NodeContext, href: [:0]const u8, text: [:0]const u8, title: ?[:0]const u8) VisitResult
 ```
 
 ###### visitImage()
@@ -329,8 +329,8 @@ Visit images `<img src="...">`.
 
 **Signature:**
 
-```typescript
-visitImage(ctx: NodeContext, src: string, alt: string, title: string): VisitResult
+```zig
+pub fn visitImage(self: *const HtmlVisitor, ctx: NodeContext, src: [:0]const u8, alt: [:0]const u8, title: ?[:0]const u8) VisitResult
 ```
 
 ###### visitHeading()
@@ -339,8 +339,8 @@ Visit heading elements `<h1>` through `<h6>`.
 
 **Signature:**
 
-```typescript
-visitHeading(ctx: NodeContext, level: number, text: string, id: string): VisitResult
+```zig
+pub fn visitHeading(self: *const HtmlVisitor, ctx: NodeContext, level: u32, text: [:0]const u8, id: ?[:0]const u8) VisitResult
 ```
 
 ###### visitCodeBlock()
@@ -349,8 +349,8 @@ Visit code blocks `<pre><code>`.
 
 **Signature:**
 
-```typescript
-visitCodeBlock(ctx: NodeContext, lang: string, code: string): VisitResult
+```zig
+pub fn visitCodeBlock(self: *const HtmlVisitor, ctx: NodeContext, lang: ?[:0]const u8, code: [:0]const u8) VisitResult
 ```
 
 ###### visitCodeInline()
@@ -359,8 +359,8 @@ Visit inline code `<code>`.
 
 **Signature:**
 
-```typescript
-visitCodeInline(ctx: NodeContext, code: string): VisitResult
+```zig
+pub fn visitCodeInline(self: *const HtmlVisitor, ctx: NodeContext, code: [:0]const u8) VisitResult
 ```
 
 ###### visitListItem()
@@ -369,8 +369,8 @@ Visit list items `<li>`.
 
 **Signature:**
 
-```typescript
-visitListItem(ctx: NodeContext, ordered: boolean, marker: string, text: string): VisitResult
+```zig
+pub fn visitListItem(self: *const HtmlVisitor, ctx: NodeContext, ordered: bool, marker: [:0]const u8, text: [:0]const u8) VisitResult
 ```
 
 ###### visitListStart()
@@ -379,8 +379,8 @@ Called before processing a list `<ul>` or `<ol>`.
 
 **Signature:**
 
-```typescript
-visitListStart(ctx: NodeContext, ordered: boolean): VisitResult
+```zig
+pub fn visitListStart(self: *const HtmlVisitor, ctx: NodeContext, ordered: bool) VisitResult
 ```
 
 ###### visitListEnd()
@@ -389,8 +389,8 @@ Called after processing a list `</ul>` or `</ol>`.
 
 **Signature:**
 
-```typescript
-visitListEnd(ctx: NodeContext, ordered: boolean, output: string): VisitResult
+```zig
+pub fn visitListEnd(self: *const HtmlVisitor, ctx: NodeContext, ordered: bool, output: [:0]const u8) VisitResult
 ```
 
 ###### visitTableStart()
@@ -399,8 +399,8 @@ Called before processing a table `<table>`.
 
 **Signature:**
 
-```typescript
-visitTableStart(ctx: NodeContext): VisitResult
+```zig
+pub fn visitTableStart(self: *const HtmlVisitor, ctx: NodeContext) VisitResult
 ```
 
 ###### visitTableRow()
@@ -409,8 +409,8 @@ Visit table rows `<tr>`.
 
 **Signature:**
 
-```typescript
-visitTableRow(ctx: NodeContext, cells: Array<string>, isHeader: boolean): VisitResult
+```zig
+pub fn visitTableRow(self: *const HtmlVisitor, ctx: NodeContext, cells: []const [:0]const u8, is_header: bool) VisitResult
 ```
 
 ###### visitTableEnd()
@@ -419,8 +419,8 @@ Called after processing a table `</table>`.
 
 **Signature:**
 
-```typescript
-visitTableEnd(ctx: NodeContext, output: string): VisitResult
+```zig
+pub fn visitTableEnd(self: *const HtmlVisitor, ctx: NodeContext, output: [:0]const u8) VisitResult
 ```
 
 ###### visitBlockquote()
@@ -429,8 +429,8 @@ Visit blockquote elements `<blockquote>`.
 
 **Signature:**
 
-```typescript
-visitBlockquote(ctx: NodeContext, content: string, depth: number): VisitResult
+```zig
+pub fn visitBlockquote(self: *const HtmlVisitor, ctx: NodeContext, content: [:0]const u8, depth: u64) VisitResult
 ```
 
 ###### visitStrong()
@@ -439,8 +439,8 @@ Visit strong/bold elements `<strong>`, `<b>`.
 
 **Signature:**
 
-```typescript
-visitStrong(ctx: NodeContext, text: string): VisitResult
+```zig
+pub fn visitStrong(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
 ###### visitEmphasis()
@@ -449,8 +449,8 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 
 **Signature:**
 
-```typescript
-visitEmphasis(ctx: NodeContext, text: string): VisitResult
+```zig
+pub fn visitEmphasis(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
 ###### visitStrikethrough()
@@ -459,8 +459,8 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 
 **Signature:**
 
-```typescript
-visitStrikethrough(ctx: NodeContext, text: string): VisitResult
+```zig
+pub fn visitStrikethrough(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
 ###### visitUnderline()
@@ -469,8 +469,8 @@ Visit underline elements `<u>`, `<ins>`.
 
 **Signature:**
 
-```typescript
-visitUnderline(ctx: NodeContext, text: string): VisitResult
+```zig
+pub fn visitUnderline(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
 ###### visitSubscript()
@@ -479,8 +479,8 @@ Visit subscript elements `<sub>`.
 
 **Signature:**
 
-```typescript
-visitSubscript(ctx: NodeContext, text: string): VisitResult
+```zig
+pub fn visitSubscript(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
 ###### visitSuperscript()
@@ -489,8 +489,8 @@ Visit superscript elements `<sup>`.
 
 **Signature:**
 
-```typescript
-visitSuperscript(ctx: NodeContext, text: string): VisitResult
+```zig
+pub fn visitSuperscript(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
 ###### visitMark()
@@ -499,8 +499,8 @@ Visit mark/highlight elements `<mark>`.
 
 **Signature:**
 
-```typescript
-visitMark(ctx: NodeContext, text: string): VisitResult
+```zig
+pub fn visitMark(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
 ###### visitLineBreak()
@@ -509,8 +509,8 @@ Visit line break elements `<br>`.
 
 **Signature:**
 
-```typescript
-visitLineBreak(ctx: NodeContext): VisitResult
+```zig
+pub fn visitLineBreak(self: *const HtmlVisitor, ctx: NodeContext) VisitResult
 ```
 
 ###### visitHorizontalRule()
@@ -519,8 +519,8 @@ Visit horizontal rule elements `<hr>`.
 
 **Signature:**
 
-```typescript
-visitHorizontalRule(ctx: NodeContext): VisitResult
+```zig
+pub fn visitHorizontalRule(self: *const HtmlVisitor, ctx: NodeContext) VisitResult
 ```
 
 ###### visitCustomElement()
@@ -529,8 +529,8 @@ Visit custom elements (web components) or unknown tags.
 
 **Signature:**
 
-```typescript
-visitCustomElement(ctx: NodeContext, tagName: string, html: string): VisitResult
+```zig
+pub fn visitCustomElement(self: *const HtmlVisitor, ctx: NodeContext, tag_name: [:0]const u8, html: [:0]const u8) VisitResult
 ```
 
 ###### visitDefinitionListStart()
@@ -539,8 +539,8 @@ Visit definition list `<dl>`.
 
 **Signature:**
 
-```typescript
-visitDefinitionListStart(ctx: NodeContext): VisitResult
+```zig
+pub fn visitDefinitionListStart(self: *const HtmlVisitor, ctx: NodeContext) VisitResult
 ```
 
 ###### visitDefinitionTerm()
@@ -549,8 +549,8 @@ Visit definition term `<dt>`.
 
 **Signature:**
 
-```typescript
-visitDefinitionTerm(ctx: NodeContext, text: string): VisitResult
+```zig
+pub fn visitDefinitionTerm(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
 ###### visitDefinitionDescription()
@@ -559,8 +559,8 @@ Visit definition description `<dd>`.
 
 **Signature:**
 
-```typescript
-visitDefinitionDescription(ctx: NodeContext, text: string): VisitResult
+```zig
+pub fn visitDefinitionDescription(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
 ###### visitDefinitionListEnd()
@@ -569,8 +569,8 @@ Called after processing a definition list `</dl>`.
 
 **Signature:**
 
-```typescript
-visitDefinitionListEnd(ctx: NodeContext, output: string): VisitResult
+```zig
+pub fn visitDefinitionListEnd(self: *const HtmlVisitor, ctx: NodeContext, output: [:0]const u8) VisitResult
 ```
 
 ###### visitForm()
@@ -579,8 +579,8 @@ Visit form elements `<form>`.
 
 **Signature:**
 
-```typescript
-visitForm(ctx: NodeContext, action: string, method: string): VisitResult
+```zig
+pub fn visitForm(self: *const HtmlVisitor, ctx: NodeContext, action: ?[:0]const u8, method: ?[:0]const u8) VisitResult
 ```
 
 ###### visitInput()
@@ -589,8 +589,8 @@ Visit input elements `<input>`.
 
 **Signature:**
 
-```typescript
-visitInput(ctx: NodeContext, inputType: string, name: string, value: string): VisitResult
+```zig
+pub fn visitInput(self: *const HtmlVisitor, ctx: NodeContext, input_type: [:0]const u8, name: ?[:0]const u8, value: ?[:0]const u8) VisitResult
 ```
 
 ###### visitButton()
@@ -599,8 +599,8 @@ Visit button elements `<button>`.
 
 **Signature:**
 
-```typescript
-visitButton(ctx: NodeContext, text: string): VisitResult
+```zig
+pub fn visitButton(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
 ###### visitAudio()
@@ -609,8 +609,8 @@ Visit audio elements `<audio>`.
 
 **Signature:**
 
-```typescript
-visitAudio(ctx: NodeContext, src: string): VisitResult
+```zig
+pub fn visitAudio(self: *const HtmlVisitor, ctx: NodeContext, src: ?[:0]const u8) VisitResult
 ```
 
 ###### visitVideo()
@@ -619,8 +619,8 @@ Visit video elements `<video>`.
 
 **Signature:**
 
-```typescript
-visitVideo(ctx: NodeContext, src: string): VisitResult
+```zig
+pub fn visitVideo(self: *const HtmlVisitor, ctx: NodeContext, src: ?[:0]const u8) VisitResult
 ```
 
 ###### visitIframe()
@@ -629,8 +629,8 @@ Visit iframe elements `<iframe>`.
 
 **Signature:**
 
-```typescript
-visitIframe(ctx: NodeContext, src: string): VisitResult
+```zig
+pub fn visitIframe(self: *const HtmlVisitor, ctx: NodeContext, src: ?[:0]const u8) VisitResult
 ```
 
 ###### visitDetails()
@@ -639,8 +639,8 @@ Visit details elements `<details>`.
 
 **Signature:**
 
-```typescript
-visitDetails(ctx: NodeContext, open: boolean): VisitResult
+```zig
+pub fn visitDetails(self: *const HtmlVisitor, ctx: NodeContext, open: bool) VisitResult
 ```
 
 ###### visitSummary()
@@ -649,8 +649,8 @@ Visit summary elements `<summary>`.
 
 **Signature:**
 
-```typescript
-visitSummary(ctx: NodeContext, text: string): VisitResult
+```zig
+pub fn visitSummary(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
 ###### visitFigureStart()
@@ -659,8 +659,8 @@ Visit figure elements `<figure>`.
 
 **Signature:**
 
-```typescript
-visitFigureStart(ctx: NodeContext): VisitResult
+```zig
+pub fn visitFigureStart(self: *const HtmlVisitor, ctx: NodeContext) VisitResult
 ```
 
 ###### visitFigcaption()
@@ -669,8 +669,8 @@ Visit figcaption elements `<figcaption>`.
 
 **Signature:**
 
-```typescript
-visitFigcaption(ctx: NodeContext, text: string): VisitResult
+```zig
+pub fn visitFigcaption(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
 ###### visitFigureEnd()
@@ -679,8 +679,8 @@ Called after processing a figure `</figure>`.
 
 **Signature:**
 
-```typescript
-visitFigureEnd(ctx: NodeContext, output: string): VisitResult
+```zig
+pub fn visitFigureEnd(self: *const HtmlVisitor, ctx: NodeContext, output: [:0]const u8) VisitResult
 ```
 
 ---
@@ -694,12 +694,12 @@ for image analysis and optimization.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `src` | `string` | — | Image source (URL, data URI, or SVG content identifier) |
-| `alt` | `string \| null` | `null` | Alternative text from alt attribute (for accessibility) |
-| `title` | `string \| null` | `null` | Title attribute (often shown as tooltip) |
-| `dimensions` | `Array<number> \| null` | `null` | Image dimensions as (width, height) if available |
+| `src` | `[:0]const u8` | — | Image source (URL, data URI, or SVG content identifier) |
+| `alt` | `[:0]const u8?` | `null` | Alternative text from alt attribute (for accessibility) |
+| `title` | `[:0]const u8?` | `null` | Title attribute (often shown as tooltip) |
+| `dimensions` | `[]const u32?` | `null` | Image dimensions as (width, height) if available |
 | `imageType` | `ImageType` | — | Image type classification |
-| `attributes` | `Record<string, string>` | — | Additional HTML attributes |
+| `attributes` | `std.StringHashMap([:0]const u8)` | — | Additional HTML attributes |
 
 
 ---
@@ -712,12 +712,12 @@ Represents `<a>` elements with parsed href values, text content, and link type c
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `href` | `string` | — | The href URL value |
-| `text` | `string` | — | Link text content (normalized, concatenated if mixed with elements) |
-| `title` | `string \| null` | `null` | Optional title attribute (often shown as tooltip) |
+| `href` | `[:0]const u8` | — | The href URL value |
+| `text` | `[:0]const u8` | — | Link text content (normalized, concatenated if mixed with elements) |
+| `title` | `[:0]const u8?` | `null` | Optional title attribute (often shown as tooltip) |
 | `linkType` | `LinkType` | — | Link type classification |
-| `rel` | `Array<string>` | — | Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") |
-| `attributes` | `Record<string, string>` | — | Additional HTML attributes |
+| `rel` | `[]const [:0]const u8` | — | Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") |
+| `attributes` | `std.StringHashMap([:0]const u8)` | — | Additional HTML attributes |
 
 
 ---
@@ -732,12 +732,12 @@ including its type, attributes, position in the DOM tree, and parent context.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `nodeType` | `NodeType` | — | Coarse-grained node type classification |
-| `tagName` | `string` | — | Raw HTML tag name (e.g., "div", "h1", "custom-element") |
-| `attributes` | `Record<string, string>` | — | All HTML attributes as key-value pairs |
-| `depth` | `number` | — | Depth in the DOM tree (0 = root) |
-| `indexInParent` | `number` | — | Index among siblings (0-based) |
-| `parentTag` | `string \| null` | `null` | Parent element's tag name (None if root) |
-| `isInline` | `boolean` | — | Whether this element is treated as inline vs block |
+| `tagName` | `[:0]const u8` | — | Raw HTML tag name (e.g., "div", "h1", "custom-element") |
+| `attributes` | `std.StringHashMap([:0]const u8)` | — | All HTML attributes as key-value pairs |
+| `depth` | `u64` | — | Depth in the DOM tree (0 = root) |
+| `indexInParent` | `u64` | — | Index among siblings (0-based) |
+| `parentTag` | `[:0]const u8?` | `null` | Parent element's tag name (None if root) |
+| `isInline` | `bool` | — | Whether this element is treated as inline vs block |
 
 
 ---
@@ -748,10 +748,10 @@ HTML preprocessing options for document cleanup before conversion.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `enabled` | `boolean` | `true` | Enable HTML preprocessing globally |
+| `enabled` | `bool` | `true` | Enable HTML preprocessing globally |
 | `preset` | `PreprocessingPreset` | `PreprocessingPreset.Standard` | Preprocessing preset level (Minimal, Standard, Aggressive) |
-| `removeNavigation` | `boolean` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
-| `removeForms` | `boolean` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
+| `removeNavigation` | `bool` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
+| `removeForms` | `bool` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
 ###### Methods
 
@@ -759,16 +759,16 @@ HTML preprocessing options for document cleanup before conversion.
 
 **Signature:**
 
-```typescript
-static default(): PreprocessingOptions
+```zig
+pub fn default() PreprocessingOptions
 ```
 
 ###### from()
 
 **Signature:**
 
-```typescript
-static from(update: PreprocessingOptionsUpdate): PreprocessingOptions
+```zig
+pub fn from(update: PreprocessingOptionsUpdate) PreprocessingOptions
 ```
 
 ---
@@ -779,7 +779,7 @@ A non-fatal warning generated during HTML processing.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `message` | `string` | — | Human-readable warning message. |
+| `message` | `[:0]const u8` | — | Human-readable warning message. |
 | `kind` | `WarningKind` | — | The category of warning. |
 
 
@@ -795,8 +795,8 @@ JSON-LD blocks are collected as raw JSON strings for flexibility.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `dataType` | `StructuredDataType` | — | Type of structured data (JSON-LD, Microdata, RDFa) |
-| `rawJson` | `string` | — | Raw JSON string (for JSON-LD) or serialized representation |
-| `schemaType` | `string \| null` | `null` | Schema type if detectable (e.g., "Article", "Event", "Product") |
+| `rawJson` | `[:0]const u8` | — | Raw JSON string (for JSON-LD) or serialized representation |
+| `schemaType` | `[:0]const u8?` | `null` | Schema type if detectable (e.g., "Article", "Event", "Product") |
 
 
 ---
@@ -808,7 +808,7 @@ A top-level extracted table with both structured data and markdown representatio
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `grid` | `TableGrid` | — | The structured table grid. |
-| `markdown` | `string` | — | The markdown rendering of this table. |
+| `markdown` | `[:0]const u8` | — | The markdown rendering of this table. |
 
 
 ---
@@ -819,9 +819,9 @@ A structured table grid with cell-level data including spans.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `rows` | `number` | — | Number of rows. |
-| `cols` | `number` | — | Number of columns. |
-| `cells` | `Array<GridCell>` | `[]` | All cells in the table (may be fewer than rows*cols due to spans). |
+| `rows` | `u32` | — | Number of rows. |
+| `cols` | `u32` | — | Number of columns. |
+| `cells` | `[]const GridCell` | `[]` | All cells in the table (may be fewer than rows*cols due to spans). |
 
 
 ---
@@ -834,8 +834,8 @@ Annotations describe formatting (bold, italic, etc.) and links within a node's t
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `start` | `number` | — | Start byte offset (inclusive) into the parent node's text. |
-| `end` | `number` | — | End byte offset (exclusive) into the parent node's text. |
+| `start` | `u32` | — | Start byte offset (inclusive) into the parent node's text. |
+| `end` | `u32` | — | End byte offset (exclusive) into the parent node's text. |
 | `kind` | `AnnotationKind` | — | The type of annotation. |
 
 
@@ -1059,19 +1059,19 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 
 | Value | Description |
 |-------|-------------|
-| `Heading` | A heading element (h1-h6). — Fields: `level`: `number`, `text`: `string` |
-| `Paragraph` | A paragraph of text. — Fields: `text`: `string` |
-| `List` | A list container (ordered or unordered). Children are `ListItem` nodes. — Fields: `ordered`: `boolean` |
-| `ListItem` | A single list item. — Fields: `text`: `string` |
+| `Heading` | A heading element (h1-h6). — Fields: `level`: `u8`, `text`: `[:0]const u8` |
+| `Paragraph` | A paragraph of text. — Fields: `text`: `[:0]const u8` |
+| `List` | A list container (ordered or unordered). Children are `ListItem` nodes. — Fields: `ordered`: `bool` |
+| `ListItem` | A single list item. — Fields: `text`: `[:0]const u8` |
 | `Table` | A table with structured cell data. — Fields: `grid`: `TableGrid` |
-| `Image` | An image element. — Fields: `description`: `string`, `src`: `string`, `imageIndex`: `number` |
-| `Code` | A code block or inline code. — Fields: `text`: `string`, `language`: `string` |
+| `Image` | An image element. — Fields: `description`: `[:0]const u8`, `src`: `[:0]const u8`, `imageIndex`: `u32` |
+| `Code` | A code block or inline code. — Fields: `text`: `[:0]const u8`, `language`: `[:0]const u8` |
 | `Quote` | A block quote container. |
 | `DefinitionList` | A definition list container. |
-| `DefinitionItem` | A definition list entry with term and description. — Fields: `term`: `string`, `definition`: `string` |
-| `RawBlock` | A raw block preserved as-is (e.g. `<script>`, `<style>` content). — Fields: `format`: `string`, `content`: `string` |
-| `MetadataBlock` | A block of key-value metadata pairs (from `<head>` meta tags). — Fields: `entries`: `Array<string>` |
-| `Group` | A section grouping container (auto-generated from heading hierarchy). — Fields: `label`: `string`, `headingLevel`: `number`, `headingText`: `string` |
+| `DefinitionItem` | A definition list entry with term and description. — Fields: `term`: `[:0]const u8`, `definition`: `[:0]const u8` |
+| `RawBlock` | A raw block preserved as-is (e.g. `<script>`, `<style>` content). — Fields: `format`: `[:0]const u8`, `content`: `[:0]const u8` |
+| `MetadataBlock` | A block of key-value metadata pairs (from `<head>` meta tags). — Fields: `entries`: `[]const [:0]const u8` |
+| `Group` | A section grouping container (auto-generated from heading hierarchy). — Fields: `label`: `[:0]const u8`, `headingLevel`: `u8`, `headingText`: `[:0]const u8` |
 
 
 ---
@@ -1092,7 +1092,7 @@ Uses internally tagged representation (`"annotation_type": "bold"`) for JSON ser
 | `Subscript` | Subscript text. |
 | `Superscript` | Superscript text. |
 | `Highlight` | Highlighted / marked text. |
-| `Link` | A hyperlink. — Fields: `url`: `string`, `title`: `string` |
+| `Link` | A hyperlink. — Fields: `url`: `[:0]const u8`, `title`: `[:0]const u8` |
 
 
 ---
@@ -1225,10 +1225,10 @@ preserving HTML, or signaling errors.
 | Value | Description |
 |-------|-------------|
 | `Continue` | Continue with default conversion behavior |
-| `Custom` | Replace default output with custom markdown The visitor takes full responsibility for the markdown output of this node and its children. — Fields: `0`: `string` |
+| `Custom` | Replace default output with custom markdown The visitor takes full responsibility for the markdown output of this node and its children. — Fields: `0`: `[:0]const u8` |
 | `Skip` | Skip this element entirely (don't output anything) The element and all its children are ignored in the output. |
 | `PreserveHtml` | Preserve original HTML (don't convert to markdown) The element's raw HTML is included verbatim in the output. |
-| `Error` | Stop conversion with an error The conversion process halts and returns this error message. — Fields: `0`: `string` |
+| `Error` | Stop conversion with an error The conversion process halts and returns this error message. — Fields: `0`: `[:0]const u8` |
 
 
 ---
@@ -1238,8 +1238,6 @@ preserving HTML, or signaling errors.
 ##### ConversionError
 
 Errors that can occur during HTML to Markdown conversion.
-
-Errors are thrown as plain `Error` objects with descriptive messages.
 
 | Variant | Description |
 |---------|-------------|
