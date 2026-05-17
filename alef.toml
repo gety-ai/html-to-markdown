@@ -28,6 +28,20 @@ extra_paths = [
   "package.json",
 ]
 
+[workspace.citation]
+title = "html-to-markdown"
+abstract = "Fast, lossless HTML to Markdown engine."
+repository-code = "https://github.com/kreuzberg-dev/html-to-markdown"
+url = "https://kreuzberg.dev"
+license = "MIT"
+date-released = "2026-05-17"
+
+[[workspace.citation.authors]]
+family-names = "Hirschfeld"
+given-names = "Na'aman"
+email = "naaman@kreuzberg.dev"
+orcid = "https://orcid.org/0009-0000-2247-5072"
+
 # test_apps version sync — use text_replacements to avoid clobbering unrelated semver strings
 [[workspace.sync.text_replacements]]
 path = "test_apps/node/package.json"
