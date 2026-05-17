@@ -51,6 +51,8 @@ data class ConversionOptionsUpdate(
     val defaultTitle: Boolean?,
     /** Optional override for `ConversionOptions.br_in_tables`. */
     val brInTables: Boolean?,
+    /** Optional override for `ConversionOptions.compact_tables`. */
+    val compactTables: Boolean?,
     /** Optional override for `ConversionOptions.highlight_style`. */
     val highlightStyle: HighlightStyle?,
     /** Optional override for `ConversionOptions.extract_metadata`. */

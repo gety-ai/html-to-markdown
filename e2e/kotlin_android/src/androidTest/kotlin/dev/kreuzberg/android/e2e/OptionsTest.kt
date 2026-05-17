@@ -73,6 +73,20 @@ class OptionsTest {
     }
 
     @Test
+    fun test_options_compact_tables_false() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: options_compact_tables_false */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
+    fun test_options_compact_tables_true() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: options_compact_tables_true */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
     fun test_options_convert_as_inline() {
         val client = dev.kreuzberg.android.HtmlToMarkdownRs()
         val result = client.convert(/* fixture: options_convert_as_inline */)

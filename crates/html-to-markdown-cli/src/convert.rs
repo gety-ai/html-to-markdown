@@ -34,6 +34,7 @@ pub fn build_conversion_options(cli: &Cli) -> ConversionOptions {
         autolinks: !cli.no_autolinks,
         default_title: cli.default_title,
         br_in_tables: cli.br_in_tables,
+        compact_tables: cli.compact_tables,
         highlight_style: cli.highlight_style.map_or(defaults.highlight_style, Into::into),
         extract_metadata: cli.extract_metadata,
         whitespace_mode: cli.whitespace_mode.map_or(defaults.whitespace_mode, Into::into),

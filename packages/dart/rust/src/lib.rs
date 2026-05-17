@@ -264,6 +264,14 @@ pub struct ConversionOptions {
     pub default_title: bool,
     /// Render `<br>` elements inside table cells as literal line breaks.
     pub br_in_tables: bool,
+    /// Emit tables without column padding (compact GFM format).
+    ///
+    /// When `true`, column widths are not computed and cells are emitted with
+    /// no trailing spaces. Separator rows use exactly `---` per column.
+    /// Produces token-efficient output suitable for RAG / LLM contexts.
+    ///
+    /// Default `false` (aligned padding preserved).
+    pub compact_tables: bool,
     /// Style used for `<mark>` / highlighted text (e.g. `==text==`).
     pub highlight_style: HighlightStyle,
     /// Populate `result.metadata` with `<head>` / `<meta>` extraction
@@ -392,6 +400,8 @@ pub struct ConversionOptionsUpdate {
     pub default_title: Option<bool>,
     /// Optional override for [`ConversionOptions::br_in_tables`].
     pub br_in_tables: Option<bool>,
+    /// Optional override for [`ConversionOptions::compact_tables`].
+    pub compact_tables: Option<bool>,
     /// Optional override for [`ConversionOptions::highlight_style`].
     pub highlight_style: Option<HighlightStyle>,
     /// Optional override for [`ConversionOptions::extract_metadata`].
@@ -1322,6 +1332,7 @@ impl From<html_to_markdown_rs::options::ConversionOptions> for ConversionOptions
             autolinks: v.autolinks as _,
             default_title: v.default_title as _,
             br_in_tables: v.br_in_tables as _,
+            compact_tables: v.compact_tables as _,
             highlight_style: HighlightStyle::from(v.highlight_style),
             extract_metadata: v.extract_metadata as _,
             whitespace_mode: WhitespaceMode::from(v.whitespace_mode),
@@ -1370,6 +1381,7 @@ impl From<html_to_markdown_rs::options::ConversionOptionsUpdate> for ConversionO
             autolinks: v.autolinks.map(|x| x as _),
             default_title: v.default_title.map(|x| x as _),
             br_in_tables: v.br_in_tables.map(|x| x as _),
+            compact_tables: v.compact_tables.map(|x| x as _),
             highlight_style: v.highlight_style.map(HighlightStyle::from),
             extract_metadata: v.extract_metadata.map(|x| x as _),
             whitespace_mode: v.whitespace_mode.map(WhitespaceMode::from),
@@ -1872,6 +1884,7 @@ impl From<ConversionOptions> for html_to_markdown_rs::options::ConversionOptions
             autolinks: v.autolinks as _,
             default_title: v.default_title as _,
             br_in_tables: v.br_in_tables as _,
+            compact_tables: v.compact_tables as _,
             highlight_style: v.highlight_style.into(),
             extract_metadata: v.extract_metadata as _,
             whitespace_mode: v.whitespace_mode.into(),

@@ -1801,8 +1801,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ConversionOptions dco_decode_conversion_options(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 41)
-      throw Exception('unexpected arr length: expect 41 but see ${arr.length}');
+    if (arr.length != 42)
+      throw Exception('unexpected arr length: expect 42 but see ${arr.length}');
     return ConversionOptions(
       headingStyle: dco_decode_heading_style(arr[0]),
       listIndentType: dco_decode_list_indent_type(arr[1]),
@@ -1817,36 +1817,37 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       autolinks: dco_decode_bool(arr[10]),
       defaultTitle: dco_decode_bool(arr[11]),
       brInTables: dco_decode_bool(arr[12]),
-      highlightStyle: dco_decode_highlight_style(arr[13]),
-      extractMetadata: dco_decode_bool(arr[14]),
-      whitespaceMode: dco_decode_whitespace_mode(arr[15]),
-      stripNewlines: dco_decode_bool(arr[16]),
-      wrap: dco_decode_bool(arr[17]),
-      wrapWidth: dco_decode_i_64(arr[18]),
-      convertAsInline: dco_decode_bool(arr[19]),
-      subSymbol: dco_decode_String(arr[20]),
-      supSymbol: dco_decode_String(arr[21]),
-      newlineStyle: dco_decode_newline_style(arr[22]),
-      codeBlockStyle: dco_decode_code_block_style(arr[23]),
-      keepInlineImagesIn: dco_decode_list_String(arr[24]),
-      preprocessing: dco_decode_preprocessing_options(arr[25]),
-      encoding: dco_decode_String(arr[26]),
-      debug: dco_decode_bool(arr[27]),
-      stripTags: dco_decode_list_String(arr[28]),
-      preserveTags: dco_decode_list_String(arr[29]),
-      skipImages: dco_decode_bool(arr[30]),
-      linkStyle: dco_decode_link_style(arr[31]),
-      outputFormat: dco_decode_output_format(arr[32]),
-      includeDocumentStructure: dco_decode_bool(arr[33]),
-      extractImages: dco_decode_bool(arr[34]),
-      maxImageSize: dco_decode_i_64(arr[35]),
-      captureSvg: dco_decode_bool(arr[36]),
-      inferDimensions: dco_decode_bool(arr[37]),
-      maxDepth: dco_decode_opt_box_autoadd_i_64(arr[38]),
-      excludeSelectors: dco_decode_list_String(arr[39]),
+      compactTables: dco_decode_bool(arr[13]),
+      highlightStyle: dco_decode_highlight_style(arr[14]),
+      extractMetadata: dco_decode_bool(arr[15]),
+      whitespaceMode: dco_decode_whitespace_mode(arr[16]),
+      stripNewlines: dco_decode_bool(arr[17]),
+      wrap: dco_decode_bool(arr[18]),
+      wrapWidth: dco_decode_i_64(arr[19]),
+      convertAsInline: dco_decode_bool(arr[20]),
+      subSymbol: dco_decode_String(arr[21]),
+      supSymbol: dco_decode_String(arr[22]),
+      newlineStyle: dco_decode_newline_style(arr[23]),
+      codeBlockStyle: dco_decode_code_block_style(arr[24]),
+      keepInlineImagesIn: dco_decode_list_String(arr[25]),
+      preprocessing: dco_decode_preprocessing_options(arr[26]),
+      encoding: dco_decode_String(arr[27]),
+      debug: dco_decode_bool(arr[28]),
+      stripTags: dco_decode_list_String(arr[29]),
+      preserveTags: dco_decode_list_String(arr[30]),
+      skipImages: dco_decode_bool(arr[31]),
+      linkStyle: dco_decode_link_style(arr[32]),
+      outputFormat: dco_decode_output_format(arr[33]),
+      includeDocumentStructure: dco_decode_bool(arr[34]),
+      extractImages: dco_decode_bool(arr[35]),
+      maxImageSize: dco_decode_i_64(arr[36]),
+      captureSvg: dco_decode_bool(arr[37]),
+      inferDimensions: dco_decode_bool(arr[38]),
+      maxDepth: dco_decode_opt_box_autoadd_i_64(arr[39]),
+      excludeSelectors: dco_decode_list_String(arr[40]),
       visitor:
           dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-              arr[40]),
+              arr[41]),
     );
   }
 
@@ -1854,8 +1855,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ConversionOptionsUpdate dco_decode_conversion_options_update(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 41)
-      throw Exception('unexpected arr length: expect 41 but see ${arr.length}');
+    if (arr.length != 42)
+      throw Exception('unexpected arr length: expect 42 but see ${arr.length}');
     return ConversionOptionsUpdate(
       headingStyle: dco_decode_opt_box_autoadd_heading_style(arr[0]),
       listIndentType: dco_decode_opt_box_autoadd_list_indent_type(arr[1]),
@@ -1870,37 +1871,38 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       autolinks: dco_decode_opt_box_autoadd_bool(arr[10]),
       defaultTitle: dco_decode_opt_box_autoadd_bool(arr[11]),
       brInTables: dco_decode_opt_box_autoadd_bool(arr[12]),
-      highlightStyle: dco_decode_opt_box_autoadd_highlight_style(arr[13]),
-      extractMetadata: dco_decode_opt_box_autoadd_bool(arr[14]),
-      whitespaceMode: dco_decode_opt_box_autoadd_whitespace_mode(arr[15]),
-      stripNewlines: dco_decode_opt_box_autoadd_bool(arr[16]),
-      wrap: dco_decode_opt_box_autoadd_bool(arr[17]),
-      wrapWidth: dco_decode_opt_box_autoadd_i_64(arr[18]),
-      convertAsInline: dco_decode_opt_box_autoadd_bool(arr[19]),
-      subSymbol: dco_decode_opt_String(arr[20]),
-      supSymbol: dco_decode_opt_String(arr[21]),
-      newlineStyle: dco_decode_opt_box_autoadd_newline_style(arr[22]),
-      codeBlockStyle: dco_decode_opt_box_autoadd_code_block_style(arr[23]),
-      keepInlineImagesIn: dco_decode_opt_list_String(arr[24]),
+      compactTables: dco_decode_opt_box_autoadd_bool(arr[13]),
+      highlightStyle: dco_decode_opt_box_autoadd_highlight_style(arr[14]),
+      extractMetadata: dco_decode_opt_box_autoadd_bool(arr[15]),
+      whitespaceMode: dco_decode_opt_box_autoadd_whitespace_mode(arr[16]),
+      stripNewlines: dco_decode_opt_box_autoadd_bool(arr[17]),
+      wrap: dco_decode_opt_box_autoadd_bool(arr[18]),
+      wrapWidth: dco_decode_opt_box_autoadd_i_64(arr[19]),
+      convertAsInline: dco_decode_opt_box_autoadd_bool(arr[20]),
+      subSymbol: dco_decode_opt_String(arr[21]),
+      supSymbol: dco_decode_opt_String(arr[22]),
+      newlineStyle: dco_decode_opt_box_autoadd_newline_style(arr[23]),
+      codeBlockStyle: dco_decode_opt_box_autoadd_code_block_style(arr[24]),
+      keepInlineImagesIn: dco_decode_opt_list_String(arr[25]),
       preprocessing:
-          dco_decode_opt_box_autoadd_preprocessing_options_update(arr[25]),
-      encoding: dco_decode_opt_String(arr[26]),
-      debug: dco_decode_opt_box_autoadd_bool(arr[27]),
-      stripTags: dco_decode_opt_list_String(arr[28]),
-      preserveTags: dco_decode_opt_list_String(arr[29]),
-      skipImages: dco_decode_opt_box_autoadd_bool(arr[30]),
-      linkStyle: dco_decode_opt_box_autoadd_link_style(arr[31]),
-      outputFormat: dco_decode_opt_box_autoadd_output_format(arr[32]),
-      includeDocumentStructure: dco_decode_opt_box_autoadd_bool(arr[33]),
-      extractImages: dco_decode_opt_box_autoadd_bool(arr[34]),
-      maxImageSize: dco_decode_opt_box_autoadd_i_64(arr[35]),
-      captureSvg: dco_decode_opt_box_autoadd_bool(arr[36]),
-      inferDimensions: dco_decode_opt_box_autoadd_bool(arr[37]),
-      maxDepth: dco_decode_opt_box_autoadd_i_64(arr[38]),
-      excludeSelectors: dco_decode_opt_list_String(arr[39]),
+          dco_decode_opt_box_autoadd_preprocessing_options_update(arr[26]),
+      encoding: dco_decode_opt_String(arr[27]),
+      debug: dco_decode_opt_box_autoadd_bool(arr[28]),
+      stripTags: dco_decode_opt_list_String(arr[29]),
+      preserveTags: dco_decode_opt_list_String(arr[30]),
+      skipImages: dco_decode_opt_box_autoadd_bool(arr[31]),
+      linkStyle: dco_decode_opt_box_autoadd_link_style(arr[32]),
+      outputFormat: dco_decode_opt_box_autoadd_output_format(arr[33]),
+      includeDocumentStructure: dco_decode_opt_box_autoadd_bool(arr[34]),
+      extractImages: dco_decode_opt_box_autoadd_bool(arr[35]),
+      maxImageSize: dco_decode_opt_box_autoadd_i_64(arr[36]),
+      captureSvg: dco_decode_opt_box_autoadd_bool(arr[37]),
+      inferDimensions: dco_decode_opt_box_autoadd_bool(arr[38]),
+      maxDepth: dco_decode_opt_box_autoadd_i_64(arr[39]),
+      excludeSelectors: dco_decode_opt_list_String(arr[40]),
       visitor:
           dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-              arr[40]),
+              arr[41]),
     );
   }
 
@@ -2814,6 +2816,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_autolinks = sse_decode_bool(deserializer);
     var var_defaultTitle = sse_decode_bool(deserializer);
     var var_brInTables = sse_decode_bool(deserializer);
+    var var_compactTables = sse_decode_bool(deserializer);
     var var_highlightStyle = sse_decode_highlight_style(deserializer);
     var var_extractMetadata = sse_decode_bool(deserializer);
     var var_whitespaceMode = sse_decode_whitespace_mode(deserializer);
@@ -2858,6 +2861,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         autolinks: var_autolinks,
         defaultTitle: var_defaultTitle,
         brInTables: var_brInTables,
+        compactTables: var_compactTables,
         highlightStyle: var_highlightStyle,
         extractMetadata: var_extractMetadata,
         whitespaceMode: var_whitespaceMode,
@@ -2907,6 +2911,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_autolinks = sse_decode_opt_box_autoadd_bool(deserializer);
     var var_defaultTitle = sse_decode_opt_box_autoadd_bool(deserializer);
     var var_brInTables = sse_decode_opt_box_autoadd_bool(deserializer);
+    var var_compactTables = sse_decode_opt_box_autoadd_bool(deserializer);
     var var_highlightStyle =
         sse_decode_opt_box_autoadd_highlight_style(deserializer);
     var var_extractMetadata = sse_decode_opt_box_autoadd_bool(deserializer);
@@ -2958,6 +2963,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         autolinks: var_autolinks,
         defaultTitle: var_defaultTitle,
         brInTables: var_brInTables,
+        compactTables: var_compactTables,
         highlightStyle: var_highlightStyle,
         extractMetadata: var_extractMetadata,
         whitespaceMode: var_whitespaceMode,
@@ -4273,6 +4279,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.autolinks, serializer);
     sse_encode_bool(self.defaultTitle, serializer);
     sse_encode_bool(self.brInTables, serializer);
+    sse_encode_bool(self.compactTables, serializer);
     sse_encode_highlight_style(self.highlightStyle, serializer);
     sse_encode_bool(self.extractMetadata, serializer);
     sse_encode_whitespace_mode(self.whitespaceMode, serializer);
@@ -4322,6 +4329,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_box_autoadd_bool(self.autolinks, serializer);
     sse_encode_opt_box_autoadd_bool(self.defaultTitle, serializer);
     sse_encode_opt_box_autoadd_bool(self.brInTables, serializer);
+    sse_encode_opt_box_autoadd_bool(self.compactTables, serializer);
     sse_encode_opt_box_autoadd_highlight_style(self.highlightStyle, serializer);
     sse_encode_opt_box_autoadd_bool(self.extractMetadata, serializer);
     sse_encode_opt_box_autoadd_whitespace_mode(self.whitespaceMode, serializer);

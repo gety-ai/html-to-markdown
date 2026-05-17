@@ -16,6 +16,7 @@
 #' @param autolinks Automatically convert bare URLs into Markdown autolinks
 #' @param default_title Emit a default title when no `<title>` tag is present
 #' @param br_in_tables Render `<br>` elements inside table cells as literal line breaks
+#' @param compact_tables Emit tables without column padding (compact GFM format)
 #' @param highlight_style Style used for `<mark>` / highlighted text (e.g. `==text==`)
 #' @param extract_metadata Populate `result.metadata` with `<head>` / `<meta>` extraction
 #' @param whitespace_mode Controls how whitespace sequences are normalised in the converted output
@@ -60,6 +61,7 @@ conversion_options <- function(
   autolinks = NULL,
   default_title = NULL,
   br_in_tables = NULL,
+  compact_tables = NULL,
   highlight_style = NULL,
   extract_metadata = NULL,
   whitespace_mode = NULL,
@@ -103,6 +105,7 @@ conversion_options <- function(
   if (!is.null(autolinks)) opts$autolinks <- autolinks
   if (!is.null(default_title)) opts$default_title <- default_title
   if (!is.null(br_in_tables)) opts$br_in_tables <- br_in_tables
+  if (!is.null(compact_tables)) opts$compact_tables <- compact_tables
   if (!is.null(highlight_style)) opts$highlight_style <- highlight_style
   if (!is.null(extract_metadata)) opts$extract_metadata <- extract_metadata
   if (!is.null(whitespace_mode)) opts$whitespace_mode <- whitespace_mode

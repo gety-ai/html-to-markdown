@@ -218,6 +218,13 @@ pub struct Cli {
     #[arg(help_heading = "Tables")]
     pub br_in_tables: bool,
 
+    /// Emit compact (unpadded) GFM tables
+    ///
+    /// Single space around cell content, no column-width alignment padding
+    #[arg(long)]
+    #[arg(help_heading = "Tables")]
+    pub compact_tables: bool,
+
     /// Style for `<mark>` elements
     ///
     /// How to represent highlighted text:

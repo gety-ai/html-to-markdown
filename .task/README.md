@@ -277,21 +277,13 @@ tasks:
   sync:
     desc: "Sync version from Cargo.toml to all manifests"
     cmds:
-      - python {{.ROOT}}/scripts/sync_versions.py
+      - alef sync-versions
 ```
 
-**Updates**:
-
-- Cargo workspace members (crates/\*/Cargo.toml)
-- Python (packages/python/pyproject.toml)
-- Node.js (packages/typescript/package.json)
-- Ruby (packages/ruby/lib/html_to_markdown/version.rb)
-- PHP (packages/php/composer.json)
-- Go (packages/go/v3/version.go)
-- Java (packages/java/pom.xml)
-- C# (packages/csharp/HtmlToMarkdown.csproj)
-- Elixir (packages/elixir/mix.exs)
-- **test_apps manifests** (tests/test_apps/\*/pyproject.toml, package.json, etc.)
+**Updates**: alef walks every manifest declared in `alef.toml` (`[crates.publish.languages.*]`,
+`[[crates.publish.languages.*.version_anchors]]`) and the workspace-level Cargo.toml is the
+single source of truth. The legacy `scripts/sync_versions.py` was removed when version sync
+moved into alef itself.
 
 ### `tools/general.yml`
 

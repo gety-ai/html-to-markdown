@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.16.31"
+alef_version = "0.16.32"
 languages = [
   "python",
   "node",
@@ -1365,6 +1365,34 @@ function = "convert()"
 note = "Real Wikipedia documents"
 
 [crates.readme.languages.zig.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+
+[crates.readme.languages.wasm]
+name = "WebAssembly"
+template = "language_package.md"
+output_path = "crates/html-to-markdown-wasm/README.md"
+package_manager = ["npm", "pnpm", "yarn", "bun"]
+package_name = "@kreuzberg/html-to-markdown-wasm"
+install_command = "pnpm add @kreuzberg/html-to-markdown-wasm"
+description = """
+Pure WebAssembly build of html-to-markdown for browsers, Deno, Cloudflare Workers, and other JS
+runtimes without a Node.js native-addon ABI. Single `.wasm` artifact loaded via `wasm-bindgen`,
+shipped with TypeScript types and dist targets for nodejs, web, bundler, and deno.
+"""
+migration_version = ""
+
+[crates.readme.languages.wasm.features]
+visitor_pattern = false
+metadata_extraction = true
+cli_proxy = false
+
+[crates.readme.languages.wasm.performance]
+platform = "Apple M4"
+function = "convert()"
+note = "Real Wikipedia documents"
+
+[crates.readme.languages.wasm.snippets]
 basic_usage = "getting-started/basic_usage.md"
 with_options = "getting-started/with_options.md"
 

@@ -191,6 +191,14 @@ pub const ConversionOptions = struct {
     default_title: bool,
     /// Render `<br>` elements inside table cells as literal line breaks.
     br_in_tables: bool,
+    /// Emit tables without column padding (compact GFM format).
+    ///
+    /// When `true`, column widths are not computed and cells are emitted with
+    /// no trailing spaces. Separator rows use exactly `---` per column.
+    /// Produces token-efficient output suitable for RAG / LLM contexts.
+    ///
+    /// Default `false` (aligned padding preserved).
+    compact_tables: bool,
     /// Style used for `<mark>` / highlighted text (e.g. `==text==`).
     highlight_style: HighlightStyle,
     /// Populate `result.metadata` with `<head>` / `<meta>` extraction
@@ -318,6 +326,8 @@ pub const ConversionOptionsUpdate = struct {
     default_title: ?bool,
     /// Optional override for `ConversionOptions.br_in_tables`.
     br_in_tables: ?bool,
+    /// Optional override for `ConversionOptions.compact_tables`.
+    compact_tables: ?bool,
     /// Optional override for `ConversionOptions.highlight_style`.
     highlight_style: ?HighlightStyle,
     /// Optional override for `ConversionOptions.extract_metadata`.

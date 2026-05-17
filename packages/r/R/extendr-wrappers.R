@@ -137,6 +137,7 @@ StructuredData <- new.env(parent = emptyenv())
 #' @field autolinks Automatically convert bare URLs into Markdown autolinks.
 #' @field default_title Emit a default title when no `<title>` tag is present.
 #' @field br_in_tables Render `<br>` elements inside table cells as literal line breaks.
+#' @field compact_tables Emit tables without column padding (compact GFM format).
 #' @field highlight_style Style used for `<mark>` / highlighted text (e.g. `==text==`).
 #' @field extract_metadata Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open Graph, Twitter Card, JSON-LD, …).
 #' @field whitespace_mode Controls how whitespace sequences are normalised in the converted output.
@@ -194,6 +195,7 @@ ConversionOptions$from_json <- function(json) .Call("wrap__ConversionOptions__fr
 #' @field autolinks Optional override for [`ConversionOptions::autolinks`].
 #' @field default_title Optional override for [`ConversionOptions::default_title`].
 #' @field br_in_tables Optional override for [`ConversionOptions::br_in_tables`].
+#' @field compact_tables Optional override for [`ConversionOptions::compact_tables`].
 #' @field highlight_style Optional override for [`ConversionOptions::highlight_style`].
 #' @field extract_metadata Optional override for [`ConversionOptions::extract_metadata`].
 #' @field whitespace_mode Optional override for [`ConversionOptions::whitespace_mode`].

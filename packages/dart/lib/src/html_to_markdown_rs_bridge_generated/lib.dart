@@ -280,6 +280,15 @@ class ConversionOptions {
   /// Render `<br>` elements inside table cells as literal line breaks.
   final bool brInTables;
 
+  /// Emit tables without column padding (compact GFM format).
+  ///
+  /// When `true`, column widths are not computed and cells are emitted with
+  /// no trailing spaces. Separator rows use exactly `---` per column.
+  /// Produces token-efficient output suitable for RAG / LLM contexts.
+  ///
+  /// Default `false` (aligned padding preserved).
+  final bool compactTables;
+
   /// Style used for `<mark>` / highlighted text (e.g. `==text==`).
   final HighlightStyle highlightStyle;
 
@@ -416,6 +425,7 @@ class ConversionOptions {
     required this.autolinks,
     required this.defaultTitle,
     required this.brInTables,
+    required this.compactTables,
     required this.highlightStyle,
     required this.extractMetadata,
     required this.whitespaceMode,
@@ -461,6 +471,7 @@ class ConversionOptions {
       autolinks.hashCode ^
       defaultTitle.hashCode ^
       brInTables.hashCode ^
+      compactTables.hashCode ^
       highlightStyle.hashCode ^
       extractMetadata.hashCode ^
       whitespaceMode.hashCode ^
@@ -508,6 +519,7 @@ class ConversionOptions {
           autolinks == other.autolinks &&
           defaultTitle == other.defaultTitle &&
           brInTables == other.brInTables &&
+          compactTables == other.compactTables &&
           highlightStyle == other.highlightStyle &&
           extractMetadata == other.extractMetadata &&
           whitespaceMode == other.whitespaceMode &&
@@ -581,6 +593,9 @@ class ConversionOptionsUpdate {
 
   /// Optional override for [`ConversionOptions::br_in_tables`].
   final bool? brInTables;
+
+  /// Optional override for [`ConversionOptions::compact_tables`].
+  final bool? compactTables;
 
   /// Optional override for [`ConversionOptions::highlight_style`].
   final HighlightStyle? highlightStyle;
@@ -680,6 +695,7 @@ class ConversionOptionsUpdate {
     this.autolinks,
     this.defaultTitle,
     this.brInTables,
+    this.compactTables,
     this.highlightStyle,
     this.extractMetadata,
     this.whitespaceMode,
@@ -725,6 +741,7 @@ class ConversionOptionsUpdate {
       autolinks.hashCode ^
       defaultTitle.hashCode ^
       brInTables.hashCode ^
+      compactTables.hashCode ^
       highlightStyle.hashCode ^
       extractMetadata.hashCode ^
       whitespaceMode.hashCode ^
@@ -772,6 +789,7 @@ class ConversionOptionsUpdate {
           autolinks == other.autolinks &&
           defaultTitle == other.defaultTitle &&
           brInTables == other.brInTables &&
+          compactTables == other.compactTables &&
           highlightStyle == other.highlightStyle &&
           extractMetadata == other.extractMetadata &&
           whitespaceMode == other.whitespaceMode &&

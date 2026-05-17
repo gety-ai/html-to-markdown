@@ -1810,6 +1810,13 @@ int32_t htm_conversion_options_default_title(const HTMConversionOptions *ptr);
 int32_t htm_conversion_options_br_in_tables(const HTMConversionOptions *ptr);
 
 /**
+ * Get the `compact_tables` field from a `ConversionOptions`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+int32_t htm_conversion_options_compact_tables(const HTMConversionOptions *ptr);
+
+/**
  * Get the `highlight_style` field from a `ConversionOptions`.
  * # Safety
  * Pointer must be a valid handle returned by this library.
@@ -2122,6 +2129,13 @@ int32_t htm_conversion_options_update_default_title(const HTMConversionOptionsUp
  * Pointer must be a valid handle returned by this library.
  */
 int32_t htm_conversion_options_update_br_in_tables(const HTMConversionOptionsUpdate *ptr);
+
+/**
+ * Get the `compact_tables` field from a `ConversionOptionsUpdate`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+int32_t htm_conversion_options_update_compact_tables(const HTMConversionOptionsUpdate *ptr);
 
 /**
  * Get the `highlight_style` field from a `ConversionOptionsUpdate`.

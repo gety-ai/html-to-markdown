@@ -50,6 +50,16 @@ data class ConversionOptions(
     val defaultTitle: Boolean,
     /** Render `<br>` elements inside table cells as literal line breaks. */
     val brInTables: Boolean,
+    /**
+     * Emit tables without column padding (compact GFM format).
+     *
+     * When `true`, column widths are not computed and cells are emitted with no trailing spaces.
+     * Separator rows use exactly `---` per column. Produces token-efficient output suitable for RAG
+     * / LLM contexts.
+     *
+     * Default `false` (aligned padding preserved).
+     */
+    val compactTables: Boolean,
     /** Style used for `<mark>` / highlighted text (e.g. `==text==`). */
     val highlightStyle: HighlightStyle,
     /**

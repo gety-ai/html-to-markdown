@@ -117,6 +117,7 @@ mod ffi {
             autolinks: bool,
             default_title: bool,
             br_in_tables: bool,
+            compact_tables: bool,
             highlight_style: HighlightStyle,
             extract_metadata: bool,
             whitespace_mode: WhitespaceMode,
@@ -159,6 +160,7 @@ mod ffi {
         fn autolinks(&self) -> bool;
         fn default_title(&self) -> bool;
         fn br_in_tables(&self) -> bool;
+        fn compact_tables(&self) -> bool;
         fn highlight_style(&self) -> String;
         fn extract_metadata(&self) -> bool;
         fn whitespace_mode(&self) -> String;
@@ -206,6 +208,7 @@ mod ffi {
             autolinks: Option<bool>,
             default_title: Option<bool>,
             br_in_tables: Option<bool>,
+            compact_tables: Option<bool>,
             highlight_style: Option<HighlightStyle>,
             extract_metadata: Option<bool>,
             whitespace_mode: Option<WhitespaceMode>,
@@ -248,6 +251,7 @@ mod ffi {
         fn autolinks(&self) -> Option<bool>;
         fn default_title(&self) -> Option<bool>;
         fn br_in_tables(&self) -> Option<bool>;
+        fn compact_tables(&self) -> Option<bool>;
         fn highlight_style(&self) -> Option<String>;
         fn extract_metadata(&self) -> Option<bool>;
         fn whitespace_mode(&self) -> Option<String>;
@@ -865,6 +869,7 @@ impl ConversionOptions {
         autolinks: bool,
         default_title: bool,
         br_in_tables: bool,
+        compact_tables: bool,
         highlight_style: HighlightStyle,
         extract_metadata: bool,
         whitespace_mode: WhitespaceMode,
@@ -916,6 +921,7 @@ impl ConversionOptions {
         __target.autolinks = autolinks;
         __target.default_title = default_title;
         __target.br_in_tables = br_in_tables;
+        __target.compact_tables = compact_tables;
         // alef: highlight_style (HighlightStyle) is an enum; reverse From not generated — left at default
         __target.extract_metadata = extract_metadata;
         // alef: whitespace_mode (WhitespaceMode) is an enum; reverse From not generated — left at default
@@ -1035,6 +1041,12 @@ impl ConversionOptions {
     }
     pub fn br_in_tables(&self) -> bool {
         ::serde_json::to_value(&self.0.br_in_tables)
+            .ok()
+            .and_then(|j| ::serde_json::from_value(j).ok())
+            .unwrap_or_default()
+    }
+    pub fn compact_tables(&self) -> bool {
+        ::serde_json::to_value(&self.0.compact_tables)
             .ok()
             .and_then(|j| ::serde_json::from_value(j).ok())
             .unwrap_or_default()
@@ -1193,6 +1205,7 @@ impl ConversionOptionsUpdate {
         autolinks: Option<bool>,
         default_title: Option<bool>,
         br_in_tables: Option<bool>,
+        compact_tables: Option<bool>,
         highlight_style: Option<HighlightStyle>,
         extract_metadata: Option<bool>,
         whitespace_mode: Option<WhitespaceMode>,
@@ -1248,6 +1261,7 @@ impl ConversionOptionsUpdate {
         __target.autolinks = autolinks;
         __target.default_title = default_title;
         __target.br_in_tables = br_in_tables;
+        __target.compact_tables = compact_tables;
         // alef: highlight_style (HighlightStyle) is an enum; reverse From not generated — left at default
         __target.extract_metadata = extract_metadata;
         // alef: whitespace_mode (WhitespaceMode) is an enum; reverse From not generated — left at default
@@ -1389,6 +1403,13 @@ impl ConversionOptionsUpdate {
     }
     pub fn br_in_tables(&self) -> Option<bool> {
         self.0.br_in_tables.as_ref().and_then(|v| {
+            ::serde_json::to_value(v)
+                .ok()
+                .and_then(|j| ::serde_json::from_value(j).ok())
+        })
+    }
+    pub fn compact_tables(&self) -> Option<bool> {
+        self.0.compact_tables.as_ref().and_then(|v| {
             ::serde_json::to_value(v)
                 .ok()
                 .and_then(|j| ::serde_json::from_value(j).ok())

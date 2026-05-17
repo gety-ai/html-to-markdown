@@ -878,6 +878,7 @@ const _: fn() = || {
         let _: bool = ConversionOptions.autolinks;
         let _: bool = ConversionOptions.default_title;
         let _: bool = ConversionOptions.br_in_tables;
+        let _: bool = ConversionOptions.compact_tables;
         let _: crate::HighlightStyle = ConversionOptions.highlight_style;
         let _: bool = ConversionOptions.extract_metadata;
         let _: crate::WhitespaceMode = ConversionOptions.whitespace_mode;
@@ -922,6 +923,7 @@ const _: fn() = || {
         let _: Option<bool> = ConversionOptionsUpdate.autolinks;
         let _: Option<bool> = ConversionOptionsUpdate.default_title;
         let _: Option<bool> = ConversionOptionsUpdate.br_in_tables;
+        let _: Option<bool> = ConversionOptionsUpdate.compact_tables;
         let _: Option<crate::HighlightStyle> = ConversionOptionsUpdate.highlight_style;
         let _: Option<bool> = ConversionOptionsUpdate.extract_metadata;
         let _: Option<crate::WhitespaceMode> = ConversionOptionsUpdate.whitespace_mode;
@@ -1807,6 +1809,7 @@ impl SseDecode for crate::ConversionOptions {
         let mut var_autolinks = <bool>::sse_decode(deserializer);
         let mut var_defaultTitle = <bool>::sse_decode(deserializer);
         let mut var_brInTables = <bool>::sse_decode(deserializer);
+        let mut var_compactTables = <bool>::sse_decode(deserializer);
         let mut var_highlightStyle = <crate::HighlightStyle>::sse_decode(deserializer);
         let mut var_extractMetadata = <bool>::sse_decode(deserializer);
         let mut var_whitespaceMode = <crate::WhitespaceMode>::sse_decode(deserializer);
@@ -1849,6 +1852,7 @@ impl SseDecode for crate::ConversionOptions {
             autolinks: var_autolinks,
             default_title: var_defaultTitle,
             br_in_tables: var_brInTables,
+            compact_tables: var_compactTables,
             highlight_style: var_highlightStyle,
             extract_metadata: var_extractMetadata,
             whitespace_mode: var_whitespaceMode,
@@ -1897,6 +1901,7 @@ impl SseDecode for crate::ConversionOptionsUpdate {
         let mut var_autolinks = <Option<bool>>::sse_decode(deserializer);
         let mut var_defaultTitle = <Option<bool>>::sse_decode(deserializer);
         let mut var_brInTables = <Option<bool>>::sse_decode(deserializer);
+        let mut var_compactTables = <Option<bool>>::sse_decode(deserializer);
         let mut var_highlightStyle = <Option<crate::HighlightStyle>>::sse_decode(deserializer);
         let mut var_extractMetadata = <Option<bool>>::sse_decode(deserializer);
         let mut var_whitespaceMode = <Option<crate::WhitespaceMode>>::sse_decode(deserializer);
@@ -1939,6 +1944,7 @@ impl SseDecode for crate::ConversionOptionsUpdate {
             autolinks: var_autolinks,
             default_title: var_defaultTitle,
             br_in_tables: var_brInTables,
+            compact_tables: var_compactTables,
             highlight_style: var_highlightStyle,
             extract_metadata: var_extractMetadata,
             whitespace_mode: var_whitespaceMode,
@@ -3211,6 +3217,7 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::ConversionOptions> {
             self.0.autolinks.into_into_dart().into_dart(),
             self.0.default_title.into_into_dart().into_dart(),
             self.0.br_in_tables.into_into_dart().into_dart(),
+            self.0.compact_tables.into_into_dart().into_dart(),
             self.0.highlight_style.into_into_dart().into_dart(),
             self.0.extract_metadata.into_into_dart().into_dart(),
             self.0.whitespace_mode.into_into_dart().into_dart(),
@@ -3266,6 +3273,7 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::ConversionOptionsUpdate
             self.0.autolinks.into_into_dart().into_dart(),
             self.0.default_title.into_into_dart().into_dart(),
             self.0.br_in_tables.into_into_dart().into_dart(),
+            self.0.compact_tables.into_into_dart().into_dart(),
             self.0.highlight_style.into_into_dart().into_dart(),
             self.0.extract_metadata.into_into_dart().into_dart(),
             self.0.whitespace_mode.into_into_dart().into_dart(),
@@ -4172,6 +4180,7 @@ impl SseEncode for crate::ConversionOptions {
         <bool>::sse_encode(self.autolinks, serializer);
         <bool>::sse_encode(self.default_title, serializer);
         <bool>::sse_encode(self.br_in_tables, serializer);
+        <bool>::sse_encode(self.compact_tables, serializer);
         <crate::HighlightStyle>::sse_encode(self.highlight_style, serializer);
         <bool>::sse_encode(self.extract_metadata, serializer);
         <crate::WhitespaceMode>::sse_encode(self.whitespace_mode, serializer);
@@ -4219,6 +4228,7 @@ impl SseEncode for crate::ConversionOptionsUpdate {
         <Option<bool>>::sse_encode(self.autolinks, serializer);
         <Option<bool>>::sse_encode(self.default_title, serializer);
         <Option<bool>>::sse_encode(self.br_in_tables, serializer);
+        <Option<bool>>::sse_encode(self.compact_tables, serializer);
         <Option<crate::HighlightStyle>>::sse_encode(self.highlight_style, serializer);
         <Option<bool>>::sse_encode(self.extract_metadata, serializer);
         <Option<crate::WhitespaceMode>>::sse_encode(self.whitespace_mode, serializer);
