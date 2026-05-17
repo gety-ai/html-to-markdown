@@ -25,7 +25,18 @@ repos:
       - id: trailing-whitespace
         exclude: \.github/copilot-instructions\.md
       - id: end-of-file-fixer
-        exclude: \.github/copilot-instructions\.md
+        # Skip intentionally-empty marker files. `.gitkeep` placeholders,
+        # PEP-561 `py.typed` markers, namespace-package `__init__.py` shims,
+        # and the empty `checkstyle.properties` config file are meant to stay
+        # zero-byte / trailing-newline-free; the hook would otherwise loop.
+        exclude: |
+          (?x)^(
+            \.github/copilot-instructions\.md|
+            .*/\.gitkeep|
+            .*/py\.typed|
+            packages/java/checkstyle\.properties|
+            (e2e/python|e2e/python/tests)/__init__\.py
+          )$
       - id: check-merge-conflict
       - id: check-added-large-files
         exclude: uv.lock
@@ -46,7 +57,7 @@ repos:
 
   # Python: ruff (linting + formatting) + mypy (type checking)
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.12
+    rev: v0.15.13
     hooks:
       - id: ruff
         args: [--fix]
@@ -54,7 +65,7 @@ repos:
 
   # Node/TS/WASM: oxlint
   - repo: https://github.com/kreuzberg-dev/pre-commit-hooks
-    rev: v1.1.2
+    rev: v1.1.5
     hooks:
       - id: cargo-sort
         args: [-w]
@@ -68,7 +79,7 @@ repos:
             "--exclude=html-to-markdown-php",
             "--exclude=html-to-markdown-py",
             "--exclude=html-to-markdown-node",
-            "--exclude=html-to-markdown-e2e-rust",
+            "--exclude=html_to_markdown_rs-e2e-rust",
             "--all-features",
             "--all-targets",
           ]
@@ -82,7 +93,7 @@ repos:
             "--exclude=html-to-markdown-php",
             "--exclude=html-to-markdown-py",
             "--exclude=html-to-markdown-node",
-            "--exclude=html-to-markdown-e2e-rust",
+            "--exclude=html_to_markdown_rs-e2e-rust",
             "--all-features",
             "--all-targets",
             "--",
@@ -111,20 +122,19 @@ repos:
       #   files: ^packages/typescript/src/.*\.ts$
       #   exclude: \.d\.ts$
       - id: alef-docs-fresh
-      # yard-coverage disabled — h2m's root Gemfile doesn't include yard;
-      # bundle exec yard fails and the hook doesn't fall back to direct
-      # `yard` on PATH. Add `gem 'yard', group: :development` to enable.
+      # yard-coverage disabled — h2m has no `yard` gem on PATH or in the
+      # repo Gemfile. The hook tries `bundle exec yard` and then falls back
+      # to a PATH `yard`, but neither resolves here. Re-enable after adding
+      # `gem 'yard', group: :development` to packages/ruby/Gemfile (or
+      # installing yard system-wide).
       # - id: yard-coverage
       #   files: ^packages/ruby/lib/.*\.rb$
       #   exclude: ^packages/ruby/lib/html_to_markdown/native\.rb$
       - id: roxygen2-check
         files: ^packages/r/R/.*\.R$
-      # godoc-lint disabled — hook v1.1.2 invokes `golangci-lint --disable-all`
-      # which is not accepted by golangci-lint v2.x. Re-enable after
-      # pre-commit-hooks fix lands.
-      # - id: godoc-lint
-      #   files: ^packages/go/.*\.go$
-      #   exclude: ^(e2e/|test_apps/)
+      - id: godoc-lint
+        files: ^packages/go/.*\.go$
+        exclude: ^(e2e/|test_apps/)
       - id: javadoc-lint
         files: ^packages/java/src/main/.*\.java$
       - id: cs-xmldoc-lint
@@ -146,12 +156,9 @@ repos:
       # plugin dep.
       # - id: swift-doc-coverage
       #   files: ^packages/swift/Sources/HtmlToMarkdown/.*\.swift$
-      # zig-doc-lint disabled — prek/identify doesn't classify .zig files
-      # as type 'zig', so prek skips with "no files to check". Re-enable
-      # after pre-commit-hooks switches the manifest to a files-based pattern.
-      # - id: zig-doc-lint
-      #   files: ^packages/zig/src/.*\.zig$
-      #   exclude: ^packages/zig/src/html_to_markdown_rs\.zig$
+      - id: zig-doc-lint
+        files: ^packages/zig/src/.*\.zig$
+        exclude: ^packages/zig/src/html_to_markdown_rs\.zig$
       # kotlin-dokka disabled — requires Dokka Gradle plugin in
       # packages/kotlin-android/build.gradle.kts; not yet wired.
       # - id: kotlin-dokka
@@ -240,9 +247,13 @@ repos:
       - id: cpd
         args: ["--minimum-tokens=120"]
         exclude: ^test_apps/
-  # Alef: verify bindings and sync versions
+  # Alef: verify bindings and sync versions.
+  # NOTE: pinned to v0.16.22 (not v0.16.23) because v0.16.23 was tagged
+  # without uploading platform binaries — the hook downloads the prebuilt
+  # tarball and 404s on that release. Bump again once a release with
+  # `alef-aarch64-apple-darwin.tar.gz` ships.
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.16.21
+    rev: v0.16.22
     hooks:
       - id: alef-verify
       - id: alef-sync-versions
@@ -255,7 +266,7 @@ repos:
 
   # Java cpd — kept upstream (not yet in shared repo)
   - repo: https://github.com/crate-ci/typos
-    rev: v1.46.1
+    rev: v1.46.2
     hooks:
       - id: typos
         args: [--force-exclude]
