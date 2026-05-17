@@ -12,8 +12,9 @@ enum class WhitespaceMode {
      * Collapse multiple whitespace characters to single spaces. Default. Matches browser behavior.
      */
     NORMALIZED,
+
     /**
      * Preserve all whitespace exactly as it appears in the HTML.
      */
-    STRICT;
+    STRICT,
 }

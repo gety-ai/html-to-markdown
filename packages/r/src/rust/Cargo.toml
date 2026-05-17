@@ -12,13 +12,14 @@ categories = ["text-processing"]
 crate-type = ["staticlib", "lib"]
 
 [dependencies]
-extendr-api = "0.9"
 html-to-markdown-rs = { path = "../../../../crates/html-to-markdown", features = [
-    "full",
-    "metadata",
-    "visitor",
-    "serde",
-    "inline-images",
+  "full",
+  "metadata",
+  "visitor",
+  "serde",
+  "inline-images",
 ] }
+extendr-api = "0.9"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+async-trait = "0.1"

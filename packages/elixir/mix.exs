@@ -6,7 +6,7 @@ defmodule HtmlToMarkdown.MixProject do
       app: :html_to_markdown,
       version: "3.5.0",
       elixir: "~> 1.14",
-      elixirc_paths: ["lib", "../..//packages/elixir/native/html_to_markdown_nif/src"],
+      elixirc_paths: ["lib", Path.expand("../../packages/elixir/native/html_to_markdown_nif/src", __DIR__)],
       rustler_crates: [html_to_markdown_nif: [mode: :release]],
       description: "High-performance HTML to Markdown converter",
       package: package(),

@@ -12,12 +12,14 @@ enum class HeadingStyle {
      * Underlined style (=== for h1, --- for h2).
      */
     UNDERLINED,
+
     /**
      * ATX style (# for h1, ## for h2, etc.). Default.
      */
     ATX,
+
     /**
      * ATX closed style (# title #, with closing hashes).
      */
-    ATX_CLOSED;
+    ATX_CLOSED,
 }

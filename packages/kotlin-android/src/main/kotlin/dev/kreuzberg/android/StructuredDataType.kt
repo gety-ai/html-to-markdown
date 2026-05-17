@@ -12,12 +12,14 @@ enum class StructuredDataType {
      * JSON-LD (JSON for Linking Data) script blocks
      */
     JSON_LD,
+
     /**
      * HTML5 Microdata attributes (itemscope, itemtype, itemprop)
      */
     MICRODATA,
+
     /**
      * RDF in Attributes (RDFa) markup
      */
-    R_D_FA;
+    R_D_FA,
 }

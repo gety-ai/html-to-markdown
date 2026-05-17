@@ -2,12 +2,15 @@
 
 package dev.kreuzberg.android
 
-/** Errors that can occur during HTML to Markdown conversion. */
+/**
+ * Errors that can occur during HTML to Markdown conversion.
+ */
 sealed class ConversionError(message: String) : Exception(message) {
     data class ParseError(val field0: String) : ConversionError("HTML parsing error: $field0")
 
-    data class SanitizationError(val field0: String) :
-        ConversionError("Sanitization error: $field0")
+    data class SanitizationError(
+        val field0: String,
+    ) : ConversionError("Sanitization error: $field0")
 
     data class ConfigError(val field0: String) : ConversionError("Invalid configuration: $field0")
 

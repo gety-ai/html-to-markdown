@@ -5,17 +5,21 @@ package dev.kreuzberg.android
 /**
  * Result of a visitor callback.
  *
- * Allows visitors to control the conversion flow by either proceeding with default behavior,
- * providing custom output, skipping elements, preserving HTML, or signaling errors.
+ * Allows visitors to control the conversion flow by either proceeding
+ * with default behavior, providing custom output, skipping elements,
+ * preserving HTML, or signaling errors.
  */
 sealed class VisitResult {
-    /** Continue with default conversion behavior */
+    /**
+     * Continue with default conversion behavior
+     */
     object Continue : VisitResult()
 
     /**
      * Replace default output with custom markdown
      *
-     * The visitor takes full responsibility for the markdown output of this node and its children.
+     * The visitor takes full responsibility for the markdown output
+     * of this node and its children.
      */
     data class Custom(val value: String) : VisitResult()
 

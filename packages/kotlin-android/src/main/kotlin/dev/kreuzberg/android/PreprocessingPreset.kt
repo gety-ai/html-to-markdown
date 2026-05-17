@@ -12,12 +12,14 @@ enum class PreprocessingPreset {
      * Minimal cleanup. Remove only essential noise (scripts, styles).
      */
     MINIMAL,
+
     /**
      * Standard cleanup. Default. Removes navigation, forms, and other auxiliary content.
      */
     STANDARD,
+
     /**
      * Aggressive cleanup. Remove extensive non-content elements and structure.
      */
-    AGGRESSIVE;
+    AGGRESSIVE,
 }

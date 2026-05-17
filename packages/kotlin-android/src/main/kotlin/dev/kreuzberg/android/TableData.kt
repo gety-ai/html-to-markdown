@@ -13,5 +13,5 @@ data class TableData(
     /**
      * The markdown rendering of this table.
      */
-    val markdown: String
+    val markdown: String,
 )

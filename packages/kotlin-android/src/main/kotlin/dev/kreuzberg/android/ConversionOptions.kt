@@ -209,5 +209,5 @@ data class ConversionOptions(
      * during conversion, allowing custom output, skipping, or HTML preservation.
      * See `HtmlVisitor`.
      */
-    val visitor: VisitorHandle?
+    val visitor: VisitorHandle?,
 )

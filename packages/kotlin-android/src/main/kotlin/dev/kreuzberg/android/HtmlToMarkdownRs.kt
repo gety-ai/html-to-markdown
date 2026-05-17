@@ -32,5 +32,4 @@ object HtmlToMarkdownRs {
      */
     suspend fun convertAsync(html: String, options: ConversionOptions? = null): ConversionResult =
         withContext(Dispatchers.IO) { convert(html, options) }
-
 }

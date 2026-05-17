@@ -12,24 +12,29 @@ enum class LinkType {
      * Anchor link within same document (href starts with #)
      */
     ANCHOR,
+
     /**
      * Internal link within same domain
      */
     INTERNAL,
+
     /**
      * External link to different domain
      */
     EXTERNAL,
+
     /**
      * Email link (mailto:)
      */
     EMAIL,
+
     /**
      * Phone link (tel:)
      */
     PHONE,
+
     /**
      * Other protocol or unclassifiable
      */
-    OTHER;
+    OTHER,
 }

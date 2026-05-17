@@ -31,5 +31,5 @@ data class LinkMetadata(
     /**
      * Additional HTML attributes
      */
-    val attributes: Map<String, String>
+    val attributes: Map<String, String>,
 )

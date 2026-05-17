@@ -20,5 +20,5 @@ data class StructuredData(
     /**
      * Schema type if detectable (e.g., "Article", "Event", "Product")
      */
-    val schemaType: String?
+    val schemaType: String?,
 )

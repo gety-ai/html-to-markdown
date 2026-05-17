@@ -29,5 +29,5 @@ data class GridCell(
     /**
      * Whether this is a header cell (`<th>`).
      */
-    val isHeader: Boolean
+    val isHeader: Boolean,
 )

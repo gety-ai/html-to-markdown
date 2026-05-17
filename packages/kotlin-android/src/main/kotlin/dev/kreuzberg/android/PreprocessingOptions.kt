@@ -21,5 +21,5 @@ data class PreprocessingOptions(
     /**
      * Remove form elements (forms, inputs, buttons, etc.)
      */
-    val removeForms: Boolean
+    val removeForms: Boolean,
 )

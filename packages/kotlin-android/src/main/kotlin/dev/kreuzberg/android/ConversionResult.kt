@@ -49,5 +49,5 @@ data class ConversionResult(
     /**
      * Non-fatal processing warnings.
      */
-    val warnings: List<ProcessingWarning>
+    val warnings: List<ProcessingWarning>,
 )

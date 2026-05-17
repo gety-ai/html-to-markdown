@@ -172,5 +172,5 @@ data class ConversionOptionsUpdate(
     /**
      * Optional override for `ConversionOptions.visitor`.
      */
-    val visitor: VisitorHandle?
+    val visitor: VisitorHandle?,
 )

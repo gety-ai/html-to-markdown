@@ -28,5 +28,5 @@ data class HeaderMetadata(
     /**
      * Byte offset in original HTML document
      */
-    val htmlOffset: Long
+    val htmlOffset: Long,
 )

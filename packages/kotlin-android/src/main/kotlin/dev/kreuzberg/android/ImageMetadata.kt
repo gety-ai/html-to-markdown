@@ -32,5 +32,5 @@ data class ImageMetadata(
     /**
      * Additional HTML attributes
      */
-    val attributes: Map<String, String>
+    val attributes: Map<String, String>,
 )

@@ -27,5 +27,5 @@ data class ProcessingWarning(
     /**
      * The category of warning.
      */
-    val kind: WarningKind
+    val kind: WarningKind,
 )

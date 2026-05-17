@@ -12,8 +12,9 @@ enum class ListIndentType {
      * Use spaces for indentation. Default. Width controlled by `list_indent_width`.
      */
     SPACES,
+
     /**
      * Use tabs for indentation.
      */
-    TABS;
+    TABS,
 }

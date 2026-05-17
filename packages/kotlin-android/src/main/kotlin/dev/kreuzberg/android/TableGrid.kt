@@ -30,5 +30,5 @@ data class TableGrid(
      * The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 || cols == 0`)
      * produces an empty vec.
      */
-    val cells: List<GridCell>
+    val cells: List<GridCell>,
 )

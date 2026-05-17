@@ -32,7 +32,7 @@ tasks:
       - alef-snippets validate --snippets docs/snippets --level syntax --timeout 120 -j 4
 
   snippets:validate:lang:
-    desc: 'Validate snippets for one language (set LANG=dart|kotlin|swift|...)'
+    desc: "Validate snippets for one language (set LANG=dart|kotlin|swift|...)"
     cmds:
       - alef-snippets validate --snippets docs/snippets --level syntax --languages {{.LANG}} --timeout 120 -j 4
     requires:

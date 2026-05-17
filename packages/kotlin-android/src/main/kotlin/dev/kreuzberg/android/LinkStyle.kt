@@ -13,8 +13,9 @@ enum class LinkStyle {
      * Inline links: `[text](url)`. Default.
      */
     INLINE,
+
     /**
      * Reference-style links: `[text][1]` with `[1]: url` at end of document.
      */
-    REFERENCE;
+    REFERENCE,
 }

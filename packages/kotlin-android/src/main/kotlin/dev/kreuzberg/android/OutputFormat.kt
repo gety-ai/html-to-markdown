@@ -12,12 +12,14 @@ enum class OutputFormat {
      * Standard Markdown (CommonMark compatible). Default.
      */
     MARKDOWN,
+
     /**
      * Djot lightweight markup language.
      */
     DJOT,
+
     /**
      * Plain text output (no markup, visible text only).
      */
-    PLAIN;
+    PLAIN,
 }

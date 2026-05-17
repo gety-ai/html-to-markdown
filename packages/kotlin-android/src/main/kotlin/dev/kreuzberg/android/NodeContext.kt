@@ -36,5 +36,5 @@ data class NodeContext(
     /**
      * Whether this element is treated as inline vs block
      */
-    val isInline: Boolean
+    val isInline: Boolean,
 )

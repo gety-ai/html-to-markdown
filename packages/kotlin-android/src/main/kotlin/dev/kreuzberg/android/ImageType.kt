@@ -12,16 +12,19 @@ enum class ImageType {
      * Data URI embedded image (base64 or other encoding)
      */
     DATA_URI,
+
     /**
      * Inline SVG element
      */
     INLINE_SVG,
+
     /**
      * External image URL (http/https)
      */
     EXTERNAL,
+
     /**
      * Relative image path
      */
-    RELATIVE;
+    RELATIVE,
 }

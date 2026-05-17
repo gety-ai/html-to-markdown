@@ -30,5 +30,5 @@ data class TextAnnotation(
     /**
      * The type of annotation.
      */
-    val kind: AnnotationKind
+    val kind: AnnotationKind,
 )

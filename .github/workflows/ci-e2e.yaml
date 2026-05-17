@@ -100,10 +100,10 @@ jobs:
       zig: ${{ steps.filter.outputs.zig }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
 
       - name: Detect changes
-        uses: dorny/paths-filter@v4 # v3
+        uses: dorny/paths-filter@v4.0.1
         id: filter
         with:
           filters: |
@@ -222,7 +222,7 @@ jobs:
           - windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
         id: checkout
 
       - name: Free disk space
@@ -263,7 +263,7 @@ jobs:
 
       - name: Upload FFI artifacts
         if: matrix.runner != 'windows-latest'
-        uses: actions/upload-artifact@v7 # v7
+        uses: actions/upload-artifact@v7.0.1.0.1
         with:
           name: ffi-${{ matrix.runner }}
           path: |
@@ -293,19 +293,19 @@ jobs:
         python: ["3.10", "3.12", "3.14"]
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
         id: checkout
 
       - name: Install Task
         uses: kreuzberg-dev/actions/install-task@v1 # v1
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7 # v7
+        uses: astral-sh/setup-uv@v8.1.0
         with:
           enable-cache: true
 
       - name: Set up Python
-        uses: actions/setup-python@v6 # v6
+        uses: actions/setup-python@v6.2.0.2.0.2.0.2.0
         with:
           python-version: ${{ matrix.python }}
 
@@ -362,7 +362,7 @@ jobs:
             runtime: bun
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
         id: checkout
 
       - name: Install Task
@@ -379,7 +379,7 @@ jobs:
 
       - name: Setup Bun
         if: matrix.runtime == 'bun'
-        uses: oven-sh/setup-bun@v2 # v2
+        uses: oven-sh/setup-bun@v2.2.0.2.0
         with:
           bun-version: latest
 
@@ -430,7 +430,7 @@ jobs:
         ruby: ["3.2", "3.3"]
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
         id: checkout
 
       - name: Setup Rust
@@ -440,7 +440,7 @@ jobs:
 
       - name: Setup Ruby (Unix)
         if: runner.os != 'Windows'
-        uses: ruby/setup-ruby@v1 # v1
+        uses: ruby/setup-ruby@v1.308.0.308.0.308.0.308.0
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler: "4.0.3"
@@ -449,7 +449,7 @@ jobs:
 
       - name: Setup Ruby (Windows)
         if: runner.os == 'Windows'
-        uses: ruby/setup-ruby@v1 # v1
+        uses: ruby/setup-ruby@v1.308.0.308.0.308.0.308.0
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler: "4.0.3"
@@ -458,7 +458,7 @@ jobs:
           windows-toolchain: UCRT64
 
       - name: Set up Python
-        uses: actions/setup-python@v6 # v6
+        uses: actions/setup-python@v6.2.0.2.0.2.0.2.0
         with:
           python-version: "3.12"
 
@@ -490,7 +490,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
         id: checkout
 
       - name: Setup PHP
@@ -532,7 +532,7 @@ jobs:
           lib-name: html_to_markdown_php
 
       - name: Upload PHP extension artifact
-        uses: actions/upload-artifact@v7 # v7
+        uses: actions/upload-artifact@v7.0.1.0.1
         with:
           name: php-extension-ubuntu
           path: ${{ steps.build-php-extension.outputs.extension-path }}
@@ -558,7 +558,7 @@ jobs:
         java: ["25"]
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
         id: checkout
 
       - name: Setup Rust
@@ -588,7 +588,7 @@ jobs:
     timeout-minutes: 120
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
         id: checkout
 
       - name: Setup Rust
@@ -631,18 +631,18 @@ jobs:
         python: ["3.10", "3.12", "3.14"]
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
 
       - name: Install Task
         uses: kreuzberg-dev/actions/install-task@v1 # v1
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7 # v7
+        uses: astral-sh/setup-uv@v8.1.0
         with:
           enable-cache: true
 
       - name: Set up Python
-        uses: actions/setup-python@v6 # v6
+        uses: actions/setup-python@v6.2.0.2.0.2.0.2.0
         with:
           python-version: ${{ matrix.python }}
 
@@ -698,7 +698,7 @@ jobs:
             runtime: bun
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
 
       - name: Install Task
         uses: kreuzberg-dev/actions/install-task@v1 # v1
@@ -712,7 +712,7 @@ jobs:
 
       - name: Setup Bun
         if: matrix.runtime == 'bun'
-        uses: oven-sh/setup-bun@v2 # v2
+        uses: oven-sh/setup-bun@v2.2.0.2.0
         with:
           bun-version: latest
 
@@ -770,14 +770,14 @@ jobs:
         ruby: ["3.2", "3.3"]
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
 
       - name: Setup Rust
         uses: kreuzberg-dev/actions/setup-rust@v1 # v1
 
       - name: Setup Ruby (Unix)
         if: runner.os != 'Windows'
-        uses: ruby/setup-ruby@v1 # v1
+        uses: ruby/setup-ruby@v1.308.0.308.0.308.0.308.0
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler: "4.0.3"
@@ -786,7 +786,7 @@ jobs:
 
       - name: Setup Ruby (Windows)
         if: runner.os == 'Windows'
-        uses: ruby/setup-ruby@v1 # v1
+        uses: ruby/setup-ruby@v1.308.0.308.0.308.0.308.0
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler: "4.0.3"
@@ -795,7 +795,7 @@ jobs:
           windows-toolchain: UCRT64
 
       - name: Set up Python
-        uses: actions/setup-python@v6 # v6
+        uses: actions/setup-python@v6.2.0.2.0.2.0.2.0
         with:
           python-version: "3.12"
 
@@ -861,7 +861,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
 
       - name: Setup PHP
         uses: shivammathur/setup-php@2.37.1 # 2
@@ -934,13 +934,13 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
 
       - name: Setup Rust
         uses: kreuzberg-dev/actions/setup-rust@v1 # v1
 
       - name: Setup Go
-        uses: actions/setup-go@v6 # v6
+        uses: actions/setup-go@v6.4.0
         with:
           go-version: ${{ env.GO_VERSION }}
           check-latest: true
@@ -993,7 +993,7 @@ jobs:
         java: ["25"]
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
 
       - name: Setup Rust
         uses: kreuzberg-dev/actions/setup-rust@v1 # v1
@@ -1030,10 +1030,10 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
 
       - name: Setup Elixir
-        uses: erlef/setup-beam@v1 # v1
+        uses: erlef/setup-beam@v1.24.0
         with:
           elixir-version: "1.19"
           otp-version: "28.1"
@@ -1082,7 +1082,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
 
       - name: Setup R
         uses: kreuzberg-dev/actions/setup-r@v1 # v1
@@ -1131,7 +1131,7 @@ jobs:
           - macos-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
 
       - name: Setup Rust
         uses: kreuzberg-dev/actions/setup-rust@v1 # v1
@@ -1182,7 +1182,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
 
       - name: Setup Rust
         uses: kreuzberg-dev/actions/setup-rust@v1 # v1
@@ -1208,7 +1208,7 @@ jobs:
     timeout-minutes: 120
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
 
       - name: Setup Rust
         uses: kreuzberg-dev/actions/setup-rust@v1 # v1
@@ -1254,7 +1254,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
         id: checkout
 
       - name: Setup Rust
@@ -1264,7 +1264,7 @@ jobs:
           cache-key-prefix: kotlin-android
 
       - name: Setup Android SDK/NDK
-        uses: android-actions/setup-android@v3 # v3
+        uses: android-actions/setup-android@v4.0.1
 
       - name: Build Android native libraries
         uses: kreuzberg-dev/actions/build-android-natives@v1 # v1
@@ -1288,7 +1288,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
 
       - name: Install Task
         uses: kreuzberg-dev/actions/install-task@v1 # v1
@@ -1325,7 +1325,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
 
       - name: Install Task
         uses: kreuzberg-dev/actions/install-task@v1 # v1
@@ -1336,7 +1336,7 @@ jobs:
           cache-key-prefix: dart
 
       - name: Setup Dart
-        uses: dart-lang/setup-dart@v1 # v1
+        uses: dart-lang/setup-dart@v1.7.2
 
       - name: Install alef
         uses: kreuzberg-dev/actions/install-alef@v1 # v1
@@ -1361,7 +1361,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
 
       - name: Install Task
         uses: kreuzberg-dev/actions/install-task@v1 # v1

@@ -15,5 +15,5 @@ data class DocumentStructure(
     /**
      * The source format (always "html" for this library).
      */
-    val sourceFormat: String?
+    val sourceFormat: String?,
 )

@@ -38,5 +38,5 @@ data class DocumentNode(
      * significance for the node type are collected. For example, heading nodes capture the `"id"`
      * attribute for anchor linking; other element-level attributes may be silently dropped.
      */
-    val attributes: Map<String, String>?
+    val attributes: Map<String, String>?,
 )

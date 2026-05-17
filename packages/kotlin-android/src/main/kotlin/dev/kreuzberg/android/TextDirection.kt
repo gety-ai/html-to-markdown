@@ -12,12 +12,14 @@ enum class TextDirection {
      * Left-to-right text flow (default for Latin scripts)
      */
     LEFT_TO_RIGHT,
+
     /**
      * Right-to-left text flow (Hebrew, Arabic, Urdu, etc.)
      */
     RIGHT_TO_LEFT,
+
     /**
      * Automatic directionality detection
      */
-    AUTO;
+    AUTO,
 }

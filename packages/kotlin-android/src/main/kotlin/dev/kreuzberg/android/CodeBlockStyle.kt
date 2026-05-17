@@ -12,12 +12,14 @@ enum class CodeBlockStyle {
      * Indented code blocks (4 spaces). `CommonMark` standard.
      */
     INDENTED,
+
     /**
      * Fenced code blocks with backticks (```). Default (GFM). Supports language hints.
      */
     BACKTICKS,
+
     /**
      * Fenced code blocks with tildes (~~~). Supports language hints.
      */
-    TILDES;
+    TILDES,
 }

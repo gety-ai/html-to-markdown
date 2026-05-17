@@ -55,5 +55,5 @@ data class DocumentMetadata(
      * Additional meta tags not covered by specific fields
      * Keys are meta name/property attributes, values are content
      */
-    val metaTags: Map<String, String>
+    val metaTags: Map<String, String>,
 )

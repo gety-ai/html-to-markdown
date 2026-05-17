@@ -25,5 +25,5 @@ data class PreprocessingOptionsUpdate(
     /**
      * Optional form element removal override (forms, inputs, buttons, etc.)
      */
-    val removeForms: Boolean?
+    val removeForms: Boolean?,
 )

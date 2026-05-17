@@ -28,5 +28,5 @@ data class HtmlMetadata(
     /**
      * Extracted structured data blocks
      */
-    val structuredData: List<StructuredData>
+    val structuredData: List<StructuredData>,
 )

@@ -12,16 +12,19 @@ enum class HighlightStyle {
      * Double equals syntax (==text==). Default. Pandoc-compatible.
      */
     DOUBLE_EQUAL,
+
     /**
      * Preserve as HTML (==text==). Original HTML tag.
      */
     HTML,
+
     /**
      * Render as bold (**text**). Uses strong emphasis.
      */
     BOLD,
+
     /**
      * Strip formatting, render as plain text. No markup.
      */
-    NONE;
+    NONE,
 }

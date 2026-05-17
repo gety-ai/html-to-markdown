@@ -12,8 +12,9 @@ enum class NewlineStyle {
      * Two trailing spaces at end of line. Default. Standard Markdown syntax.
      */
     SPACES,
+
     /**
      * Backslash at end of line. Alternative Markdown syntax.
      */
-    BACKSLASH;
+    BACKSLASH,
 }
