@@ -258,7 +258,7 @@ repos:
   # tarball and 404s on that release. Bump again once a release with
   # `alef-aarch64-apple-darwin.tar.gz` ships.
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.16.23
+    rev: v0.16.24
     hooks:
       - id: alef-verify
       - id: alef-sync-versions
