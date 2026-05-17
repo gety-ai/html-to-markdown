@@ -10,7 +10,7 @@ tasks:
           cd packages/typescript && pnpm up
         ignore_error: false
       - cmd: |
-          cd packages/wasm && pnpm up
+          cd crates/html-to-markdown-wasm && pnpm up
         ignore_error: false
 
   upgrade:
@@ -21,5 +21,5 @@ tasks:
           cd packages/typescript && pnpm up --latest
         ignore_error: false
       - cmd: |
-          cd packages/wasm && pnpm up --latest
+          cd crates/html-to-markdown-wasm && pnpm up --latest --latest
         ignore_error: false

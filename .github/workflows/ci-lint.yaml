@@ -137,16 +137,18 @@ jobs:
         uses: kreuzberg-dev/actions/install-alef@v1
 
       - name: Pre-populate alef-hooks cache
-        # The alef pre-commit hook (kreuzberg-dev/alef) reads the binary
-        # version from alef's own alef.toml in the hook repo, then expects
-        # the binary at ~/.cache/alef-hooks/<ver>/alef-<triple>/alef. The
-        # release tarball extracts to alef-<triple>/alef (one level deeper),
-        # so the hook fails to locate it. Copy the just-installed binary
-        # into the expected path so the hook skips download/extract.
+        # The alef pre-commit hook resolves the binary version from this
+        # repo's alef.toml `[workspace] alef_version`, then expects the
+        # binary at ~/.cache/alef-hooks/<ver>/alef-<triple>/alef. Read the
+        # pin dynamically (avoid drift like the old hard-coded 0.14.30 pin
+        # that silently rotted as alef released new versions).
         shell: bash
-        env:
-          HOOK_ALEF_VERSION: "0.14.30"
         run: |
+          version="$(awk -F'"' '/^alef_version[[:space:]]*=/ {print $2; exit}' alef.toml)"
+          if [ -z "$version" ]; then
+            echo "Could not parse alef_version from alef.toml" >&2
+            exit 1
+          fi
           case "$(uname -s)-$(uname -m)" in
             Linux-x86_64) target=alef-x86_64-unknown-linux-gnu ;;
             Linux-aarch64) target=alef-aarch64-unknown-linux-gnu ;;
@@ -154,7 +156,7 @@ jobs:
             Darwin-x86_64) target=alef-x86_64-apple-darwin ;;
             *) echo "Unsupported platform"; exit 1 ;;
           esac
-          dest="${HOME}/.cache/alef-hooks/${HOOK_ALEF_VERSION}/${target}"
+          dest="${HOME}/.cache/alef-hooks/${version}/${target}"
           mkdir -p "${dest}"
           cp "$(command -v alef)" "${dest}/alef"
           chmod +x "${dest}/alef"

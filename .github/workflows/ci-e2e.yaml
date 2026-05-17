@@ -182,7 +182,6 @@ jobs:
             wasm:
               - 'crates/html-to-markdown-wasm/**'
               - 'crates/html-to-markdown-wasm-wasi/**'
-              - 'packages/wasm/**'
               - 'e2e/wasm/**'
               - 'fixtures/**'
             kotlin:
