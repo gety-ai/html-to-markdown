@@ -183,6 +183,7 @@ vendor/
 **/.build/
 e2e/kotlin_android/build/
 packages/kotlin-android/build/
+**/.gradle/
 
 **/logs/
 
