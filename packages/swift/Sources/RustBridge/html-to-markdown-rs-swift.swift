@@ -1713,16 +1713,16 @@ extension ConversionOptions {
     _ bullets: GenericIntoRustString, _ strong_em_symbol: GenericIntoRustString,
     _ escape_asterisks: Bool, _ escape_underscores: Bool, _ escape_misc: Bool, _ escape_ascii: Bool,
     _ code_language: GenericIntoRustString, _ autolinks: Bool, _ default_title: Bool,
-    _ br_in_tables: Bool, _ highlight_style: HighlightStyle, _ extract_metadata: Bool,
-    _ whitespace_mode: WhitespaceMode, _ strip_newlines: Bool, _ wrap: Bool, _ wrap_width: UInt,
-    _ convert_as_inline: Bool, _ sub_symbol: GenericIntoRustString,
-    _ sup_symbol: GenericIntoRustString, _ newline_style: NewlineStyle,
-    _ code_block_style: CodeBlockStyle, _ keep_inline_images_in: RustVec<GenericIntoRustString>,
-    _ preprocessing: PreprocessingOptions, _ encoding: GenericIntoRustString, _ debug: Bool,
-    _ strip_tags: RustVec<GenericIntoRustString>, _ preserve_tags: RustVec<GenericIntoRustString>,
-    _ skip_images: Bool, _ link_style: LinkStyle, _ output_format: OutputFormat,
-    _ include_document_structure: Bool, _ extract_images: Bool, _ max_image_size: UInt64,
-    _ capture_svg: Bool, _ infer_dimensions: Bool, _ max_depth: UInt?,
+    _ br_in_tables: Bool, _ compact_tables: Bool, _ highlight_style: HighlightStyle,
+    _ extract_metadata: Bool, _ whitespace_mode: WhitespaceMode, _ strip_newlines: Bool,
+    _ wrap: Bool, _ wrap_width: UInt, _ convert_as_inline: Bool,
+    _ sub_symbol: GenericIntoRustString, _ sup_symbol: GenericIntoRustString,
+    _ newline_style: NewlineStyle, _ code_block_style: CodeBlockStyle,
+    _ keep_inline_images_in: RustVec<GenericIntoRustString>, _ preprocessing: PreprocessingOptions,
+    _ encoding: GenericIntoRustString, _ debug: Bool, _ strip_tags: RustVec<GenericIntoRustString>,
+    _ preserve_tags: RustVec<GenericIntoRustString>, _ skip_images: Bool, _ link_style: LinkStyle,
+    _ output_format: OutputFormat, _ include_document_structure: Bool, _ extract_images: Bool,
+    _ max_image_size: UInt64, _ capture_svg: Bool, _ infer_dimensions: Bool, _ max_depth: UInt?,
     _ exclude_selectors: RustVec<GenericIntoRustString>, _ visitor: VisitorHandle?
   ) {
     self.init(
@@ -1749,7 +1749,7 @@ extension ConversionOptions {
           let rustString = code_language.intoRustString()
           rustString.isOwned = false
           return rustString.ptr
-        }(), autolinks, default_title, br_in_tables,
+        }(), autolinks, default_title, br_in_tables, compact_tables,
         {
           highlight_style.isOwned = false
           return highlight_style.ptr
@@ -1887,6 +1887,10 @@ extension ConversionOptionsRef {
 
   public func br_in_tables() -> Bool {
     __swift_bridge__$ConversionOptions$br_in_tables(ptr)
+  }
+
+  public func compact_tables() -> Bool {
+    __swift_bridge__$ConversionOptions$compact_tables(ptr)
   }
 
   public func highlight_style() -> RustString {
@@ -2084,12 +2088,12 @@ extension ConversionOptionsUpdate {
     _ bullets: GenericIntoRustString?, _ strong_em_symbol: GenericIntoRustString?,
     _ escape_asterisks: Bool?, _ escape_underscores: Bool?, _ escape_misc: Bool?,
     _ escape_ascii: Bool?, _ code_language: GenericIntoRustString?, _ autolinks: Bool?,
-    _ default_title: Bool?, _ br_in_tables: Bool?, _ highlight_style: HighlightStyle?,
-    _ extract_metadata: Bool?, _ whitespace_mode: WhitespaceMode?, _ strip_newlines: Bool?,
-    _ wrap: Bool?, _ wrap_width: UInt?, _ convert_as_inline: Bool?,
-    _ sub_symbol: GenericIntoRustString?, _ sup_symbol: GenericIntoRustString?,
-    _ newline_style: NewlineStyle?, _ code_block_style: CodeBlockStyle?,
-    _ keep_inline_images_in: RustVec<GenericIntoRustString>?,
+    _ default_title: Bool?, _ br_in_tables: Bool?, _ compact_tables: Bool?,
+    _ highlight_style: HighlightStyle?, _ extract_metadata: Bool?,
+    _ whitespace_mode: WhitespaceMode?, _ strip_newlines: Bool?, _ wrap: Bool?, _ wrap_width: UInt?,
+    _ convert_as_inline: Bool?, _ sub_symbol: GenericIntoRustString?,
+    _ sup_symbol: GenericIntoRustString?, _ newline_style: NewlineStyle?,
+    _ code_block_style: CodeBlockStyle?, _ keep_inline_images_in: RustVec<GenericIntoRustString>?,
     _ preprocessing: PreprocessingOptionsUpdate?, _ encoding: GenericIntoRustString?,
     _ debug: Bool?, _ strip_tags: RustVec<GenericIntoRustString>?,
     _ preserve_tags: RustVec<GenericIntoRustString>?, _ skip_images: Bool?,
@@ -2141,6 +2145,7 @@ extension ConversionOptionsUpdate {
             return nil
           }
         }(), autolinks.intoFfiRepr(), default_title.intoFfiRepr(), br_in_tables.intoFfiRepr(),
+        compact_tables.intoFfiRepr(),
         {
           if let val = highlight_style {
             val.isOwned = false
@@ -2348,6 +2353,10 @@ extension ConversionOptionsUpdateRef {
 
   public func br_in_tables() -> Bool? {
     __swift_bridge__$ConversionOptionsUpdate$br_in_tables(ptr).intoSwiftRepr()
+  }
+
+  public func compact_tables() -> Bool? {
+    __swift_bridge__$ConversionOptionsUpdate$compact_tables(ptr).intoSwiftRepr()
   }
 
   public func highlight_style() -> RustString? {
