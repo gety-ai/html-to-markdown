@@ -254,7 +254,7 @@ repos:
         exclude: ^test_apps/
   # Alef: verify bindings and sync versions.
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.16.40
+    rev: v0.16.43
     hooks:
       - id: alef-verify
       - id: alef-sync-versions
@@ -265,11 +265,13 @@ repos:
     hooks:
       - id: actionlint
 
-  # GitHub Actions: pin maintenance
-  - repo: https://github.com/Goldziher/gh-actions-updater
-    rev: v0.1.1
-    hooks:
-      - id: gh-actions-updater
+  # GitHub Actions: pin maintenance — disabled; gau v0.1.1 reports updates for
+  # publish.yaml but `--update` cannot rewrite multi-line `uses:` entries, so
+  # the hook always fails. Re-enable once upstream handles those cases.
+  # - repo: https://github.com/Goldziher/gh-actions-updater
+  #   rev: v0.1.1
+  #   hooks:
+  #     - id: gh-actions-updater
 
   # Java cpd — kept upstream (not yet in shared repo)
   - repo: https://github.com/crate-ci/typos
