@@ -21,14 +21,24 @@
 
 package dev.kreuzberg.android
 
-/** HTML preprocessing options for document cleanup before conversion. */
+/**
+ * HTML preprocessing options for document cleanup before conversion.
+ */
 data class PreprocessingOptions(
-    /** Enable HTML preprocessing globally */
+    /**
+     * Enable HTML preprocessing globally
+     */
     val enabled: Boolean,
-    /** Preprocessing preset level (Minimal, Standard, Aggressive) */
-    val preset: String,
-    /** Remove navigation elements (nav, breadcrumbs, menus, sidebars) */
+    /**
+     * Preprocessing preset level (Minimal, Standard, Aggressive)
+     */
+    val preset: PreprocessingPreset,
+    /**
+     * Remove navigation elements (nav, breadcrumbs, menus, sidebars)
+     */
     val removeNavigation: Boolean,
-    /** Remove form elements (forms, inputs, buttons, etc.) */
-    val removeForms: Boolean,
+    /**
+     * Remove form elements (forms, inputs, buttons, etc.)
+     */
+    val removeForms: Boolean
 )

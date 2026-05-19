@@ -220,82 +220,14 @@ public typealias ConversionOptions = RustBridge.ConversionOptions
 public typealias ConversionOptionsUpdate = RustBridge.ConversionOptionsUpdate
 
 /// HTML preprocessing options for document cleanup before conversion.
-public struct PreprocessingOptions: Codable, Sendable, Hashable {
-    /// Enable HTML preprocessing globally
-    public let enabled: Bool
-    /// Preprocessing preset level (Minimal, Standard, Aggressive)
-    public let preset: String
-    /// Remove navigation elements (nav, breadcrumbs, menus, sidebars)
-    public let removeNavigation: Bool
-    /// Remove form elements (forms, inputs, buttons, etc.)
-    public let removeForms: Bool
-    public init(enabled: Bool, preset: String, removeNavigation: Bool, removeForms: Bool) {
-        self.enabled = enabled
-        self.preset = preset
-        self.removeNavigation = removeNavigation
-        self.removeForms = removeForms
-    }
-    private enum CodingKeys: String, CodingKey {
-        case enabled = "enabled"
-        case preset = "preset"
-        case removeNavigation = "remove_navigation"
-        case removeForms = "remove_forms"
-    }
-}
-
-// MARK: - Internal FFI conversions for PreprocessingOptions
-internal extension PreprocessingOptions {
-    init(_ rb: RustBridge.PreprocessingOptions) throws {
-        self.enabled = rb.enabled()
-        self.preset = rb.preset().toString()
-        self.removeNavigation = rb.remove_navigation()
-        self.removeForms = rb.remove_forms()
-    }
-    func intoRust() throws -> RustBridge.PreprocessingOptions {
-        return RustBridge.PreprocessingOptions(self.enabled, self.preset, self.removeNavigation, self.removeForms)
-    }
-}
+public typealias PreprocessingOptions = RustBridge.PreprocessingOptions
 
 /// Partial update for `PreprocessingOptions`.
 ///
 /// This struct uses `Option<T>` to represent optional fields that can be selectively updated.
 /// Only specified fields (Some values) will override existing options; None values leave the
 /// corresponding fields unchanged when applied via [`PreprocessingOptions::apply_update`].
-public struct PreprocessingOptionsUpdate: Codable, Sendable, Hashable {
-    /// Optional global preprocessing enablement override
-    public let enabled: Bool?
-    /// Optional preprocessing preset level override (Minimal, Standard, Aggressive)
-    public let preset: String?
-    /// Optional navigation element removal override (nav, breadcrumbs, menus, sidebars)
-    public let removeNavigation: Bool?
-    /// Optional form element removal override (forms, inputs, buttons, etc.)
-    public let removeForms: Bool?
-    public init(enabled: Bool? = nil, preset: String? = nil, removeNavigation: Bool? = nil, removeForms: Bool? = nil) {
-        self.enabled = enabled
-        self.preset = preset
-        self.removeNavigation = removeNavigation
-        self.removeForms = removeForms
-    }
-    private enum CodingKeys: String, CodingKey {
-        case enabled = "enabled"
-        case preset = "preset"
-        case removeNavigation = "remove_navigation"
-        case removeForms = "remove_forms"
-    }
-}
-
-// MARK: - Internal FFI conversions for PreprocessingOptionsUpdate
-internal extension PreprocessingOptionsUpdate {
-    init(_ rb: RustBridge.PreprocessingOptionsUpdate) throws {
-        self.enabled = rb.enabled()
-        self.preset = rb.preset()?.toString()
-        self.removeNavigation = rb.remove_navigation()
-        self.removeForms = rb.remove_forms()
-    }
-    func intoRust() throws -> RustBridge.PreprocessingOptionsUpdate {
-        return RustBridge.PreprocessingOptionsUpdate(self.enabled, self.preset, self.removeNavigation, self.removeForms)
-    }
-}
+public typealias PreprocessingOptionsUpdate = RustBridge.PreprocessingOptionsUpdate
 
 /// A structured document tree representing the semantic content of an HTML document.
 ///
@@ -505,6 +437,18 @@ public typealias VisitorHandle = RustBridge.VisitorHandle
 /// including its type, attributes, position in the DOM tree, and parent context.
 public typealias NodeContext = RustBridge.NodeContext
 
+/// Text directionality of document content.
+///
+/// Corresponds to the HTML `dir` attribute and `bdi` element directionality.
+public enum TextDirection: String, Codable, Sendable, Hashable {
+    /// Left-to-right text flow (default for Latin scripts)
+    case leftToRight = "ltr"
+    /// Right-to-left text flow (Hebrew, Arabic, Urdu, etc.)
+    case rightToLeft = "rtl"
+    /// Automatic directionality detection
+    case auto
+}
+
 /// Link classification based on href value and document context.
 ///
 /// Used to categorize links during extraction for filtering and analysis.
@@ -548,6 +492,52 @@ public enum StructuredDataType: String, Codable, Sendable, Hashable {
     /// RDF in Attributes (RDFa) markup
     case rdFa = "rdfa"
 }
+
+/// HTML preprocessing aggressiveness level.
+///
+/// Controls the extent of cleanup performed before conversion. Higher levels remove more elements.
+public typealias PreprocessingPreset = RustBridge.PreprocessingPreset
+
+/// Heading style options for Markdown output.
+///
+/// Controls how headings (h1-h6) are rendered in the output Markdown.
+public typealias HeadingStyle = RustBridge.HeadingStyle
+
+/// List indentation character type.
+///
+/// Controls whether list items are indented with spaces or tabs.
+public typealias ListIndentType = RustBridge.ListIndentType
+
+/// Whitespace handling strategy during conversion.
+///
+/// Determines how sequences of whitespace characters (spaces, tabs, newlines) are processed.
+public typealias WhitespaceMode = RustBridge.WhitespaceMode
+
+/// Line break syntax in Markdown output.
+///
+/// Controls how soft line breaks (from `<br>` or line breaks in source) are rendered.
+public typealias NewlineStyle = RustBridge.NewlineStyle
+
+/// Code block fence style in Markdown output.
+///
+/// Determines how code blocks (`<pre><code>`) are rendered in Markdown.
+public typealias CodeBlockStyle = RustBridge.CodeBlockStyle
+
+/// Highlight rendering style for `<mark>` elements.
+///
+/// Controls how highlighted text is rendered in Markdown output.
+public typealias HighlightStyle = RustBridge.HighlightStyle
+
+/// Link rendering style in Markdown output.
+///
+/// Controls whether links and images use inline `[text](url)` syntax or
+/// reference-style `[text][1]` syntax with definitions collected at the end.
+public typealias LinkStyle = RustBridge.LinkStyle
+
+/// Output format for conversion.
+///
+/// Specifies the target markup language format for the conversion output.
+public typealias OutputFormat = RustBridge.OutputFormat
 
 /// The semantic content type of a document node.
 ///
