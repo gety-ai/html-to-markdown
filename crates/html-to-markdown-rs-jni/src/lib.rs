@@ -123,3 +123,7 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_android_HtmlToMarkdownRsBridge_
         }
     }
 }
+
+// ---------------------------------------------------------------------------
+// Trait-bridge shims
+// ---------------------------------------------------------------------------
