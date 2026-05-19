@@ -1122,6 +1122,7 @@ public static class HtmlVisitorRegistry {
         }
     }
 
+
 }
 
 /// <summary>FFI JSON serialization extension methods</summary>
