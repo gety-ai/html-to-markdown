@@ -1111,6 +1111,25 @@ pub enum VisitResult {
     Error { field0: String },
 }
 
+/// Errors that can occur during HTML to Markdown conversion.
+#[frb(mirror(ConversionError))]
+pub enum ConversionError {
+    /// HTML parsing error
+    ParseError { field0: String },
+    /// HTML sanitization error
+    SanitizationError { field0: String },
+    /// Invalid configuration
+    ConfigError { field0: String },
+    /// I/O error
+    IoError { field0: String },
+    /// Panic caught during conversion to prevent unwinding across FFI boundaries
+    Panic { field0: String },
+    /// Invalid input data
+    InvalidInput { field0: String },
+    /// Generic conversion error
+    Other { field0: String },
+}
+
 // From<SourceT> conversions for bridge return types.
 
 impl From<html_to_markdown_rs::metadata::DocumentMetadata> for DocumentMetadata {
