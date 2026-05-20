@@ -65,6 +65,8 @@ HeaderMetadata$is_valid <- function() .Call("wrap__HeaderMetadata__is_valid", se
 }
 #' @export
 `[[.HeaderMetadata` <- `$.HeaderMetadata`
+#' @export
+is_valid.HeaderMetadata <- function(x, ...) x$is_valid(...)
 #' Hyperlink metadata with categorization and attributes
 #'
 #' Represents `<a>` elements with parsed href values, text content, and link type classification.
@@ -425,3 +427,5 @@ AnnotationKind$from_json <- function(json) .Call("wrap__AnnotationKind__from_jso
 }
 #' @export
 `[[.AnnotationKind` <- `$.AnnotationKind`
+#' @export
+is_valid <- function(x, ...) UseMethod("is_valid")

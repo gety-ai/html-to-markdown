@@ -38,6 +38,20 @@ class OptionsTest {
     }
 
     @Test
+    fun test_options_capture_svg_false() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: options_capture_svg_false */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
+    fun test_options_capture_svg_true() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: options_capture_svg_true */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
     fun test_options_code_block_backticks() {
         val client = dev.kreuzberg.android.HtmlToMarkdownRs()
         val result = client.convert(/* fixture: options_code_block_backticks */)
@@ -199,6 +213,20 @@ class OptionsTest {
     }
 
     @Test
+    fun test_options_extract_images_false() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: options_extract_images_false */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
+    fun test_options_extract_images_true_data_uri() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: options_extract_images_true_data_uri */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
     fun test_options_extract_metadata_true() {
         val client = dev.kreuzberg.android.HtmlToMarkdownRs()
         val result = client.convert(/* fixture: options_extract_metadata_true */)
@@ -244,6 +272,34 @@ class OptionsTest {
     fun test_options_highlight_none() {
         val client = dev.kreuzberg.android.HtmlToMarkdownRs()
         val result = client.convert(/* fixture: options_highlight_none */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
+    fun test_options_include_document_structure_false() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: options_include_document_structure_false */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
+    fun test_options_include_document_structure_true() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: options_include_document_structure_true */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
+    fun test_options_infer_dimensions_false() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: options_infer_dimensions_false */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
+    fun test_options_infer_dimensions_true() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: options_infer_dimensions_true */)
         // TODO: assert result is not an error
     }
 
@@ -300,6 +356,20 @@ class OptionsTest {
     fun test_options_max_depth_zero_empty() {
         val client = dev.kreuzberg.android.HtmlToMarkdownRs()
         val result = client.convert(/* fixture: options_max_depth_zero_empty */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
+    fun test_options_max_image_size_generous_limit() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: options_max_image_size_generous_limit */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
+    fun test_options_max_image_size_tiny_limit_safe() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: options_max_image_size_tiny_limit_safe */)
         // TODO: assert result is not an error
     }
 
