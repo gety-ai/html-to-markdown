@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.17.13"
+alef_version = "0.17.14"
 languages = [
   "python",
   "node",
@@ -451,6 +451,13 @@ languages = [
   "swift",
   "dart",
   "zig",
+]
+result_fields = [
+  "content",
+  "document",
+  "metadata",
+  "tables",
+  "warnings",
 ]
 fields_optional = [
   "content",
