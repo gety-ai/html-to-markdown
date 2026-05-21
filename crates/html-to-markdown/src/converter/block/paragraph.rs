@@ -100,7 +100,12 @@ pub fn handle(
     // Notify the structure collector if present and we produced non-empty top-level paragraph content.
     if has_content && !ctx.in_table_cell && !ctx.in_list_item && !ctx.convert_as_inline {
         if let Some(ref sc) = ctx.structure_collector {
-            let text = output[content_start_pos..].trim().to_string();
+            // An inline element's whitespace-normalisation pop can remove a byte from the
+            // separator that was appended after `content_start_pos` was captured, leaving
+            // `content_start_pos` pointing at the interior of a multibyte character.
+            // Clamp to the nearest valid char boundary to avoid a slice panic (#380).
+            let safe_start = crate::converter::utility::content::floor_char_boundary(output, content_start_pos);
+            let text = output[safe_start..].trim().to_string();
             if !text.is_empty() {
                 sc.borrow_mut().push_paragraph(&text);
             }

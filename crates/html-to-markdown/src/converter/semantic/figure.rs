@@ -83,8 +83,10 @@ pub fn handle_figure(
                         output.push_str("\n\n");
                     }
                     output.push_str(&custom);
-                    // Still call visit_figure_end with the custom content
-                    let safe_start = start_pos.min(output.len());
+                    // Still call visit_figure_end with the custom content.
+                    // Clamp to a valid char boundary in case a pop landed mid-codepoint (#380).
+                    let safe_start =
+                        crate::converter::utility::content::floor_char_boundary(output, start_pos.min(output.len()));
                     let figure_output = output[safe_start..].to_owned();
                     let end_result = {
                         let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
@@ -183,7 +185,9 @@ pub fn handle_figure(
                 parent_tag,
                 is_inline: false,
             };
-            let safe_start = figure_start.min(output.len());
+            // Clamp to a valid char boundary in case a pop landed mid-codepoint (#380).
+            let safe_start =
+                crate::converter::utility::content::floor_char_boundary(output, figure_start.min(output.len()));
             let figure_output = output[safe_start..].to_owned();
             let visit_result = {
                 let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");

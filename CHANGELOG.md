@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **core: fix panic slicing output at a non-UTF-8 char boundary** — `paragraph.rs` captured `content_start_pos = output.len()` before appending a separator; a subsequent `output.pop()` in the whitespace-normalisation path of `handle_span` could shift the effective boundary one byte back, landing it mid-codepoint (e.g. inside U+25A0 ■). The structure-collector slice `output[content_start_pos..]` then panicked. Fixed by clamping with `floor_char_boundary` before slicing; the same clamp is now applied at the two analogous sites in `figure.rs`. Triggered by `include_document_structure = true` with a `<pre>` preceding block and a `<span>` whose first character is multibyte. (#380)
+
 - **core: avoid stack overflow on documents with many unclosed list items** — preprocessing now applies the HTML5 implicit-close rule for `<li>`, `<dt>`, and `<dd>` before the `tl` parser sees the document, so a 15k-item changelog with bare `<li>` tags (e.g. `https://curl.se/changes.html`) is parsed as siblings instead of a 448-deep chain. Eliminates a process abort (`fatal runtime error: stack overflow`) that bypassed `Result::Err` and `std::panic::catch_unwind`. (#379)
 
 ### Documentation
