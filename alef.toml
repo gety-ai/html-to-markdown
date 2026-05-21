@@ -302,7 +302,7 @@ check = "cd packages/zig && zig fmt --check src"
 [crates.test.python]
 precondition = "command -v uv >/dev/null 2>&1"
 before = "cd e2e/python && uv sync --no-install-project --no-install-workspace && uv pip install --refresh ../../packages/python"
-e2e = "cd e2e/python && uv run pytest tests/ -q"
+e2e = "cd e2e/python && uv run --no-sync pytest tests/ -q"
 
 [crates.test.node]
 precondition = "command -v pnpm >/dev/null 2>&1"

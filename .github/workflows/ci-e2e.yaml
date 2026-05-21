@@ -325,7 +325,7 @@ jobs:
               echo "Removing existing .venv directory on Windows"
               rm -rf .venv
             fi
-            uv sync --all-extras --no-install-workspace
+            uv sync --all-extras --no-install-project --no-install-workspace
           shell: bash
 
       - name: Build Python Bindings
@@ -662,7 +662,7 @@ jobs:
               echo "Removing existing .venv directory on Windows"
               rm -rf .venv
             fi
-            uv sync --all-extras --no-install-workspace
+            uv sync --all-extras --no-install-project --no-install-workspace
           shell: bash
 
       - name: Build Python Bindings

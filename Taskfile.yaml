@@ -392,8 +392,8 @@ tasks:
     desc: "Smoke test Python package from PyPI"
     dir: test_apps/python
     cmds:
-      - uv sync
-      - uv run pytest tests/test_smoke.py -v
+      - uv sync --no-install-project --no-install-workspace
+      - uv run --no-sync pytest tests/test_smoke.py -v
 
   e2e:smoke:node:
     desc: "Smoke test Node package from npm"
@@ -497,8 +497,8 @@ tasks:
     desc: "Comprehensive tests for Python package"
     dir: test_apps/python
     cmds:
-      - uv sync
-      - uv run pytest comprehensive_test.py -v
+      - uv sync --no-install-project --no-install-workspace
+      - uv run --no-sync pytest comprehensive_test.py -v
 
   e2e:test:node:
     desc: "Comprehensive tests for Node package"

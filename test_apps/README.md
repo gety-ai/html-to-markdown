@@ -248,9 +248,9 @@ For debugging or local validation:
 ```bash
 # Python
 cd tests/test_apps/python
-uv sync
-uv run pytest smoke_test.py -v
-uv run pytest comprehensive_test.py -v
+uv sync --no-install-project --no-install-workspace
+uv run --no-sync pytest smoke_test.py -v
+uv run --no-sync pytest comprehensive_test.py -v
 
 # Node.js
 cd tests/test_apps/node
@@ -580,8 +580,8 @@ def update_test_apps_versions(repo_root: Path, version: str) -> None:
 
 ```bash
 cd tests/test_apps/python
-uv sync
-uv run pytest -v
+uv sync --no-install-project --no-install-workspace
+uv run --no-sync pytest -v
 ```
 
 ### Node.js (npm)
