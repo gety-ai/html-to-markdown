@@ -3,7 +3,7 @@
 
 version = '4.0'
 name = 'html-to-markdown'
-description = 'High-performance HTML to Markdown converter with Rust core and polyglot bindings (Python, TypeScript, Ruby, PHP, Go, Java, C#, Elixir, R, WebAssembly, C FFI).'
+description = 'High-performance HTML to Markdown converter with active Python, TypeScript/Node, Ruby, PHP, Go, Java/JNI, C#, Elixir, R, WebAssembly, Dart, Kotlin Android, Swift, Zig, and C FFI bindings'
 gitignore = true
 presets = ['claude', 'copilot', 'cursor', 'antigravity', 'codex']
 builtins = [
@@ -17,6 +17,15 @@ builtins = [
   'csharp',
   'elixir',
   'r',
+  'wasm',
+  'pyo3',
+  'napi-rs',
+  'magnus',
+  'ext-php-rs',
+  'rustler',
+  'cgo',
+  'jni-rs',
+  'extendr',
   'default-commands',
 ]
 
