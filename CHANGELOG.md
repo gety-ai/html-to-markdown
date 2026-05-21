@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Tests
+
+- **e2e/php: skip visitor fixtures in `fixtures/edge-cases/visitor_errors.json`** — five visitor fixtures (`visitor_custom_element_with_nesting`, `visitor_unknown_tag_preservation`, `visitor_deeply_nested_skip`, `visitor_element_start_skip_entire_subtree`, `visitor_element_end_modification`) now carry `"skip": { "languages": ["php"] }` matching the rest of the visitor fixtures already in `fixtures/visitor/*.json`. The PHP `ext-php-rs` binding does not yet support callable visitor handles (no `VisitorHandle::from_php_object()` method), so these tests were emitting unbuildable test code. Generated PHP tests dropped from 262 to 208; suite is fully green.
+
 ### Fixed
 
 - **core: fix panic slicing output at a non-UTF-8 char boundary** — `paragraph.rs` captured `content_start_pos = output.len()` before appending a separator; a subsequent `output.pop()` in the whitespace-normalisation path of `handle_span` could shift the effective boundary one byte back, landing it mid-codepoint (e.g. inside U+25A0 ■). The structure-collector slice `output[content_start_pos..]` then panicked. Fixed by clamping with `floor_char_boundary` before slicing; the same clamp is now applied at the two analogous sites in `figure.rs`. Triggered by `include_document_structure = true` with a `<pre>` preceding block and a `<span>` whose first character is multibyte. (#380)
