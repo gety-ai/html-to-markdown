@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **e2e/kotlin_android: build the JNI crate in the e2e before-hook** — the Kotlin/Android host-JVM e2e loads `libhtm_jni` (the `html-to-markdown-rs-jni` crate's `[lib] name = "htm_jni"` cdylib), not the C FFI dylib. The `[crates.test.kotlin_android]` before-hook in `alef.toml` was building `html-to-markdown-ffi`, so all 208 tests failed with `UnsatisfiedLinkError: no htm_jni in java.library.path`. It now builds `html-to-markdown-rs-jni`; the suite is fully green.
 
+- **e2e/node: invoke the napi build via `pnpm run build` in the e2e before-hook** — the `[crates.test.node]` before-hook ran a bare `napi build`, which is not on `PATH` in CI (the `@napi-rs/cli` binary lives in `node_modules/.bin`). The before-hook now runs `pnpm install && pnpm run build` so napi resolves from the crate's own `package.json` `build` script, fixing `sh: 1: napi: not found`.
+
 ### Fixed
 
 - **core: fix panic slicing output at a non-UTF-8 char boundary** — `paragraph.rs` captured `content_start_pos = output.len()` before appending a separator; a subsequent `output.pop()` in the whitespace-normalisation path of `handle_span` could shift the effective boundary one byte back, landing it mid-codepoint (e.g. inside U+25A0 ■). The structure-collector slice `output[content_start_pos..]` then panicked. Fixed by clamping with `floor_char_boundary` before slicing; the same clamp is now applied at the two analogous sites in `figure.rs`. Triggered by `include_document_structure = true` with a `<pre>` preceding block and a `<span>` whose first character is multibyte. (#380)

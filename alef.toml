@@ -312,7 +312,10 @@ e2e = "cd e2e/python && uv run --no-sync pytest tests/ -q"
 
 [crates.test.node]
 precondition = "command -v pnpm >/dev/null 2>&1"
-before = "cd crates/html-to-markdown-node && napi build --platform --release && cd ../../packages/typescript && pnpm install && pnpm run build"
+# Invoke the napi build via `pnpm run build` (the crate package.json's `build`
+# script) so the `@napi-rs/cli` binary resolves from node_modules/.bin — a bare
+# `napi` is not on PATH in CI. `pnpm install` first guarantees node_modules.
+before = "cd crates/html-to-markdown-node && pnpm install && pnpm run build && cd ../../packages/typescript && pnpm install && pnpm run build"
 e2e = "cd e2e/node && pnpm install && pnpm exec vitest run"
 
 [crates.test.go]
