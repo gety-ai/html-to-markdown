@@ -1,7 +1,6 @@
 # html-to-markdown
 
 <div align="center" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 20px 0;">
-  <!-- Built with -->
   <a href="https://github.com/kreuzberg-dev/alef">
     <img src="https://img.shields.io/badge/built%20with-alef%20%D7%90-007ec6" alt="Built with alef">
   </a>
@@ -12,8 +11,8 @@
   <a href="https://pypi.org/project/html-to-markdown/">
     <img src="https://img.shields.io/pypi/v/html-to-markdown?label=Python&color=007ec6" alt="Python">
   </a>
-  <a href="https://www.npmjs.com/package/@kreuzberg/html-to-markdown">
-    <img src="https://img.shields.io/npm/v/@kreuzberg/html-to-markdown?label=Node.js&color=007ec6" alt="Node.js">
+  <a href="https://www.npmjs.com/package/@kreuzberg/html-to-markdown-node">
+    <img src="https://img.shields.io/npm/v/@kreuzberg/html-to-markdown-node?label=Node.js&color=007ec6" alt="Node.js">
   </a>
   <a href="https://www.npmjs.com/package/@kreuzberg/html-to-markdown-wasm">
     <img src="https://img.shields.io/npm/v/@kreuzberg/html-to-markdown-wasm?label=WASM&color=007ec6" alt="WASM">
@@ -22,7 +21,7 @@
     <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown?label=Java&color=007ec6" alt="Java">
   </a>
   <a href="https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown">
-    <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/html-to-markdown?label=Go&color=007ec6&filter=v3.5.0" alt="Go">
+    <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/html-to-markdown?label=Go&color=007ec6&filter=v3*" alt="Go">
   </a>
   <a href="https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/">
     <img src="https://img.shields.io/nuget/v/KreuzbergDev.HtmlToMarkdown?label=C%23&color=007ec6" alt="C#">
@@ -37,18 +36,33 @@
     <img src="https://img.shields.io/hexpm/v/html_to_markdown?label=Elixir&color=007ec6" alt="Elixir">
   </a>
   <a href="https://kreuzberg-dev.r-universe.dev/htmltomarkdown">
-    <img src="https://img.shields.io/cran/v/htmltomarkdown?label=R&color=007ec6" alt="R">
+    <img src="https://img.shields.io/badge/R-htmltomarkdown-007ec6" alt="R">
+  </a>
+  <a href="https://pub.dev/packages/h2m">
+    <img src="https://img.shields.io/pub/v/h2m?label=Dart&color=007ec6" alt="Dart">
+  </a>
+  <a href="https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown-android">
+    <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown-android?label=Kotlin&color=007ec6" alt="Kotlin">
+  </a>
+  <a href="https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/swift">
+    <img src="https://img.shields.io/badge/Swift-SPM-007ec6" alt="Swift">
+  </a>
+  <a href="https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/zig">
+    <img src="https://img.shields.io/badge/Zig-package-007ec6" alt="Zig">
   </a>
   <a href="https://github.com/kreuzberg-dev/html-to-markdown/releases">
-    <img src="https://img.shields.io/badge/C-FFI-007ec6" alt="C">
+    <img src="https://img.shields.io/badge/C-FFI-007ec6" alt="C FFI">
   </a>
 
   <!-- Project Info -->
-  <a href="https://docs.html-to-markdown.kreuzberg.dev">
-    <img src="https://img.shields.io/badge/Docs-kreuzberg.dev-007ec6" alt="Documentation">
-  </a>
   <a href="https://github.com/kreuzberg-dev/html-to-markdown/blob/main/LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License">
+    <img src="https://img.shields.io/badge/License-MIT-007ec6" alt="License">
+  </a>
+  <a href="https://docs.html-to-markdown.kreuzberg.dev">
+    <img src="https://img.shields.io/badge/docs-kreuzberg.dev-007ec6" alt="Documentation">
+  </a>
+  <a href="https://html-to-markdown.kreuzberg.dev">
+    <img src="https://img.shields.io/badge/Live%20Demo-open-007ec6" alt="Live Demo">
   </a>
 </div>
 
@@ -56,20 +70,18 @@
 
 <div align="center" style="margin-top: 20px;">
   <a href="https://discord.gg/pXxagNK2zN">
-      <img height="22" src="https://img.shields.io/badge/Discord-Join%20our%20community-7289da?logo=discord&logoColor=white" alt="Discord">
+      <img height="22" src="https://img.shields.io/badge/Discord-Join%20our%20community-007ec6?logo=discord&logoColor=white" alt="Discord">
   </a>
 </div>
 
 High-performance HTML to Markdown converter with Go bindings to the Rust core library.
 Supports automatic downloading of prebuilt FFI libraries for Linux, macOS, and Windows with customizable caching.
 
-
 ## Installation
 
 ```bash
 go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown
 ```
-
 
 Requires Go 1.25+. After installing the package, run `go generate` to automatically download the platform-specific FFI library:
 
@@ -81,17 +93,15 @@ This downloads the native library from GitHub releases and generates the necessa
 
 Alternatively, you can manually set `CGO_CFLAGS` and `CGO_LDFLAGS` environment variables if you prefer to manage the FFI library yourself.
 
-
 ## Performance Snapshot
 
 **Apple M4** · `Convert()` · Real Wikipedia documents
 
-| Document | Size | Latency | Throughput |
-|----------|------|---------|------------|
-| Lists (Timeline) | 129KB | 0.46ms | 277.5 MB/s |
-| Tables (Countries) | 360KB | 1.37ms | 262.1 MB/s |
-| Mixed (Python wiki) | 656KB | 2.75ms | 237.9 MB/s |
-
+| Document            | Size  | Latency | Throughput |
+| ------------------- | ----- | ------- | ---------- |
+| Lists (Timeline)    | 129KB | 0.46ms  | 277.5 MB/s |
+| Tables (Countries)  | 360KB | 1.37ms  | 262.1 MB/s |
+| Mixed (Python wiki) | 656KB | 2.75ms  | 237.9 MB/s |
 
 ## Quick Start
 
@@ -168,7 +178,6 @@ metadata  := result.Metadata   // *Metadata — when ExtractMetadata: true
 tables    := result.Tables     // []TableData — when ExtractTables: true
 ```
 
-
 ### Options
 
 **`ConversionOptions`** – Key configuration fields:
@@ -201,7 +210,6 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
-
 ```go
 import "github.com/kreuzberg-dev/html-to-markdown/packages/go/v2/htmltomarkdown"
 
@@ -214,13 +222,11 @@ markdown, _ := htmltomarkdown.Convert(html)
 // Note: Djot output format configuration is not yet supported in Go bindings
 ```
 
-
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
-
 
 ```go
 import "github.com/kreuzberg-dev/html-to-markdown/packages/go/v2/htmltomarkdown"
@@ -231,9 +237,7 @@ plain, _ := htmltomarkdown.Convert(html, htmltomarkdown.WithOutputFormat("plain"
 // Result: "Title\n\nThis is bold and italic text."
 ```
 
-
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
-
 
 ## Visitor Pattern
 
@@ -250,7 +254,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
-
 
 ## Examples
 

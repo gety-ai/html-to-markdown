@@ -1,7 +1,6 @@
 # html-to-markdown
 
 <div align="center" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 20px 0;">
-  <!-- Built with -->
   <a href="https://github.com/kreuzberg-dev/alef">
     <img src="https://img.shields.io/badge/built%20with-alef%20%D7%90-007ec6" alt="Built with alef">
   </a>
@@ -22,7 +21,7 @@
     <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown?label=Java&color=007ec6" alt="Java">
   </a>
   <a href="https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown">
-    <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/html-to-markdown?label=Go&color=007ec6&filter=v3.0.0" alt="Go">
+    <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/html-to-markdown?label=Go&color=007ec6&filter=v3*" alt="Go">
   </a>
   <a href="https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/">
     <img src="https://img.shields.io/nuget/v/KreuzbergDev.HtmlToMarkdown?label=C%23&color=007ec6" alt="C#">
@@ -39,17 +38,31 @@
   <a href="https://kreuzberg-dev.r-universe.dev/htmltomarkdown">
     <img src="https://img.shields.io/badge/R-htmltomarkdown-007ec6" alt="R">
   </a>
+  <a href="https://pub.dev/packages/h2m">
+    <img src="https://img.shields.io/pub/v/h2m?label=Dart&color=007ec6" alt="Dart">
+  </a>
+  <a href="https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown-android">
+    <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown-android?label=Kotlin&color=007ec6" alt="Kotlin">
+  </a>
+  <a href="https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/swift">
+    <img src="https://img.shields.io/badge/Swift-SPM-007ec6" alt="Swift">
+  </a>
+  <a href="https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/zig">
+    <img src="https://img.shields.io/badge/Zig-package-007ec6" alt="Zig">
+  </a>
   <a href="https://github.com/kreuzberg-dev/html-to-markdown/releases">
-    <img src="https://img.shields.io/badge/C-FFI-007ec6" alt="C">
+    <img src="https://img.shields.io/badge/C-FFI-007ec6" alt="C FFI">
   </a>
-  <a href="https://docs.html-to-markdown.kreuzberg.dev">
-    <img src="https://img.shields.io/badge/Docs-kreuzberg.dev-007ec6" alt="Documentation">
-  </a>
+
+  <!-- Project Info -->
   <a href="https://github.com/kreuzberg-dev/html-to-markdown/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-007ec6" alt="License">
   </a>
-  <a href="https://docs.html-to-markdown.kreuzberg.dev/demo/">
-    <img src="https://img.shields.io/badge/%E2%96%B6%EF%B8%8F_Live_Demo-007ec6" alt="Live Demo">
+  <a href="https://docs.html-to-markdown.kreuzberg.dev">
+    <img src="https://img.shields.io/badge/docs-kreuzberg.dev-007ec6" alt="Documentation">
+  </a>
+  <a href="https://html-to-markdown.kreuzberg.dev">
+    <img src="https://img.shields.io/badge/Live%20Demo-open-007ec6" alt="Live Demo">
   </a>
 </div>
 
@@ -57,7 +70,7 @@
 
 <div align="center" style="margin-top: 20px;">
   <a href="https://discord.gg/pXxagNK2zN">
-      <img height="22" src="https://img.shields.io/badge/Discord-Join%20our%20community-7289da?logo=discord&logoColor=white" alt="Discord">
+      <img height="22" src="https://img.shields.io/badge/Discord-Join%20our%20community-007ec6?logo=discord&logoColor=white" alt="Discord">
   </a>
 </div>
 
@@ -113,7 +126,7 @@ print(result.metadata)       # title, links, headings, …
 
 ```typescript
 // TypeScript / Node.js
-import { convert } from "@kreuzberg/html-to-markdown-node";
+import { convert } from "@kreuzberg/html-to-markdown";
 
 const result = convert("<h1>Hello</h1><p>World</p>");
 console.log(result.content); // # Hello\n\nWorld
