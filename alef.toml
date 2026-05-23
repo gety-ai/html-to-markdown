@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.17.36"
+alef_version = "0.18.0"
 languages = [
   "python",
   "node",
@@ -134,6 +134,7 @@ output = "packages/python/html_to_markdown/"
 
 [crates.node]
 package_name = "@kreuzberg/html-to-markdown-node"
+crate_dir = "crates/html-to-markdown-node"
 
 [crates.ruby]
 gem_name = "html-to-markdown"
@@ -204,6 +205,9 @@ pubspec_name = "h2m"
 lib_name = "h2m"
 style = "frb"
 features = ["full"]
+
+[crates.wasm]
+crate_dir = "crates/html-to-markdown-wasm"
 
 [crates.zig]
 module_name = "html_to_markdown_rs"
