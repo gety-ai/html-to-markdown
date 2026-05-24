@@ -1291,22 +1291,11 @@ jobs:
 
       - uses: kreuzberg-dev/actions/setup-rust@v1
 
-      - name: Install Hex/Rebar and dependencies
-        # Inline: trio of one-liners; not worth a shared action.
-        shell: bash
-        run: |
-          mix local.hex --force
-          mix local.rebar --force
-          (cd packages/elixir && mix deps.get)
-
-      - name: Build Hex tarball
-        # Inline: hex.build needs the per-package working dir and target/
-        # cleanup to fit under the 128 MiB Hex upload limit. Tightly coupled
-        # to Hex packaging conventions.
-        shell: bash
-        run: |
-          find packages/elixir/native -type d -name target -prune -exec rm -rf {} + 2>/dev/null || true
-          (cd packages/elixir && mix hex.build)
+      - uses: kreuzberg-dev/actions/build-elixir-hex@v1
+        with:
+          package-dir: packages/elixir
+          nif-crate-path: packages/elixir/native/html_to_markdown_nif
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
 
       - uses: actions/upload-artifact@v7
         with:
