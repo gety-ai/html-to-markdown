@@ -87,7 +87,7 @@ jobs:
       release_php: ${{ steps.meta.outputs.release_php }}
       release_elixir: ${{ steps.meta.outputs.release_elixir }}
       release_c_ffi: ${{ steps.meta.outputs.release_c_ffi }}
-      release_kotlin_android: ${{ steps.meta.outputs.release_kotlin_android }}
+      release_kotlin: ${{ steps.meta.outputs.release_kotlin }}
       release_swift: ${{ steps.meta.outputs.release_swift }}
       release_dart: ${{ steps.meta.outputs.release_dart }}
       release_zig: ${{ steps.meta.outputs.release_zig }}
@@ -384,7 +384,7 @@ jobs:
   check-maven-kotlin:
     name: Check Maven Central for Kotlin Android
     needs: prepare
-    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_kotlin_android == 'true' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_kotlin == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
@@ -471,6 +471,19 @@ jobs:
       - name: Free disk space
         if: runner.os == 'Linux'
         uses: kreuzberg-dev/actions/free-disk-space-linux@v1
+
+      - name: Setup Rust on host (macOS, Windows)
+        # cibuildwheel's before-build runs `cargo build` which auto-installs
+        # the toolchain pinned by rust-toolchain.toml via rustup. On macOS-arm64
+        # this collides with the runner's pre-installed clippy/rustfmt and
+        # rustup aborts with "detected conflict: bin/cargo-clippy". Pre-install
+        # via actions-rust-lang/setup-rust-toolchain so the toolchain is ready
+        # by the time cibuildwheel runs cargo. No-op for Linux (cibw runs in
+        # a manylinux container — host rust is invisible there).
+        if: runner.os != 'Linux'
+        uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          use-sccache: "false"
 
       - name: Build wheels
         uses: kreuzberg-dev/actions/build-python-wheels@v1
@@ -1863,7 +1876,7 @@ jobs:
   kotlin-android-natives:
     name: Build Kotlin Android natives (${{ matrix.abi }})
     needs: [prepare]
-    if: ${{ needs.prepare.outputs.release_kotlin_android == 'true' && needs.prepare.outputs.is_tag == 'true' }}
+    if: ${{ needs.prepare.outputs.release_kotlin == 'true' && needs.prepare.outputs.is_tag == 'true' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -1896,7 +1909,7 @@ jobs:
   publish-kotlin-android:
     name: Publish Kotlin Android to Maven Central
     needs: [prepare, kotlin-android-natives, check-maven-kotlin]
-    if: ${{ needs.prepare.outputs.release_kotlin_android == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-maven-kotlin.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    if: ${{ needs.prepare.outputs.release_kotlin == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-maven-kotlin.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
