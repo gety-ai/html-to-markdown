@@ -1589,8 +1589,6 @@ jobs:
           packages-dir: crates/html-to-markdown-node/npm
           npm-tag: ${{ needs.prepare.outputs.npm_tag }}
           dry-run: ${{ needs.prepare.outputs.dry_run }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Wait for npm indexing (linux-x64-gnu)
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
@@ -1616,8 +1614,6 @@ jobs:
           package-dir: crates/html-to-markdown-node
           npm-tag: ${{ needs.prepare.outputs.npm_tag }}
           dry-run: ${{ needs.prepare.outputs.dry_run }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Wait for main Node package indexing
         if: ${{ needs.prepare.outputs.dry_run != 'true' && needs.check-npm.outputs.ts_exists != 'true' }}
@@ -1661,8 +1657,6 @@ jobs:
           package-dir: packages/typescript
           npm-tag: ${{ needs.prepare.outputs.npm_tag }}
           dry-run: ${{ needs.prepare.outputs.dry_run }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-wasm:
     name: Publish WASM package
@@ -1703,8 +1697,6 @@ jobs:
           npm-tag: ${{ needs.prepare.outputs.npm_tag }}
           provenance: "true"
           dry-run: ${{ needs.prepare.outputs.dry_run }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-packagist:
     name: Trigger Packagist update
