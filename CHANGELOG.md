@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **ci(publish): skip `publish-hex` and `homebrew-bottles` on dry-run.** Both jobs need real GitHub Release assets (`generate-elixir-checksums` downloads NIF tarballs; `brew install --build-bottle` downloads CLI/FFI source tarballs), but `upload-release-assets@v1` only logs on dry-run — the release doesn't exist. Both jobs failed every dry-run after surviving every other stage. Gated their `if:` on `dry_run != 'true'`; real-release runs continue to exercise them.
+
 ### Changed
 
 - **ci(publish): replace inline Homebrew formula updater with `kreuzberg-dev/actions/publish-homebrew-source-formulas@v1`.** The `publish-homebrew-formula` job previously ran a 184-line `scripts/publish/update-homebrew-formula.sh` Bash heredoc that wrote `html-to-markdown.rb` + `libhtml-to-markdown.rb` from scratch (h2m is a dual-formula tap; the shared single-formula `publish-homebrew@v1` doesn't apply). The new shared action does the same job from per-formula `.rb.tmpl` templates + a `scripts/publish/homebrew.json` manifest, downloading release assets via `gh release download` and substituting their SHA256s into `${cli_*_sha}` / `${ffi_*_sha}` placeholders. The script is deleted; the formula generation rules now live in version-controlled Ruby templates rather than a bash heredoc. The job's gate now also passes on `dry_run == 'true'` (was `is_tag == 'true'` only) so dry-run pipelines exercise the bottle pipeline downstream — the new action substitutes a zero-SHA placeholder for missing assets on dry-run.

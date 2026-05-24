@@ -1846,7 +1846,10 @@ jobs:
   publish-hex:
     name: Publish Hex package
     needs: [prepare, elixir-package, upload-elixir-release, check-hex]
-    if: ${{ needs.prepare.outputs.release_elixir == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.elixir-package.result == 'success' && (needs.check-hex.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    # Skipped on dry-run: generate-elixir-checksums downloads NIF tarballs from
+    # the GitHub Release, which doesn't exist on dry-run (upload-release-assets
+    # only logs in dry-run mode). Real-release runs exercise this path.
+    if: ${{ needs.prepare.outputs.release_elixir == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && needs.elixir-package.result == 'success' && (needs.check-hex.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -2063,7 +2066,10 @@ jobs:
   homebrew-bottles:
     name: Build Homebrew bottle (${{ matrix.bottle_tag }})
     needs: [prepare, publish-homebrew-formula]
-    if: ${{ needs.prepare.outputs.release_homebrew == 'true' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.publish-homebrew-formula.result == 'success' }}
+    # Skipped on dry-run: `brew install --build-bottle` downloads CLI/FFI source
+    # tarballs from the GitHub Release, which doesn't exist on dry-run (formula
+    # is rendered locally only; tap isn't pushed). Real-release runs cover this.
+    if: ${{ needs.prepare.outputs.release_homebrew == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && needs.publish-homebrew-formula.result == 'success' }}
     runs-on: ${{ matrix.os }}
     permissions:
       contents: write
