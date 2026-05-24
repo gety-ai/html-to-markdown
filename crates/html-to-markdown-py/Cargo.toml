@@ -1,6 +1,6 @@
 [package]
 name = "html-to-markdown-py"
-version = "3.5.0-rc.1"
+version = "3.5.0-rc.2"
 edition = "2024"
 license = "MIT"
 description = "High-performance HTML to Markdown converter"
@@ -13,7 +13,7 @@ name = "_html_to_markdown"
 crate-type = ["cdylib"]
 
 [dependencies]
-html-to-markdown-rs = { version = "3.5.0-rc.1", path = "../html-to-markdown", features = ["full", "metadata", "visitor", "serde", "inline-images"] }
+html-to-markdown-rs = { version = "3.5.0-rc.2", path = "../html-to-markdown", features = ["full", "metadata", "visitor", "serde", "inline-images"] }
 pyo3 = { version = "0.28" }
 pyo3-async-runtimes = { version = "0.28", features = ["tokio-runtime"] }
 serde = { version = "1", features = ["derive"] }

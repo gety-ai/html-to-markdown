@@ -983,7 +983,7 @@ jobs:
   go-ffi-libraries:
     name: Build Go FFI library (${{ matrix.platform }})
     needs: [prepare, check-go]
-    if: ${{ needs.prepare.outputs.release_go == 'true' && (needs.check-go.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    if: ${{ needs.prepare.outputs.release_go == 'true' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && (needs.check-go.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 180
     strategy:

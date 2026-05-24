@@ -270,7 +270,7 @@ internal extension TextAnnotation {
     init(_ rb: RustBridge.TextAnnotationRef) throws {
         self.start = rb.start()
         self.end = rb.end()
-        self.kind = try AnnotationKind(rb.kind())
+        self.kind = try JSONDecoder().decode(AnnotationKind.self, from: (rb.kind().toString().data(using: .utf8) ?? Data("null".utf8)))
     }
     func intoRust() throws -> RustBridge.TextAnnotation {
         let data = try JSONEncoder().encode(self)
