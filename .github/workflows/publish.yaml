@@ -1234,15 +1234,21 @@ jobs:
             --manifest-path packages/elixir/native/html_to_markdown_nif/Cargo.toml
           NIF_DIR="packages/elixir/native/html_to_markdown_nif"
           if [[ "${RUNNER_OS}" == "macOS" ]]; then
-            LIB_NAME="libhtml_to_markdown_nif.dylib"
+            EXT="dylib"
+          elif [[ "${RUNNER_OS}" == "Windows" ]]; then
+            EXT="dll"
           else
-            LIB_NAME="libhtml_to_markdown_nif.so"
+            EXT="so"
           fi
+          LIB_NAME="libhtml_to_markdown_nif.${EXT}"
           LIB_PATH="${NIF_DIR}/target/${TARGET}/release/${LIB_NAME}"
           [[ -f "$LIB_PATH" ]] || LIB_PATH="${NIF_DIR}/target/release/${LIB_NAME}"
           mkdir -p dist/elixir
           for NIF_VERSION in 2.16 2.17; do
-            ARTIFACT="libhtml_to_markdown_nif-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.so"
+            # rustler_precompiled / generate-elixir-checksums uses the platform
+            # extension (.so / .dylib / .dll) in the artifact filename — must
+            # match so the consumer can locate the right tarball per platform.
+            ARTIFACT="libhtml_to_markdown_nif-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${EXT}"
             cp "$LIB_PATH" "${ARTIFACT}"
             tar -czf "dist/elixir/${ARTIFACT}.tar.gz" "${ARTIFACT}"
             rm -f "${ARTIFACT}"
