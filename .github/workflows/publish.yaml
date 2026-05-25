@@ -1040,6 +1040,20 @@ jobs:
         run: |
           alef publish build --lang ffi --target ${{ matrix.target }}
           alef publish package --lang go --target ${{ matrix.target }} -o dist/go-ffi
+          # Workaround: alef 0.19.6 packages Go FFI archives with the same
+          # `-ffi-` infix as the C FFI packager, which collides with the
+          # `html-to-markdown-rs-ffi-*` asset-prefix probe used by check-go and
+          # the verify-release-assets pattern list. Rename `-ffi-v` → `-go-v` so
+          # downstream gating can distinguish Go from C FFI tarballs. Drop this
+          # block once h2m's alef.toml moves to a release that ships the
+          # alef-side fix (alef/src/publish/package/go.rs already uses `-go-`
+          # on main).
+          shopt -s nullglob
+          for archive in dist/go-ffi/*-ffi-v*.tar.gz; do
+            renamed="${archive/-ffi-v/-go-v}"
+            mv "$archive" "$renamed"
+          done
+          shopt -u nullglob
 
       - uses: actions/upload-artifact@v7
         with:
