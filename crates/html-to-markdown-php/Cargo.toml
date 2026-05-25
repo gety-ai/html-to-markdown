@@ -23,7 +23,7 @@ async-trait = "0.1"
 # `AHashMap<Cow<str>, _>` parameters (the conditional `__*_ahash` shim rebuilds).
 # `futures-util` is similarly conditional on streaming adapters being declared.
 [package.metadata.cargo-machete]
-ignored = ["ahash"]
+ignored = ["tokio", "async-trait", "ahash"]
 
 [features]
 extension-module = []
