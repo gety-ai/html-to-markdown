@@ -16,8 +16,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PASS=0
 FAIL=0
 
-pass() { echo "PASS: $1"; PASS=$((PASS + 1)); }
-fail() { echo "FAIL: $1 — $2" >&2; FAIL=$((FAIL + 1)); }
+pass() {
+  echo "PASS: $1"
+  PASS=$((PASS + 1))
+}
+fail() {
+  echo "FAIL: $1 — $2" >&2
+  FAIL=$((FAIL + 1))
+}
 
 # Install formulae.
 brew bundle install --file="$SCRIPT_DIR/Brewfile"

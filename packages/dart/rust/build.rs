@@ -122,9 +122,9 @@ fn patch_published_loader() {
         }
     }
 
-    if patched != source {
-        if let Err(err) = std::fs::write(path, patched) {
-            println!("cargo:warning=failed to write published-loader patch: {err}");
-        }
+    if patched != source
+        && let Err(err) = std::fs::write(path, patched)
+    {
+        println!("cargo:warning=failed to write published-loader patch: {err}");
     }
 }
