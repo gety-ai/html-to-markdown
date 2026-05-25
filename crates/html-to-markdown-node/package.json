@@ -24,6 +24,7 @@
   },
   "napi": {
     "binaryName": "html-to-markdown-node",
+    "packageName": "@kreuzberg/html-to-markdown-node",
     "targets": [
       "x86_64-unknown-linux-gnu",
       "aarch64-unknown-linux-gnu",

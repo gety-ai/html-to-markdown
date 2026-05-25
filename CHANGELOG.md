@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **bindings: regenerated with alef 0.19.6.** Node optional-dep package names now carry the `@kreuzberg/` scope (`@kreuzberg/html-to-markdown-node-<target>`) so `requireOptionalDependency()` resolves the published per-platform packages instead of an unscoped name that does not exist on npm. `test_apps/` restructured by alef to the new layout (per-language runners under `test_apps/<lang>/{ffi,htm_test,run_tests}` for C; legacy in-tree test files removed). Additional alef-emitter, swift-bridge, FFI param handling, and ahash-scaffold fixes carried through from the 0.19.x line.
+
 ## [3.5.0-rc.3] - 2026-05-25
 
 ### Fixed
