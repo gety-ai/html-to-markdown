@@ -1,3 +1,10 @@
+# Claude Code local state
+.claude/
+
+# Go FFI download cache (populated by `go generate ./...` post-install)
+packages/go/.lib/
+packages/go/**/.lib/
+
 # Python
 __pycache__/
 *.py[cod]

@@ -1,4 +1,4 @@
 # Brewfile — managed by alef. DO NOT EDIT.
 tap "kreuzberg-dev/tap"
-brew "html-to-markdown"
-brew "libhtml-to-markdown"
+brew "kreuzberg-dev/tap/html-to-markdown"
+brew "kreuzberg-dev/tap/libhtml-to-markdown"
