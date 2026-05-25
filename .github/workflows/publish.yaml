@@ -428,37 +428,16 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  check-spi-swift:
-    name: Check Swift Package Index for tag
-    needs: prepare
-    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_swift == 'true' }}
-    runs-on: ubuntu-latest
-    outputs:
-      exists: ${{ steps.check.outputs.exists }}
-    steps:
-      - id: check
-        uses: kreuzberg-dev/actions/check-registry@v1
-        with:
-          registry: swift
-          package: html-to-markdown
-          version: ${{ needs.prepare.outputs.version }}
-          repo: ${{ github.repository }}
-
-  check-zig:
-    name: Check Zig package presence
-    needs: prepare
-    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_zig == 'true' }}
-    runs-on: ubuntu-latest
-    outputs:
-      exists: ${{ steps.check.outputs.exists }}
-    steps:
-      - id: check
-        uses: kreuzberg-dev/actions/check-registry@v1
-        with:
-          registry: zig
-          package: html-to-markdown
-          version: ${{ needs.prepare.outputs.version }}
-          repo: ${{ github.repository }}
+  # Swift Package Index and Zig have no central registry — packages are
+  # consumed directly from git tags, so the tag push IS the publish event.
+  # The previous `check-spi-swift`/`check-zig` + `publish-swift`/`publish-zig`
+  # jobs only pinged SPI for fast re-indexing (SPI auto-discovers within ~1h
+  # without a ping) and appended a tarball SHA hint to the release notes for
+  # Zig consumers (consumers can compute the hash themselves via
+  # `zig fetch --save <url>`). Both are pure nice-to-haves, not load-bearing,
+  # so they have been dropped from the publish workflow to cut runner cost
+  # and simplify the dependency graph. The `release_swift` / `release_zig`
+  # `prepare` outputs are still emitted but no longer consumed.
 
   # ─── Build matrix jobs ────────────────────────────────────────────────
 
@@ -1984,24 +1963,6 @@ jobs:
           MAVEN_GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
-  publish-swift:
-    name: Publish Swift to Swift Package Index
-    needs: [prepare, check-spi-swift]
-    if: ${{ needs.prepare.outputs.release_swift == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-spi-swift.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          ref: ${{ needs.prepare.outputs.ref }}
-          submodules: recursive
-
-      - uses: kreuzberg-dev/actions/publish-swift@v1
-        with:
-          working-directory: packages/swift
-          tag: ${{ needs.prepare.outputs.tag }}
-          ping-spi: "true"
-          dry-run: ${{ needs.prepare.outputs.dry_run }}
-
   trigger-pubdev:
     name: Trigger pub.dev publish workflow
     needs: [prepare, check-pub, assemble-dart-package]
@@ -2020,26 +1981,6 @@ jobs:
           gh workflow run publish-pubdev.yaml \
             --ref ${{ github.ref_name }} \
             -f run_id=${{ github.run_id }}
-
-  publish-zig:
-    name: Publish Zig package metadata
-    needs: [prepare, check-zig]
-    if: ${{ needs.prepare.outputs.release_zig == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-zig.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          ref: ${{ needs.prepare.outputs.ref }}
-          submodules: recursive
-
-      - uses: kreuzberg-dev/actions/publish-zig@v1
-        with:
-          working-directory: packages/zig
-          tag: ${{ needs.prepare.outputs.tag }}
-          update-release-notes: "true"
-          dry-run: ${{ needs.prepare.outputs.dry_run }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # ─── Homebrew (formula update + bottles) ──────────────────────────────
   #
@@ -2241,9 +2182,7 @@ jobs:
       - publish-hex
       - publish-homebrew-bottles
       - publish-kotlin-android
-      - publish-swift
       - trigger-pubdev
-      - publish-zig
       - upload-cli-release
       - upload-go-release
       - upload-c-ffi-release
@@ -2278,9 +2217,7 @@ jobs:
       - publish-hex
       - publish-homebrew-bottles
       - publish-kotlin-android
-      - publish-swift
       - trigger-pubdev
-      - publish-zig
       - upload-cli-release
       - upload-go-release
       - upload-c-ffi-release
