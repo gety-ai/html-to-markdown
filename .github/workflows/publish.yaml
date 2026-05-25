@@ -411,6 +411,23 @@ jobs:
           package: html_to_markdown
           version: ${{ needs.prepare.outputs.version }}
 
+  assemble-dart-package:
+    name: Assemble Dart package artifact
+    needs: [prepare, check-pub]
+    if: ${{ needs.prepare.outputs.release_dart == 'true' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && (needs.check-pub.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.ref }}
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dart-package-assembled
+          path: packages/dart
+          if-no-files-found: error
+          retention-days: 7
+
   check-spi-swift:
     name: Check Swift Package Index for tag
     needs: prepare
@@ -1971,24 +1988,24 @@ jobs:
           ping-spi: "true"
           dry-run: ${{ needs.prepare.outputs.dry_run }}
 
-  publish-dart:
-    name: Publish Dart to pub.dev
-    needs: [prepare, check-pub]
-    if: ${{ needs.prepare.outputs.release_dart == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-pub.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+  trigger-pubdev:
+    name: Trigger pub.dev publish workflow
+    needs: [prepare, check-pub, assemble-dart-package]
+    # pub.dev OIDC rejects tokens from `release` events. We dispatch a separate
+    # workflow whose `workflow_dispatch` event produces an accepted token.
+    if: ${{ needs.prepare.outputs.release_dart == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && (needs.check-pub.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      id-token: write
+      actions: write
     steps:
-      - uses: actions/checkout@v6
-        with:
-          ref: ${{ needs.prepare.outputs.ref }}
-          submodules: recursive
-
-      - uses: kreuzberg-dev/actions/publish-pub@v1
-        with:
-          package-dir: packages/dart
-          dry-run: ${{ needs.prepare.outputs.dry_run }}
+      - name: Dispatch publish-pubdev workflow
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh workflow run publish-pubdev.yaml \
+            --ref ${{ github.ref_name }} \
+            -f run_id=${{ github.run_id }}
 
   publish-zig:
     name: Publish Zig package metadata
@@ -2211,7 +2228,7 @@ jobs:
       - publish-homebrew-bottles
       - publish-kotlin-android
       - publish-swift
-      - publish-dart
+      - trigger-pubdev
       - publish-zig
       - upload-cli-release
       - upload-go-release
@@ -2248,7 +2265,7 @@ jobs:
       - publish-homebrew-bottles
       - publish-kotlin-android
       - publish-swift
-      - publish-dart
+      - trigger-pubdev
       - publish-zig
       - upload-cli-release
       - upload-go-release
