@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.19.6"
+alef_version = "0.19.8"
 languages = [
   "python",
   "node",
@@ -484,6 +484,7 @@ languages = [
   "node",
   "ruby",
   "php",
+  "php_ext",
   "c",
   "go",
   "java",
@@ -496,6 +497,7 @@ languages = [
   "swift",
   "dart",
   "zig",
+  "homebrew",
 ]
 result_fields = ["content", "document", "metadata", "tables", "warnings"]
 fields_optional = [
@@ -776,6 +778,20 @@ version = "^3.5.0"
 
 [crates.e2e.registry.packages.zig]
 name = "html_to_markdown"
+version = "3.5.0"
+# hash populated by `zig fetch --save https://github.com/.../html-to-markdown-zig-v3.5.0.tar.gz`
+# once the v3.5.0 zig tarball lands on the release. Until then the generator
+# emits a placeholder comment in build.zig.zon directing the developer to
+# populate it.
+
+[crates.e2e.registry.packages.php_ext]
+name = "kreuzberg-dev/html-to-markdown-ext"
+version = "3.5.0"
+
+[crates.e2e.registry.packages.homebrew]
+tap = "kreuzberg-dev/tap"
+cli_formula = "html-to-markdown"
+ffi_formula = "libhtml-to-markdown"
 version = "3.5.0"
 
 [crates.e2e.packages.rust]
