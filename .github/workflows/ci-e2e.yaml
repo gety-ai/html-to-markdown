@@ -94,6 +94,7 @@ jobs:
       elixir: ${{ steps.filter.outputs.elixir }}
       r: ${{ steps.filter.outputs.r }}
       wasm: ${{ steps.filter.outputs.wasm }}
+      csharp: ${{ steps.filter.outputs.csharp }}
       kotlin: ${{ steps.filter.outputs.kotlin }}
       swift: ${{ steps.filter.outputs.swift }}
       dart: ${{ steps.filter.outputs.dart }}
@@ -183,6 +184,11 @@ jobs:
               - 'crates/html-to-markdown-wasm/**'
               - 'crates/html-to-markdown-wasm-wasi/**'
               - 'e2e/wasm/**'
+              - 'fixtures/**'
+            csharp:
+              - 'packages/csharp/**'
+              - 'e2e/csharp/**'
+              - 'crates/html-to-markdown-ffi/**'
               - 'fixtures/**'
             kotlin:
               - 'packages/kotlin-android/**'
@@ -528,6 +534,59 @@ jobs:
           name: php-extension-ubuntu
           path: ${{ steps.build-php-extension.outputs.extension-path }}
           retention-days: 7
+
+      - name: Cleanup Rust cache
+        if: always() && steps.checkout.outcome == 'success'
+        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
+
+  build-csharp:
+    needs: [changes]
+    name: "Build: C# (${{ matrix.os }})"
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.core == 'true' ||
+      needs.changes.outputs.csharp == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        id: checkout
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          cache-key-prefix: csharp-${{ matrix.os }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build FFI library (Unix)
+        if: runner.os != 'Windows'
+        run: cargo build --release -p html-to-markdown-ffi
+        shell: bash
+
+      - name: Build FFI library (Windows)
+        if: runner.os == 'Windows'
+        run: cargo build -p html-to-markdown-ffi
+        shell: bash
+
+      - name: Restore C# dependencies
+        run: dotnet restore packages/csharp/
+        shell: bash
+
+      - name: Build C# package
+        run: dotnet build packages/csharp/ -c Release
+        shell: bash
 
       - name: Cleanup Rust cache
         if: always() && steps.checkout.outcome == 'success'
@@ -903,6 +962,82 @@ jobs:
         shell: bash
         env:
           EXTENSION_PATH: ${{ steps.build-php-extension.outputs.extension-path }}
+
+  test-csharp:
+    needs: [build-csharp, build-ffi, changes]
+    name: "Test: C# (${{ matrix.os }})"
+    if: |
+      always() && !cancelled() && needs.build-csharp.result != 'skipped' &&
+      (github.event_name == 'workflow_dispatch' ||
+       needs.changes.outputs.csharp == 'true' ||
+       needs.changes.outputs.ffi == 'true' ||
+       needs.changes.outputs.core == 'true')
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          cache-key-prefix: csharp-test-${{ matrix.os }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build FFI library (Unix)
+        if: runner.os != 'Windows'
+        run: cargo build --release -p html-to-markdown-ffi
+        shell: bash
+
+      - name: Build FFI library (Windows)
+        if: runner.os == 'Windows'
+        run: cargo build -p html-to-markdown-ffi
+        shell: bash
+
+      - name: Restore C# dependencies
+        run: dotnet restore packages/csharp/
+        shell: bash
+
+      - name: Build C# package
+        run: dotnet build packages/csharp/ -c Release
+        shell: bash
+
+      - name: Run C# unit tests
+        run: dotnet test packages/csharp/ -c Release
+        shell: bash
+
+      - name: Install alef
+        uses: kreuzberg-dev/actions/install-alef@v1 # v1
+
+      - name: Run E2E tests (Unix)
+        if: runner.os != 'Windows'
+        run: alef test --e2e --lang csharp
+        shell: bash
+        env:
+          LD_LIBRARY_PATH: ${{ github.workspace }}/target/release:${{ github.workspace }}/target/debug
+          DYLD_LIBRARY_PATH: ${{ github.workspace }}/target/release:${{ github.workspace }}/target/debug
+
+      - name: Run E2E tests (Windows)
+        if: runner.os == 'Windows'
+        run: alef test --e2e --lang csharp
+        shell: bash
+        env:
+          PATH: ${{ github.workspace }}/target/release;${{ github.workspace }}/target/debug;${{ env.PATH }}
+
+      - name: Cleanup Rust cache
+        if: always()
+        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
 
   test-go:
     needs: [build-ffi, changes]
