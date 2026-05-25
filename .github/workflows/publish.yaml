@@ -1298,8 +1298,15 @@ jobs:
 
   elixir-package:
     name: Build Elixir Hex package
-    needs: [prepare, check-hex]
-    if: ${{ needs.prepare.outputs.release_elixir == 'true' && (needs.check-hex.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    needs: [prepare, check-hex, publish-crates]
+    # Must wait for `publish-crates`: the shared `build-elixir-hex` action
+    # rewrites the NIF's `Cargo.toml` path-dep on `html-to-markdown-rs` to a
+    # registry version-dep and runs `cargo generate-lockfile` against it. If
+    # publish-crates hasn't published the new version to crates.io yet, the
+    # lockfile resolution fails with `failed to select a version for the
+    # requirement \`html-to-markdown-rs = "^X.Y.Z"\``. Mirrors the gate used
+    # by python-sdist and ruby-gem.
+    if: ${{ !cancelled() && needs.publish-crates.result != 'failure' && needs.prepare.outputs.release_elixir == 'true' && (needs.check-hex.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     env:
       MIX_ENV: dev
