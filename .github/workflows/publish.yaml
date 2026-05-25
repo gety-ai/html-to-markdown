@@ -1110,6 +1110,56 @@ jobs:
           path: dist/c-ffi
           retention-days: 14
 
+  swift-artifactbundle:
+    name: Build Swift Artifact Bundle
+    needs: [prepare]
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_swift == 'true' }}
+    runs-on: macos-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          cache-key-prefix: publish-swift-artifactbundle
+
+      - uses: kreuzberg-dev/actions/build-swift-artifactbundle@v1
+        id: build
+        with:
+          crate-name: html-to-markdown-swift
+          artifact-name: HtmlToMarkdown-rs
+          header-path: target/release/build/html-to-markdown-swift-*/out
+          output-dir: dist/swift-artifactbundle
+          build-profile: release
+
+      - name: Record checksum
+        id: checksum
+        run: |
+          CHECKSUM=$(cat "${{ steps.build.outputs.bundle-zip }}.sha256" 2>/dev/null || swift package compute-checksum "${{ steps.build.outputs.bundle-zip }}")
+          echo "checksum=${CHECKSUM}" >> "$GITHUB_OUTPUT"
+          echo "Artifact bundle checksum: ${CHECKSUM}"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: swift-artifactbundle
+          path: dist/swift-artifactbundle
+          retention-days: 14
+
+      - name: Save checksum as artifact
+        run: |
+          mkdir -p dist/swift-checksums
+          echo "${{ steps.checksum.outputs.checksum }}" > dist/swift-checksums/HtmlToMarkdown-rs.artifactbundle.zip.checksum
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: swift-checksum
+          path: dist/swift-checksums/
+          retention-days: 14
+
   java-natives:
     name: Build Java FFI library (${{ matrix.platform }})
     needs: [prepare, check-maven]
@@ -1445,6 +1495,27 @@ jobs:
           assets: |
             **/*.tar.gz
             **/*.zip
+
+  upload-swift-release:
+    name: Upload Swift Artifact Bundle to GitHub Release
+    needs: [prepare, swift-artifactbundle]
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.swift-artifactbundle.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: swift-*
+          path: dist/swift
+          merge-multiple: true
+
+      - uses: kreuzberg-dev/actions/upload-release-assets@v1
+        with:
+          tag: ${{ needs.prepare.outputs.tag }}
+          working-directory: dist/swift
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+          assets: |
+            **/*.zip
+            **/*.checksum
 
   upload-elixir-release:
     name: Upload Elixir NIF archives to GitHub Release
@@ -2214,6 +2285,60 @@ jobs:
             # Elixir NIF
             libhtml_to_markdown_nif-*.tar.gz
 
+  update-swift-package-manifest:
+    name: Update Swift Package.swift manifest with artifact URL and checksum
+    needs: [prepare, upload-swift-release]
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.upload-swift-release.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: swift-checksum
+          path: swift-checksums
+
+      - name: Update Package.swift with version and checksum
+        run: |
+          VERSION="${{ needs.prepare.outputs.version }}"
+          CHECKSUM=$(cat swift-checksums/*.checksum | tr -d '[:space:]')
+
+          # Replace placeholders in Package.swift
+          sed -i "s/__ALEF_SWIFT_VERSION__/${VERSION}/g" Package.swift
+          sed -i "s/__ALEF_SWIFT_CHECKSUM__/${CHECKSUM}/g" Package.swift
+
+          echo "Updated Package.swift:"
+          head -30 Package.swift
+
+      - name: Update release notes with artifact URL
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          CHECKSUM=$(cat swift-checksums/*.checksum | tr -d '[:space:]')
+          ASSET_URL="https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v${VERSION}/HtmlToMarkdown-rs.artifactbundle.zip"
+
+          cat > /tmp/swift-notes.md << EOF
+          ## Swift Package Manager
+
+          Add to your \`Package.swift\`:
+
+          \`\`\`swift
+          .package(url: "https://github.com/kreuzberg-dev/html-to-markdown", from: "${VERSION}")
+          \`\`\`
+
+          The Swift binding is distributed as a pre-built artifact bundle. No Rust toolchain required.
+
+          **Artifact**: [HtmlToMarkdown-rs.artifactbundle.zip](${ASSET_URL})
+          **Checksum**: \`${CHECKSUM}\`
+          EOF
+
+          gh release edit "v${VERSION}" --notes-file /tmp/swift-notes.md
+
   release-finalize:
     name: Finalize GitHub Release
     needs:
@@ -2235,6 +2360,8 @@ jobs:
       - upload-cli-release
       - upload-go-release
       - upload-c-ffi-release
+      - upload-swift-release
+      - update-swift-package-manifest
     if: |
       always() &&
       !cancelled() &&
