@@ -1,9 +1,9 @@
 # Visitor Pattern - Elixir
 
-Customize HTML to Markdown conversion by passing a visitor map to
-`HtmlToMarkdown.convert/2`. Each entry maps a callback name (as a
-string) to a one-arity function that receives the JSON-decoded
-arguments.
+Customize HTML to Markdown conversion by passing a visitor map under
+the `:visitor` key of `HtmlToMarkdown.convert/2`'s options. Each entry
+maps a callback **atom** (e.g. `:handle_link`) to a one-arity function
+that receives the JSON-decoded arguments map.
 
 The bridge spawns a system thread for the conversion, then sends
 `{:visitor_callback, ref_id, callback_name, args_json}` messages back
@@ -15,12 +15,12 @@ that dispatches each message against your visitor map and calls
 
 ```elixir
 visitor = %{
-  "visit_link" => fn args ->
-    # args is a list: [ctx, href, text, title_or_nil]
-    [_ctx, _href, text, _title] = args
+  :handle_link => fn args ->
+    text = Map.get(args, "text", "")
     {:custom, text}
   end,
-  "visit_image" => fn _args -> :skip end
+  :handle_image => fn _args -> :skip end,
+  :handle_text => fn _args -> :continue end
 }
 
 html = "<p>Visit <a href='https://example.com'>our site</a> for more!</p>"
@@ -43,21 +43,22 @@ Anything else falls back to `:continue`.
 
 ## Callback Names
 
-The bridge accepts any of the `visit_*` callbacks defined by the Rust
-`HtmlVisitor` trait. The frequently-overridden ones:
+Callbacks are keyed by atom and use the `handle_` prefix (the bridge
+translates the Rust `visit_X` trait methods to `:handle_X` over the
+wire). Frequently overridden:
 
-- `visit_text` — text nodes (~100+ per document; keep it cheap)
-- `visit_link` — `<a>` elements: `[ctx, href, text, title_or_nil]`
-- `visit_image` — `<img>` elements: `[ctx, src, alt, title_or_nil]`
-- `visit_heading` — headings: `[ctx, level, text, id_or_nil]`
-- `visit_code_block` — `<pre><code>`: `[ctx, lang_or_nil, code]`
-- `visit_element_start` / `visit_element_end` — generic enter/leave hooks
+- `:handle_text` — text nodes: `%{"ctx" => …, "text" => "…"}` (called ~100+ times per document; keep it cheap)
+- `:handle_link` — `<a>` elements: `%{"ctx" => …, "href" => "…", "text" => "…", "title" => …}`
+- `:handle_image` — `<img>` elements: `%{"ctx" => …, "src" => "…", "alt" => "…", "title" => …}`
+- `:handle_heading` — headings: `%{"ctx" => …, "level" => 1, "text" => "…", "id" => …}`
+- `:handle_code_block` — `<pre><code>`: `%{"ctx" => …, "lang" => …, "code" => "…"}`
+- `:handle_element_start` / `:handle_element_end` — generic enter/leave hooks
 
 Omit a callback to fall through to the default Rust implementation.
 
 ## Node Context
 
-The first argument (`ctx`) in every callback is a JSON-decoded map:
+The `"ctx"` value in every callback arg map is a JSON-decoded map:
 
 ```elixir
 %{
@@ -71,12 +72,12 @@ The first argument (`ctx`) in every callback is a JSON-decoded map:
 
 ## Combining Options and Visitor
 
-Pass the visitor as a value under the `:visitor` key alongside any
-other `ConversionOptions` fields:
+Pass the visitor under the `:visitor` key alongside any other
+`ConversionOptions` fields:
 
 ```elixir
 {:ok, result} = HtmlToMarkdown.convert(html, %{
-  visitor: %{"visit_link" => fn _ -> :skip end},
+  visitor: %{:handle_link => fn _ -> :skip end},
   output_format: "github",
   extract_metadata: true
 })

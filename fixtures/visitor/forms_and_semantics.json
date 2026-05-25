@@ -29,7 +29,13 @@
         "field": "content",
         "value": "input"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "wasm"
+      ],
+      "reason": "WASM visitor bridge not yet exposed via @kreuzberg/html-to-markdown-wasm public API"
+    }
   },
   {
     "id": "visitor_form_skip",
@@ -60,7 +66,13 @@
         "field": "content",
         "value": "email"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "wasm"
+      ],
+      "reason": "WASM visitor bridge not yet exposed via @kreuzberg/html-to-markdown-wasm public API"
+    }
   },
   {
     "id": "visitor_input_custom",
@@ -87,7 +99,13 @@
         "field": "content",
         "value": "[INPUT:password]"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "wasm"
+      ],
+      "reason": "WASM visitor bridge not yet exposed via @kreuzberg/html-to-markdown-wasm public API"
+    }
   },
   {
     "id": "visitor_input_skip",
@@ -118,7 +136,13 @@
         "field": "content",
         "value": "email"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "wasm"
+      ],
+      "reason": "WASM visitor bridge not yet exposed via @kreuzberg/html-to-markdown-wasm public API"
+    }
   },
   {
     "id": "visitor_button_custom",
@@ -150,7 +174,13 @@
         "field": "content",
         "value": "Confirm action:"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "wasm"
+      ],
+      "reason": "WASM visitor bridge not yet exposed via @kreuzberg/html-to-markdown-wasm public API"
+    }
   },
   {
     "id": "visitor_button_skip",
@@ -186,7 +216,13 @@
         "field": "content",
         "value": "Export"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "wasm"
+      ],
+      "reason": "WASM visitor bridge not yet exposed via @kreuzberg/html-to-markdown-wasm public API"
+    }
   },
   {
     "id": "visitor_definition_list_custom",
@@ -218,6 +254,12 @@
         "field": "content",
         "value": "HyperText Markup Language"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "wasm"
+      ],
+      "reason": "WASM visitor bridge not yet exposed via @kreuzberg/html-to-markdown-wasm public API"
+    }
   }
 ]

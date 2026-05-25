@@ -24,7 +24,13 @@
         "field": "content",
         "value": "Widget content here"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "wasm"
+      ],
+      "reason": "WASM visitor bridge not yet exposed via @kreuzberg/html-to-markdown-wasm public API"
+    }
   },
   {
     "id": "visitor_unknown_tag_preservation",
@@ -55,7 +61,13 @@
         "field": "content",
         "value": "<x-custom>"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "wasm"
+      ],
+      "reason": "WASM visitor bridge not yet exposed via @kreuzberg/html-to-markdown-wasm public API"
+    }
   },
   {
     "id": "visitor_deeply_nested_skip",
@@ -86,7 +98,13 @@
         "field": "content",
         "value": "highlight"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "wasm"
+      ],
+      "reason": "WASM visitor bridge not yet exposed via @kreuzberg/html-to-markdown-wasm public API"
+    }
   },
   {
     "id": "visitor_element_start_skip_entire_subtree",
@@ -112,7 +130,13 @@
         "field": "content",
         "value": "Content"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "wasm"
+      ],
+      "reason": "WASM visitor bridge not yet exposed via @kreuzberg/html-to-markdown-wasm public API"
+    }
   },
   {
     "id": "visitor_element_end_modification",
@@ -133,6 +157,12 @@
         "type": "not_empty",
         "field": "content"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "wasm"
+      ],
+      "reason": "WASM visitor bridge not yet exposed via @kreuzberg/html-to-markdown-wasm public API"
+    }
   }
 ]

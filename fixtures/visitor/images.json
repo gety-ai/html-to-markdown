@@ -30,7 +30,13 @@
         "field": "content",
         "value": "photoone.jpg"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "wasm"
+      ],
+      "reason": "WASM visitor bridge not yet exposed via @kreuzberg/html-to-markdown-wasm public API"
+    }
   },
   {
     "id": "visitor_skip_images",
@@ -66,7 +72,13 @@
         "field": "content",
         "value": "A photo"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "wasm"
+      ],
+      "reason": "WASM visitor bridge not yet exposed via @kreuzberg/html-to-markdown-wasm public API"
+    }
   },
   {
     "id": "visitor_custom_image",
@@ -93,6 +105,12 @@
         "field": "content",
         "value": "banner.png"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "wasm"
+      ],
+      "reason": "WASM visitor bridge not yet exposed via @kreuzberg/html-to-markdown-wasm public API"
+    }
   }
 ]
