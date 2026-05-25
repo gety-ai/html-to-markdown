@@ -37,12 +37,5 @@
     "html",
     "markdown",
     "converter"
-  ],
-  "extra": {
-    "pie": {
-      "binary": {
-        "url-template": "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v{Version}/php_html_to_markdown-{Version}_php{PhpVersion}-{Arch}-{OS}-{Libc}-{TSMode}.tgz"
-      }
-    }
-  }
+  ]
 }

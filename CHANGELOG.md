@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.1] - 2026-05-25
+
+### Fixed
+
+- **bindings(ruby): expose `ConversionOptions.visitor` and wire the magnus visitor bridge end-to-end.** The Ruby gem previously dropped `VisitorHandle` from codegen via `[crates.ruby] exclude_types`, so the documented `HtmlToMarkdown.convert(html, MyVisitor.new)` example silently ignored the visitor and emitted default markdown. Removed the exclusion — alef's magnus backend already implements the full visitor trait bridge, so the regen produces a working `RbHtmlVisitorBridge` that dispatches each `visit_*` callback via `respond_to?` + `funcall` and translates Ruby return values (`:continue` / `:skip` / `:preserve_html` / `{custom: "..."}`) into `VisitResult` variants. Closes #388.
+
+- **bindings(elixir): expose `ConversionOptions.visitor` and wire the rustler visitor bridge end-to-end.** Same fix as Ruby: removed `VisitorHandle` from `[crates.elixir] exclude_types`. The alef rustler backend already ships the bridge — a system thread runs the conversion, sends `{:visitor_callback, ref_id, callback_name, args_json}` to the caller, and blocks on `HtmlToMarkdown.Native.visitor_reply/2` until the receive loop in `HtmlToMarkdown.convert/2` dispatches the user's visitor map and replies. Visitor maps are keyed by callback name (`"visit_link"`, `"visit_text"`, …) with one-arity function values.
+
+- **list**: nested-list duplication in Markdown output and the document structure collector (PR #385, fixes [kreuzberg#1004](https://github.com/kreuzberg-dev/kreuzberg/issues/1004)). `push_list_item` was previously called with `output[item_start_pos..]`, which included the rendered Markdown of nested `<ul>`/`<ol>` children. Inner items' text was triple-counted: once as the item itself, once inside the parent item's text, and once as free text from the walker. A `text_end_pos` cursor now advances only past non-list children. Affects any `ul > li > ul` (or arbitrarily nested) shape.
+
+- **alef.toml**: dropped stale Ruby/Elixir `vendor_mode = "core-only"` overrides — alef now defaults source-build languages to `vendor_mode = "registry"` (the migrated install-from-crates.io flow), and the shared `build-ruby-gem` / `build-elixir-hex` actions enforce the same rewrite at workflow time. Overriding to `core-only` would silently vendor the core crate into `packages/{ruby,elixir}/vendor/` and leave the manifest pointing at the workspace path, which fails to resolve on consumer machines.
+
+- **crates/html-to-markdown-py/src/pyproject.toml**: maturin `manifest-path` corrected to `../Cargo.toml` (was `../../crates/html-to-markdown-py/Cargo.toml`, which resolved to `crates/crates/…` from the pyproject's own directory). Local `uv sync --upgrade` / `task upgrade` now completes; the publish workflow builds via `maturin build` with explicit paths and was not affected.
+
+- **packages/swift/rust/src/lib.rs**: regenerated against alef 0.19.7 with the swift-bridge inbound trait phantom fix. The previous alef emitted `Vec<Swift{Trait}BoxBox>` in the `extern "Rust"` block (double-`Box` suffix), which swift-bridge-build rejected with "Type must be declared with `type >`". The inbound phantom is now omitted entirely — `Swift{Trait}Box` is an `extern "Swift" type` with no Rust-side struct backing it, and the Vec accessors are not consumed by the bindings we emit.
+
+- **.task/languages/kotlin_android.yml** + **alef.toml `[crates.update.kotlin_android]`**: the `com.github.ben-manes.versions` Gradle plugin (current pin 0.52.0, latest 0.53.0) throws `java.util.ConcurrentModificationException` under Gradle 9.5.1 on every `:dependencyUpdates` invocation; the plugin has not shipped a release since 2024-11. Both `alef update --latest` and `task kotlin_android:upgrade` previously failed the rest of the upgrade chain. Inert-echo the probe in both places until upstream lands a Gradle 9 fix or we swap to `nl.littlerobots.version-catalog-update`.
+
+### Added
+
+- **`alef test-apps generate` first-class subcommand**, bundled into `alef all` as a discrete pipeline stage so registry-mode test_apps regenerate alongside the local-mode e2e suite. Per-stage stale-file sweep prevents either output dir (`e2e/` vs `test_apps/`) from deleting the other's files (the bug that wiped half of `test_apps/` when `alef all` ran in the previous topology).
+
+- **Two new test_app channels** emitted by the new subcommand: `test_apps/homebrew/` (Brewfile + `run_tests.sh` + `ffi_smoke.c` — exercises both Homebrew formulae via `brew bundle install` and a pkg-config-linked C smoke test) and `test_apps/php_ext/` (PIE-installed native ext driver — `pie install kreuzberg-dev/html-to-markdown-ext` then `extension_loaded` + convert smoke).
+
+- **alef-generated `build.gradle.kts` for `test_apps/kotlin_android/`** — registry mode consumes the published `dev.kreuzberg:html-to-markdown-android:3.5.x` Maven artifact instead of the local workspace AAR.
+
+- **Taskfile**: `e2e:smoke:homebrew` and `e2e:smoke:php_ext` entries wired into the `e2e:smoke:all` aggregator.
+
+- **`.gitattributes`**: marks `test_apps/**` as `linguist-generated=true` (via the alef-scaffold change that now reads `[e2e.registry].output`).
+
+### Docs
+
+- **`docs/snippets/ruby/visitor/basic_visitor.md`** rewritten against the magnus-real API: visitor is a positional second argument to `HtmlToMarkdown.convert`, callbacks dispatch via `respond_to?` + `funcall`, return values are `:continue` / `:skip` / `:preserve_html` / `{ custom: "..." }`, the `ctx` argument is a Hash with `:node_type` / `:tag_name` / `:depth` / etc. The previous snippet used a `visitor: MyVisitor.new` kwarg form and `result[:content]` accessor that don't match the gem's actual surface.
+
+- **`docs/snippets/elixir/visitor/basic_visitor.md`** rewritten against the rustler-real API: visitor is a `%{"visit_*" => fn args -> ... end}` map under the `:visitor` key of the options Hash; the bridge sends `{:visitor_callback, ref_id, callback_name, args_json}` messages and blocks on `visitor_reply/2`. The previous snippet used an aspirational `use HtmlToMarkdown.Visitor` behaviour form that alef does not generate.
+
+### CI
+
+- **`publish-swift` job removed** from `.github/workflows/publish.yaml`. Swift Package Index has no central registry — packages are consumed directly from git tags, so the tag push IS the publish event. The previous `check-spi-swift` + `publish-swift` jobs only pinged SPI for fast re-indexing (SPI auto-discovers tags within ~1h without a ping). Cuts runner cost; SPI catches up automatically.
+
+- **`publish-zig` retained** — appends the tarball URL + SHA-256 to the GitHub Release notes via `update-release-notes: true`, which downstream consumers copy directly into `build.zig.zon`.
+
+- **`actions/publish-hex` bumped to v1.6.9**: generates `Cargo.lock` for every `native/**/Cargo.toml` before `mix hex.publish`. The lockfile is gitignored, so the publish action's fresh checkout had nothing to publish; this mirrors the `build-elixir-hex` fix from earlier in the v3.5.0 cycle.
+
+- **`task upgrade` works end-to-end again** after the Python and Kotlin Android fixes above.
+
 ## [3.5.0] - 2026-05-25
 
 ### Fixed
@@ -60,6 +106,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **ci(publish): build the Go FFI matrix on dry-runs too.** `.github/workflows/publish.yaml` job `go-ffi-libraries` gated only on `release_go == 'true'` and the registry existence check, so on `workflow_dispatch` dry-runs it skipped entirely. Its downstream sibling `upload-go-release` already gates on `is_tag || dry_run` but waits for `go-ffi-libraries.result == 'success'`, so no Go assets were ever uploaded to the dry-run release, and the terminal `verify-assets` gate failed with `✗ pattern NOT matched: html-to-markdown-rs-go-*.tar.gz` on every recent retry (the immediate blocker on v3.5.0-rc.1 publish). Added the `(is_tag == 'true' || dry_run == 'true')` clause to `go-ffi-libraries`'s `if:`, mirroring the `kotlin-android-natives` pattern (precedent: commit `e00a56e1` "ci(publish): build Kotlin Android natives on dry_run too").
 
 - **ci(e2e/ruby): drop the explicit `python3 scripts/ci/ruby/vendor-core-crate.py` step from both ruby build jobs in `.github/workflows/ci-e2e.yaml` (committed earlier today as `f23e6d458`); the dead script itself is removed in `f440af4fa`.** The shared `kreuzberg-dev/actions/build-ruby-gem@v1` action now invokes `rewrite-native-deps@v1` internally and vendors the core crate into `packages/ruby/vendor/html-to-markdown/` (no `-rs` suffix). Running the local script first wrote `packages/ruby/vendor/Cargo.toml` with `members = ["html-to-markdown-rs"]` and copied the crate into `vendor/html-to-markdown-rs/`; the subsequent action then created a sibling `vendor/html-to-markdown/` outside that members list, and cargo refused to build it with `error inheriting 'lints' from workspace root manifest's 'workspace.lints'` / `'workspace.lints' was not defined`. The action is now the single source of truth for ruby vendoring.
+
 ## [3.5.0-rc.1] - 2026-05-24
 
 ### Changed

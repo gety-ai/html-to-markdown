@@ -138,7 +138,7 @@ crate_dir = "crates/html-to-markdown-node"
 
 [crates.ruby]
 gem_name = "html-to-markdown"
-exclude_types = ["ConversionOptionsBuilder", "VisitorHandle"]
+exclude_types = ["ConversionOptionsBuilder"]
 
 [crates.ruby.stubs]
 output = "packages/ruby/sig/"
@@ -149,7 +149,7 @@ namespace = "HtmlToMarkdown"
 
 [crates.elixir]
 app_name = "html_to_markdown"
-exclude_types = ["VisitorHandle", "ConversionOptionsBuilder"]
+exclude_types = ["ConversionOptionsBuilder"]
 cpu_bound_functions = ["convert"]
 
 [crates.ffi]

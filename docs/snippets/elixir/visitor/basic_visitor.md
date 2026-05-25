@@ -1,177 +1,86 @@
 # Visitor Pattern - Elixir
 
-Customize HTML to Markdown conversion by implementing visitor callbacks.
+Customize HTML to Markdown conversion by passing a visitor map to
+`HtmlToMarkdown.convert/2`. Each entry maps a callback name (as a
+string) to a one-arity function that receives the JSON-decoded
+arguments.
+
+The bridge spawns a system thread for the conversion, then sends
+`{:visitor_callback, ref_id, callback_name, args_json}` messages back
+to the calling process. `HtmlToMarkdown.convert/2` runs a receive loop
+that dispatches each message against your visitor map and calls
+`HtmlToMarkdown.Native.visitor_reply/2` to unblock the worker.
 
 ## Basic Visitor Example
 
-Define a visitor module implementing `HtmlToMarkdown.Visitor`:
-
 ```elixir
-defmodule MyLinkFilter do
-  use HtmlToMarkdown.Visitor
-
-  @impl true
-  def handle_link(_context, _href, text, _title) do
-    # Convert all links to plain text
+visitor = %{
+  "visit_link" => fn args ->
+    # args is a list: [ctx, href, text, title_or_nil]
+    [_ctx, _href, text, _title] = args
     {:custom, text}
-  end
-end
+  end,
+  "visit_image" => fn _args -> :skip end
+}
 
 html = "<p>Visit <a href='https://example.com'>our site</a> for more!</p>"
-opts = %HtmlToMarkdown.Options{visitor: MyLinkFilter}
-{:ok, result} = HtmlToMarkdown.convert(html, opts)
-# result.content == "Visit our site for more!\n"
+{:ok, result} = HtmlToMarkdown.convert(html, %{visitor: visitor})
+IO.puts(result.content)
+# => Visit our site for more!
 ```
-
-## Available Callbacks
-
-### Generic Hooks
-
-- `handle_element_start(context)` - called before entering any element
-- `handle_element_end(context, output)` - called after exiting an element
-
-### Text & Formatting
-
-- `handle_text(context, text)` - text nodes
-- `handle_strong(context, text)` - `<strong>`, `<b>`
-- `handle_emphasis(context, text)` - `<em>`, `<i>`
-- `handle_strikethrough(context, text)` - `<s>`, `<del>`, `<strike>`
-- `handle_underline(context, text)` - `<u>`, `<ins>`
-- `handle_subscript(context, text)` - `<sub>`
-- `handle_superscript(context, text)` - `<sup>`
-- `handle_mark(context, text)` - `<mark>`
-
-### Links & Media
-
-- `handle_link(context, href, text, title)` - `<a>` elements
-- `handle_image(context, src, alt, title)` - `<img>` elements
-- `handle_audio(context, src)` - `<audio>` elements
-- `handle_video(context, src)` - `<video>` elements
-- `handle_iframe(context, src)` - `<iframe>` elements
-
-### Code
-
-- `handle_code_block(context, lang, code)` - `<pre><code>` blocks
-- `handle_code_inline(context, code)` - `<code>` inline
-
-### Headings & Structure
-
-- `handle_heading(context, level, text, id)` - `<h1>` through `<h6>`
-- `handle_blockquote(context, content, depth)` - `<blockquote>`
-- `handle_horizontal_rule(context)` - `<hr>`
-- `handle_line_break(context)` - `<br>`
-
-### Lists
-
-- `handle_list_start(context, ordered)` - `<ul>` or `<ol>` start
-- `handle_list_item(context, ordered, marker, text)` - `<li>` elements
-- `handle_list_end(context, ordered, output)` - list end
-
-### Tables
-
-- `handle_table_start(context)` - `<table>` start
-- `handle_table_row(context, cells, is_header)` - `<tr>` elements
-- `handle_table_end(context, output)` - table end
-
-### Forms
-
-- `handle_form(context, action, method)` - `<form>`
-- `handle_input(context, type, name, value)` - `<input>`
-- `handle_button(context, text)` - `<button>`
-
-### Definition Lists
-
-- `handle_definition_list_start(context)` - `<dl>` start
-- `handle_definition_term(context, text)` - `<dt>`
-- `handle_definition_description(context, text)` - `<dd>`
-- `handle_definition_list_end(context, output)` - list end
-
-### Custom Elements
-
-- `handle_custom_element(context, tag_name, html)` - web components or unknown tags
-- `handle_other(callback, context, args)` - catch-all for unimplemented callbacks
 
 ## Visitor Return Values
 
-Each callback must return one of:
+Each function must return one of:
 
-- `:continue` - proceed with default conversion
-- `{:custom, markdown}` - replace output with custom markdown
-- `:skip` - omit this element entirely
-- `:preserve_html` - include raw HTML verbatim
-- `{:error, reason}` - stop conversion with error
+- `:continue` — proceed with default conversion
+- `:skip` — omit this element entirely
+- `:preserve_html` — include the raw HTML verbatim
+- `{:custom, markdown_string}` — replace this element's output with the given string
+- A bare string — treated as a custom replacement
+
+Anything else falls back to `:continue`.
+
+## Callback Names
+
+The bridge accepts any of the `visit_*` callbacks defined by the Rust
+`HtmlVisitor` trait. The frequently-overridden ones:
+
+- `visit_text` — text nodes (~100+ per document; keep it cheap)
+- `visit_link` — `<a>` elements: `[ctx, href, text, title_or_nil]`
+- `visit_image` — `<img>` elements: `[ctx, src, alt, title_or_nil]`
+- `visit_heading` — headings: `[ctx, level, text, id_or_nil]`
+- `visit_code_block` — `<pre><code>`: `[ctx, lang_or_nil, code]`
+- `visit_element_start` / `visit_element_end` — generic enter/leave hooks
+
+Omit a callback to fall through to the default Rust implementation.
 
 ## Node Context
 
-All callbacks receive a `NodeContext` struct with element metadata:
+The first argument (`ctx`) in every callback is a JSON-decoded map:
 
 ```elixir
 %{
-  node_type: :link,           # coarse-grained classification
-  tag_name: "a",              # raw HTML tag name
-  attributes: %{...},         # HTML attributes as a map
-  depth: 2,                   # nesting depth in DOM
-  index_in_parent: 0,         # zero-based sibling index
-  parent_tag: "p",            # parent element's tag (nil if root)
-  is_inline: true             # whether treated as inline vs block
+  "node_type" => "Link",
+  "tag_name" => "a",
+  "depth" => 2,
+  "index_in_parent" => 0,
+  "parent_tag" => "p"
 }
 ```
 
-## Remove All Links Example
+## Combining Options and Visitor
+
+Pass the visitor as a value under the `:visitor` key alongside any
+other `ConversionOptions` fields:
 
 ```elixir
-defmodule NoLinksVisitor do
-  use HtmlToMarkdown.Visitor
-
-  @impl true
-  def handle_link(_context, _href, text, _title) do
-    # Convert links to plain text
-    {:custom, text}
-  end
-end
-
-html = "<p>Check <a href='#'>this</a> out.</p>"
-opts = %HtmlToMarkdown.Options{visitor: NoLinksVisitor}
-{:ok, result} = HtmlToMarkdown.convert(html, opts)
-# result.content == "Check this out.\n"
+{:ok, result} = HtmlToMarkdown.convert(html, %{
+  visitor: %{"visit_link" => fn _ -> :skip end},
+  output_format: "github",
+  extract_metadata: true
+})
 ```
 
-## Advanced Example: Stateful Image Collection
-
-Use a GenServer to maintain state across callbacks:
-
-```elixir
-defmodule ImageCollector do
-  use GenServer
-  use HtmlToMarkdown.Visitor
-
-  def start_link(_), do: GenServer.start_link(__MODULE__, [])
-
-  def init(_), do: {:ok, []}
-
-  @impl true
-  def handle_image(_context, src, alt, _title) do
-    GenServer.cast(self(), {:collect, src, alt})
-    :continue
-  end
-
-  def handle_cast({:collect, src, alt}, images) do
-    {:noreply, [%{src: src, alt: alt} | images]}
-  end
-end
-
-{:ok, pid} = ImageCollector.start_link(nil)
-opts = %HtmlToMarkdown.Options{visitor: pid}
-{:ok, result} = HtmlToMarkdown.convert(html, opts)
-# Can query collected images via GenServer API
-```
-
-## Execution Order
-
-Callbacks are invoked during depth-first traversal. For `<div><p>text</p></div>`:
-
-1. `handle_element_start` for `<div>`
-2. `handle_element_start` for `<p>`
-3. `handle_text` for "text"
-4. `handle_element_end` for `<p>`
-5. `handle_element_end` for `</div>`
+`HtmlToMarkdown.convert/2` pops the `:visitor` key, JSON-encodes the
+remaining options, and dispatches to `convert_with_visitor`.
