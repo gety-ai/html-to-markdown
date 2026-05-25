@@ -7,9 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.0] - 2026-05-25
+
 ### Fixed
 
 - **bindings: regenerated with alef 0.19.6.** Node optional-dep package names now carry the `@kreuzberg/` scope (`@kreuzberg/html-to-markdown-node-<target>`) so `requireOptionalDependency()` resolves the published per-platform packages instead of an unscoped name that does not exist on npm. `test_apps/` restructured by alef to the new layout (per-language runners under `test_apps/<lang>/{ffi,htm_test,run_tests}` for C; legacy in-tree test files removed). Additional alef-emitter, swift-bridge, FFI param handling, and ahash-scaffold fixes carried through from the 0.19.x line.
+
+- **ci(publish-hex): bump to kreuzberg-dev/actions@v1.6.9 — generate `Cargo.lock` before `mix hex.publish`.** `publish-hex@v1` runs a fresh `actions/checkout`, so the gitignored `packages/elixir/native/html_to_markdown_nif/Cargo.lock` is absent and `mix hex.publish` fails with `Missing files: native/html_to_markdown_nif/Cargo.lock`. v1.6.9 mirrors the `build-elixir-hex` fix and runs `cargo generate-lockfile` for every `native/**/Cargo.toml` before publishing. (`v1` floating tag retagged.)
+
+- **ci(publish): rename Go FFI tarballs to use `-go-` infix instead of `-ffi-`.** alef 0.19.6's Go packager (`alef publish package --lang go`) emitted `{crate}-ffi-v{version}-{platform}.tar.gz`, colliding with the C FFI packager's prefix. `check-registry` asset-prefix probes and `verify-release-assets` pattern lists could not distinguish Go from C FFI tarballs, so `verify-release-assets` failed on the missing `html-to-markdown-rs-go-*.tar.gz` pattern. Workaround: rename `-ffi-v` → `-go-v` immediately after `alef publish package --lang go` in the workflow. The alef-side fix is already on alef main; the workaround can be dropped once the local alef pin moves to a release that ships it.
+
+- **release: cut v3.5.0.** Promoted from v3.5.0-rc.3 after the dry-run/republish cycle (publish run 26393110006) reached fully green (31 success / 0 failed / 56 skipped). Aligned every workspace manifest on `3.5.0` via `alef sync-versions --set 3.5.0` + full `alef generate` regen.
 
 ## [3.5.0-rc.3] - 2026-05-25
 
