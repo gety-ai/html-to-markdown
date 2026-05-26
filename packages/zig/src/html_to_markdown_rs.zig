@@ -1099,17 +1099,17 @@ pub const IHtmlVisitor = extern struct {
     /// # Arguments
     /// - `ctx`: Node context (will have `node_type: NodeType::Text`)
     /// - `text`: The raw text content (HTML entities already decoded)
-    visit_text: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_text: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Called before entering any element.
     ///
     /// This is the first callback invoked for every HTML element, allowing
     /// visitors to implement generic element handling before tag-specific logic.
-    visit_element_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_element_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Called after exiting any element.
     ///
     /// Receives the default markdown output that would be generated.
     /// Visitors can inspect or replace this output.
-    visit_element_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_element_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit anchor links `<a href="...">`.
     ///
     /// # Arguments
@@ -1117,7 +1117,7 @@ pub const IHtmlVisitor = extern struct {
     /// - `href`: The link URL (from `href` attribute)
     /// - `text`: The link text content (already converted to markdown)
     /// - `title`: Optional title attribute
-    visit_link: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _href: [*c]const u8, _text: [*c]const u8, _title: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_link: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _href: [*c]const u8, _text: [*c]const u8, _title: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit images `<img src="...">`.
     ///
     /// # Arguments
@@ -1125,7 +1125,7 @@ pub const IHtmlVisitor = extern struct {
     /// - `src`: The image source URL
     /// - `alt`: The alt text
     /// - `title`: Optional title attribute
-    visit_image: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, _alt: [*c]const u8, _title: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_image: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, _alt: [*c]const u8, _title: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit heading elements `<h1>` through `<h6>`.
     ///
     /// # Arguments
@@ -1133,20 +1133,20 @@ pub const IHtmlVisitor = extern struct {
     /// - `level`: Heading level (1-6)
     /// - `text`: The heading text content
     /// - `id`: Optional id attribute (for anchor links)
-    visit_heading: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _level: u32, _text: [*c]const u8, _id: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_heading: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _level: u32, _text: [*c]const u8, _id: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit code blocks `<pre><code>`.
     ///
     /// # Arguments
     /// - `ctx`: Node context
     /// - `lang`: Optional language specifier (from class attribute)
     /// - `code`: The code content
-    visit_code_block: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _lang: [*c]const u8, _code: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_code_block: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _lang: [*c]const u8, _code: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit inline code `<code>`.
     ///
     /// # Arguments
     /// - `ctx`: Node context
     /// - `code`: The code content
-    visit_code_inline: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _code: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_code_inline: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _code: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit list items `<li>`.
     ///
     /// # Arguments
@@ -1154,87 +1154,87 @@ pub const IHtmlVisitor = extern struct {
     /// - `ordered`: Whether this is an ordered list item
     /// - `marker`: The list marker (e.g., "-", "1.", "a)")
     /// - `text`: The list item content (already converted)
-    visit_list_item: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, _marker: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_list_item: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, _marker: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Called before processing a list `<ul>` or `<ol>`.
-    visit_list_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_list_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Called after processing a list `</ul>` or `</ol>`.
-    visit_list_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_list_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Called before processing a table `<table>`.
-    visit_table_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_table_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit table rows `<tr>`.
     ///
     /// # Arguments
     /// - `ctx`: Node context
     /// - `cells`: Cell contents (already converted to markdown)
     /// - `is_header`: Whether this row is in `<thead>`
-    visit_table_row: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _cells: [*c]const u8, _is_header: i32, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_table_row: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _cells: [*c]const u8, _is_header: i32, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Called after processing a table `</table>`.
-    visit_table_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_table_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit blockquote elements `<blockquote>`.
     ///
     /// # Arguments
     /// - `ctx`: Node context
     /// - `content`: The blockquote content (already converted)
     /// - `depth`: Nesting depth (for nested blockquotes)
-    visit_blockquote: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _content: [*c]const u8, _depth: usize, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_blockquote: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _content: [*c]const u8, _depth: usize, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit strong/bold elements `<strong>`, `<b>`.
-    visit_strong: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_strong: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit emphasis/italic elements `<em>`, `<i>`.
-    visit_emphasis: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_emphasis: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
-    visit_strikethrough: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_strikethrough: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit underline elements `<u>`, `<ins>`.
-    visit_underline: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_underline: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit subscript elements `<sub>`.
-    visit_subscript: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_subscript: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit superscript elements `<sup>`.
-    visit_superscript: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_superscript: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit mark/highlight elements `<mark>`.
-    visit_mark: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_mark: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit line break elements `<br>`.
-    visit_line_break: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_line_break: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit horizontal rule elements `<hr>`.
-    visit_horizontal_rule: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_horizontal_rule: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit custom elements (web components) or unknown tags.
     ///
     /// # Arguments
     /// - `ctx`: Node context
     /// - `tag_name`: The custom element's tag name
     /// - `html`: The raw HTML of this element
-    visit_custom_element: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _tag_name: [*c]const u8, _html: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_custom_element: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _tag_name: [*c]const u8, _html: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit definition list `<dl>`.
-    visit_definition_list_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_definition_list_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit definition term `<dt>`.
-    visit_definition_term: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_definition_term: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit definition description `<dd>`.
-    visit_definition_description: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_definition_description: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Called after processing a definition list `</dl>`.
-    visit_definition_list_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_definition_list_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit form elements `<form>`.
-    visit_form: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _action: [*c]const u8, _method: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_form: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _action: [*c]const u8, _method: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit input elements `<input>`.
-    visit_input: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _input_type: [*c]const u8, _name: [*c]const u8, _value: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_input: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _input_type: [*c]const u8, _name: [*c]const u8, _value: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit button elements `<button>`.
-    visit_button: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_button: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit audio elements `<audio>`.
-    visit_audio: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_audio: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit video elements `<video>`.
-    visit_video: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_video: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit iframe elements `<iframe>`.
-    visit_iframe: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_iframe: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit details elements `<details>`.
-    visit_details: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _open: i32, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_details: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _open: i32, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit summary elements `<summary>`.
-    visit_summary: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_summary: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit figure elements `<figure>`.
-    visit_figure_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_figure_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Visit figcaption elements `<figcaption>`.
-    visit_figcaption: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_figcaption: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Called after processing a figure `</figure>`.
-    visit_figure_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 = null,
+    visit_figure_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 = null,
     /// Called by the Rust runtime when the bridge is dropped.
     /// Use this to release any Zig-side state held via `user_data`.
-    free_user_data: ?*const fn (user_data: ?*anyopaque) callconv(.C) void = null,
+    free_user_data: ?*const fn (user_data: ?*anyopaque) callconv(.c) void = null,
 };
 
 /// Wrap a `IHtmlVisitor` vtable into a `VisitorHandle` suitable for the
@@ -1250,7 +1250,7 @@ pub fn html_visitor_handle_from_vtable(callbacks: c.HTMHtmVisitorCallbacks) ?Vis
 /// Build an `IHtmlVisitor` vtable for a concrete Zig type `T`.
 ///
 /// `T` must implement every method of `HtmlVisitor` as a plain Zig function.
-/// Each slot is wrapped in a `callconv(.C)` thunk that casts `user_data`
+/// Each slot is wrapped in a `callconv(.c)` thunk that casts `user_data`
 /// back to `*T` and forwards the call.
 ///
 /// # Usage
@@ -1262,7 +1262,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
     _ = instance; // instance is passed as user_data by the caller
     return IHtmlVisitor{
         .visit_text = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_text(_ctx, _text);
@@ -1270,7 +1270,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_element_start = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_element_start(_ctx);
@@ -1278,7 +1278,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_element_end = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_element_end(_ctx, _output);
@@ -1286,7 +1286,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_link = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _href: [*c]const u8, _text: [*c]const u8, _title: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _href: [*c]const u8, _text: [*c]const u8, _title: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_link(_ctx, _href, _text, _title);
@@ -1294,7 +1294,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_image = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, _alt: [*c]const u8, _title: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, _alt: [*c]const u8, _title: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_image(_ctx, _src, _alt, _title);
@@ -1302,7 +1302,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_heading = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _level: u32, _text: [*c]const u8, _id: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _level: u32, _text: [*c]const u8, _id: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_heading(_ctx, _level, _text, _id);
@@ -1310,7 +1310,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_code_block = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _lang: [*c]const u8, _code: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _lang: [*c]const u8, _code: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_code_block(_ctx, _lang, _code);
@@ -1318,7 +1318,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_code_inline = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _code: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _code: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_code_inline(_ctx, _code);
@@ -1326,7 +1326,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_list_item = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, _marker: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, _marker: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_list_item(_ctx, _ordered, _marker, _text);
@@ -1334,7 +1334,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_list_start = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_list_start(_ctx, _ordered);
@@ -1342,7 +1342,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_list_end = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_list_end(_ctx, _ordered, _output);
@@ -1350,7 +1350,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_table_start = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_table_start(_ctx);
@@ -1358,7 +1358,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_table_row = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _cells: [*c]const u8, _is_header: i32, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _cells: [*c]const u8, _is_header: i32, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_table_row(_ctx, _cells, _is_header);
@@ -1366,7 +1366,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_table_end = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_table_end(_ctx, _output);
@@ -1374,7 +1374,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_blockquote = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _content: [*c]const u8, _depth: usize, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _content: [*c]const u8, _depth: usize, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_blockquote(_ctx, _content, _depth);
@@ -1382,7 +1382,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_strong = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_strong(_ctx, _text);
@@ -1390,7 +1390,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_emphasis = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_emphasis(_ctx, _text);
@@ -1398,7 +1398,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_strikethrough = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_strikethrough(_ctx, _text);
@@ -1406,7 +1406,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_underline = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_underline(_ctx, _text);
@@ -1414,7 +1414,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_subscript = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_subscript(_ctx, _text);
@@ -1422,7 +1422,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_superscript = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_superscript(_ctx, _text);
@@ -1430,7 +1430,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_mark = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_mark(_ctx, _text);
@@ -1438,7 +1438,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_line_break = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_line_break(_ctx);
@@ -1446,7 +1446,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_horizontal_rule = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_horizontal_rule(_ctx);
@@ -1454,7 +1454,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_custom_element = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _tag_name: [*c]const u8, _html: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _tag_name: [*c]const u8, _html: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_custom_element(_ctx, _tag_name, _html);
@@ -1462,7 +1462,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_definition_list_start = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_definition_list_start(_ctx);
@@ -1470,7 +1470,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_definition_term = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_definition_term(_ctx, _text);
@@ -1478,7 +1478,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_definition_description = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_definition_description(_ctx, _text);
@@ -1486,7 +1486,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_definition_list_end = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_definition_list_end(_ctx, _output);
@@ -1494,7 +1494,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_form = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _action: [*c]const u8, _method: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _action: [*c]const u8, _method: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_form(_ctx, _action, _method);
@@ -1502,7 +1502,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_input = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _input_type: [*c]const u8, _name: [*c]const u8, _value: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _input_type: [*c]const u8, _name: [*c]const u8, _value: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_input(_ctx, _input_type, _name, _value);
@@ -1510,7 +1510,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_button = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_button(_ctx, _text);
@@ -1518,7 +1518,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_audio = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_audio(_ctx, _src);
@@ -1526,7 +1526,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_video = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_video(_ctx, _src);
@@ -1534,7 +1534,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_iframe = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_iframe(_ctx, _src);
@@ -1542,7 +1542,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_details = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _open: i32, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _open: i32, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_details(_ctx, _open);
@@ -1550,7 +1550,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_summary = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_summary(_ctx, _text);
@@ -1558,7 +1558,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_figure_start = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_figure_start(_ctx);
@@ -1566,7 +1566,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_figcaption = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_figcaption(_ctx, _text);
@@ -1574,7 +1574,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .visit_figure_end = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.C) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) [*c]const u8 {
                 const self: *T = @ptrCast(@alignCast(ud));
                 _ = out_result;
                 return self.visit_figure_end(_ctx, _output);
@@ -1582,7 +1582,7 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
 
         .free_user_data = struct {
-            fn thunk(user_data: ?*anyopaque) callconv(.C) void {
+            fn thunk(user_data: ?*anyopaque) callconv(.c) void {
                 _ = user_data;
             }
         }.thunk,

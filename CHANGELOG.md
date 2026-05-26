@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.2] - 2026-05-26
+
 ### Fixed
+
+- **bindings(csharp): trait-bridge facade methods now throw the per-binding `HtmlToMarkdownRsException` instead of an undefined `KreuzbergException`.** The alef csharp backend's register/unregister facade method emitter was hardcoded to `KreuzbergException` (the kreuzberg core lib's exception class), causing every C# build to fail with `CS0246: KreuzbergException could not be found`. Fixed in alef 0.19.13 and pulled in by this regen.
+
+- **bindings(swift): `RustBridgeC.h` placeholder now declares the `RustStr` C struct that `SwiftBridgeCore.swift` depends on.** Without the typedef the Swift compiler reported `cannot find type 'RustStr' in scope` for every `extension RustStr` block before the full `cargo build` populated the real header. Fixed in alef 0.19.13.
 
 - **bindings(swift): resolve Swift Package Manager "unsafe build flags" rejection for v3.5.2+.** Swift 6.0+ strictly rejects packages with `unsafeFlags` in public products to prevent supply-chain code injection. The root `Package.swift` used by external consumers (via `.package(url: "...", from: "...")`) is now removed from git; it will be regenerated at release time with `.binaryTarget` pointing to pre-built xcframework/artifactbundle assets. For v3.5.2+, consumers will receive binary distribution (no Rust compilation required). For source builds, developers use `cd packages/swift && swift build` after `cargo build -p html-to-markdown-rs-swift`. The in-tree `packages/swift/Package.swift` retains `unsafeFlags` for local development. This fixes the blocking error for v3.5.1 external consumers attempting to depend on the package.
 

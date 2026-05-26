@@ -69,7 +69,7 @@ repos:
 
   # Node/TS/WASM: oxlint
   - repo: https://github.com/kreuzberg-dev/pre-commit-hooks
-    rev: v1.1.18
+    rev: v1.1.19
     hooks:
       - id: cargo-sort
         args: [-w]
@@ -261,7 +261,7 @@ repos:
   # (unreleased). The alef-sync-versions hook will try to bump this to
   # match alef/Cargo.toml; revert before committing release-prep.
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.19.10
+    rev: v0.19.14
     hooks:
       - id: alef-verify
       - id: alef-sync-versions

@@ -9,6 +9,9 @@ echo "Building Rust binding..."
 cargo build -p html-to-markdown-rs-swift --release || exit 1
 
 echo "Copying swift-bridge output to packages/swift..."
+# shellcheck disable=SC2012
+# find -printf '%T@' isn't portable to BSD `find` (macOS); `ls -dt` is good enough
+# for sorting alphanumeric build directories.
 OUT=$(ls -dt target/release/build/html-to-markdown-rs-swift-*/out 2>/dev/null | head -1)
 if [ -z "$OUT" ]; then
   echo "Error: Could not find swift-bridge output directory"

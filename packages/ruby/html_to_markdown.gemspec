@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name = "html-to-markdown"
-  spec.version = "3.5.1"
+  spec.version = "3.5.2"
   spec.authors       = ["Kreuzberg Team"]
   spec.summary       = "High-performance HTML to Markdown converter"
   spec.description   = "High-performance HTML to Markdown converter"
@@ -12,7 +12,9 @@ Gem::Specification.new do |spec|
   spec.metadata["keywords"] = %w[html markdown converter].join(",")
   spec.metadata["rubygems_mfa_required"] = "true"
 
-  spec.files         = Dir.glob(%w[lib/**/* ext/**/* sig/**/* Steepfile])
+  spec.files = Dir.glob(%w[lib/**/* ext/**/* sig/**/* Steepfile]).reject do |f|
+    f.include?("/native/target/") || f.include?("/native/tmp/")
+  end
   spec.require_paths = ["lib"]
   spec.extensions    = ["ext/html_to_markdown_rb/extconf.rb"]
 

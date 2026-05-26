@@ -1,12 +1,14 @@
 [package]
 name = "html-to-markdown-rb"
-version = "3.5.1"
+version = "3.5.2"
 edition = "2024"
 license = "MIT"
 description = "High-performance HTML to Markdown converter"
 readme = false
 keywords = ["html", "markdown", "converter"]
 categories = ["text-processing"]
+[package.metadata.cargo-machete]
+ignored = ["tokio", "async-trait"]
 
 [lib]
 name = "html_to_markdown_rb"
@@ -15,7 +17,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 async-trait = "0.1"
-html-to-markdown-rs = { version = "3.5.1", path = "../../../../../crates/html-to-markdown", features = ["full", "metadata", "visitor", "serde", "inline-images"] }
+html-to-markdown-rs = { version = "3.5.2", path = "../../../../../crates/html-to-markdown", features = ["full", "metadata", "visitor", "serde", "inline-images"] }
 magnus = "0.8"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
