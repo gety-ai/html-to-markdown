@@ -97,9 +97,9 @@ tasks:
       - task: rust:build
 
   build:bindings:
-    desc: "Build all language bindings (skip Rust core)"
+    desc: "Build all language bindings"
     cmds:
-      - alef build
+      - task: alef:build
 
   build:cli:
     desc: "Build the html-to-markdown CLI binary"
@@ -274,26 +274,29 @@ tasks:
 
   # === Alef lifecycle ===
   alef:generate:
-    desc: "Run full alef pipeline (generate + stubs + scaffold + readme + sync + e2e + test-apps) and `alef docs` (docs/reference for Zensical)"
+    desc: "Regenerate all Alef-managed outputs without formatting or building"
     cmds:
-      - alef generate
-      - alef stubs
-      - alef scaffold
-      - alef readme
-      - alef sync-versions
-      - alef e2e generate
-      - alef test-apps generate
-      - alef docs
+      - alef all --clean --format=false
 
   alef:verify:
-    desc: "Check bindings are up-to-date (CI mode)"
+    desc: "Check Alef-generated files are up to date"
     cmds:
       - alef verify --exit-code
+
+  alef:build:
+    desc: "Build all language bindings"
+    cmds:
+      - alef build
 
   alef:sync:
     desc: "Sync version from Cargo.toml to all manifests"
     cmds:
       - alef sync-versions
+
+  alef:docs:
+    desc: "Generate API reference documentation"
+    cmds:
+      - alef docs
 
   # === E2E tests (local fixture-based, via alef) ===
   # Per-language: <lang>:e2e — builds binding then runs e2e/<lang> suite
@@ -375,10 +378,10 @@ tasks:
       - alef test --e2e
 
   e2e:full:
-    desc: "Regenerate e2e tests, build all bindings, and run all e2e tests"
+    desc: "Regenerate Alef-managed outputs and run all e2e tests"
     cmds:
       - alef e2e generate
-      - alef generate --clean
+      - task: alef:generate
       - alef test --e2e
 
   e2e:generate:

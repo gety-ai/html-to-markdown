@@ -19,6 +19,9 @@ languages = [
   "zig",
 ]
 
+[workspace.format]
+enabled = false
+
 [workspace.sync]
 extra_paths = [
   "packages/ruby/lib/html_to_markdown/version.rb",
