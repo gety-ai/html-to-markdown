@@ -16,6 +16,17 @@ tasks:
     cmds:
       - uv run --no-sync --group doc zensical serve
 
+  generate:
+    desc: Generate API reference documentation using alef
+    cmds:
+      - alef docs
+
+  generate:check:
+    desc: Validate API docs match generated output (CI mode)
+    cmds:
+      - alef docs
+      - git diff --exit-code -- docs/reference/
+
   lint:links:
     desc: Check links with lychee
     cmds:

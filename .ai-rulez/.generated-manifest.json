@@ -128,6 +128,7 @@
     ".cursor/commands/parallelize.md",
     ".cursor/rules/agent-workflow.mdc",
     ".cursor/rules/alef-generated-bindings.mdc",
+    ".cursor/rules/alef-workflow.mdc",
     ".cursor/rules/anti-patterns.mdc",
     ".cursor/rules/atomic-commits.mdc",
     ".cursor/rules/avoid-duplication.mdc",
