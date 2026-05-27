@@ -4,11 +4,26 @@
 
 use super::types::{NodeContext, VisitResult};
 
-/// Visitor trait for HTML→Markdown conversion.
+/// Visitor for HTML→Markdown conversion.
 ///
-/// Implement this trait to customize the conversion behavior for any HTML element type.
-/// All methods have default implementations that return `VisitResult::Continue`, allowing
-/// selective override of only the elements you care about.
+/// Provide a visitor object whose methods customize the conversion behavior for any
+/// HTML element type. Override only the methods you care about; unimplemented methods
+/// default to `Continue` (emit the standard rendering).
+///
+/// Each callback returns one of:
+///
+/// - `Continue` (the default) — keep the standard rendering.
+/// - `Skip` — drop the element from the output entirely.
+/// - `PreserveHtml` — pass the original HTML through verbatim.
+/// - `Custom(text)` — replace the rendering with `text`.
+/// - `Error(message)` — abort conversion with `message`.
+///
+/// **Language idioms.** In Rust, return one of the [`VisitResult`] variants directly.
+/// In Python, Ruby, JavaScript/TypeScript, and other duck-typed bindings, define a
+/// plain class (no base class required) and return either a string (`"continue"`,
+/// `"skip"`, `"preserve_html"`) or a tagged map (`{"custom": "..."}`,
+/// `{"error": "..."}`) — the binding converts the return value to the corresponding
+/// [`VisitResult`] variant automatically.
 ///
 /// # Method Naming Convention
 ///
@@ -28,7 +43,7 @@ use super::types::{NodeContext, VisitResult};
 /// # Performance Notes
 ///
 /// - `visit_text` is the most frequently called method (~100+ times per document)
-/// - Return `VisitResult::Continue` quickly for elements you don't need to customize
+/// - Return `Continue` quickly for elements you don't need to customize
 /// - Avoid heavy computation in visitor methods; consider caching if needed
 pub trait HtmlVisitor: std::fmt::Debug + Send {
     /// Visit text nodes (most frequent callback - ~100+ per document).

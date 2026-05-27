@@ -1084,6 +1084,35 @@ public sealed class HtmlVisitorBridge : IDisposable {
             _implHandle.Free();
         }
     }
+
+    /// <summary>Register a HtmlVisitor implementation and return its native handle</summary>
+    public static IntPtr Register(IHtmlVisitor impl, string name) {
+        if (impl == null)
+            throw new ArgumentNullException(nameof(impl));
+
+
+        var bridge = new HtmlVisitorBridge(impl);
+
+        try {
+            var userDataHandle = GCHandle.Alloc(bridge, GCHandleType.Normal);
+            var userData = GCHandle.ToIntPtr(userDataHandle);
+            var vtablePtr = bridge._vtable;
+
+            var result = NativeMethods.RegisterHtmlVisitor(name, vtablePtr, userData, out var outError);
+            if (result != 0) {
+                userDataHandle.Free();
+                bridge.Dispose();
+                var errorMsg = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(outError) ?? "Unknown error";
+                global::System.Runtime.InteropServices.Marshal.FreeCoTaskMem(outError);
+                throw new InvalidOperationException($"Failed to register {name}: {errorMsg}");
+            }
+
+            return userData;
+        } catch {
+            bridge.Dispose();
+            throw;
+        }
+    }
 }
 
 /// <summary>Static helpers for registering trait implementations</summary>
@@ -1106,9 +1135,9 @@ public static class HtmlVisitorRegistry {
         return userData;
     }
 
-    /// <summary>Register a HtmlVisitor implementation</summary>
+    /// <summary>Register a HtmlVisitor implementation and return its native handle</summary>
 
-    public static void Register(IHtmlVisitor impl, string name) {
+    public static IntPtr Register(IHtmlVisitor impl, string name) {
         if (impl == null)
             throw new ArgumentNullException(nameof(impl));
 
@@ -1130,6 +1159,7 @@ public static class HtmlVisitorRegistry {
             }
 
             _bridges.TryAdd(name, bridge);
+            return userData;
         } catch {
             bridge.Dispose();
             throw;

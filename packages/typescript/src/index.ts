@@ -1,4 +1,6 @@
-export { convert } from "@kreuzberg/html-to-markdown-node";
+export {
+  convert,
+} from '@kreuzberg/html-to-markdown-node';
 
 export type {
   AnnotationKind,
@@ -39,4 +41,4 @@ export type {
   VisitorHandle,
   WarningKind,
   WhitespaceMode,
-} from "@kreuzberg/html-to-markdown-node";
+} from '@kreuzberg/html-to-markdown-node';

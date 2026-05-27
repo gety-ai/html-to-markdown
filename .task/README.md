@@ -296,12 +296,12 @@ tasks:
   toml:format:
     desc: "Format TOML files"
     cmds:
-      - taplo format **/*.toml
+      - pyproject-fmt pyproject.toml
 
   toml:format:check:
     desc: "Check TOML formatting"
     cmds:
-      - taplo format --check **/*.toml
+      - pyproject-fmt --check pyproject.toml
 ```
 
 ## How to Add a New Language

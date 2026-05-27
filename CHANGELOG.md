@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.3] - 2026-05-27
+
+### Fixed
+
+- **core: prevent silent truncation on XHTML-style self-closing tags (`<td/>`, `<br/>`, etc.) embedded in EPUB-derived HTML.** The bundled astral-tl parser treats `/` as an identifier character, so `<td/>` was parsed as a tag literally named `"td/"` and subsequent siblings nested under it — table rows collapsed into a single cell and any content after the broken table was dropped. `convert_api::normalize_input` now preprocesses `<tag/>` → `<tag />` before tokenization so the trailing slash is read as a self-closing marker. Regression covered by `tests/issue_391_xhtml_self_closing.rs`. Closes #391.
+- **docs(python): visitor API reference rewritten to match the actual duck-typed binding.** The generated `docs/reference/api-python.md` documented a `class MyVisitor(VisitorHandle):` subclass pattern with `VisitResult.Continue` enum returns, but `VisitorHandle` is `#[pyclass(unsendable, from_py_object)]` (sealed; cannot be subclassed) and `VisitResult` exposes only property getters (`VisitResult.Continue` raises `AttributeError`). The trait rustdoc on `HtmlVisitor` now leads with the plain-class + string/dict return idiom that the magnus-style bridge actually accepts. Closes #389.
+- **packaging(python): unblock PyPI sdist build from Alpine/musl and other no-precompiled-wheel platforms.** PyPI 3.5.1's sdist was missing the core `crates/html-to-markdown/` directory because a stale `.gitmodules` entry pointing at a deleted `homebrew-tap` submodule caused `cargo package --list` to fail silently during the CI maturin run, so maturin only bundled the PyO3 crate and shipped a sdist that could not build. Removed the stale `.gitmodules`; maturin's path-dependency auto-bundling now works again and the resulting sdist contains all 177 core-crate files. Closes #390.
+- **ci(swift): Swift Artifact Bundle publish job uses the renamed crate `html-to-markdown-rs-swift`.** Stale `html-to-markdown-swift` reference broke the Swift bundle step on every release since v3.5.0.
+
+### Chore
+
+- **bindings: regenerated against alef v0.19.22.** Pulls in the e2e green-up cohort (csharp/php/extendr/rustler/swift/zig/dart/go/java/ruby/elixir trait-bridge emitter fixes) and drops alef's broken `[tool.maturin] include` directive (maturin rejects archive paths with `..`).
+
 ## [3.5.2] - 2026-05-26
 
 ### Fixed

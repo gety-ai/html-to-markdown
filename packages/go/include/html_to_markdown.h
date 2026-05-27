@@ -139,11 +139,26 @@ typedef struct HTMHighlightStyle HTMHighlightStyle;
  */
 typedef struct HTMHtmlMetadata HTMHtmlMetadata;
 /**
- * Visitor trait for HTMLâMarkdown conversion.
+ * Visitor for HTMLâMarkdown conversion.
  *
- * Implement this trait to customize the conversion behavior for any HTML element type.
- * All methods have default implementations that return `VisitResult::Continue`, allowing
- * selective override of only the elements you care about.
+ * Provide a visitor object whose methods customize the conversion behavior for any
+ * HTML element type. Override only the methods you care about; unimplemented methods
+ * default to `Continue` (emit the standard rendering).
+ *
+ * Each callback returns one of:
+ *
+ * - `Continue` (the default) â keep the standard rendering.
+ * - `Skip` â drop the element from the output entirely.
+ * - `PreserveHtml` â pass the original HTML through verbatim.
+ * - `Custom(text)` â replace the rendering with `text`.
+ * - `Error(message)` â abort conversion with `message`.
+ *
+ * **Language idioms.** In Rust, return one of the [`VisitResult`] variants directly.
+ * In Python, Ruby, JavaScript/TypeScript, and other duck-typed bindings, define a
+ * plain class (no base class required) and return either a string (`"continue"`,
+ * `"skip"`, `"preserve_html"`) or a tagged map (`{"custom": "..."}`,
+ * `{"error": "..."}`) â the binding converts the return value to the corresponding
+ * [`VisitResult`] variant automatically.
  *
  * # Method Naming Convention
  *
@@ -163,7 +178,7 @@ typedef struct HTMHtmlMetadata HTMHtmlMetadata;
  * # Performance Notes
  *
  * - `visit_text` is the most frequently called method (~100+ times per document)
- * - Return `VisitResult::Continue` quickly for elements you don't need to customize
+ * - Return `Continue` quickly for elements you don't need to customize
  * - Avoid heavy computation in visitor methods; consider caching if needed
  */
 typedef struct HTMHtmlVisitor HTMHtmlVisitor;

@@ -1136,9 +1136,9 @@ jobs:
       - uses: kreuzberg-dev/actions/build-swift-artifactbundle@v1
         id: build
         with:
-          crate-name: html-to-markdown-swift
+          crate-name: html-to-markdown-rs-swift
           artifact-name: HtmlToMarkdown-rs
-          header-path: target/release/build/html-to-markdown-swift-*/out
+          header-path: target/release/build/html-to-markdown-rs-swift-*/out
           output-dir: dist/swift-artifactbundle
           build-profile: release
 
