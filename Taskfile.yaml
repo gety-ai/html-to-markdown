@@ -464,6 +464,11 @@ tasks:
     desc: "Smoke test PHP package from Packagist"
     dir: test_apps/php
     cmds:
+      # Packagist publishes `kreuzberg-dev/html-to-markdown` as `type: php-ext`,
+      # so composer alone will not install it — PIE must place the native
+      # extension first. install.sh fetches the matching alef-pinned release
+      # via PIE before composer install can satisfy `ext-html_to_markdown: "*"`.
+      - bash install.sh
       - composer install
       - vendor/bin/phpunit tests/SmokeTest.php
 
