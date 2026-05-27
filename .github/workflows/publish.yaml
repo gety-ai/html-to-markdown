@@ -589,12 +589,17 @@ jobs:
           node-version: "24"
 
       - name: Generate TypeScript definitions
-        # Inline: napi build produces index.js + index.d.ts as a side effect;
-        # we only need to copy them out and discard the binary. Tightly coupled
-        # to napi-rs convention.
+        # Inline: napi build produces index.js + a fresh index.d.ts as a side
+        # effect. We keep napi's index.js (its platform-dispatch stub loader)
+        # but restore alef's committed index.d.ts: alef adds *Update DTO types
+        # (e.g. ConversionOptionsUpdate, PreprocessingOptionsUpdate) that the
+        # napi macros deliberately filter out — those types are re-exported by
+        # packages/typescript/src/index.ts, so dropping them breaks tsc with
+        # TS2724 at the wrapper publish step.
         shell: bash
         run: |
           pnpm --filter ./crates/html-to-markdown-node exec napi build --release
+          git checkout HEAD -- crates/html-to-markdown-node/index.d.ts
           mkdir -p typescript-defs
           cp crates/html-to-markdown-node/index.js crates/html-to-markdown-node/index.d.ts typescript-defs/
 
@@ -739,7 +744,7 @@ jobs:
           - { os: ubuntu-24.04-arm, label: linux-aarch64 }
           - { os: macos-latest, label: macos-arm64 }
           - { os: macos-15-intel, label: macos-x86_64 }
-          - { os: windows-latest, label: windows-x64 }
+          - { os: ubuntu-latest, label: windows-x64, dock_platform: x64-mingw-ucrt }
           # windows-11-arm: deferred until rb-sys + Magnus toolchain validated on aarch64-pc-windows-msvc
     steps:
       - uses: actions/checkout@v6
@@ -820,7 +825,9 @@ jobs:
         # Inline: rb-sys's rake tasks are platform-dependent. All platforms use
         # native[PLATFORM] gem to produce platform-specific gems. The native task
         # is smart: on matching architectures it builds in-place, on mismatched
-        # architectures it cross-compiles via rake-compiler-dock.
+        # architectures it cross-compiles via rake-compiler-dock. Windows cross-
+        # compilation is explicitly handled via rb-sys-dock to avoid GNU toolchain
+        # linker corruption from native Windows builds.
         working-directory: packages/ruby
         shell: bash
         run: |
@@ -832,7 +839,15 @@ jobs:
             windows-x64) target="x64-mingw-ucrt" ;;
             *) echo "Unknown platform: ${{ matrix.label }}"; exit 1 ;;
           esac
-          bundle exec rake "native[$target]" gem
+
+          if [ -n "${{ matrix.dock_platform }}" ]; then
+            # Cross-compile for Windows via Docker using rb-sys-dock
+            gem install rb_sys
+            rb-sys-dock --platform "${{ matrix.dock_platform }}" -- bundle exec rake "native[$target]" gem
+          else
+            # Native build on matching architecture
+            bundle exec rake "native[$target]" gem
+          fi
 
       - name: Drop source gem on non-canonical builders
         if: ${{ matrix.label != 'linux' }}
@@ -1329,22 +1344,29 @@ jobs:
           cargo build --release --target "${TARGET}" \
             --manifest-path packages/elixir/native/html_to_markdown_nif/Cargo.toml
           NIF_DIR="packages/elixir/native/html_to_markdown_nif"
+          # Source library extension on disk (set by cargo's cdylib output).
           if [[ "${RUNNER_OS}" == "macOS" ]]; then
-            EXT="dylib"
+            SRC_EXT="dylib"
           elif [[ "${RUNNER_OS}" == "Windows" ]]; then
-            EXT="dll"
+            SRC_EXT="dll"
           else
-            EXT="so"
+            SRC_EXT="so"
           fi
-          LIB_NAME="libhtml_to_markdown_nif.${EXT}"
+          # Published artifact extension. rustler_precompiled (<= 0.9) hardcodes
+          # `dll` for windows and `so` for everything else (including macOS) in
+          # its download URL — see `lib_name_with_ext/2`. If we publish a .dylib
+          # tarball, consumers 404 on darwin. Normalize to `so` on non-windows.
+          if [[ "${RUNNER_OS}" == "Windows" ]]; then
+            ARTIFACT_EXT="dll"
+          else
+            ARTIFACT_EXT="so"
+          fi
+          LIB_NAME="libhtml_to_markdown_nif.${SRC_EXT}"
           LIB_PATH="${NIF_DIR}/target/${TARGET}/release/${LIB_NAME}"
           [[ -f "$LIB_PATH" ]] || LIB_PATH="${NIF_DIR}/target/release/${LIB_NAME}"
           mkdir -p dist/elixir
           for NIF_VERSION in 2.16 2.17; do
-            # rustler_precompiled / generate-elixir-checksums uses the platform
-            # extension (.so / .dylib / .dll) in the artifact filename — must
-            # match so the consumer can locate the right tarball per platform.
-            ARTIFACT="libhtml_to_markdown_nif-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${EXT}"
+            ARTIFACT="libhtml_to_markdown_nif-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARTIFACT_EXT}"
             cp "$LIB_PATH" "${ARTIFACT}"
             tar -czf "dist/elixir/${ARTIFACT}.tar.gz" "${ARTIFACT}"
             rm -f "${ARTIFACT}"
