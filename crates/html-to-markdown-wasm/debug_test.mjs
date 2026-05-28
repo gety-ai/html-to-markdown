@@ -1,7 +1,7 @@
 import { convert } from "./dist/html_to_markdown_wasm.js";
 
 const html =
-  '<html><head><title>Fallback Title</title><meta property="og:title" content="OG Title"></head><body><p>Content</p></body></html>';
+	'<html><head><title>Fallback Title</title><meta property="og:title" content="OG Title"></head><body><p>Content</p></body></html>';
 const result = convert(html, undefined);
 const doc = result.metadata?.document;
 console.log("doc.openGraph:", doc?.openGraph);

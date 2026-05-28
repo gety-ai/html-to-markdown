@@ -10,8 +10,8 @@ pub fn build(b: *std.Build) void {
     const pkg_name = if (builtin.target.os.tag == .linux) (
         if (builtin.target.cpu.arch == .x86_64) "html_to_markdown_linux_x86_64" else "html_to_markdown_linux_aarch64")
     else if (builtin.target.os.tag == .macos) (
-        if (builtin.target.cpu.arch == .x86_64) "html_to_markdown_macos_amd64" else "html_to_markdown_macos_arm64")
-    else if (builtin.target.os.tag == .windows) "html_to_markdown_windows_x64" else @compileError("unsupported platform for this Zig package");
+        if (builtin.target.cpu.arch == .x86_64) "html_to_markdown_macos_x86_64" else "html_to_markdown_macos_arm64")
+    else if (builtin.target.os.tag == .windows) "html_to_markdown_windows_x86_64" else @compileError("unsupported platform for this Zig package");
 
     const html_to_markdown_rs_module = b.dependency(pkg_name, .{
         .target = target,

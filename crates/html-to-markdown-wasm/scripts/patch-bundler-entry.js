@@ -147,45 +147,45 @@ export interface WasmConversionResult {
 `;
 
 function injectTypedef(content, specifier) {
-  const typedefBlock = `\n/**\n * @typedef {import("${specifier}").WasmConversionOptions} WasmConversionOptions\n */\n`;
-  if (content.includes("WasmConversionOptions} WasmConversionOptions")) {
-    return content;
-  }
-  if (content.includes("let wasm;")) {
-    return content.replace("let wasm;", `let wasm;${typedefBlock}`);
-  }
-  return `${typedefBlock}${content}`;
+	const typedefBlock = `\n/**\n * @typedef {import("${specifier}").WasmConversionOptions} WasmConversionOptions\n */\n`;
+	if (content.includes("WasmConversionOptions} WasmConversionOptions")) {
+		return content;
+	}
+	if (content.includes("let wasm;")) {
+		return content.replace("let wasm;", `let wasm;${typedefBlock}`);
+	}
+	return `${typedefBlock}${content}`;
 }
 
 function patchJsDoc(targetPath, typeSpecifier) {
-  if (!fs.existsSync(targetPath)) {
-    return;
-  }
-  let jsContent = fs.readFileSync(targetPath, "utf8");
-  const originalContent = jsContent;
+	if (!fs.existsSync(targetPath)) {
+		return;
+	}
+	let jsContent = fs.readFileSync(targetPath, "utf8");
+	const originalContent = jsContent;
 
-  jsContent = injectTypedef(jsContent, typeSpecifier);
+	jsContent = injectTypedef(jsContent, typeSpecifier);
 
-  const optionsPattern = /@param\s+\{any\}\s+options/g;
-  const optionsReplacement = "@param {WasmConversionOptions | null | undefined} [options]";
-  jsContent = jsContent.replace(optionsPattern, optionsReplacement);
+	const optionsPattern = /@param\s+\{any\}\s+options/g;
+	const optionsReplacement = "@param {WasmConversionOptions | null | undefined} [options]";
+	jsContent = jsContent.replace(optionsPattern, optionsReplacement);
 
-  const returnsPattern = /@returns\s+\{any\}/g;
-  const returnsReplacement = "@returns {WasmConversionResult}";
-  jsContent = jsContent.replace(returnsPattern, returnsReplacement);
+	const returnsPattern = /@returns\s+\{any\}/g;
+	const returnsReplacement = "@returns {WasmConversionResult}";
+	jsContent = jsContent.replace(returnsPattern, returnsReplacement);
 
-  if (jsContent !== originalContent) {
-    fs.writeFileSync(targetPath, jsContent, "utf8");
-  }
+	if (jsContent !== originalContent) {
+		fs.writeFileSync(targetPath, jsContent, "utf8");
+	}
 }
 
 if (!typesOnly) {
-  if (!fs.existsSync(entryPath)) {
-    console.error(`[patch-bundler-entry] Missing entry file at ${entryPath}`);
-    process.exit(1);
-  }
+	if (!fs.existsSync(entryPath)) {
+		console.error(`[patch-bundler-entry] Missing entry file at ${entryPath}`);
+		process.exit(1);
+	}
 
-  const wrapper = `import * as wasmModule from "./html_to_markdown_wasm_bg.wasm";
+	const wrapper = `import * as wasmModule from "./html_to_markdown_wasm_bg.wasm";
 export * from "./html_to_markdown_wasm_bg.js";
 import * as imports_mod from "./html_to_markdown_wasm_bg.js";
 import { convert as wasmConvert, WasmConversionOptions, WasmVisitorHandle } from "./html_to_markdown_wasm_bg.js";
@@ -402,55 +402,52 @@ export function convert(html, options) {
 }
 `;
 
-  fs.writeFileSync(entryPath, wrapper, "utf8");
+	fs.writeFileSync(entryPath, wrapper, "utf8");
 }
 
 if (!fs.existsSync(dtsPath)) {
-  console.error(`[patch-bundler-entry] Missing type definitions at ${dtsPath}`);
-  process.exit(1);
+	console.error(`[patch-bundler-entry] Missing type definitions at ${dtsPath}`);
+	process.exit(1);
 }
 
 let content = fs.readFileSync(dtsPath, "utf8");
 
 if (!typesOnly && !content.includes("initWasm():")) {
-  const additions = `\nexport declare function initWasm(): Promise<void>;\nexport declare const wasmReady: Promise<void>;\n`;
-  content += additions;
+	const additions = `\nexport declare function initWasm(): Promise<void>;\nexport declare const wasmReady: Promise<void>;\n`;
+	content += additions;
 }
 
 if (content.includes("options: any")) {
-  content = content.replace(/options: any/g, "options?: WasmConversionOptions | null");
+	content = content.replace(/options: any/g, "options?: WasmConversionOptions | null");
 }
 
-content = content.replace(
-  "readonly attributes: any;",
-  "readonly attributes: Record<string, string>;",
-);
+content = content.replace("readonly attributes: any;", "readonly attributes: Record<string, string>;");
 
 // Fix return types: wasm-bindgen generates `string` or `any` for Result<JsValue, JsValue>
 if (!content.includes("WasmConversionResult")) {
-  // convert() returns a structured result object, not a string
-  content = content.replace(
-    /export function convert\(html: string, options\?: WasmConversionOptions \| null\): string;/,
-    "export function convert(html: string, options?: WasmConversionOptions | null): WasmConversionResult;",
-  );
-  // Also handle the case where wasm-bindgen emits `any` as the return type
-  content = content.replace(
-    /export function convert\(html: string, options\?: WasmConversionOptions \| null\): any;/,
-    "export function convert(html: string, options?: WasmConversionOptions | null): WasmConversionResult;",
-  );
-  // convertWithMetadata and convertBytesWithMetadata return structured results
-  content = content.replace(
-    /export function convertWithMetadata\(([^)]*)\): any;/,
-    "export function convertWithMetadata($1): WasmConversionResult;",
-  );
-  content = content.replace(
-    /export function convertBytesWithMetadata\(([^)]*)\): any;/,
-    "export function convertBytesWithMetadata($1): WasmConversionResult;",
-  );
+	// convert() returns a structured result object, not a string
+	content = content.replace(
+		/export function convert\(html: string, options\?: WasmConversionOptions \| null\): string;/,
+		"export function convert(html: string, options?: WasmConversionOptions | null): WasmConversionResult;",
+	);
+	// Also handle the case where wasm-bindgen emits `any` as the return type
+	content = content.replace(
+		/export function convert\(html: string, options\?: WasmConversionOptions \| null\): any;/,
+		"export function convert(html: string, options?: WasmConversionOptions | null): WasmConversionResult;",
+	);
+	// convertWithMetadata and convertBytesWithMetadata return structured results
+	content = content.replace(
+		/export function convertWithMetadata\(([^)]*)\): any;/,
+		"export function convertWithMetadata($1): WasmConversionResult;",
+	);
+	content = content.replace(
+		/export function convertBytesWithMetadata\(([^)]*)\): any;/,
+		"export function convertBytesWithMetadata($1): WasmConversionResult;",
+	);
 }
 
 if (!content.includes("interface WasmConversionOptions")) {
-  content += `\n${typeDefinitions}`;
+	content += `\n${typeDefinitions}`;
 }
 
 fs.writeFileSync(dtsPath, content, "utf8");
@@ -462,11 +459,11 @@ patchJsDoc(jsDocTarget, typeImportSpecifier);
 // Fix package.json "files" field to include all necessary files
 const pkgJsonPath = path.join(distDir, "package.json");
 if (fs.existsSync(pkgJsonPath)) {
-  const pkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, "utf8"));
+	const pkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, "utf8"));
 
-  // Use glob patterns to ensure all generated files are included
-  pkgJson.files = ["*.wasm", "*.js", "*.d.ts"];
+	// Use glob patterns to ensure all generated files are included
+	pkgJson.files = ["*.wasm", "*.js", "*.d.ts"];
 
-  fs.writeFileSync(pkgJsonPath, JSON.stringify(pkgJson, null, 2) + "\n", "utf8");
-  console.log(`[patch-bundler-entry] Updated package.json files field in ${distArg}`);
+	fs.writeFileSync(pkgJsonPath, JSON.stringify(pkgJson, null, 2) + "\n", "utf8");
+	console.log(`[patch-bundler-entry] Updated package.json files field in ${distArg}`);
 }

@@ -13,3 +13,13 @@ ignoredBuiltDependencies:
 
 allowBuilds:
   esbuild: true
+
+minimumReleaseAgeExclude:
+  - '@kreuzberg/html-to-markdown-node-darwin-arm64@3.5.4'
+  - '@kreuzberg/html-to-markdown-node-darwin-x64@3.5.4'
+  - '@kreuzberg/html-to-markdown-node-linux-arm64-gnu@3.5.4'
+  - '@kreuzberg/html-to-markdown-node-linux-arm64-musl@3.5.4'
+  - '@kreuzberg/html-to-markdown-node-linux-x64-gnu@3.5.4'
+  - '@kreuzberg/html-to-markdown-node-linux-x64-musl@3.5.4'
+  - '@kreuzberg/html-to-markdown-node-win32-arm64-msvc@3.5.4'
+  - '@kreuzberg/html-to-markdown-node-win32-x64-msvc@3.5.4'

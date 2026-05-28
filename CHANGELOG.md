@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.5] - 2026-05-28
+
+### Fixed
+
+- **ci(ruby): cross-compile `windows-x64` gem via `bundle install` inside the `rb-sys-dock` container.** The previous matrix entry ran `rb-sys-dock --platform ... -- bundle exec rake "native[$target]" gem`, which invoked `bundle exec` inside the container without first materialising the lockfile against the container's Ruby version. The rb-sys-dock container ships its own Ruby toolchain (4.0.2 preview) while the host `Gemfile.lock` pins 3.3.11, so bundler failed with "Could not find …" and hung for 47 minutes. The command now wraps the container invocation in `bash -c "bundle install --jobs=4 --retry=3 && bundle exec rake …"` so the lockfile materialises against the container's Ruby before `rake` runs. (`.github/workflows/publish.yaml`)
+- **ci(elixir): Hex publish no longer 404s on darwin tarball downloads.** alef v0.20.2 changed darwin NIF tarballs to `.dylib.tar.gz` to "match the platform-native extension," but `rustler_precompiled 0.9.0` (the latest version on Hex; no `.dylib`-aware version exists) hardcodes `.so` for every non-Windows consumer download URL in `lib_name_with_ext/2` and ignores all caller overrides. h2m's hand-maintained publish.yaml had already normalised darwin uploads to `.so`, so h2m's own Hex publish kept working; the bug only surfaced in sibling polyglot repos. The alef v0.20.5 revert (`.dylib` → `.so`) restores polyrepo alignment and is picked up by this regen. (`alef.toml` pin → `v0.20.5`, `kreuzberg-dev/actions/generate-elixir-checksums@v1`)
+- **bindings(c): registry test_app `download_ffi.sh` now hits the correct release asset prefix.** The `[crates.e2e.registry.packages.c] name` was `html-to-markdown-ffi`, but `publish.yaml` uploads C FFI tarballs with `asset-prefix: html-to-markdown-rs-ffi-`. Drift caused `task test-apps:smoke:c` to 404 on the GH release tarball. (`alef.toml`)
+- **bindings(java): registry test_app now ships the Maven wrapper (`mvnw`, `mvnw.cmd`, `.mvn/wrapper/maven-wrapper.properties`).** Previously missing because mvnw emission landed in alef v0.20.2 and h2m was pinned at v0.20.1. (`alef.toml` pin → `v0.20.5`)
+- **bindings(homebrew, c, …): every alef-emitted `*.sh` (e.g. `run_tests.sh`, `download_ffi.sh`) is now created with the `+x` bit set.** alef's `write_scaffold_files_with_overwrite()` skipped the shebang-chmod helper that `write_files()` applied, so every alef-generated shell script in `e2e/` and `test_apps/` landed as `-rw-r--r--`, breaking `task test-apps:smoke:homebrew` with "permission denied" on `./run_tests.sh`. Fixed by alef v0.20.3's shared `apply_shebang_chmod()` helper called from both writers. (`alef.toml` pin → `v0.20.5`)
+- **bindings(go, php, swift, csharp, dart, kotlin_android, zig, …): trait-bridge codegen cohort fixes.** PHP refcount safety (inc_count/dec_count via PhpRc), Go duplicate //export removal + cgo.Handle.Delete defer/recover, Swift async/throws + try await order + JSON-encode conditionally, C# callback method naming + bool→int + IntPtr userData + usize/isize mapping, Dart trait-import + factory wrapper required-only methods + RID-aware published-loader, Kotlin Android useJUnitPlatform() in registry mode, Zig error-union removal from test-backend stubs, Java trait-method emission incl. default-impl methods + `ffi_skip_methods` honouring in `I{Trait}` interface emission. (`alef.toml` pin → `v0.20.5`)
+- **bindings(elixir): rustler upgraded 0.37 → 0.38.** (`packages/elixir/native/html_to_markdown_nif/Cargo.toml`)
+- **bindings(php): PHP trait-bridge async no longer panics on "Cannot start a runtime from within a runtime."** Generated async method bodies now prefer `Handle::try_current()` before `WORKER_RUNTIME.block_on(...)` so the bridge is safe to call from within an outer tokio runtime. (`alef.toml` pin → `v0.20.5`)
+- **bindings(wasm, node): test_apps pass `--config.minimumReleaseAge=0` to `pnpm test` so freshly-published RC packages clear pnpm's supply-chain policy check.** (`alef.toml` pin → `v0.20.5`)
+
+### Chore
+
+- **bindings: regenerated against alef v0.20.5.** Folds in every fix from v0.20.2 through v0.20.5 — see alef CHANGELOG for the full backend cohort.
+- **deps(java): jackson-databind + jackson-datatype-jdk8 2.21.2 → 2.21.3.** (`packages/java/pom.xml`)
+- **deps(rust): reqwest 0.13.3 → 0.13.4 in CLI binary.** (`crates/html-to-markdown-cli/Cargo.toml`)
+- **deps(js): pnpm packageManager 11.3.0 → 11.4.0.** (`package.json`)
+- **taskfile(elixir): tolerate `mix hex.outdated` non-zero exits before `mix deps.update --all`.** (`.task/languages/elixir.yml`)
+
 ## [3.5.4] - 2026-05-28
 
 ### Fixed
