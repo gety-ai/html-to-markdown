@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Chore
 
-- **bindings: regenerated against alef v0.20.0.** Folds in B6 hash semantics, java/c e2e build-path fixes, php install.sh, vendored Cargo workspace marker, scaffold persistence (rustc job cap + Node memory cap), wasm e2e import dedupe, and the service_api emitter family for csharp/dart/go/swift/zig/jni/ffi/extendr/napi/magnus/php/rustler/pyo3 (not yet wired in h2m but available for downstream features).
+- **bindings: regenerated against alef v0.20.1.** Folds in B6 hash semantics, java/c e2e build-path fixes, php install.sh, vendored Cargo workspace marker, scaffold persistence (rustc job cap + Node memory cap), wasm e2e import dedupe, service_api emitter family for csharp/dart/go/swift/zig/jni/ffi/extendr/napi/magnus/php/rustler/pyo3 with real dispatch (not yet wired in h2m but available for downstream features), zig platform-suffixed URLs in build.zig.zon, kotlin nullable bare result assertions, and php anonymous-class super_trait `name()` dedup.
 
 ## [3.5.3] - 2026-05-27
 
