@@ -9,10 +9,10 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/kreuzberg-dev/html-to-markdown"
   spec.license       = "MIT"
   spec.required_ruby_version = ">= 3.2.0"
-  spec.metadata["keywords"] = %w[html markdown converter].join(",")
+  spec.metadata["keywords"] = %w[converter html markdown].join(",")
   spec.metadata["rubygems_mfa_required"] = "true"
 
-  spec.files         = Dir.glob(%w[lib/**/* ext/**/* sig/**/* Steepfile]).reject { |f| f.include?("/native/target/") || f.include?("/native/tmp/") }
+  spec.files         = Dir.glob(%w[README* LICENSE* lib/**/* ext/**/* sig/**/* Steepfile]).reject { |f| f.include?("/native/target/") || f.include?("/native/tmp/") }
   spec.require_paths = ["lib"]
   spec.extensions    = ["ext/html_to_markdown_rb/extconf.rb"]
 

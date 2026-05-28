@@ -5,7 +5,7 @@ edition = "2024"
 license = "MIT"
 description = "High-performance HTML to Markdown converter"
 readme = false
-keywords = ["html", "markdown", "converter"]
+keywords = ["converter", "html", "markdown"]
 categories = ["text-processing"]
 
 [lib]

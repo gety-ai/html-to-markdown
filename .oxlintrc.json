@@ -29,7 +29,11 @@
 		"**/pkg/**",
 		"**/.next/**",
 		"**/*.min.js",
-		"docs/snippets/**/*.ts"
+		"docs/snippets/**/*.ts",
+		"docs/demo/**",
+		"e2e/wasm/tests/**",
+		"test_apps/wasm/tests/**",
+		"crates/html-to-markdown-node/index.js"
 	],
 	"rules": {
 		"no-console": "off",

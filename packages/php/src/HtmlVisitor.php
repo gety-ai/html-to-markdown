@@ -15,7 +15,6 @@ namespace HtmlToMarkdown;
  */
 interface HtmlVisitorInterface
 {
-
     /**
      * Visit text nodes (most frequent callback - ~100+ per document).
      *
@@ -24,7 +23,7 @@ interface HtmlVisitorInterface
      * @param string $_text
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_text(NodeContext $contextstring $_text): VisitResult;
+    public function visit_text(NodeContext $context, string $_text): VisitResult;
 
     /**
      * Called before entering any element.
@@ -43,7 +42,7 @@ interface HtmlVisitorInterface
      * @param string $_output
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_element_end(NodeContext $contextstring $_output): VisitResult;
+    public function visit_element_end(NodeContext $context, string $_output): VisitResult;
 
     /**
      * Visit anchor links `<a href="...">`.
@@ -55,7 +54,7 @@ interface HtmlVisitorInterface
      * @param ?string $_title
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_link(NodeContext $contextstring $_href, string $_text, ?string $_title): VisitResult;
+    public function visit_link(NodeContext $context, string $_href, string $_text, ?string $_title): VisitResult;
 
     /**
      * Visit images `<img src="...">`.
@@ -67,7 +66,7 @@ interface HtmlVisitorInterface
      * @param ?string $_title
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_image(NodeContext $contextstring $_src, string $_alt, ?string $_title): VisitResult;
+    public function visit_image(NodeContext $context, string $_src, string $_alt, ?string $_title): VisitResult;
 
     /**
      * Visit heading elements `<h1>` through `<h6>`.
@@ -79,7 +78,7 @@ interface HtmlVisitorInterface
      * @param ?string $_id
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_heading(NodeContext $contextint $_level, string $_text, ?string $_id): VisitResult;
+    public function visit_heading(NodeContext $context, int $_level, string $_text, ?string $_id): VisitResult;
 
     /**
      * Visit code blocks `<pre><code>`.
@@ -90,7 +89,7 @@ interface HtmlVisitorInterface
      * @param string $_code
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_code_block(NodeContext $context?string $_lang, string $_code): VisitResult;
+    public function visit_code_block(NodeContext $context, ?string $_lang, string $_code): VisitResult;
 
     /**
      * Visit inline code `<code>`.
@@ -100,7 +99,7 @@ interface HtmlVisitorInterface
      * @param string $_code
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_code_inline(NodeContext $contextstring $_code): VisitResult;
+    public function visit_code_inline(NodeContext $context, string $_code): VisitResult;
 
     /**
      * Visit list items `<li>`.
@@ -112,7 +111,7 @@ interface HtmlVisitorInterface
      * @param string $_text
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_list_item(NodeContext $contextbool $_ordered, string $_marker, string $_text): VisitResult;
+    public function visit_list_item(NodeContext $context, bool $_ordered, string $_marker, string $_text): VisitResult;
 
     /**
      * Called before processing a list `<ul>` or `<ol>`.
@@ -122,7 +121,7 @@ interface HtmlVisitorInterface
      * @param bool $_ordered
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_list_start(NodeContext $contextbool $_ordered): VisitResult;
+    public function visit_list_start(NodeContext $context, bool $_ordered): VisitResult;
 
     /**
      * Called after processing a list `</ul>` or `</ol>`.
@@ -133,7 +132,7 @@ interface HtmlVisitorInterface
      * @param string $_output
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_list_end(NodeContext $contextbool $_ordered, string $_output): VisitResult;
+    public function visit_list_end(NodeContext $context, bool $_ordered, string $_output): VisitResult;
 
     /**
      * Called before processing a table `<table>`.
@@ -153,7 +152,7 @@ interface HtmlVisitorInterface
      * @param bool $_is_header
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_table_row(NodeContext $contextmixed $_cells, bool $_is_header): VisitResult;
+    public function visit_table_row(NodeContext $context, mixed $_cells, bool $_is_header): VisitResult;
 
     /**
      * Called after processing a table `</table>`.
@@ -163,7 +162,7 @@ interface HtmlVisitorInterface
      * @param string $_output
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_table_end(NodeContext $contextstring $_output): VisitResult;
+    public function visit_table_end(NodeContext $context, string $_output): VisitResult;
 
     /**
      * Visit blockquote elements `<blockquote>`.
@@ -174,7 +173,7 @@ interface HtmlVisitorInterface
      * @param int $_depth
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_blockquote(NodeContext $contextstring $_content, int $_depth): VisitResult;
+    public function visit_blockquote(NodeContext $context, string $_content, int $_depth): VisitResult;
 
     /**
      * Visit strong/bold elements `<strong>`, `<b>`.
@@ -184,7 +183,7 @@ interface HtmlVisitorInterface
      * @param string $_text
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_strong(NodeContext $contextstring $_text): VisitResult;
+    public function visit_strong(NodeContext $context, string $_text): VisitResult;
 
     /**
      * Visit emphasis/italic elements `<em>`, `<i>`.
@@ -194,7 +193,7 @@ interface HtmlVisitorInterface
      * @param string $_text
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_emphasis(NodeContext $contextstring $_text): VisitResult;
+    public function visit_emphasis(NodeContext $context, string $_text): VisitResult;
 
     /**
      * Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
@@ -204,7 +203,7 @@ interface HtmlVisitorInterface
      * @param string $_text
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_strikethrough(NodeContext $contextstring $_text): VisitResult;
+    public function visit_strikethrough(NodeContext $context, string $_text): VisitResult;
 
     /**
      * Visit underline elements `<u>`, `<ins>`.
@@ -214,7 +213,7 @@ interface HtmlVisitorInterface
      * @param string $_text
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_underline(NodeContext $contextstring $_text): VisitResult;
+    public function visit_underline(NodeContext $context, string $_text): VisitResult;
 
     /**
      * Visit subscript elements `<sub>`.
@@ -224,7 +223,7 @@ interface HtmlVisitorInterface
      * @param string $_text
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_subscript(NodeContext $contextstring $_text): VisitResult;
+    public function visit_subscript(NodeContext $context, string $_text): VisitResult;
 
     /**
      * Visit superscript elements `<sup>`.
@@ -234,7 +233,7 @@ interface HtmlVisitorInterface
      * @param string $_text
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_superscript(NodeContext $contextstring $_text): VisitResult;
+    public function visit_superscript(NodeContext $context, string $_text): VisitResult;
 
     /**
      * Visit mark/highlight elements `<mark>`.
@@ -244,7 +243,7 @@ interface HtmlVisitorInterface
      * @param string $_text
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_mark(NodeContext $contextstring $_text): VisitResult;
+    public function visit_mark(NodeContext $context, string $_text): VisitResult;
 
     /**
      * Visit line break elements `<br>`.
@@ -273,7 +272,7 @@ interface HtmlVisitorInterface
      * @param string $_html
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_custom_element(NodeContext $contextstring $_tag_name, string $_html): VisitResult;
+    public function visit_custom_element(NodeContext $context, string $_tag_name, string $_html): VisitResult;
 
     /**
      * Visit definition list `<dl>`.
@@ -292,7 +291,7 @@ interface HtmlVisitorInterface
      * @param string $_text
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_definition_term(NodeContext $contextstring $_text): VisitResult;
+    public function visit_definition_term(NodeContext $context, string $_text): VisitResult;
 
     /**
      * Visit definition description `<dd>`.
@@ -302,7 +301,7 @@ interface HtmlVisitorInterface
      * @param string $_text
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_definition_description(NodeContext $contextstring $_text): VisitResult;
+    public function visit_definition_description(NodeContext $context, string $_text): VisitResult;
 
     /**
      * Called after processing a definition list `</dl>`.
@@ -312,7 +311,7 @@ interface HtmlVisitorInterface
      * @param string $_output
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_definition_list_end(NodeContext $contextstring $_output): VisitResult;
+    public function visit_definition_list_end(NodeContext $context, string $_output): VisitResult;
 
     /**
      * Visit form elements `<form>`.
@@ -323,7 +322,7 @@ interface HtmlVisitorInterface
      * @param ?string $_method
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_form(NodeContext $context?string $_action, ?string $_method): VisitResult;
+    public function visit_form(NodeContext $context, ?string $_action, ?string $_method): VisitResult;
 
     /**
      * Visit input elements `<input>`.
@@ -335,7 +334,7 @@ interface HtmlVisitorInterface
      * @param ?string $_value
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_input(NodeContext $contextstring $_input_type, ?string $_name, ?string $_value): VisitResult;
+    public function visit_input(NodeContext $context, string $_input_type, ?string $_name, ?string $_value): VisitResult;
 
     /**
      * Visit button elements `<button>`.
@@ -345,7 +344,7 @@ interface HtmlVisitorInterface
      * @param string $_text
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_button(NodeContext $contextstring $_text): VisitResult;
+    public function visit_button(NodeContext $context, string $_text): VisitResult;
 
     /**
      * Visit audio elements `<audio>`.
@@ -355,7 +354,7 @@ interface HtmlVisitorInterface
      * @param ?string $_src
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_audio(NodeContext $context?string $_src): VisitResult;
+    public function visit_audio(NodeContext $context, ?string $_src): VisitResult;
 
     /**
      * Visit video elements `<video>`.
@@ -365,7 +364,7 @@ interface HtmlVisitorInterface
      * @param ?string $_src
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_video(NodeContext $context?string $_src): VisitResult;
+    public function visit_video(NodeContext $context, ?string $_src): VisitResult;
 
     /**
      * Visit iframe elements `<iframe>`.
@@ -375,7 +374,7 @@ interface HtmlVisitorInterface
      * @param ?string $_src
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_iframe(NodeContext $context?string $_src): VisitResult;
+    public function visit_iframe(NodeContext $context, ?string $_src): VisitResult;
 
     /**
      * Visit details elements `<details>`.
@@ -385,7 +384,7 @@ interface HtmlVisitorInterface
      * @param bool $_open
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_details(NodeContext $contextbool $_open): VisitResult;
+    public function visit_details(NodeContext $context, bool $_open): VisitResult;
 
     /**
      * Visit summary elements `<summary>`.
@@ -395,7 +394,7 @@ interface HtmlVisitorInterface
      * @param string $_text
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_summary(NodeContext $contextstring $_text): VisitResult;
+    public function visit_summary(NodeContext $context, string $_text): VisitResult;
 
     /**
      * Visit figure elements `<figure>`.
@@ -414,7 +413,7 @@ interface HtmlVisitorInterface
      * @param string $_text
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_figcaption(NodeContext $contextstring $_text): VisitResult;
+    public function visit_figcaption(NodeContext $context, string $_text): VisitResult;
 
     /**
      * Called after processing a figure `</figure>`.
@@ -424,6 +423,6 @@ interface HtmlVisitorInterface
      * @param string $_output
      * @return VisitResult How to proceed with traversal (Continue, Skip, or Custom output)
      */
-    public function visit_figure_end(NodeContext $contextstring $_output): VisitResult;
+    public function visit_figure_end(NodeContext $context, string $_output): VisitResult;
 
 }
