@@ -50,17 +50,17 @@ const tryLoadBinding = () => {
 		],
 		[
 			"linux",
-			"x64",
-			"musl",
-			"./html-to-markdown-node.linux-x64-musl.node",
-			"@kreuzberg/html-to-markdown-node-linux-x64-musl",
-		],
-		[
-			"linux",
 			"arm64",
 			"gnu",
 			"./html-to-markdown-node.linux-arm64-gnu.node",
 			"@kreuzberg/html-to-markdown-node-linux-arm64-gnu",
+		],
+		[
+			"linux",
+			"x64",
+			"musl",
+			"./html-to-markdown-node.linux-x64-musl.node",
+			"@kreuzberg/html-to-markdown-node-linux-x64-musl",
 		],
 		[
 			"linux",

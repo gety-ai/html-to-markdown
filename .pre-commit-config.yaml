@@ -14,7 +14,12 @@ repos:
 - repo: https://github.com/kreuzberg-dev/pre-commit-hooks
   rev: v1.2.3
   hooks:
+  # ── Structure & generated-asset sync (run first; formatters get the final word) ──
   - id: ai-rulez-generate
+  - id: alef-sync-versions
+    args:
+    - --no-regen
+  # ── File-level safety ──
   - id: trailing-whitespace
     exclude: \.github/copilot-instructions\.md
   - id: end-of-file-fixer
@@ -32,9 +37,9 @@ repos:
     - --unsafe
   - id: check-toml
   - id: check-case-conflict
+  # ── Formatters (autofixers, in language order) ──
   - id: pyproject-fmt
     exclude: ^test_apps/python/pyproject\.toml$
-  - id: ruff
   - id: ruff-format
   - id: cargo-sort
     args:
@@ -43,6 +48,48 @@ repos:
   - id: cargo-fmt
     args:
     - --all
+  - id: shfmt
+    args:
+    - -w
+    - -i
+    - '2'
+  - id: clang-format
+    args:
+    - --style=file
+    files: ^crates/html-to-markdown-ffi/tests/c/
+  - id: go-fmt
+    exclude: ^(e2e/|test_apps/)
+  - id: rubocop
+    files: ^packages/ruby/.*\.rb$
+    exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
+  - id: dotnet-format
+    files: ^packages/csharp/.*\.cs$
+  - id: php-cs-fixer
+    files: ^packages/php/.*\.php$
+    exclude: ^packages/php/stubs/
+  - id: mix-format
+    files: ^packages/elixir/
+  - id: ktfmt
+    files: ^packages/kotlin-android/.*\.kts?$
+    args:
+    - --kotlinlang-style
+  - id: swift-format
+    files: ^packages/swift/.*\.swift$
+  - id: dart-format
+    files: ^packages/dart/.*\.dart$
+  - id: zig-fmt
+    files: ^packages/zig/.*\.zig$
+  - id: oxfmt
+  - id: rumdl-fmt
+  - id: textlint
+    files: ^docs/.*\.md$
+    exclude: ^docs/(reference/|api-|snippets/|migration/)
+    args:
+    - --fix
+    - --config
+    - .textlintrc.json
+  # ── Linters & static analysis (non-autofixing checks) ──
+  - id: ruff
   - id: cargo-check
     args:
     - --workspace
@@ -74,6 +121,68 @@ repos:
   - id: cargo-deny
     args:
     - check
+  - id: shellcheck
+  - id: clang-tidy
+    files: ^crates/html-to-markdown-ffi/tests/c/
+  - id: mypy
+    exclude: e2e/|tests/|scripts/|^packages/r/
+  - id: golangci-lint
+    exclude: ^(e2e/|test_apps/)
+    env:
+      KREUZBERG_GO_MOD_DIRS: packages/go
+  - id: govulncheck
+    exclude: ^(e2e/|test_apps/)
+  - id: rubocop-lint
+    files: ^packages/ruby/.*\.(rb|rbs)$
+    exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
+  - id: steep
+    files: ^packages/ruby/.*\.(rb|rbs)$
+    exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
+  - id: dotnet-format-check
+    files: ^packages/csharp/.*\.cs$
+  - id: phpstan
+    files: ^packages/php/(src|tests)/.*\.php$
+    args:
+    - analyse
+    - --no-progress
+    - --configuration
+    - packages/php/phpstan.neon
+  - id: mix-credo
+    files: ^packages/elixir/
+  - id: checkstyle
+    args:
+    - -c
+    - packages/java/checkstyle.xml
+    - -p
+    - packages/java/checkstyle.properties
+    exclude: ^(\.mvn/wrapper/|e2e/|test_apps/|packages/java/src/)
+  - id: detekt
+    files: ^packages/kotlin-android/.*\.kts?$
+    args:
+    - --build-upon-default-config
+  - id: ktlint
+    files: ^packages/kotlin-android/.*\.kts?$
+  - id: swiftlint
+    files: ^packages/swift/.*\.swift$
+  - id: dart-analyze
+    files: ^packages/dart/.*\.dart$
+    exclude: ^(test_apps/|e2e/dart/)
+  - id: zig-build-check
+    files: ^packages/zig/.*\.zig$
+  - id: oxlint
+  - id: cppcheck
+    args:
+    - --suppress=unusedStructMember
+  - id: cpd
+    args:
+    - --minimum-tokens=120
+    exclude: ^(test_apps/|e2e/java/)
+  - id: actionlint
+  - id: gh-actions-updater
+  - id: typos
+    args:
+    - --force-exclude
+  # ── Documentation lints ──
   - id: rustdoc-lint
     files: ^crates/html-to-markdown/src/.*\.rs$
     exclude: /tests/
@@ -83,7 +192,6 @@ repos:
   - id: pydocstyle
     files: ^packages/python/.*\.py$
     exclude: ^packages/python/(tests/|.*_native\.py$)
-  - id: alef-docs-fresh
   - id: roxygen2-check
     files: ^packages/r/R/.*\.R$
   - id: godoc-lint
@@ -103,108 +211,8 @@ repos:
   - id: zig-doc-lint
     files: ^packages/zig/src/.*\.zig$
     exclude: ^packages/zig/src/html_to_markdown_rs\.zig$
-  - id: shfmt
-    args:
-    - -w
-    - -i
-    - '2'
-  - id: shellcheck
-  - id: clang-format
-    args:
-    - --style=file
-    files: ^crates/html-to-markdown-ffi/tests/c/
-  - id: clang-tidy
-    files: ^crates/html-to-markdown-ffi/tests/c/
-  - id: checkstyle
-    args:
-    - -c
-    - packages/java/checkstyle.xml
-    - -p
-    - packages/java/checkstyle.properties
-    exclude: ^(\.mvn/wrapper/|e2e/|test_apps/|packages/java/src/)
-  - id: mypy
-    exclude: e2e/|tests/|scripts/|^packages/r/
-  - id: go-fmt
-    exclude: ^(e2e/|test_apps/)
-  - id: golangci-lint
-    exclude: ^(e2e/|test_apps/)
-    env:
-      KREUZBERG_GO_MOD_DIRS: packages/go
-  - id: govulncheck
-    exclude: ^(e2e/|test_apps/)
-  - id: rubocop
-    files: ^packages/ruby/.*\.rb$
-    exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
-  - id: rubocop-lint
-    files: ^packages/ruby/.*\.(rb|rbs)$
-    exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
-  - id: steep
-    files: ^packages/ruby/.*\.(rb|rbs)$
-    exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
-  - id: dotnet-format
-    files: ^packages/csharp/.*\.cs$
-  - id: dotnet-format-check
-    files: ^packages/csharp/.*\.cs$
-  - id: php-cs-fixer
-    files: ^packages/php/.*\.php$
-    exclude: ^packages/php/stubs/
-  - id: phpstan
-    files: ^packages/php/(src|tests)/.*\.php$
-    args:
-    - analyse
-    - --no-progress
-    - --configuration
-    - packages/php/phpstan.neon
-  - id: mix-format
-    files: ^packages/elixir/
-  - id: mix-credo
-    files: ^packages/elixir/
+  # ── Final verification (must run after all autofixers) ──
   - id: java-verify
     files: ^packages/java/
-  - id: ktfmt
-    files: ^packages/kotlin-android/.*\.kts?$
-    args:
-    - --kotlinlang-style
-  - id: detekt
-    files: ^packages/kotlin-android/.*\.kts?$
-    args:
-    - --build-upon-default-config
-  - id: ktlint
-    files: ^packages/kotlin-android/.*\.kts?$
-  - id: swift-format
-    files: ^packages/swift/.*\.swift$
-  - id: swiftlint
-    files: ^packages/swift/.*\.swift$
-  - id: dart-format
-    files: ^packages/dart/.*\.dart$
-  - id: dart-analyze
-    files: ^packages/dart/.*\.dart$
-    exclude: ^(test_apps/|e2e/dart/)
-  - id: zig-fmt
-    files: ^packages/zig/.*\.zig$
-  - id: zig-build-check
-    files: ^packages/zig/.*\.zig$
-  - id: textlint
-    files: ^docs/.*\.md$
-    exclude: ^docs/(reference/|api-|snippets/|migration/)
-    args:
-    - --fix
-    - --config
-    - .textlintrc.json
-  - id: oxlint
-  - id: oxfmt
-  - id: cppcheck
-    args:
-    - --suppress=unusedStructMember
-  - id: rumdl-fmt
-  - id: cpd
-    args:
-    - --minimum-tokens=120
-    exclude: ^(test_apps/|e2e/java/)
+  - id: alef-docs-fresh
   - id: alef-verify
-  - id: alef-sync-versions
-  - id: actionlint
-  - id: gh-actions-updater
-  - id: typos
-    args:
-    - --force-exclude

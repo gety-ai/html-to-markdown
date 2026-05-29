@@ -43,7 +43,9 @@ let package = Package(
         .linkedFramework("SystemConfiguration", .when(platforms: [.macOS])),
       ]
     ),
-    .target(name: "HtmlToMarkdown", dependencies: ["RustBridge"], path: "Sources/HtmlToMarkdown"),
+    .target(
+      name: "HtmlToMarkdown", dependencies: ["RustBridge"],
+      path: "Sources/HtmlToMarkdown"),
     .testTarget(
       name: "HtmlToMarkdownTests", dependencies: ["HtmlToMarkdown"],
       path: "Tests/HtmlToMarkdownTests"),

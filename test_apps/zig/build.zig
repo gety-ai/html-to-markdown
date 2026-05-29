@@ -6,14 +6,8 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
     const test_step = b.step("test", "Run tests");
 
-    // Select the platform-specific dependency based on build host.
-    const pkg_name = if (builtin.target.os.tag == .linux) (
-        if (builtin.target.cpu.arch == .x86_64) "html_to_markdown_linux_x86_64" else "html_to_markdown_linux_aarch64")
-    else if (builtin.target.os.tag == .macos) (
-        if (builtin.target.cpu.arch == .x86_64) "html_to_markdown_macos_x86_64" else "html_to_markdown_macos_arm64")
-    else if (builtin.target.os.tag == .windows) "html_to_markdown_windows_x86_64" else @compileError("unsupported platform for this Zig package");
-
-    const html_to_markdown_rs_module = b.dependency(pkg_name, .{
+    // Fetch the published Zig package from the registry.
+    const html_to_markdown_rs_module = b.dependency("html_to_markdown", .{
         .target = target,
         .optimize = optimize,
     }).module("html_to_markdown_rs");
