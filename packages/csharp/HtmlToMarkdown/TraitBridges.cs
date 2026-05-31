@@ -286,7 +286,12 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     public HtmlVisitorBridge(IHtmlVisitor impl) {
         _impl = impl ?? throw new ArgumentNullException(nameof(impl));
-        _implHandle = GCHandle.Alloc(impl, GCHandleType.Pinned);
+        // Reference types cannot be Pinned (GCHandle throws "Object contains references").
+        // Normal handles keep the object alive across GC without moving it; that is
+        // sufficient because we hand Rust function pointers obtained via
+        // GetFunctionPointerForDelegate, which remain valid as long as the delegate
+        // (and its target) is alive — the managed address of the array does not matter.
+        _implHandle = GCHandle.Alloc(impl, GCHandleType.Normal);
         _delegates = new object[42];
         _delegatesHandle = GCHandle.Alloc(_delegates, GCHandleType.Normal);
         _vtable = IntPtr.Zero;
@@ -514,15 +519,8 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     }
 
-    private static readonly JsonSerializerOptions FfiJsonOptions = new()
-    {
-        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower) },
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
-        NumberHandling = JsonNumberHandling.AllowReadingFromString
-    };
-
     private static string ToJsonString<T>(T value) {
-        return JsonSerializer.Serialize(value);
+        return JsonSerializer.Serialize(value, FfiJsonExtensions.FfiJsonOptions);
     }
 
     /// <summary>Called by Rust via FreeUserDataCallback when done with this bridge</summary>
@@ -571,7 +569,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
             var methodResult = bridge._impl.VisitText(managed_ctx, managed_text);
             try {
@@ -608,7 +606,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var methodResult = bridge._impl.VisitElementStart(managed_ctx);
             try {
                 string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
@@ -644,7 +642,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_output = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(output) ?? string.Empty;
             var methodResult = bridge._impl.VisitElementEnd(managed_ctx, managed_output);
             try {
@@ -681,7 +679,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_href = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(href) ?? string.Empty;
             var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
             var managed_title = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(title) ?? string.Empty;
@@ -720,7 +718,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_src = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(src) ?? string.Empty;
             var managed_alt = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(alt) ?? string.Empty;
             var managed_title = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(title) ?? string.Empty;
@@ -759,7 +757,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
             var managed_id = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(id) ?? string.Empty;
             var methodResult = bridge._impl.VisitHeading(managed_ctx, level, managed_text, managed_id);
@@ -797,7 +795,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_lang = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(lang) ?? string.Empty;
             var managed_code = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(code) ?? string.Empty;
             var methodResult = bridge._impl.VisitCodeBlock(managed_ctx, managed_lang, managed_code);
@@ -835,7 +833,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_code = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(code) ?? string.Empty;
             var methodResult = bridge._impl.VisitCodeInline(managed_ctx, managed_code);
             try {
@@ -872,7 +870,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_marker = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(marker) ?? string.Empty;
             var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
             var methodResult = bridge._impl.VisitListItem(managed_ctx, (ordered != 0), managed_marker, managed_text);
@@ -910,7 +908,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var methodResult = bridge._impl.VisitListStart(managed_ctx, (ordered != 0));
             try {
                 string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
@@ -946,7 +944,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_output = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(output) ?? string.Empty;
             var methodResult = bridge._impl.VisitListEnd(managed_ctx, (ordered != 0), managed_output);
             try {
@@ -983,7 +981,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var methodResult = bridge._impl.VisitTableStart(managed_ctx);
             try {
                 string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
@@ -1019,9 +1017,9 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var json_cells = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(cells) ?? "{}";
-            var managed_cells = JsonSerializer.Deserialize<List<string>>(json_cells, FfiJsonOptions)!;
+            var managed_cells = JsonSerializer.Deserialize<List<string>>(json_cells, FfiJsonExtensions.FfiJsonOptions)!;
             var methodResult = bridge._impl.VisitTableRow(managed_ctx, managed_cells, (isHeader != 0));
             try {
                 string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
@@ -1057,7 +1055,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_output = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(output) ?? string.Empty;
             var methodResult = bridge._impl.VisitTableEnd(managed_ctx, managed_output);
             try {
@@ -1094,7 +1092,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_content = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(content) ?? string.Empty;
             var methodResult = bridge._impl.VisitBlockquote(managed_ctx, managed_content, depth);
             try {
@@ -1131,7 +1129,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
             var methodResult = bridge._impl.VisitStrong(managed_ctx, managed_text);
             try {
@@ -1168,7 +1166,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
             var methodResult = bridge._impl.VisitEmphasis(managed_ctx, managed_text);
             try {
@@ -1205,7 +1203,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
             var methodResult = bridge._impl.VisitStrikethrough(managed_ctx, managed_text);
             try {
@@ -1242,7 +1240,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
             var methodResult = bridge._impl.VisitUnderline(managed_ctx, managed_text);
             try {
@@ -1279,7 +1277,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
             var methodResult = bridge._impl.VisitSubscript(managed_ctx, managed_text);
             try {
@@ -1316,7 +1314,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
             var methodResult = bridge._impl.VisitSuperscript(managed_ctx, managed_text);
             try {
@@ -1353,7 +1351,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
             var methodResult = bridge._impl.VisitMark(managed_ctx, managed_text);
             try {
@@ -1390,7 +1388,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var methodResult = bridge._impl.VisitLineBreak(managed_ctx);
             try {
                 string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
@@ -1426,7 +1424,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var methodResult = bridge._impl.VisitHorizontalRule(managed_ctx);
             try {
                 string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
@@ -1462,7 +1460,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_tagName = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(tagName) ?? string.Empty;
             var managed_html = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(html) ?? string.Empty;
             var methodResult = bridge._impl.VisitCustomElement(managed_ctx, managed_tagName, managed_html);
@@ -1500,7 +1498,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var methodResult = bridge._impl.VisitDefinitionListStart(managed_ctx);
             try {
                 string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
@@ -1536,7 +1534,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
             var methodResult = bridge._impl.VisitDefinitionTerm(managed_ctx, managed_text);
             try {
@@ -1573,7 +1571,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
             var methodResult = bridge._impl.VisitDefinitionDescription(managed_ctx, managed_text);
             try {
@@ -1610,7 +1608,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_output = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(output) ?? string.Empty;
             var methodResult = bridge._impl.VisitDefinitionListEnd(managed_ctx, managed_output);
             try {
@@ -1647,7 +1645,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_action = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(action) ?? string.Empty;
             var managed_method = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(method) ?? string.Empty;
             var methodResult = bridge._impl.VisitForm(managed_ctx, managed_action, managed_method);
@@ -1685,7 +1683,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_inputType = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(inputType) ?? string.Empty;
             var managed_name = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(name) ?? string.Empty;
             var managed_value = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(value) ?? string.Empty;
@@ -1724,7 +1722,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
             var methodResult = bridge._impl.VisitButton(managed_ctx, managed_text);
             try {
@@ -1761,7 +1759,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_src = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(src) ?? string.Empty;
             var methodResult = bridge._impl.VisitAudio(managed_ctx, managed_src);
             try {
@@ -1798,7 +1796,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_src = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(src) ?? string.Empty;
             var methodResult = bridge._impl.VisitVideo(managed_ctx, managed_src);
             try {
@@ -1835,7 +1833,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_src = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(src) ?? string.Empty;
             var methodResult = bridge._impl.VisitIframe(managed_ctx, managed_src);
             try {
@@ -1872,7 +1870,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var methodResult = bridge._impl.VisitDetails(managed_ctx, (open != 0));
             try {
                 string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
@@ -1908,7 +1906,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
             var methodResult = bridge._impl.VisitSummary(managed_ctx, managed_text);
             try {
@@ -1945,7 +1943,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var methodResult = bridge._impl.VisitFigureStart(managed_ctx);
             try {
                 string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
@@ -1981,7 +1979,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
             var methodResult = bridge._impl.VisitFigcaption(managed_ctx, managed_text);
             try {
@@ -2018,7 +2016,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         try {
             var bridge = _bridgeFromRegistry!;
             var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonOptions)!;
+            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
             var managed_output = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(output) ?? string.Empty;
             var methodResult = bridge._impl.VisitFigureEnd(managed_ctx, managed_output);
             try {
@@ -2176,12 +2174,22 @@ public static class HtmlVisitorRegistry {
 
 }
 
-/// <summary>FFI JSON serialization extension methods</summary>
+/// <summary>FFI JSON serialization extension methods and options</summary>
 internal static class FfiJsonExtensions {
+
+    /// <summary>Global JsonSerializerOptions for FFI marshalling with relaxed numeric handling.
+    /// Supports: enum-to-snake_case conversion, ignoring default values, and reading numeric values from strings.
+    /// Used by both trait bridges and callback deserialization.</summary>
+    public static readonly JsonSerializerOptions FfiJsonOptions = new()
+    {
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower) },
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+        NumberHandling = JsonNumberHandling.AllowReadingFromString
+    };
 
     /// <summary>Serialize any object to JSON for FFI marshalling</summary>
     internal static string ToFfiJson<T>(this T value) {
-        return JsonSerializer.Serialize(value);
+        return JsonSerializer.Serialize(value, FfiJsonOptions);
     }
 
 }
