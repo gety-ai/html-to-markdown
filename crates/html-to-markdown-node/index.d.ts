@@ -8,10 +8,8 @@
  * The handle may be cloned and shared across threads without additional
  * synchronisation on the caller's side.
  */
-export declare class VisitorHandle {
-
-}
-export type JsVisitorHandle = VisitorHandle
+export declare class VisitorHandle {}
+export type JsVisitorHandle = VisitorHandle;
 
 /**
  * The type of an inline text annotation.
@@ -19,9 +17,9 @@ export type JsVisitorHandle = VisitorHandle
  * Uses internally tagged representation (`"annotation_type": "bold"`) for JSON serialization.
  */
 export interface AnnotationKind {
-  annotation_type: string
-  url?: string
-  title?: string
+	annotation_type: string;
+	url?: string;
+	title?: string;
 }
 
 /**
@@ -30,12 +28,12 @@ export interface AnnotationKind {
  * Determines how code blocks (`<pre><code>`) are rendered in Markdown.
  */
 export declare const enum CodeBlockStyle {
-  /** Indented code blocks (4 spaces). `CommonMark` standard. */
-  Indented = 'Indented',
-  /** Fenced code blocks with backticks (```). Default (GFM). Supports language hints. */
-  Backticks = 'Backticks',
-  /** Fenced code blocks with tildes (~~~). Supports language hints. */
-  Tildes = 'Tildes'
+	/** Indented code blocks (4 spaces). `CommonMark` standard. */
+	Indented = "Indented",
+	/** Fenced code blocks with backticks (```). Default (GFM). Supports language hints. */
+	Backticks = "Backticks",
+	/** Fenced code blocks with tildes (~~~). Supports language hints. */
+	Tildes = "Tildes",
 }
 
 /**
@@ -46,164 +44,164 @@ export declare const enum CodeBlockStyle {
  * # Example
  */
 export interface ConversionOptions {
-  /** Heading style to use in Markdown output (ATX `#` or Setext underline). */
-  headingStyle?: JsHeadingStyle
-  /** How to indent nested list items (spaces or tab). */
-  listIndentType?: JsListIndentType
-  /** Number of spaces (or tabs) to use for each level of list indentation. */
-  listIndentWidth?: number
-  /** Bullet character(s) to use for unordered list items (e.g. `"-"`, `"*"`). */
-  bullets?: string
-  /** Character used for bold/italic emphasis markers (`*` or `_`). */
-  strongEmSymbol?: string
-  /** Escape `*` characters in plain text to avoid unintended bold/italic. */
-  escapeAsterisks?: boolean
-  /** Escape `_` characters in plain text to avoid unintended bold/italic. */
-  escapeUnderscores?: boolean
-  /** Escape miscellaneous Markdown metacharacters (`[]()#` etc.) in plain text. */
-  escapeMisc?: boolean
-  /** Escape ASCII characters that have special meaning in certain Markdown dialects. */
-  escapeAscii?: boolean
-  /** Default language annotation for fenced code blocks that have no language hint. */
-  codeLanguage?: string
-  /** Automatically convert bare URLs into Markdown autolinks. */
-  autolinks?: boolean
-  /** Emit a default title when no `<title>` tag is present. */
-  defaultTitle?: boolean
-  /** Render `<br>` elements inside table cells as literal line breaks. */
-  brInTables?: boolean
-  /**
-   * Emit tables without column padding (compact GFM format).
-   *
-   * When `true`, column widths are not computed and cells are emitted with
-   * no trailing spaces. Separator rows use exactly `---` per column.
-   * Produces token-efficient output suitable for RAG / LLM contexts.
-   *
-   * Default `false` (aligned padding preserved).
-   */
-  compactTables?: boolean
-  /** Style used for `<mark>` / highlighted text (e.g. `==text==`). */
-  highlightStyle?: JsHighlightStyle
-  /**
-   * Populate `result.metadata` with `<head>` / `<meta>` extraction
-   * (title, description, Open Graph, Twitter Card, JSON-LD, …).
-   *
-   * Default `true`. Disabling skips the metadata pass only — table
-   * extraction into `result.tables` runs unconditionally.
-   */
-  extractMetadata?: boolean
-  /**
-   * Controls how whitespace sequences are normalised in the converted output.
-   *
-   * - [`WhitespaceMode::Normalized`] (default) — collapses consecutive whitespace characters
-   *   (spaces, tabs, newlines) to a single space, matching browser rendering behaviour.
-   * - [`WhitespaceMode::Strict`] — preserves all whitespace exactly as it appears in the
-   *   source HTML, including runs of spaces and embedded newlines.
-   *
-   * Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted
-   * content outside `<pre>` tags). For most documents `Normalized` produces cleaner output.
-   */
-  whitespaceMode?: JsWhitespaceMode
-  /** Strip all newlines from the output, producing a single-line result. */
-  stripNewlines?: boolean
-  /** Wrap long lines at [`wrap_width`](Self::wrap_width) characters. */
-  wrap?: boolean
-  /**
-   * Maximum output line width in characters when [`wrap`](Self::wrap) is `true` (default `80`).
-   *
-   * Lines are broken at word boundaries so that no line exceeds this length. A value of `0`
-   * is treated as "no limit" — equivalent to leaving [`wrap`](Self::wrap) disabled. Has no
-   * effect when `wrap` is `false`.
-   */
-  wrapWidth?: number
-  /** Treat the entire document as inline content (no block-level wrappers). */
-  convertAsInline?: boolean
-  /** Markdown notation for subscript text (e.g. `"~"`). */
-  subSymbol?: string
-  /** Markdown notation for superscript text (e.g. `"^"`). */
-  supSymbol?: string
-  /** How to encode hard line breaks (`<br>`) in Markdown. */
-  newlineStyle?: JsNewlineStyle
-  /** Style used for fenced code blocks (backticks or tilde). */
-  codeBlockStyle?: JsCodeBlockStyle
-  /** HTML tag names whose `<img>` children are kept inline instead of block. */
-  keepInlineImagesIn?: Array<string>
-  /**
-   * Options for the HTML pre-processing pass applied before conversion begins.
-   *
-   * Pre-processing runs before the HTML is handed to the converter and can perform operations
-   * such as unwrapping redundant wrapper elements, removing tracking pixels, and normalising
-   * vendor-specific markup. See [`PreprocessingOptions`] for the full set of knobs.
-   *
-   * Defaults to [`PreprocessingOptions::default()`], which enables the standard cleaning
-   * passes. Set individual fields on [`PreprocessingOptions`] (or construct via
-   * [`ConversionOptions::builder`]) to opt in or out of specific passes.
-   */
-  preprocessing?: JsPreprocessingOptions
-  /** Expected character encoding of the input HTML (default `"utf-8"`). */
-  encoding?: string
-  /** Emit debug information during conversion. */
-  debug?: boolean
-  /** HTML tag names whose content is stripped from the output entirely. */
-  stripTags?: Array<string>
-  /** HTML tag names that are preserved verbatim in the output. */
-  preserveTags?: Array<string>
-  /** Skip conversion of `<img>` elements (omit images from output). */
-  skipImages?: boolean
-  /**
-   * URL encoding strategy for link and image destinations.
-   *
-   * Controls how special characters in URL destinations are escaped:
-   * - [`UrlEscapeStyle::Angle`] (default) — wraps the destination in angle brackets when it
-   *   contains spaces or newlines. Some parsers misinterpret `>` inside such a destination.
-   * - [`UrlEscapeStyle::Percent`] — percent-encodes every character that is not an RFC 3986
-   *   unreserved character or `/`, producing a destination that all Markdown parsers handle
-   *   correctly even when the URL contains `<`, `>`, spaces, or parentheses.
-   */
-  urlEscapeStyle?: JsUrlEscapeStyle
-  /** Link rendering style (inline or reference). */
-  linkStyle?: JsLinkStyle
-  /** Target output format (Markdown, plain text, etc.). */
-  outputFormat?: JsOutputFormat
-  /** Include structured document tree in result. */
-  includeDocumentStructure?: boolean
-  /** Extract inline images from data URIs and SVGs. */
-  extractImages?: boolean
-  /** Maximum decoded image size in bytes (default 5MB). */
-  maxImageSize?: number
-  /** Capture SVG elements as images. */
-  captureSvg?: boolean
-  /** Infer image dimensions from data. */
-  inferDimensions?: boolean
-  /**
-   * Maximum DOM traversal depth. `None` means unlimited.
-   * When set, subtrees beyond this depth are silently truncated.
-   */
-  maxDepth?: number
-  /**
-   * CSS selectors for elements to exclude entirely (element + all content).
-   *
-   * Unlike `strip_tags` (which removes the tag wrapper but keeps children),
-   * excluded elements and all their descendants are dropped from the output.
-   * Supports any CSS selector that `tl` supports: tag names, `.class`,
-   * `#id`, `[attribute]`, etc.
-   *
-   * Invalid selectors are silently skipped at conversion time.
-   *
-   * Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]`
-   */
-  excludeSelectors?: Array<string>
-  /**
-   * Optional visitor for custom traversal logic.
-   *
-   * When set, the visitor's callbacks are invoked for matching HTML elements
-   * during conversion, allowing custom output, skipping, or HTML preservation.
-   * See `HtmlVisitor`.
-   */
-  visitor?: object
+	/** Heading style to use in Markdown output (ATX `#` or Setext underline). */
+	headingStyle?: JsHeadingStyle;
+	/** How to indent nested list items (spaces or tab). */
+	listIndentType?: JsListIndentType;
+	/** Number of spaces (or tabs) to use for each level of list indentation. */
+	listIndentWidth?: number;
+	/** Bullet character(s) to use for unordered list items (e.g. `"-"`, `"*"`). */
+	bullets?: string;
+	/** Character used for bold/italic emphasis markers (`*` or `_`). */
+	strongEmSymbol?: string;
+	/** Escape `*` characters in plain text to avoid unintended bold/italic. */
+	escapeAsterisks?: boolean;
+	/** Escape `_` characters in plain text to avoid unintended bold/italic. */
+	escapeUnderscores?: boolean;
+	/** Escape miscellaneous Markdown metacharacters (`[]()#` etc.) in plain text. */
+	escapeMisc?: boolean;
+	/** Escape ASCII characters that have special meaning in certain Markdown dialects. */
+	escapeAscii?: boolean;
+	/** Default language annotation for fenced code blocks that have no language hint. */
+	codeLanguage?: string;
+	/** Automatically convert bare URLs into Markdown autolinks. */
+	autolinks?: boolean;
+	/** Emit a default title when no `<title>` tag is present. */
+	defaultTitle?: boolean;
+	/** Render `<br>` elements inside table cells as literal line breaks. */
+	brInTables?: boolean;
+	/**
+	 * Emit tables without column padding (compact GFM format).
+	 *
+	 * When `true`, column widths are not computed and cells are emitted with
+	 * no trailing spaces. Separator rows use exactly `---` per column.
+	 * Produces token-efficient output suitable for RAG / LLM contexts.
+	 *
+	 * Default `false` (aligned padding preserved).
+	 */
+	compactTables?: boolean;
+	/** Style used for `<mark>` / highlighted text (e.g. `==text==`). */
+	highlightStyle?: JsHighlightStyle;
+	/**
+	 * Populate `result.metadata` with `<head>` / `<meta>` extraction
+	 * (title, description, Open Graph, Twitter Card, JSON-LD, …).
+	 *
+	 * Default `true`. Disabling skips the metadata pass only — table
+	 * extraction into `result.tables` runs unconditionally.
+	 */
+	extractMetadata?: boolean;
+	/**
+	 * Controls how whitespace sequences are normalised in the converted output.
+	 *
+	 * - [`WhitespaceMode::Normalized`] (default) — collapses consecutive whitespace characters
+	 *   (spaces, tabs, newlines) to a single space, matching browser rendering behaviour.
+	 * - [`WhitespaceMode::Strict`] — preserves all whitespace exactly as it appears in the
+	 *   source HTML, including runs of spaces and embedded newlines.
+	 *
+	 * Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted
+	 * content outside `<pre>` tags). For most documents `Normalized` produces cleaner output.
+	 */
+	whitespaceMode?: JsWhitespaceMode;
+	/** Strip all newlines from the output, producing a single-line result. */
+	stripNewlines?: boolean;
+	/** Wrap long lines at [`wrap_width`](Self::wrap_width) characters. */
+	wrap?: boolean;
+	/**
+	 * Maximum output line width in characters when [`wrap`](Self::wrap) is `true` (default `80`).
+	 *
+	 * Lines are broken at word boundaries so that no line exceeds this length. A value of `0`
+	 * is treated as "no limit" — equivalent to leaving [`wrap`](Self::wrap) disabled. Has no
+	 * effect when `wrap` is `false`.
+	 */
+	wrapWidth?: number;
+	/** Treat the entire document as inline content (no block-level wrappers). */
+	convertAsInline?: boolean;
+	/** Markdown notation for subscript text (e.g. `"~"`). */
+	subSymbol?: string;
+	/** Markdown notation for superscript text (e.g. `"^"`). */
+	supSymbol?: string;
+	/** How to encode hard line breaks (`<br>`) in Markdown. */
+	newlineStyle?: JsNewlineStyle;
+	/** Style used for fenced code blocks (backticks or tilde). */
+	codeBlockStyle?: JsCodeBlockStyle;
+	/** HTML tag names whose `<img>` children are kept inline instead of block. */
+	keepInlineImagesIn?: Array<string>;
+	/**
+	 * Options for the HTML pre-processing pass applied before conversion begins.
+	 *
+	 * Pre-processing runs before the HTML is handed to the converter and can perform operations
+	 * such as unwrapping redundant wrapper elements, removing tracking pixels, and normalising
+	 * vendor-specific markup. See [`PreprocessingOptions`] for the full set of knobs.
+	 *
+	 * Defaults to [`PreprocessingOptions::default()`], which enables the standard cleaning
+	 * passes. Set individual fields on [`PreprocessingOptions`] (or construct via
+	 * [`ConversionOptions::builder`]) to opt in or out of specific passes.
+	 */
+	preprocessing?: JsPreprocessingOptions;
+	/** Expected character encoding of the input HTML (default `"utf-8"`). */
+	encoding?: string;
+	/** Emit debug information during conversion. */
+	debug?: boolean;
+	/** HTML tag names whose content is stripped from the output entirely. */
+	stripTags?: Array<string>;
+	/** HTML tag names that are preserved verbatim in the output. */
+	preserveTags?: Array<string>;
+	/** Skip conversion of `<img>` elements (omit images from output). */
+	skipImages?: boolean;
+	/**
+	 * URL encoding strategy for link and image destinations.
+	 *
+	 * Controls how special characters in URL destinations are escaped:
+	 * - [`UrlEscapeStyle::Angle`] (default) — wraps the destination in angle brackets when it
+	 *   contains spaces or newlines. Some parsers misinterpret `>` inside such a destination.
+	 * - [`UrlEscapeStyle::Percent`] — percent-encodes every character that is not an RFC 3986
+	 *   unreserved character or `/`, producing a destination that all Markdown parsers handle
+	 *   correctly even when the URL contains `<`, `>`, spaces, or parentheses.
+	 */
+	urlEscapeStyle?: JsUrlEscapeStyle;
+	/** Link rendering style (inline or reference). */
+	linkStyle?: JsLinkStyle;
+	/** Target output format (Markdown, plain text, etc.). */
+	outputFormat?: JsOutputFormat;
+	/** Include structured document tree in result. */
+	includeDocumentStructure?: boolean;
+	/** Extract inline images from data URIs and SVGs. */
+	extractImages?: boolean;
+	/** Maximum decoded image size in bytes (default 5MB). */
+	maxImageSize?: number;
+	/** Capture SVG elements as images. */
+	captureSvg?: boolean;
+	/** Infer image dimensions from data. */
+	inferDimensions?: boolean;
+	/**
+	 * Maximum DOM traversal depth. `None` means unlimited.
+	 * When set, subtrees beyond this depth are silently truncated.
+	 */
+	maxDepth?: number;
+	/**
+	 * CSS selectors for elements to exclude entirely (element + all content).
+	 *
+	 * Unlike `strip_tags` (which removes the tag wrapper but keeps children),
+	 * excluded elements and all their descendants are dropped from the output.
+	 * Supports any CSS selector that `tl` supports: tag names, `.class`,
+	 * `#id`, `[attribute]`, etc.
+	 *
+	 * Invalid selectors are silently skipped at conversion time.
+	 *
+	 * Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]`
+	 */
+	excludeSelectors?: Array<string>;
+	/**
+	 * Optional visitor for custom traversal logic.
+	 *
+	 * When set, the visitor's callbacks are invoked for matching HTML elements
+	 * during conversion, allowing custom output, skipping, or HTML preservation.
+	 * See `HtmlVisitor`.
+	 */
+	visitor?: object;
 }
 
-export declare function conversionOptionsDefault(): ConversionOptions
+export declare function conversionOptionsDefault(): ConversionOptions;
 
 /**
  * The primary result of HTML conversion and extraction.
@@ -222,44 +220,48 @@ export declare function conversionOptionsDefault(): ConversionOptions
  * ```
  */
 export interface ConversionResult {
-  /**
-   * Converted text output (markdown, djot, or plain text).
-   *
-   * `None` when `output_format` is set to `OutputFormat::None`,
-   * indicating extraction-only mode.
-   */
-  content?: string
-  /**
-   * Structured document tree with semantic elements.
-   *
-   * Populated when `ConversionOptions::include_document_structure` is `true`. `None`
-   * otherwise (the default), which avoids the overhead of building the tree.
-   *
-   * When present, the tree mirrors the converted document: headings open
-   * `Group` sections, paragraphs and list items carry
-   * inline `TextAnnotation`s, and tables reference the same
-   * `TableGrid` data exposed in [`Self::tables`].
-   *
-   * Note: this field is independent of the `metadata` feature flag. Document structure
-   * collection is always available at runtime; it is gated only by the runtime option, not
-   * by a compile-time feature.
-   */
-  document?: DocumentStructure
-  /** Extracted HTML metadata (title, OG, links, images, structured data). */
-  metadata?: HtmlMetadata
-  /** Extracted tables with structured cell data and markdown representation. */
-  tables?: Array<JsTableData>
-  /**
-   * Extracted inline images (data URIs and SVGs).
-   *
-   * Populated when `extract_images` is `true` in options.
-   */
-  images?: Array<string>
-  /** Non-fatal processing warnings. */
-  warnings?: Array<JsProcessingWarning>
+	/**
+	 * Converted text output (markdown, djot, or plain text).
+	 *
+	 * `None` when `output_format` is set to `OutputFormat::None`,
+	 * indicating extraction-only mode.
+	 */
+	content?: string;
+	/**
+	 * Structured document tree with semantic elements.
+	 *
+	 * Populated when `ConversionOptions::include_document_structure` is `true`. `None`
+	 * otherwise (the default), which avoids the overhead of building the tree.
+	 *
+	 * When present, the tree mirrors the converted document: headings open
+	 * `Group` sections, paragraphs and list items carry
+	 * inline `TextAnnotation`s, and tables reference the same
+	 * `TableGrid` data exposed in [`Self::tables`].
+	 *
+	 * Note: this field is independent of the `metadata` feature flag. Document structure
+	 * collection is always available at runtime; it is gated only by the runtime option, not
+	 * by a compile-time feature.
+	 */
+	document?: DocumentStructure;
+	/** Extracted HTML metadata (title, OG, links, images, structured data). */
+	metadata?: HtmlMetadata;
+	/** Extracted tables with structured cell data and markdown representation. */
+	tables?: Array<JsTableData>;
+	/**
+	 * Extracted inline images (data URIs and SVGs).
+	 *
+	 * Populated when `extract_images` is `true` in options.
+	 */
+	images?: Array<string>;
+	/** Non-fatal processing warnings. */
+	warnings?: Array<JsProcessingWarning>;
 }
 
-export declare function convert(html: string, options?: ConversionOptions | undefined | null, visitor?: object | undefined | null): ConversionResult
+export declare function convert(
+	html: string,
+	options?: ConversionOptions | undefined | null,
+	visitor?: object | undefined | null,
+): ConversionResult;
 
 /**
  * Document-level metadata extracted from `<head>` and top-level elements.
@@ -270,64 +272,64 @@ export declare function convert(html: string, options?: ConversionOptions | unde
  * # Examples
  */
 export interface DocumentMetadata {
-  /** Document title from `<title>` tag */
-  title?: string
-  /** Document description from `<meta name="description">` tag */
-  description?: string
-  /** Document keywords from `<meta name="keywords">` tag, split on commas */
-  keywords?: Array<string>
-  /** Document author from `<meta name="author">` tag */
-  author?: string
-  /** Canonical URL from `<link rel="canonical">` tag */
-  canonicalUrl?: string
-  /** Base URL from `<base href="">` tag for resolving relative URLs */
-  baseHref?: string
-  /** Document language from `lang` attribute */
-  language?: string
-  /** Document text direction from `dir` attribute */
-  textDirection?: JsTextDirection
-  /**
-   * Open Graph metadata (og:* properties) for social media
-   * Keys like "title", "description", "image", "url", etc.
-   */
-  openGraph?: Record<string, string>
-  /**
-   * Twitter Card metadata (twitter:* properties)
-   * Keys like "card", "site", "creator", "title", "description", "image", etc.
-   */
-  twitterCard?: Record<string, string>
-  /**
-   * Additional meta tags not covered by specific fields
-   * Keys are meta name/property attributes, values are content
-   */
-  metaTags?: Record<string, string>
+	/** Document title from `<title>` tag */
+	title?: string;
+	/** Document description from `<meta name="description">` tag */
+	description?: string;
+	/** Document keywords from `<meta name="keywords">` tag, split on commas */
+	keywords?: Array<string>;
+	/** Document author from `<meta name="author">` tag */
+	author?: string;
+	/** Canonical URL from `<link rel="canonical">` tag */
+	canonicalUrl?: string;
+	/** Base URL from `<base href="">` tag for resolving relative URLs */
+	baseHref?: string;
+	/** Document language from `lang` attribute */
+	language?: string;
+	/** Document text direction from `dir` attribute */
+	textDirection?: JsTextDirection;
+	/**
+	 * Open Graph metadata (og:* properties) for social media
+	 * Keys like "title", "description", "image", "url", etc.
+	 */
+	openGraph?: Record<string, string>;
+	/**
+	 * Twitter Card metadata (twitter:* properties)
+	 * Keys like "card", "site", "creator", "title", "description", "image", etc.
+	 */
+	twitterCard?: Record<string, string>;
+	/**
+	 * Additional meta tags not covered by specific fields
+	 * Keys are meta name/property attributes, values are content
+	 */
+	metaTags?: Record<string, string>;
 }
 
 /** A single node in the document tree. */
 export interface DocumentNode {
-  /** Deterministic node identifier. */
-  id: string
-  /** The semantic content of this node. */
-  content: JsNodeContent
-  /** Index of the parent node (None for root nodes). */
-  parent?: number
-  /** Indices of child nodes in reading order. */
-  children: Array<number>
-  /** Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text. */
-  annotations: Array<JsTextAnnotation>
-  /**
-   * Format-specific attributes preserved from the source HTML element.
-   *
-   * Keys are lowercased attribute names as they appear in the HTML (e.g. `"class"`, `"id"`,
-   * `"data-foo"`). Values are the raw attribute strings, copied verbatim from the source —
-   * no HTML entity decoding is applied here.
-   *
-   * The map is `None` when no attributes are present (omitted entirely in serialized output).
-   * Not every HTML attribute is preserved: only attributes that carry semantic or structural
-   * significance for the node type are collected. For example, heading nodes capture the `"id"`
-   * attribute for anchor linking; other element-level attributes may be silently dropped.
-   */
-  attributes?: Record<string, string>
+	/** Deterministic node identifier. */
+	id: string;
+	/** The semantic content of this node. */
+	content: JsNodeContent;
+	/** Index of the parent node (None for root nodes). */
+	parent?: number;
+	/** Indices of child nodes in reading order. */
+	children: Array<number>;
+	/** Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text. */
+	annotations: Array<JsTextAnnotation>;
+	/**
+	 * Format-specific attributes preserved from the source HTML element.
+	 *
+	 * Keys are lowercased attribute names as they appear in the HTML (e.g. `"class"`, `"id"`,
+	 * `"data-foo"`). Values are the raw attribute strings, copied verbatim from the source —
+	 * no HTML entity decoding is applied here.
+	 *
+	 * The map is `None` when no attributes are present (omitted entirely in serialized output).
+	 * Not every HTML attribute is preserved: only attributes that carry semantic or structural
+	 * significance for the node type are collected. For example, heading nodes capture the `"id"`
+	 * attribute for anchor linking; other element-level attributes may be silently dropped.
+	 */
+	attributes?: Record<string, string>;
 }
 
 /**
@@ -336,26 +338,26 @@ export interface DocumentNode {
  * Uses a flat node array with index-based parent/child references for efficient traversal.
  */
 export interface DocumentStructure {
-  /** All nodes in document reading order. */
-  nodes: Array<JsDocumentNode>
-  /** The source format (always "html" for this crate). */
-  sourceFormat?: string
+	/** All nodes in document reading order. */
+	nodes: Array<JsDocumentNode>;
+	/** The source format (always "html" for this crate). */
+	sourceFormat?: string;
 }
 
 /** A single cell in a table grid. */
 export interface GridCell {
-  /** The text content of the cell. */
-  content: string
-  /** 0-indexed row position. */
-  row: number
-  /** 0-indexed column position. */
-  col: number
-  /** Number of rows this cell spans (default 1). */
-  rowSpan: number
-  /** Number of columns this cell spans (default 1). */
-  colSpan: number
-  /** Whether this is a header cell (`<th>`). */
-  isHeader: boolean
+	/** The text content of the cell. */
+	content: string;
+	/** 0-indexed row position. */
+	row: number;
+	/** 0-indexed column position. */
+	col: number;
+	/** Number of rows this cell spans (default 1). */
+	rowSpan: number;
+	/** Number of columns this cell spans (default 1). */
+	colSpan: number;
+	/** Whether this is a header cell (`<th>`). */
+	isHeader: boolean;
 }
 
 /**
@@ -367,16 +369,16 @@ export interface GridCell {
  * # Examples
  */
 export interface HeaderMetadata {
-  /** Header level: 1 (h1) through 6 (h6) */
-  level: number
-  /** Normalized text content of the header */
-  text: string
-  /** HTML id attribute if present */
-  id?: string
-  /** Document tree depth at the header element */
-  depth: number
-  /** Byte offset in original HTML document */
-  htmlOffset: number
+	/** Header level: 1 (h1) through 6 (h6) */
+	level: number;
+	/** Normalized text content of the header */
+	text: string;
+	/** HTML id attribute if present */
+	id?: string;
+	/** Document tree depth at the header element */
+	depth: number;
+	/** Byte offset in original HTML document */
+	htmlOffset: number;
 }
 
 /**
@@ -385,12 +387,12 @@ export interface HeaderMetadata {
  * Controls how headings (h1-h6) are rendered in the output Markdown.
  */
 export declare const enum HeadingStyle {
-  /** Underlined style (=== for h1, --- for h2). */
-  Underlined = 'Underlined',
-  /** ATX style (# for h1, ## for h2, etc.). Default. */
-  Atx = 'Atx',
-  /** ATX closed style (# title #, with closing hashes). */
-  AtxClosed = 'AtxClosed'
+	/** Underlined style (=== for h1, --- for h2). */
+	Underlined = "Underlined",
+	/** ATX style (# for h1, ## for h2, etc.). Default. */
+	Atx = "Atx",
+	/** ATX closed style (# title #, with closing hashes). */
+	AtxClosed = "AtxClosed",
 }
 
 /**
@@ -399,14 +401,14 @@ export declare const enum HeadingStyle {
  * Controls how highlighted text is rendered in Markdown output.
  */
 export declare const enum HighlightStyle {
-  /** Double equals syntax (==text==). Default. Pandoc-compatible. */
-  DoubleEqual = 'DoubleEqual',
-  /** Preserve as HTML (==text==). Original HTML tag. */
-  Html = 'Html',
-  /** Render as bold (**text**). Uses strong emphasis. */
-  Bold = 'Bold',
-  /** Strip formatting, render as plain text. No markup. */
-  None = 'None'
+	/** Double equals syntax (==text==). Default. Pandoc-compatible. */
+	DoubleEqual = "DoubleEqual",
+	/** Preserve as HTML (==text==). Original HTML tag. */
+	Html = "Html",
+	/** Render as bold (**text**). Uses strong emphasis. */
+	Bold = "Bold",
+	/** Strip formatting, render as plain text. No markup. */
+	None = "None",
 }
 
 /**
@@ -418,16 +420,16 @@ export declare const enum HighlightStyle {
  * # Examples
  */
 export interface HtmlMetadata {
-  /** Document-level metadata (title, description, canonical, etc.) */
-  document?: DocumentMetadata
-  /** Extracted header elements with hierarchy */
-  headers?: Array<HeaderMetadata>
-  /** Extracted hyperlinks with type classification */
-  links?: Array<LinkMetadata>
-  /** Extracted images with source and dimensions */
-  images?: Array<ImageMetadata>
-  /** Extracted structured data blocks */
-  structuredData?: Array<StructuredData>
+	/** Document-level metadata (title, description, canonical, etc.) */
+	document?: DocumentMetadata;
+	/** Extracted header elements with hierarchy */
+	headers?: Array<HeaderMetadata>;
+	/** Extracted hyperlinks with type classification */
+	links?: Array<LinkMetadata>;
+	/** Extracted images with source and dimensions */
+	images?: Array<ImageMetadata>;
+	/** Extracted structured data blocks */
+	structuredData?: Array<StructuredData>;
 }
 
 /**
@@ -439,18 +441,18 @@ export interface HtmlMetadata {
  * # Examples
  */
 export interface ImageMetadata {
-  /** Image source (URL, data URI, or SVG content identifier) */
-  src: string
-  /** Alternative text from alt attribute (for accessibility) */
-  alt?: string
-  /** Title attribute (often shown as tooltip) */
-  title?: string
-  /** Image dimensions as (width, height) if available */
-  dimensions?: Array<number>
-  /** Image type classification */
-  imageType: JsImageType
-  /** Additional HTML attributes */
-  attributes: Record<string, string>
+	/** Image source (URL, data URI, or SVG content identifier) */
+	src: string;
+	/** Alternative text from alt attribute (for accessibility) */
+	alt?: string;
+	/** Title attribute (often shown as tooltip) */
+	title?: string;
+	/** Image dimensions as (width, height) if available */
+	dimensions?: Array<number>;
+	/** Image type classification */
+	imageType: JsImageType;
+	/** Additional HTML attributes */
+	attributes: Record<string, string>;
 }
 
 /**
@@ -459,14 +461,14 @@ export interface ImageMetadata {
  * Determines whether an image is embedded (data URI), inline SVG, external, or relative.
  */
 export declare const enum ImageType {
-  /** Data URI embedded image (base64 or other encoding) */
-  DataUri = 'data_uri',
-  /** Inline SVG element */
-  InlineSvg = 'inline_svg',
-  /** External image URL (http/https) */
-  External = 'external',
-  /** Relative image path */
-  Relative = 'relative'
+	/** Data URI embedded image (base64 or other encoding) */
+	DataUri = "data_uri",
+	/** Inline SVG element */
+	InlineSvg = "inline_svg",
+	/** External image URL (http/https) */
+	External = "external",
+	/** Relative image path */
+	Relative = "relative",
 }
 
 /**
@@ -477,18 +479,18 @@ export declare const enum ImageType {
  * # Examples
  */
 export interface LinkMetadata {
-  /** The href URL value */
-  href: string
-  /** Link text content (normalized, concatenated if mixed with elements) */
-  text: string
-  /** Optional title attribute (often shown as tooltip) */
-  title?: string
-  /** Link type classification */
-  linkType: JsLinkType
-  /** Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") */
-  rel: Array<string>
-  /** Additional HTML attributes */
-  attributes: Record<string, string>
+	/** The href URL value */
+	href: string;
+	/** Link text content (normalized, concatenated if mixed with elements) */
+	text: string;
+	/** Optional title attribute (often shown as tooltip) */
+	title?: string;
+	/** Link type classification */
+	linkType: JsLinkType;
+	/** Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") */
+	rel: Array<string>;
+	/** Additional HTML attributes */
+	attributes: Record<string, string>;
 }
 
 /**
@@ -498,10 +500,10 @@ export interface LinkMetadata {
  * reference-style `[text][1]` syntax with definitions collected at the end.
  */
 export declare const enum LinkStyle {
-  /** Inline links: `[text](url)`. Default. */
-  Inline = 'Inline',
-  /** Reference-style links: `[text][1]` with `[1]: url` at end of document. */
-  Reference = 'Reference'
+	/** Inline links: `[text](url)`. Default. */
+	Inline = "Inline",
+	/** Reference-style links: `[text][1]` with `[1]: url` at end of document. */
+	Reference = "Reference",
 }
 
 /**
@@ -510,18 +512,18 @@ export declare const enum LinkStyle {
  * Used to categorize links during extraction for filtering and analysis.
  */
 export declare const enum LinkType {
-  /** Anchor link within same document (href starts with #) */
-  Anchor = 'anchor',
-  /** Internal link within same domain */
-  Internal = 'internal',
-  /** External link to different domain */
-  External = 'external',
-  /** Email link (mailto:) */
-  Email = 'email',
-  /** Phone link (tel:) */
-  Phone = 'phone',
-  /** Other protocol or unclassifiable */
-  Other = 'other'
+	/** Anchor link within same document (href starts with #) */
+	Anchor = "anchor",
+	/** Internal link within same domain */
+	Internal = "internal",
+	/** External link to different domain */
+	External = "external",
+	/** Email link (mailto:) */
+	Email = "email",
+	/** Phone link (tel:) */
+	Phone = "phone",
+	/** Other protocol or unclassifiable */
+	Other = "other",
 }
 
 /**
@@ -530,10 +532,10 @@ export declare const enum LinkType {
  * Controls whether list items are indented with spaces or tabs.
  */
 export declare const enum ListIndentType {
-  /** Use spaces for indentation. Default. Width controlled by `list_indent_width`. */
-  Spaces = 'Spaces',
-  /** Use tabs for indentation. */
-  Tabs = 'Tabs'
+	/** Use spaces for indentation. Default. Width controlled by `list_indent_width`. */
+	Spaces = "Spaces",
+	/** Use tabs for indentation. */
+	Tabs = "Tabs",
 }
 
 /**
@@ -542,10 +544,10 @@ export declare const enum ListIndentType {
  * Controls how soft line breaks (from `<br>` or line breaks in source) are rendered.
  */
 export declare const enum NewlineStyle {
-  /** Two trailing spaces at end of line. Default. Standard Markdown syntax. */
-  Spaces = 'Spaces',
-  /** Backslash at end of line. Alternative Markdown syntax. */
-  Backslash = 'Backslash'
+	/** Two trailing spaces at end of line. Default. Standard Markdown syntax. */
+	Spaces = "Spaces",
+	/** Backslash at end of line. Alternative Markdown syntax. */
+	Backslash = "Backslash",
 }
 
 /**
@@ -554,23 +556,23 @@ export declare const enum NewlineStyle {
  * Uses internally tagged representation (`"node_type": "heading"`) for JSON serialization.
  */
 export interface NodeContent {
-  node_type: string
-  level?: number
-  text?: string
-  ordered?: boolean
-  grid?: TableGrid
-  description?: string
-  src?: string
-  imageIndex?: number
-  language?: string
-  term?: string
-  definition?: string
-  format?: string
-  content?: string
-  entries?: Array<Array<string>>
-  label?: string
-  headingLevel?: number
-  headingText?: string
+	node_type: string;
+	level?: number;
+	text?: string;
+	ordered?: boolean;
+	grid?: TableGrid;
+	description?: string;
+	src?: string;
+	imageIndex?: number;
+	language?: string;
+	term?: string;
+	definition?: string;
+	format?: string;
+	content?: string;
+	entries?: Array<Array<string>>;
+	label?: string;
+	headingLevel?: number;
+	headingText?: string;
 }
 
 /**
@@ -580,20 +582,20 @@ export interface NodeContent {
  * including its type, attributes, position in the DOM tree, and parent context.
  */
 export interface NodeContext {
-  /** Coarse-grained node type classification */
-  nodeType: JsNodeType
-  /** Raw HTML tag name (e.g., "div", "h1", "custom-element") */
-  tagName: string
-  /** All HTML attributes as key-value pairs */
-  attributes: Record<string, string>
-  /** Depth in the DOM tree (0 = root) */
-  depth: number
-  /** Index among siblings (0-based) */
-  indexInParent: number
-  /** Parent element's tag name (None if root) */
-  parentTag?: string
-  /** Whether this element is treated as inline vs block */
-  isInline: boolean
+	/** Coarse-grained node type classification */
+	nodeType: JsNodeType;
+	/** Raw HTML tag name (e.g., "div", "h1", "custom-element") */
+	tagName: string;
+	/** All HTML attributes as key-value pairs */
+	attributes: Record<string, string>;
+	/** Depth in the DOM tree (0 = root) */
+	depth: number;
+	/** Index among siblings (0-based) */
+	indexInParent: number;
+	/** Parent element's tag name (None if root) */
+	parentTag?: string;
+	/** Whether this element is treated as inline vs block */
+	isInline: boolean;
 }
 
 /**
@@ -603,182 +605,182 @@ export interface NodeContext {
  * providing a coarse-grained classification for visitor dispatch.
  */
 export declare const enum NodeType {
-  /** Text node (most frequent - 100+ per document) */
-  Text = 'Text',
-  /** Generic element node */
-  Element = 'Element',
-  /** Heading elements (h1-h6) */
-  Heading = 'Heading',
-  /** Paragraph element */
-  Paragraph = 'Paragraph',
-  /** Generic div container */
-  Div = 'Div',
-  /** Blockquote element */
-  Blockquote = 'Blockquote',
-  /** Preformatted text block */
-  Pre = 'Pre',
-  /** Horizontal rule */
-  Hr = 'Hr',
-  /** Ordered or unordered list (ul, ol) */
-  List = 'List',
-  /** List item (li) */
-  ListItem = 'ListItem',
-  /** Definition list (dl) */
-  DefinitionList = 'DefinitionList',
-  /** Definition term (dt) */
-  DefinitionTerm = 'DefinitionTerm',
-  /** Definition description (dd) */
-  DefinitionDescription = 'DefinitionDescription',
-  /** Table element */
-  Table = 'Table',
-  /** Table row (tr) */
-  TableRow = 'TableRow',
-  /** Table cell (td, th) */
-  TableCell = 'TableCell',
-  /** Table header cell (th) */
-  TableHeader = 'TableHeader',
-  /** Table body (tbody) */
-  TableBody = 'TableBody',
-  /** Table head (thead) */
-  TableHead = 'TableHead',
-  /** Table foot (tfoot) */
-  TableFoot = 'TableFoot',
-  /** Anchor link (a) */
-  Link = 'Link',
-  /** Image (img) */
-  Image = 'Image',
-  /** Strong/bold (strong, b) */
-  Strong = 'Strong',
-  /** Emphasis/italic (em, i) */
-  Em = 'Em',
-  /** Inline code (code) */
-  Code = 'Code',
-  /** Strikethrough (s, del, strike) */
-  Strikethrough = 'Strikethrough',
-  /** Underline (u, ins) */
-  Underline = 'Underline',
-  /** Subscript (sub) */
-  Subscript = 'Subscript',
-  /** Superscript (sup) */
-  Superscript = 'Superscript',
-  /** Mark/highlight (mark) */
-  Mark = 'Mark',
-  /** Small text (small) */
-  Small = 'Small',
-  /** Line break (br) */
-  Br = 'Br',
-  /** Span element */
-  Span = 'Span',
-  /** Article element */
-  Article = 'Article',
-  /** Section element */
-  Section = 'Section',
-  /** Navigation element */
-  Nav = 'Nav',
-  /** Aside element */
-  Aside = 'Aside',
-  /** Header element */
-  Header = 'Header',
-  /** Footer element */
-  Footer = 'Footer',
-  /** Main element */
-  Main = 'Main',
-  /** Figure element */
-  Figure = 'Figure',
-  /** Figure caption */
-  Figcaption = 'Figcaption',
-  /** Time element */
-  Time = 'Time',
-  /** Details element */
-  Details = 'Details',
-  /** Summary element */
-  Summary = 'Summary',
-  /** Form element */
-  Form = 'Form',
-  /** Input element */
-  Input = 'Input',
-  /** Select element */
-  Select = 'Select',
-  /** Option element */
-  Option = 'Option',
-  /** Button element */
-  Button = 'Button',
-  /** Textarea element */
-  Textarea = 'Textarea',
-  /** Label element */
-  Label = 'Label',
-  /** Fieldset element */
-  Fieldset = 'Fieldset',
-  /** Legend element */
-  Legend = 'Legend',
-  /** Audio element */
-  Audio = 'Audio',
-  /** Video element */
-  Video = 'Video',
-  /** Picture element */
-  Picture = 'Picture',
-  /** Source element */
-  Source = 'Source',
-  /** Iframe element */
-  Iframe = 'Iframe',
-  /** SVG element */
-  Svg = 'Svg',
-  /** Canvas element */
-  Canvas = 'Canvas',
-  /** Ruby annotation */
-  Ruby = 'Ruby',
-  /** Ruby text */
-  Rt = 'Rt',
-  /** Ruby parenthesis */
-  Rp = 'Rp',
-  /** Abbreviation */
-  Abbr = 'Abbr',
-  /** Keyboard input */
-  Kbd = 'Kbd',
-  /** Sample output */
-  Samp = 'Samp',
-  /** Variable */
-  Var = 'Var',
-  /** Citation */
-  Cite = 'Cite',
-  /** Quote */
-  Q = 'Q',
-  /** Deleted text */
-  Del = 'Del',
-  /** Inserted text */
-  Ins = 'Ins',
-  /** Data element */
-  Data = 'Data',
-  /** Meter element */
-  Meter = 'Meter',
-  /** Progress element */
-  Progress = 'Progress',
-  /** Output element */
-  Output = 'Output',
-  /** Template element */
-  Template = 'Template',
-  /** Slot element */
-  Slot = 'Slot',
-  /** HTML root element */
-  Html = 'Html',
-  /** Head element */
-  Head = 'Head',
-  /** Body element */
-  Body = 'Body',
-  /** Title element */
-  Title = 'Title',
-  /** Meta element */
-  Meta = 'Meta',
-  /** Link element (not anchor) */
-  LinkTag = 'LinkTag',
-  /** Style element */
-  Style = 'Style',
-  /** Script element */
-  Script = 'Script',
-  /** Base element */
-  Base = 'Base',
-  /** Custom element (web components) or unknown tag */
-  Custom = 'Custom'
+	/** Text node (most frequent - 100+ per document) */
+	Text = "Text",
+	/** Generic element node */
+	Element = "Element",
+	/** Heading elements (h1-h6) */
+	Heading = "Heading",
+	/** Paragraph element */
+	Paragraph = "Paragraph",
+	/** Generic div container */
+	Div = "Div",
+	/** Blockquote element */
+	Blockquote = "Blockquote",
+	/** Preformatted text block */
+	Pre = "Pre",
+	/** Horizontal rule */
+	Hr = "Hr",
+	/** Ordered or unordered list (ul, ol) */
+	List = "List",
+	/** List item (li) */
+	ListItem = "ListItem",
+	/** Definition list (dl) */
+	DefinitionList = "DefinitionList",
+	/** Definition term (dt) */
+	DefinitionTerm = "DefinitionTerm",
+	/** Definition description (dd) */
+	DefinitionDescription = "DefinitionDescription",
+	/** Table element */
+	Table = "Table",
+	/** Table row (tr) */
+	TableRow = "TableRow",
+	/** Table cell (td, th) */
+	TableCell = "TableCell",
+	/** Table header cell (th) */
+	TableHeader = "TableHeader",
+	/** Table body (tbody) */
+	TableBody = "TableBody",
+	/** Table head (thead) */
+	TableHead = "TableHead",
+	/** Table foot (tfoot) */
+	TableFoot = "TableFoot",
+	/** Anchor link (a) */
+	Link = "Link",
+	/** Image (img) */
+	Image = "Image",
+	/** Strong/bold (strong, b) */
+	Strong = "Strong",
+	/** Emphasis/italic (em, i) */
+	Em = "Em",
+	/** Inline code (code) */
+	Code = "Code",
+	/** Strikethrough (s, del, strike) */
+	Strikethrough = "Strikethrough",
+	/** Underline (u, ins) */
+	Underline = "Underline",
+	/** Subscript (sub) */
+	Subscript = "Subscript",
+	/** Superscript (sup) */
+	Superscript = "Superscript",
+	/** Mark/highlight (mark) */
+	Mark = "Mark",
+	/** Small text (small) */
+	Small = "Small",
+	/** Line break (br) */
+	Br = "Br",
+	/** Span element */
+	Span = "Span",
+	/** Article element */
+	Article = "Article",
+	/** Section element */
+	Section = "Section",
+	/** Navigation element */
+	Nav = "Nav",
+	/** Aside element */
+	Aside = "Aside",
+	/** Header element */
+	Header = "Header",
+	/** Footer element */
+	Footer = "Footer",
+	/** Main element */
+	Main = "Main",
+	/** Figure element */
+	Figure = "Figure",
+	/** Figure caption */
+	Figcaption = "Figcaption",
+	/** Time element */
+	Time = "Time",
+	/** Details element */
+	Details = "Details",
+	/** Summary element */
+	Summary = "Summary",
+	/** Form element */
+	Form = "Form",
+	/** Input element */
+	Input = "Input",
+	/** Select element */
+	Select = "Select",
+	/** Option element */
+	Option = "Option",
+	/** Button element */
+	Button = "Button",
+	/** Textarea element */
+	Textarea = "Textarea",
+	/** Label element */
+	Label = "Label",
+	/** Fieldset element */
+	Fieldset = "Fieldset",
+	/** Legend element */
+	Legend = "Legend",
+	/** Audio element */
+	Audio = "Audio",
+	/** Video element */
+	Video = "Video",
+	/** Picture element */
+	Picture = "Picture",
+	/** Source element */
+	Source = "Source",
+	/** Iframe element */
+	Iframe = "Iframe",
+	/** SVG element */
+	Svg = "Svg",
+	/** Canvas element */
+	Canvas = "Canvas",
+	/** Ruby annotation */
+	Ruby = "Ruby",
+	/** Ruby text */
+	Rt = "Rt",
+	/** Ruby parenthesis */
+	Rp = "Rp",
+	/** Abbreviation */
+	Abbr = "Abbr",
+	/** Keyboard input */
+	Kbd = "Kbd",
+	/** Sample output */
+	Samp = "Samp",
+	/** Variable */
+	Var = "Var",
+	/** Citation */
+	Cite = "Cite",
+	/** Quote */
+	Q = "Q",
+	/** Deleted text */
+	Del = "Del",
+	/** Inserted text */
+	Ins = "Ins",
+	/** Data element */
+	Data = "Data",
+	/** Meter element */
+	Meter = "Meter",
+	/** Progress element */
+	Progress = "Progress",
+	/** Output element */
+	Output = "Output",
+	/** Template element */
+	Template = "Template",
+	/** Slot element */
+	Slot = "Slot",
+	/** HTML root element */
+	Html = "Html",
+	/** Head element */
+	Head = "Head",
+	/** Body element */
+	Body = "Body",
+	/** Title element */
+	Title = "Title",
+	/** Meta element */
+	Meta = "Meta",
+	/** Link element (not anchor) */
+	LinkTag = "LinkTag",
+	/** Style element */
+	Style = "Style",
+	/** Script element */
+	Script = "Script",
+	/** Base element */
+	Base = "Base",
+	/** Custom element (web components) or unknown tag */
+	Custom = "Custom",
 }
 
 /**
@@ -787,27 +789,27 @@ export declare const enum NodeType {
  * Specifies the target markup language format for the conversion output.
  */
 export declare const enum OutputFormat {
-  /** Standard Markdown (CommonMark compatible). Default. */
-  Markdown = 'Markdown',
-  /** Djot lightweight markup language. */
-  Djot = 'Djot',
-  /** Plain text output (no markup, visible text only). */
-  Plain = 'Plain'
+	/** Standard Markdown (CommonMark compatible). Default. */
+	Markdown = "Markdown",
+	/** Djot lightweight markup language. */
+	Djot = "Djot",
+	/** Plain text output (no markup, visible text only). */
+	Plain = "Plain",
 }
 
 /** HTML preprocessing options for document cleanup before conversion. */
 export interface PreprocessingOptions {
-  /** Enable HTML preprocessing globally */
-  enabled?: boolean
-  /** Preprocessing preset level (Minimal, Standard, Aggressive) */
-  preset?: JsPreprocessingPreset
-  /** Remove navigation elements (nav, breadcrumbs, menus, sidebars) */
-  removeNavigation?: boolean
-  /** Remove form elements (forms, inputs, buttons, etc.) */
-  removeForms?: boolean
+	/** Enable HTML preprocessing globally */
+	enabled?: boolean;
+	/** Preprocessing preset level (Minimal, Standard, Aggressive) */
+	preset?: JsPreprocessingPreset;
+	/** Remove navigation elements (nav, breadcrumbs, menus, sidebars) */
+	removeNavigation?: boolean;
+	/** Remove form elements (forms, inputs, buttons, etc.) */
+	removeForms?: boolean;
 }
 
-export declare function preprocessingOptionsDefault(): PreprocessingOptions
+export declare function preprocessingOptionsDefault(): PreprocessingOptions;
 
 /**
  * HTML preprocessing aggressiveness level.
@@ -815,12 +817,12 @@ export declare function preprocessingOptionsDefault(): PreprocessingOptions
  * Controls the extent of cleanup performed before conversion. Higher levels remove more elements.
  */
 export declare const enum PreprocessingPreset {
-  /** Minimal cleanup. Remove only essential noise (scripts, styles). */
-  Minimal = 'Minimal',
-  /** Standard cleanup. Default. Removes navigation, forms, and other auxiliary content. */
-  Standard = 'Standard',
-  /** Aggressive cleanup. Remove extensive non-content elements and structure. */
-  Aggressive = 'Aggressive'
+	/** Minimal cleanup. Remove only essential noise (scripts, styles). */
+	Minimal = "Minimal",
+	/** Standard cleanup. Default. Removes navigation, forms, and other auxiliary content. */
+	Standard = "Standard",
+	/** Aggressive cleanup. Remove extensive non-content elements and structure. */
+	Aggressive = "Aggressive",
 }
 
 /**
@@ -841,10 +843,10 @@ export declare const enum PreprocessingPreset {
  * See `WarningKind` for the full taxonomy of warning categories.
  */
 export interface ProcessingWarning {
-  /** Human-readable warning message. */
-  message: string
-  /** The category of warning. */
-  kind: JsWarningKind
+	/** Human-readable warning message. */
+	message: string;
+	/** The category of warning. */
+	kind: JsWarningKind;
 }
 
 /**
@@ -856,12 +858,12 @@ export interface ProcessingWarning {
  * # Examples
  */
 export interface StructuredData {
-  /** Type of structured data (JSON-LD, Microdata, RDFa) */
-  dataType: JsStructuredDataType
-  /** Raw JSON string (for JSON-LD) or serialized representation */
-  rawJson: string
-  /** Schema type if detectable (e.g., "Article", "Event", "Product") */
-  schemaType?: string
+	/** Type of structured data (JSON-LD, Microdata, RDFa) */
+	dataType: JsStructuredDataType;
+	/** Raw JSON string (for JSON-LD) or serialized representation */
+	rawJson: string;
+	/** Schema type if detectable (e.g., "Article", "Event", "Product") */
+	schemaType?: string;
 }
 
 /**
@@ -870,45 +872,45 @@ export interface StructuredData {
  * Identifies the schema/format used for structured data markup.
  */
 export declare const enum StructuredDataType {
-  /** JSON-LD (JSON for Linking Data) script blocks */
-  JsonLd = 'json_ld',
-  /** HTML5 Microdata attributes (itemscope, itemtype, itemprop) */
-  Microdata = 'microdata',
-  /** RDF in Attributes (RDFa) markup */
-  RDFa = 'rdfa'
+	/** JSON-LD (JSON for Linking Data) script blocks */
+	JsonLd = "json_ld",
+	/** HTML5 Microdata attributes (itemscope, itemtype, itemprop) */
+	Microdata = "microdata",
+	/** RDF in Attributes (RDFa) markup */
+	RDFa = "rdfa",
 }
 
 /** A top-level extracted table with both structured data and markdown representation. */
 export interface TableData {
-  /** The structured table grid. */
-  grid: TableGrid
-  /** The markdown rendering of this table. */
-  markdown: string
+	/** The structured table grid. */
+	grid: TableGrid;
+	/** The markdown rendering of this table. */
+	markdown: string;
 }
 
 /** A structured table grid with cell-level data including spans. */
 export interface TableGrid {
-  /** Number of rows. */
-  rows?: number
-  /** Number of columns. */
-  cols?: number
-  /**
-   * All cells in the table as a flat, sparse list.
-   *
-   * The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells
-   * that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear
-   * in the list. Only the top-left "origin" cell of a span is present, with its `row_span`
-   * and `col_span` fields set accordingly.
-   *
-   * To reconstruct the full visual grid, iterate over all cells and mark the rectangular
-   * region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any
-   * `(row, col)` position that is not the origin of any cell is covered by a span from an
-   * earlier cell.
-   *
-   * The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 || cols == 0`)
-   * produces an empty vec.
-   */
-  cells?: Array<JsGridCell>
+	/** Number of rows. */
+	rows?: number;
+	/** Number of columns. */
+	cols?: number;
+	/**
+	 * All cells in the table as a flat, sparse list.
+	 *
+	 * The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells
+	 * that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear
+	 * in the list. Only the top-left "origin" cell of a span is present, with its `row_span`
+	 * and `col_span` fields set accordingly.
+	 *
+	 * To reconstruct the full visual grid, iterate over all cells and mark the rectangular
+	 * region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any
+	 * `(row, col)` position that is not the origin of any cell is covered by a span from an
+	 * earlier cell.
+	 *
+	 * The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 || cols == 0`)
+	 * produces an empty vec.
+	 */
+	cells?: Array<JsGridCell>;
 }
 
 /**
@@ -928,12 +930,12 @@ export interface TableGrid {
  * See `AnnotationKind` for the full list of supported annotation types.
  */
 export interface TextAnnotation {
-  /** Start byte offset (inclusive) into the parent node's text. */
-  start: number
-  /** End byte offset (exclusive) into the parent node's text. */
-  end: number
-  /** The type of annotation. */
-  kind: JsAnnotationKind
+	/** Start byte offset (inclusive) into the parent node's text. */
+	start: number;
+	/** End byte offset (exclusive) into the parent node's text. */
+	end: number;
+	/** The type of annotation. */
+	kind: JsAnnotationKind;
 }
 
 /**
@@ -942,12 +944,12 @@ export interface TextAnnotation {
  * Corresponds to the HTML `dir` attribute and `bdi` element directionality.
  */
 export declare const enum TextDirection {
-  /** Left-to-right text flow (default for Latin scripts) */
-  LeftToRight = 'ltr',
-  /** Right-to-left text flow (Hebrew, Arabic, Urdu, etc.) */
-  RightToLeft = 'rtl',
-  /** Automatic directionality detection */
-  Auto = 'auto'
+	/** Left-to-right text flow (default for Latin scripts) */
+	LeftToRight = "ltr",
+	/** Right-to-left text flow (Hebrew, Arabic, Urdu, etc.) */
+	RightToLeft = "rtl",
+	/** Automatic directionality detection */
+	Auto = "auto",
 }
 
 /**
@@ -965,10 +967,10 @@ export declare const enum TextDirection {
  * parsers: `[text](url%20with%20spaces)`.
  */
 export declare const enum UrlEscapeStyle {
-  /** Wrap destinations that contain spaces or newlines in angle brackets. Default. */
-  Angle = 'Angle',
-  /** Percent-encode all characters that are not RFC 3986 unreserved or `/`. */
-  Percent = 'Percent'
+	/** Wrap destinations that contain spaces or newlines in angle brackets. Default. */
+	Angle = "Angle",
+	/** Percent-encode all characters that are not RFC 3986 unreserved or `/`. */
+	Percent = "Percent",
 }
 
 /**
@@ -979,49 +981,49 @@ export declare const enum UrlEscapeStyle {
  * preserving HTML, or signaling errors.
  */
 export declare const enum VisitResult {
-  /** Continue with default conversion behavior */
-  Continue = 'Continue',
-  /**
-   * Replace default output with custom markdown
-   *
-   * The visitor takes full responsibility for the markdown output
-   * of this node and its children.
-   */
-  Custom = 'Custom',
-  /**
-   * Skip this element entirely (don't output anything)
-   *
-   * The element and all its children are ignored in the output.
-   */
-  Skip = 'Skip',
-  /**
-   * Preserve original HTML (don't convert to markdown)
-   *
-   * The element's raw HTML is included verbatim in the output.
-   */
-  PreserveHtml = 'PreserveHtml',
-  /**
-   * Stop conversion with an error
-   *
-   * The conversion process halts and returns this error message.
-   */
-  Error = 'Error'
+	/** Continue with default conversion behavior */
+	Continue = "Continue",
+	/**
+	 * Replace default output with custom markdown
+	 *
+	 * The visitor takes full responsibility for the markdown output
+	 * of this node and its children.
+	 */
+	Custom = "Custom",
+	/**
+	 * Skip this element entirely (don't output anything)
+	 *
+	 * The element and all its children are ignored in the output.
+	 */
+	Skip = "Skip",
+	/**
+	 * Preserve original HTML (don't convert to markdown)
+	 *
+	 * The element's raw HTML is included verbatim in the output.
+	 */
+	PreserveHtml = "PreserveHtml",
+	/**
+	 * Stop conversion with an error
+	 *
+	 * The conversion process halts and returns this error message.
+	 */
+	Error = "Error",
 }
 
 /** Categories of processing warnings. */
 export declare const enum WarningKind {
-  /** An image could not be extracted (e.g. invalid data URI, unsupported format). */
-  ImageExtractionFailed = 'image_extraction_failed',
-  /** The input encoding was not recognized; fell back to UTF-8. */
-  EncodingFallback = 'encoding_fallback',
-  /** The input was truncated due to size limits. */
-  TruncatedInput = 'truncated_input',
-  /** The HTML was malformed but processing continued with best effort. */
-  MalformedHtml = 'malformed_html',
-  /** Sanitization was applied to remove potentially unsafe content. */
-  SanitizationApplied = 'sanitization_applied',
-  /** DOM traversal was truncated because max_depth was exceeded. */
-  DepthLimitExceeded = 'depth_limit_exceeded'
+	/** An image could not be extracted (e.g. invalid data URI, unsupported format). */
+	ImageExtractionFailed = "image_extraction_failed",
+	/** The input encoding was not recognized; fell back to UTF-8. */
+	EncodingFallback = "encoding_fallback",
+	/** The input was truncated due to size limits. */
+	TruncatedInput = "truncated_input",
+	/** The HTML was malformed but processing continued with best effort. */
+	MalformedHtml = "malformed_html",
+	/** Sanitization was applied to remove potentially unsafe content. */
+	SanitizationApplied = "sanitization_applied",
+	/** DOM traversal was truncated because max_depth was exceeded. */
+	DepthLimitExceeded = "depth_limit_exceeded",
 }
 
 /**
@@ -1030,8 +1032,8 @@ export declare const enum WarningKind {
  * Determines how sequences of whitespace characters (spaces, tabs, newlines) are processed.
  */
 export declare const enum WhitespaceMode {
-  /** Collapse multiple whitespace characters to single spaces. Default. Matches browser behavior. */
-  Normalized = 'Normalized',
-  /** Preserve all whitespace exactly as it appears in the HTML. */
-  Strict = 'Strict'
+	/** Collapse multiple whitespace characters to single spaces. Default. Matches browser behavior. */
+	Normalized = "Normalized",
+	/** Preserve all whitespace exactly as it appears in the HTML. */
+	Strict = "Strict",
 }
