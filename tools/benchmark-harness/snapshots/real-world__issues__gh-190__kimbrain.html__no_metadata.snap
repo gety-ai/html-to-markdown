@@ -198,7 +198,7 @@ call_func(
   fooooooooooooooooooooooooooooooooo,
   bar, bat);
 
-ReturnType LongClassName::ReallyReallyReallyReallyLongFunctionName(
+ReturnType LongClassName::ReallyReallyReallyReallyLongFunctonName(
   Type par_name1,  //2 스페이스 들여쓰기
   Type par_name1,
   Type par_name1,)
@@ -436,7 +436,7 @@ super().__inti__ 뒤에 들어가는 'minimal_publisher'는
  Node의 이름을 나타냅니다.
 여기서 중요한게 self.publisher_ 는
  변수이름이라 그냥 이름을 publisher라고 하였을 뿐 별 이유는 없지만 그 뒤에가
- publisher하는 변수로 만들어 줍니다. self.create_publisher(String(메시지타입),
+ publisher하는 변수로 만들어 줍니다. self.create_pulisher(String(메시지타입),
  'topic'(토픽의 이름), 10)
 timer_period는 0.5초 마다로 만들어서 self.timer =
  self.create_timer(timer_period, self.timer_callback) 0.5초마다

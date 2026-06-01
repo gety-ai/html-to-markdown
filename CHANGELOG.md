@@ -98,7 +98,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `convert(html, Some(opts))`, `convert(html, None)`, and
   `convert(html, ConversionOptions::default())` are all valid Rust call shapes.
   Existing callers continue to compile unchanged — this is purely additive
-  flexibility, not a breaking change.
+  flexibility, not a breaking change. The ~250-line conversion body is held in a
+  private non-generic `convert_inner` so the generic wrapper monomorphises exactly
+  once per call site rather than per `Into` impl chosen.
 
 - **`url_escape_style` option** (`UrlEscapeStyle::Angle` | `UrlEscapeStyle::Percent`). When set
   to `Percent`, link and image destinations are percent-encoded instead of wrapped in angle
