@@ -55,10 +55,92 @@ pub fn convert(html: &str, options: impl Into<Option<ConversionOptions>>) -> Res
 
     let options = options.into().unwrap_or_default();
 
+    // Tier-1 dispatcher.
+    //
+    // `TierStrategy::Tier2` skips this block entirely and falls straight to
+    // the Tier-2 pipeline below.
+    //
+    // `TierStrategy::Auto` runs the prescan + classifier once.  If the
+    // classifier returns `RouterDecision::Tier1`, the scanner is invoked.  On
+    // success the result is returned immediately.  On bail the normalized input
+    // that was already produced is threaded to the Tier-2 pipeline via
+    // `precomputed_normalized` — no re-normalisation.
+    //
+    // `TierStrategy::Tier1` (testkit-only) bypasses the classifier and forces
+    // the scanner unconditionally, still with Tier-2 fallback on bail.
+    //
+    // `precomputed_normalized` carries the `Cow<str>` produced by
+    // `normalize_input` when the Tier-1 path ran it.  The Tier-2 entry point
+    // below uses it directly; the `Tier2` branch leaves it `None` and computes
+    // it there.
+    let mut precomputed_normalized: Option<Cow<'_, str>> = None;
+
+    match options.tier_strategy {
+        crate::options::TierStrategy::Tier2 => {
+            // Skip Tier-1 entirely; fall through to the Tier-2 path below.
+        }
+        crate::options::TierStrategy::Auto => {
+            let normalized = normalize_input(html)?;
+            let (cleaned, report) = crate::converter::prescan::run(normalized.as_ref());
+            let decision = crate::converter::tier1::router::classify(&report, &options);
+            if decision == crate::converter::tier1::RouterDecision::Tier1 {
+                match crate::converter::tier1::run(cleaned.as_ref(), &report, &options) {
+                    Ok(markdown) => {
+                        return Ok(crate::types::ConversionResult {
+                            content: Some(markdown),
+                            document: None,
+                            tables: Vec::new(),
+                            warnings: Vec::new(),
+                            #[cfg(feature = "metadata")]
+                            metadata: crate::metadata::HtmlMetadata::default(),
+                            #[cfg(feature = "inline-images")]
+                            images: Vec::new(),
+                        });
+                    }
+                    Err(_bail) => {
+                        // Fall through to Tier-2 with the already-normalized input.
+                        precomputed_normalized = Some(normalized);
+                    }
+                }
+            } else {
+                // RouterDecision::Tier2: fall through with the already-normalized input.
+                precomputed_normalized = Some(normalized);
+            }
+        }
+        #[cfg(any(test, feature = "testkit"))]
+        crate::options::TierStrategy::Tier1 => {
+            // Testkit path: bypass the classifier and force Tier-1, with
+            // Tier-2 fallback on bail.
+            let normalized = normalize_input(html)?;
+            let (cleaned, report) = crate::converter::prescan::run(normalized.as_ref());
+            match crate::converter::tier1::run(cleaned.as_ref(), &report, &options) {
+                Ok(markdown) => {
+                    return Ok(crate::types::ConversionResult {
+                        content: Some(markdown),
+                        document: None,
+                        tables: Vec::new(),
+                        warnings: Vec::new(),
+                        #[cfg(feature = "metadata")]
+                        metadata: crate::metadata::HtmlMetadata::default(),
+                        #[cfg(feature = "inline-images")]
+                        images: Vec::new(),
+                    });
+                }
+                Err(_bail) => {
+                    // Fall through to Tier-2 with the already-normalized input.
+                    precomputed_normalized = Some(normalized);
+                }
+            }
+        }
+    }
+
     #[cfg(feature = "visitor")]
     let visitor = options.visitor.clone();
 
-    let normalized_html = normalize_input(html)?;
+    let normalized_html = match precomputed_normalized {
+        Some(n) => n,
+        None => normalize_input(html)?,
+    };
 
     // Fast path: plain text with no HTML tags — skip full parsing pipeline.
     if !options.wrap {

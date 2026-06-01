@@ -95,6 +95,7 @@ pub mod dom_context;
 pub mod form;
 pub mod format;
 pub mod handlers;
+pub mod head_metadata;
 pub mod inline;
 pub mod list;
 pub mod main;
@@ -103,10 +104,12 @@ pub mod media;
 mod metadata;
 pub mod plain_text;
 pub mod preprocessing_helpers;
+pub mod prescan;
 pub mod reference_collector;
 pub mod semantic;
 pub mod text;
 mod text_node;
+pub mod tier1;
 pub mod utility;
 
 #[cfg(feature = "visitor")]

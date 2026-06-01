@@ -9,6 +9,89 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Tiered HTML-to-Markdown conversion architecture.** Clean HTML inputs now have an opt-in
+  fast path through a Tier-1 single-pass byte scanner (`converter/tier1/`); on anything the
+  scanner cannot prove byte-equivalent to the existing Tier-2 DOM walker, it returns a
+  structured bail and the dispatcher falls back to Tier-2 (`tl::parse` + `walk_node`)
+  transparently. Output is always byte-equal to what Tier-2 would have produced for the
+  same input — verified by 116 oracle snapshots and a per-fixture byte-equality integration
+  test (`tests/tier1_byte_equality_test.rs`). Tier-3 (`html5ever` repair) remains the
+  fallback for truly malformed HTML.
+
+- **`ConversionOptions::tier_strategy`** (`TierStrategy::Auto` | `Tier2` | `Tier1`)
+  for runtime tier selection. `Auto` (default) lets the classifier decide based on the
+  prescan signals and options shape; `Tier2` forces the existing DOM-walk path; `Tier1` is
+  testkit-only (`#[cfg(any(test, feature = "testkit"))]`) for debugging and benchmarking.
+  Exposed to Node (`tierStrategy: "auto" | "tier2"`) and Wasm (`WasmTierStrategy` enum).
+  CLI and Python pick up the field via the standard options-mapping flow.
+
+- **Tier-1 router style-option gate.** The classifier forces Tier-2 when any of these
+  deviate from Tier-1's hardcoded value: `heading_style`, `code_block_style`,
+  `strong_em_symbol`, `bullets`, `list_indent_*`, `whitespace_mode`, `newline_style`,
+  `escape_*` flags, `output_format`, `link_style`, `url_escape_style`, `compact_tables`,
+  `default_title`, `sub_symbol`, `sup_symbol`, `highlight_style`. 47 integration tests
+  enforce the gate.
+
+- **Tier-1 conservative bail set.** Tier-1 returns `Err(BailReason::*)` rather than emit
+  potentially-wrong output on: custom elements, CDATA, unescaped `<`, inline SVG, HTML
+  5 optional-close edge cases, `<table>` with rowspan/colspan/block-children-in-cells/
+  caption/mixed-section-order, nested lists (Tier-2 cycles bullets by depth), `<pre>`
+  with non-Indented `code_block_style`, named HTML entities outside the 45-entry
+  zero-alloc table, table cells containing `|`, and `<br>` inside table cells. Tests
+  cover every variant.
+
+- **Benchmark harness** (`tools/benchmark-harness/`, binary `htmbench`) with
+  `run` / `compare` / `oracle` / `oracle:bless` / `survey` / `mdream` subcommands.
+  Per-group regression guardrails (`baselines/baseline.json`, `guardrails.json`).
+  Wired under `task bench:*` namespace.
+
+- **Bench regression gate in CI** — every PR that touches the Rust core or bench harness now
+  runs `task bench:oracle && task bench:run && task bench:compare` on `ubuntu-24.04-arm`,
+  failing on any fixture that exceeds its per-group threshold in
+  `tools/benchmark-harness/guardrails.json` (5% clean_large, 8% clean_medium, 10% other groups,
+  30% adversarial). Baselines are blessed deliberately by humans, not automatically by CI.
+
+### Performance
+
+- **Tier-1 byte scanner activated in production** (`tier_strategy = Auto`). The classifier
+  decides per-input whether Tier-1's single-pass byte scanner runs; on bail, the dispatcher
+  falls back to Tier-2 transparently. Measured throughput on the harness corpus (29 fixtures,
+  6.4 MB total; Apple Silicon, `cargo build --release`):
+
+  | Fixture                                  |   Size | ms (best) | Throughput |
+  |------------------------------------------|-------:|----------:|-----------:|
+  | `real-world/wikipedia/medium_python.html` | 1.24 MB | 62.58 ms  | 19.0 MB/s  |
+  | `real-world/wikipedia/large_rust.html`   | 1.07 MB | 37.17 ms  | 27.3 MB/s  |
+  | `mdream/github-markdown-complete.html`   | 430 KB | 10.57 ms  | 38.7 MB/s  |
+  | `mdream/react-learn.html`                | 265 KB | 12.11 ms  | 20.9 MB/s  |
+  | `mdream/wikipedia-small.html`            | 166 KB |  5.63 ms  | 28.1 MB/s  |
+  | `real-world/issues/gh-121-hacker-news.html` |  57 KB |  1.08 ms  | 50.3 MB/s  |
+  | `mdream/nuxt-example.html`               | 3.6 KB |  0.029 ms | 116.1 MB/s |
+
+  Per-group regression thresholds (5–30%) are enforced on every PR via `task bench:compare` (see Added section).
+
+- **memchr-driven text scan**: `decode_and_collapse_into` and `decode_entities_into` use
+  `memchr::memchr3` / `memchr::memchr` to skip ahead to the next special byte (`<`, `&`,
+  whitespace boundary) and bulk-copy plain text runs in a single `push_str`. Replaces a
+  byte-by-byte conditional inner loop and closes a substantial portion of the gap to main's
+  heavily-optimized Tier-2 path on Wikipedia-scale documents (e.g., +32% on `wikipedia-small`).
+
+- **Tier-1 dispatcher reuses normalized input on Tier-2 fallback.** When the Tier-1 scanner
+  bails or the classifier routes to Tier-2, the dispatcher threads the already-computed
+  `normalize_input` `Cow<str>` through to the Tier-2 path instead of recomputing it. Eliminates
+  one full-input pass on every bail-fallback or Tier-2-routed call.
+
+- **`collapse_excess_blank_lines` in-place.** Replaced the fresh-`String` rewrite with
+  `String::retain`, eliminating an output-sized allocation on every Tier-1 success whose
+  output contains `\n\n\n`. Measured wins (best-of-3, `--force-tier1`, vs prior commit):
+  `wikipedia/lists_timeline` -3.81%, `gh-121-hacker-news` -4.23%, `github-markdown-complete`
+  -2.99%, `wikipedia/medium_python` -2.94%, `mdream/wikipedia-small` -2.68%, `mdn-array`
+  -2.12%, `gh-190/firsteigen` -2.55%. No fixture regressed.
+
+- **`htmbench --force-tier2`** flag mirroring `--force-tier1`, for clean head-to-head
+  benchmarks now that the Auto router activates Tier-1 on most fixtures and so cannot be
+  used as a Tier-2 control.
+
 - **`convert()` accepts options as a bare `ConversionOptions`** in addition to
   `Option<ConversionOptions>` (resolves #398). The second parameter now bounds
   `impl Into<Option<ConversionOptions>>`, so `convert(html, opts)`,
@@ -23,6 +106,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   contains `<`, `>`, spaces, or parentheses (resolves #392).
 
 ### Fixed
+
+- **Non-deterministic SVG attribute serialization** in `converter/media/svg.rs`:
+  `serialize_element` iterated `tag.attributes()` over astral-tl's internal `HashMap`,
+  which has non-deterministic iteration order. SVG `data:` URIs therefore differed across
+  runs. Fixed by sorting attributes by name before emission, restoring determinism.
 
 - **spurious blank lines after frontmatter and lists (MD012)** (resolves #399). Block-level
   emission now collapses runs of three or more consecutive newlines into exactly two, so
