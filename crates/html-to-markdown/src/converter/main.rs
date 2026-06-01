@@ -15,8 +15,8 @@ use std::collections::{BTreeMap, HashSet};
 
 use crate::converter::dom_context::DomContext;
 use crate::converter::main_helpers::{
-    extract_head_metadata, format_metadata_frontmatter, has_custom_element_tags, repair_with_html5ever,
-    trim_line_end_whitespace, trim_trailing_whitespace,
+    collapse_excess_blank_lines, extract_head_metadata, format_metadata_frontmatter, has_custom_element_tags,
+    repair_with_html5ever, trim_line_end_whitespace, trim_trailing_whitespace,
 };
 use crate::converter::plain_text::extract_plain_text;
 use crate::converter::preprocessing_helpers::{has_inline_block_misnest, should_drop_for_preprocessing};
@@ -299,6 +299,7 @@ pub fn convert_html_impl(
         extract_plain_text(&dom, parser, options)
     } else {
         trim_line_end_whitespace(&mut output);
+        collapse_excess_blank_lines(&mut output);
         output
     };
     let (document, tables) = finish_structure_collector(structure_collector);

@@ -19,6 +19,34 @@ pub fn trim_trailing_whitespace(output: &mut String) {
     }
 }
 
+/// Collapse runs of three or more consecutive newlines into exactly two.
+///
+/// Block-level emitters append their own trailing newlines and the next block
+/// emitter typically prepends a leading newline, which can produce `\n\n\n`
+/// runs in transitions such as frontmatter → first block or list → next block.
+/// markdownlint's MD012 rule forbids multiple consecutive blank lines, so the
+/// final emission is normalized here. This intentionally preserves single
+/// blank lines (`\n\n`) — only runs of three or more newlines are collapsed.
+pub fn collapse_excess_blank_lines(output: &mut String) {
+    if !output.contains("\n\n\n") {
+        return;
+    }
+    let mut cleaned = String::with_capacity(output.len());
+    let mut consecutive = 0usize;
+    for ch in output.chars() {
+        if ch == '\n' {
+            consecutive += 1;
+            if consecutive <= 2 {
+                cleaned.push(ch);
+            }
+        } else {
+            consecutive = 0;
+            cleaned.push(ch);
+        }
+    }
+    *output = cleaned;
+}
+
 /// Remove trailing spaces/tabs from every line while preserving newlines.
 pub fn trim_line_end_whitespace(output: &mut String) {
     if output.is_empty() {

@@ -7,8 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [3.6.0] - 2026-05-31
-
 ### Added
 
 - **`convert()` accepts options as a bare `ConversionOptions`** in addition to
@@ -26,6 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **spurious blank lines after frontmatter and lists (MD012)** (resolves #399). Block-level
+  emission now collapses runs of three or more consecutive newlines into exactly two, so
+  the frontmatter→body and list→next-block transitions no longer produce extra blank lines
+  that violate markdownlint MD012.
 - **autolinks: bare paths and filenames are no longer wrapped as autolinks** (resolves #397).
   Per GFM §6.5, autolinks require an absolute URI with a scheme — but the previous check only
   compared the link text to the `href`, so `<a href="foobar.png">foobar.png</a>` became the
