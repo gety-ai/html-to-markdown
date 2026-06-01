@@ -131,6 +131,9 @@ features = ["full", "metadata", "visitor", "serde", "inline-images"]
 [crates.python]
 module_name = "_html_to_markdown"
 pip_name = "html-to-markdown"
+reexported_types = [
+  "ConversionResult",
+]
 
 [crates.python.stubs]
 output = "packages/python/html_to_markdown/"
