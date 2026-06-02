@@ -75,6 +75,11 @@ struct RunArgs {
     /// `auto` is the production path.
     #[arg(long)]
     force_tier2: bool,
+
+    /// Attach a no-op visitor to every conversion. Used to measure the
+    /// `NodeContext` build cost and `visit_*` dispatch overhead in isolation.
+    #[arg(long)]
+    with_visitor: bool,
 }
 
 fn cmd_run(args: RunArgs) -> Result<()> {
@@ -94,7 +99,7 @@ fn cmd_run(args: RunArgs) -> Result<()> {
     for fix in &fixtures {
         let html = std::fs::read_to_string(&fix.path).with_context(|| format!("reading {}", fix.path.display()))?;
 
-        let opts: Option<ConversionOptions> = if args.force_tier1 {
+        let mut opts: Option<ConversionOptions> = if args.force_tier1 {
             #[cfg(feature = "testkit")]
             {
                 Some(ConversionOptions {
@@ -116,6 +121,14 @@ fn cmd_run(args: RunArgs) -> Result<()> {
         } else {
             None
         };
+
+        if args.with_visitor {
+            let handle = html_to_markdown_bench::bench::new_noop_visitor_handle();
+            opts = Some(ConversionOptions {
+                visitor: Some(handle),
+                ..opts.unwrap_or_default()
+            });
+        }
         let (ms_best, output_bytes) = bench::run_one(&html, opts);
         if ms_best == 0.0 {
             tracing::warn!(

@@ -9,9 +9,26 @@
 //! bounded for large fixtures.
 
 use std::hint::black_box;
+use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use html_to_markdown_rs::options::ConversionOptions;
+use html_to_markdown_rs::visitor::{HtmlVisitor, VisitorHandle};
+
+/// No-op visitor used to isolate visitor-dispatch overhead from conversion cost.
+///
+/// Every method falls through to the default `VisitResult::Continue` from the trait,
+/// so the only thing being measured against the no-visitor baseline is the cost of
+/// building each `NodeContext` and acquiring the visitor mutex at every callback site.
+#[derive(Debug, Default)]
+pub struct NoOpVisitor;
+
+impl HtmlVisitor for NoOpVisitor {}
+
+/// Construct a fresh no-op visitor handle suitable for `ConversionOptions::visitor`.
+pub fn new_noop_visitor_handle() -> VisitorHandle {
+    Arc::new(Mutex::new(NoOpVisitor))
+}
 
 /// Target duration for a single calibration run.
 const TARGET_CALIBRATION: Duration = Duration::from_millis(50);
