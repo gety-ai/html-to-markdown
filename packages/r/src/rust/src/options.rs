@@ -12,16 +12,6 @@ fn list_get(list: &List, key: &str) -> Option<Robj> {
         .map(|(_, val)| val)
 }
 
-/// Decode a url escape style enum from its string representation.
-fn decode_url_escape_style(val: Robj) -> std::result::Result<crate::UrlEscapeStyle, String> {
-    let s = String::try_from(&val).map_err(|e| format!("url_escape_style: {e}"))?;
-    match s.as_str() {
-        "Angle" => Ok(crate::UrlEscapeStyle::Angle),
-        "Percent" => Ok(crate::UrlEscapeStyle::Percent),
-        _ => Err(format!("url_escape_style: unknown variant '{{}}'", s)),
-    }
-}
-
 /// Decode a list indent type enum from its string representation.
 fn decode_list_indent_type(val: Robj) -> std::result::Result<crate::ListIndentType, String> {
     let s = String::try_from(&val).map_err(|e| format!("list_indent_type: {e}"))?;
@@ -42,29 +32,6 @@ fn decode_link_style(val: Robj) -> std::result::Result<crate::LinkStyle, String>
     }
 }
 
-/// Decode a highlight style enum from its string representation.
-fn decode_highlight_style(val: Robj) -> std::result::Result<crate::HighlightStyle, String> {
-    let s = String::try_from(&val).map_err(|e| format!("highlight_style: {e}"))?;
-    match s.as_str() {
-        "DoubleEqual" => Ok(crate::HighlightStyle::DoubleEqual),
-        "Html" => Ok(crate::HighlightStyle::Html),
-        "Bold" => Ok(crate::HighlightStyle::Bold),
-        "None" => Ok(crate::HighlightStyle::None),
-        _ => Err(format!("highlight_style: unknown variant '{{}}'", s)),
-    }
-}
-
-/// Decode a heading style enum from its string representation.
-fn decode_heading_style(val: Robj) -> std::result::Result<crate::HeadingStyle, String> {
-    let s = String::try_from(&val).map_err(|e| format!("heading_style: {e}"))?;
-    match s.as_str() {
-        "Atx" => Ok(crate::HeadingStyle::Atx),
-        "Underlined" => Ok(crate::HeadingStyle::Underlined),
-        "AtxClosed" => Ok(crate::HeadingStyle::AtxClosed),
-        _ => Err(format!("heading_style: unknown variant '{{}}'", s)),
-    }
-}
-
 /// Decode a output format enum from its string representation.
 fn decode_output_format(val: Robj) -> std::result::Result<crate::OutputFormat, String> {
     let s = String::try_from(&val).map_err(|e| format!("output_format: {e}"))?;
@@ -76,17 +43,6 @@ fn decode_output_format(val: Robj) -> std::result::Result<crate::OutputFormat, S
     }
 }
 
-/// Decode a code block style enum from its string representation.
-fn decode_code_block_style(val: Robj) -> std::result::Result<crate::CodeBlockStyle, String> {
-    let s = String::try_from(&val).map_err(|e| format!("code_block_style: {e}"))?;
-    match s.as_str() {
-        "Indented" => Ok(crate::CodeBlockStyle::Indented),
-        "Backticks" => Ok(crate::CodeBlockStyle::Backticks),
-        "Tildes" => Ok(crate::CodeBlockStyle::Tildes),
-        _ => Err(format!("code_block_style: unknown variant '{{}}'", s)),
-    }
-}
-
 /// Decode a whitespace mode enum from its string representation.
 fn decode_whitespace_mode(val: Robj) -> std::result::Result<crate::WhitespaceMode, String> {
     let s = String::try_from(&val).map_err(|e| format!("whitespace_mode: {e}"))?;
@@ -94,6 +50,16 @@ fn decode_whitespace_mode(val: Robj) -> std::result::Result<crate::WhitespaceMod
         "Normalized" => Ok(crate::WhitespaceMode::Normalized),
         "Strict" => Ok(crate::WhitespaceMode::Strict),
         _ => Err(format!("whitespace_mode: unknown variant '{{}}'", s)),
+    }
+}
+
+/// Decode a url escape style enum from its string representation.
+fn decode_url_escape_style(val: Robj) -> std::result::Result<crate::UrlEscapeStyle, String> {
+    let s = String::try_from(&val).map_err(|e| format!("url_escape_style: {e}"))?;
+    match s.as_str() {
+        "Angle" => Ok(crate::UrlEscapeStyle::Angle),
+        "Percent" => Ok(crate::UrlEscapeStyle::Percent),
+        _ => Err(format!("url_escape_style: unknown variant '{{}}'", s)),
     }
 }
 
@@ -115,6 +81,40 @@ fn decode_preprocessing_preset(val: Robj) -> std::result::Result<crate::Preproce
         "Standard" => Ok(crate::PreprocessingPreset::Standard),
         "Aggressive" => Ok(crate::PreprocessingPreset::Aggressive),
         _ => Err(format!("preprocessing_preset: unknown variant '{{}}'", s)),
+    }
+}
+
+/// Decode a heading style enum from its string representation.
+fn decode_heading_style(val: Robj) -> std::result::Result<crate::HeadingStyle, String> {
+    let s = String::try_from(&val).map_err(|e| format!("heading_style: {e}"))?;
+    match s.as_str() {
+        "Atx" => Ok(crate::HeadingStyle::Atx),
+        "Underlined" => Ok(crate::HeadingStyle::Underlined),
+        "AtxClosed" => Ok(crate::HeadingStyle::AtxClosed),
+        _ => Err(format!("heading_style: unknown variant '{{}}'", s)),
+    }
+}
+
+/// Decode a highlight style enum from its string representation.
+fn decode_highlight_style(val: Robj) -> std::result::Result<crate::HighlightStyle, String> {
+    let s = String::try_from(&val).map_err(|e| format!("highlight_style: {e}"))?;
+    match s.as_str() {
+        "DoubleEqual" => Ok(crate::HighlightStyle::DoubleEqual),
+        "Html" => Ok(crate::HighlightStyle::Html),
+        "Bold" => Ok(crate::HighlightStyle::Bold),
+        "None" => Ok(crate::HighlightStyle::None),
+        _ => Err(format!("highlight_style: unknown variant '{{}}'", s)),
+    }
+}
+
+/// Decode a code block style enum from its string representation.
+fn decode_code_block_style(val: Robj) -> std::result::Result<crate::CodeBlockStyle, String> {
+    let s = String::try_from(&val).map_err(|e| format!("code_block_style: {e}"))?;
+    match s.as_str() {
+        "Indented" => Ok(crate::CodeBlockStyle::Indented),
+        "Backticks" => Ok(crate::CodeBlockStyle::Backticks),
+        "Tildes" => Ok(crate::CodeBlockStyle::Tildes),
+        _ => Err(format!("code_block_style: unknown variant '{{}}'", s)),
     }
 }
 
