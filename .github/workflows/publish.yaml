@@ -823,11 +823,14 @@ jobs:
 
       - name: Build platform gem
         # Inline: rb-sys's rake tasks are platform-dependent. All platforms use
-        # native[PLATFORM] gem to produce platform-specific gems. The native task
-        # is smart: on matching architectures it builds in-place, on mismatched
-        # architectures it cross-compiles via rake-compiler-dock. Windows cross-
-        # compilation is explicitly handled via rb-sys-dock to avoid GNU toolchain
-        # linker corruption from native Windows builds.
+        # native:PLATFORM gem to produce platform-specific gems. The native:<platform>
+        # subtask is registered by rake-compiler when ext.cross_compile = true and
+        # ext.cross_platform includes the target; on a matching architecture it
+        # builds in-place, on mismatched architectures it cross-compiles via
+        # rake-compiler-dock. Windows cross-compilation is explicitly handled via
+        # rb-sys-dock to avoid GNU toolchain linker corruption from native Windows
+        # builds. Do NOT use rake "native[$target]" syntax — that calls the `native`
+        # task with a positional arg, which rake-compiler doesn't accept.
         working-directory: packages/ruby
         shell: bash
         run: |
@@ -847,10 +850,10 @@ jobs:
             # lockfile materializes against the container's Ruby version
             # rather than the host's.
             gem install rb_sys
-            rb-sys-dock --platform "${{ matrix.dock_platform }}" -- bash -c "bundle install --jobs=4 --retry=3 && bundle exec rake \"native[$target]\" gem"
+            rb-sys-dock --platform "${{ matrix.dock_platform }}" -- bash -c "bundle install --jobs=4 --retry=3 && bundle exec rake \"native:$target\" gem"
           else
             # Native build on matching architecture
-            bundle exec rake "native[$target]" gem
+            bundle exec rake "native:$target" gem
           fi
 
       - name: Drop source gem on non-canonical builders
