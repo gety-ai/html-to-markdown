@@ -721,16 +721,16 @@ pub struct ProcessingWarning {
 /// synchronisation on the caller's side.
 #[frb(opaque)]
 pub struct VisitorHandle {
-    pub(crate) inner: html_to_markdown_rs::visitor::VisitorHandle,
+    pub(crate) inner: html_to_markdown_rs::VisitorHandle,
 }
 
-impl From<html_to_markdown_rs::visitor::VisitorHandle> for VisitorHandle {
-    fn from(inner: html_to_markdown_rs::visitor::VisitorHandle) -> Self {
+impl From<html_to_markdown_rs::VisitorHandle> for VisitorHandle {
+    fn from(inner: html_to_markdown_rs::VisitorHandle) -> Self {
         Self { inner }
     }
 }
 
-impl From<VisitorHandle> for html_to_markdown_rs::visitor::VisitorHandle {
+impl From<VisitorHandle> for html_to_markdown_rs::VisitorHandle {
     fn from(value: VisitorHandle) -> Self {
         value.inner
     }
@@ -3068,7 +3068,7 @@ pub async fn create_html_visitor(
         visit_figcaption: Box::new(visit_figcaption),
         visit_figure_end: Box::new(visit_figure_end),
     };
-    let __inner: html_to_markdown_rs::visitor::VisitorHandle = std::sync::Arc::new(std::sync::Mutex::new(__impl));
+    let __inner: html_to_markdown_rs::VisitorHandle = std::sync::Arc::new(std::sync::Mutex::new(__impl));
     VisitorHandle::from(__inner)
 }
 
@@ -3083,6 +3083,6 @@ pub fn create_conversion_options_from_json_with_visitor(
 ) -> Result<ConversionOptions, String> {
     let mut __core: html_to_markdown_rs::options::ConversionOptions =
         serde_json::from_str(&json).map_err(|e| e.to_string())?;
-    __core.visitor = visitor.map(<html_to_markdown_rs::visitor::VisitorHandle>::from);
+    __core.visitor = visitor.map(<html_to_markdown_rs::VisitorHandle>::from);
     Ok(ConversionOptions::from(__core))
 }

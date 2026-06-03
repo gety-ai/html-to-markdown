@@ -2131,7 +2131,7 @@ impl ProcessingWarning {
     }
 }
 
-pub struct VisitorHandle(pub html_to_markdown_rs::visitor::VisitorHandle);
+pub struct VisitorHandle(pub html_to_markdown_rs::VisitorHandle);
 
 pub struct NodeContext(pub html_to_markdown_rs::NodeContext);
 impl NodeContext {
@@ -3534,12 +3534,12 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for SwiftHtmlVisitorWrapper {
     }
 }
 
-impl From<html_to_markdown_rs::visitor::VisitorHandle> for VisitorHandle {
-    fn from(v: html_to_markdown_rs::visitor::VisitorHandle) -> Self {
+impl From<html_to_markdown_rs::VisitorHandle> for VisitorHandle {
+    fn from(v: html_to_markdown_rs::VisitorHandle) -> Self {
         Self(v)
     }
 }
-impl From<VisitorHandle> for html_to_markdown_rs::visitor::VisitorHandle {
+impl From<VisitorHandle> for html_to_markdown_rs::VisitorHandle {
     fn from(v: VisitorHandle) -> Self {
         v.0
     }
@@ -3555,8 +3555,7 @@ impl From<html_to_markdown_rs::options::ConversionOptions> for ConversionOptions
 /// `VisitorHandle` that can be passed to the options-with-visitor helper.
 pub fn make_html_visitor_handle(swift_box: ffi::SwiftHtmlVisitorBox) -> VisitorHandle {
     let __wrapper = SwiftHtmlVisitorWrapper::new(swift_box);
-    let __inner: html_to_markdown_rs::visitor::VisitorHandle =
-        ::std::sync::Arc::new(::std::sync::Mutex::new(__wrapper));
+    let __inner: html_to_markdown_rs::VisitorHandle = ::std::sync::Arc::new(::std::sync::Mutex::new(__wrapper));
     VisitorHandle::from(__inner)
 }
 
@@ -3569,7 +3568,7 @@ pub fn conversion_options_from_json_with_visitor(
 ) -> Result<ConversionOptions, String> {
     let mut __core: html_to_markdown_rs::options::ConversionOptions =
         ::serde_json::from_str(&json).map_err(|e| e.to_string())?;
-    __core.visitor = visitor.map(|h| <html_to_markdown_rs::visitor::VisitorHandle>::from(h));
+    __core.visitor = visitor.map(|h| <html_to_markdown_rs::VisitorHandle>::from(h));
     Ok(ConversionOptions::from(__core))
 }
 

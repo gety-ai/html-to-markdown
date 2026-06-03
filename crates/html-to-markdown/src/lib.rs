@@ -99,7 +99,7 @@ pub use types::{
     NodeContent, ProcessingWarning, TableData, TableGrid, TextAnnotation, WarningKind,
 };
 #[cfg(feature = "visitor")]
-pub use visitor::{NodeContext, NodeType, VisitResult};
+pub use visitor::{NodeContext, NodeType, VisitResult, VisitorHandle};
 
 // ============================================================================
 // Main Public API Functions
