@@ -1,6 +1,6 @@
 [package]
 name = "html-to-markdown-rs-dart"
-version = "3.6.0-rc.6"
+version = "3.6.0-rc.7"
 edition = "2024"
 license = "MIT"
 
@@ -15,7 +15,6 @@ crate-type = ["cdylib", "staticlib"]
 [dependencies]
 html_to_markdown_rs = { path = "../../../crates/html-to-markdown", package = "html-to-markdown-rs", features = ["full", "testkit"] }
 flutter_rust_bridge = "=2.12.0"
-serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["rt-multi-thread", "sync"] }
 async-trait = "0.1"
