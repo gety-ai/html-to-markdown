@@ -164,6 +164,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw);
 
   @protected
+  ImageDimensions dco_decode_box_autoadd_image_dimensions(dynamic raw);
+
+  @protected
   LinkStyle dco_decode_box_autoadd_link_style(dynamic raw);
 
   @protected
@@ -243,6 +246,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 dco_decode_i_64(dynamic raw);
 
   @protected
+  ImageDimensions dco_decode_image_dimensions(dynamic raw);
+
+  @protected
   ImageMetadata dco_decode_image_metadata(dynamic raw);
 
   @protected
@@ -282,7 +288,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<LinkMetadata> dco_decode_list_link_metadata(dynamic raw);
 
   @protected
-  List<List<String>> dco_decode_list_list_String(dynamic raw);
+  List<MetadataEntry> dco_decode_list_metadata_entry(dynamic raw);
 
   @protected
   Int64List dco_decode_list_prim_i_64_strict(dynamic raw);
@@ -304,6 +310,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<TextAnnotation> dco_decode_list_text_annotation(dynamic raw);
+
+  @protected
+  MetadataEntry dco_decode_metadata_entry(dynamic raw);
 
   @protected
   NewlineStyle dco_decode_newline_style(dynamic raw);
@@ -351,6 +360,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw);
 
   @protected
+  ImageDimensions? dco_decode_opt_box_autoadd_image_dimensions(dynamic raw);
+
+  @protected
   LinkStyle? dco_decode_opt_box_autoadd_link_style(dynamic raw);
 
   @protected
@@ -385,9 +397,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<String>? dco_decode_opt_list_String(dynamic raw);
-
-  @protected
-  Int64List? dco_decode_opt_list_prim_i_64_strict(dynamic raw);
 
   @protected
   OutputFormat dco_decode_output_format(dynamic raw);
@@ -521,6 +530,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
 
   @protected
+  ImageDimensions sse_decode_box_autoadd_image_dimensions(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   LinkStyle sse_decode_box_autoadd_link_style(SseDeserializer deserializer);
 
   @protected
@@ -620,6 +634,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
 
   @protected
+  ImageDimensions sse_decode_image_dimensions(SseDeserializer deserializer);
+
+  @protected
   ImageMetadata sse_decode_image_metadata(SseDeserializer deserializer);
 
   @protected
@@ -667,7 +684,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  List<List<String>> sse_decode_list_list_String(SseDeserializer deserializer);
+  List<MetadataEntry> sse_decode_list_metadata_entry(
+    SseDeserializer deserializer,
+  );
 
   @protected
   Int64List sse_decode_list_prim_i_64_strict(SseDeserializer deserializer);
@@ -697,6 +716,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<TextAnnotation> sse_decode_list_text_annotation(
     SseDeserializer deserializer,
   );
+
+  @protected
+  MetadataEntry sse_decode_metadata_entry(SseDeserializer deserializer);
 
   @protected
   NewlineStyle sse_decode_newline_style(SseDeserializer deserializer);
@@ -756,6 +778,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer);
 
   @protected
+  ImageDimensions? sse_decode_opt_box_autoadd_image_dimensions(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   LinkStyle? sse_decode_opt_box_autoadd_link_style(
     SseDeserializer deserializer,
   );
@@ -808,9 +835,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<String>? sse_decode_opt_list_String(SseDeserializer deserializer);
-
-  @protected
-  Int64List? sse_decode_opt_list_prim_i_64_strict(SseDeserializer deserializer);
 
   @protected
   OutputFormat sse_decode_output_format(SseDeserializer deserializer);
@@ -1069,6 +1093,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_image_dimensions(
+    ImageDimensions self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_link_style(
     LinkStyle self,
     SseSerializer serializer,
@@ -1207,6 +1237,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
 
   @protected
+  void sse_encode_image_dimensions(
+    ImageDimensions self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_image_metadata(ImageMetadata self, SseSerializer serializer);
 
   @protected
@@ -1261,8 +1297,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_list_list_String(
-    List<List<String>> self,
+  void sse_encode_list_metadata_entry(
+    List<MetadataEntry> self,
     SseSerializer serializer,
   );
 
@@ -1307,6 +1343,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     List<TextAnnotation> self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_metadata_entry(MetadataEntry self, SseSerializer serializer);
 
   @protected
   void sse_encode_newline_style(NewlineStyle self, SseSerializer serializer);
@@ -1376,6 +1415,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_opt_box_autoadd_image_dimensions(
+    ImageDimensions? self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_opt_box_autoadd_link_style(
     LinkStyle? self,
     SseSerializer serializer,
@@ -1437,12 +1482,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_opt_list_String(List<String>? self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_list_prim_i_64_strict(
-    Int64List? self,
-    SseSerializer serializer,
-  );
 
   @protected
   void sse_encode_output_format(OutputFormat self, SseSerializer serializer);

@@ -246,6 +246,9 @@ public func preprocessingOptionsFromJson<GenericIntoRustString: IntoRustString>(
 public func preprocessingOptionsUpdateFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> PreprocessingOptionsUpdate {
     try { let val = __swift_bridge__$preprocessing_options_update_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return PreprocessingOptionsUpdate(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
+public func imageDimensionsFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> ImageDimensions {
+    try { let val = __swift_bridge__$image_dimensions_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return ImageDimensions(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
 public func documentStructureFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> DocumentStructure {
     try { let val = __swift_bridge__$document_structure_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return DocumentStructure(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
@@ -254,6 +257,9 @@ public func documentNodeFromJson<GenericIntoRustString: IntoRustString>(_ json: 
 }
 public func textAnnotationFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> TextAnnotation {
     try { let val = __swift_bridge__$text_annotation_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return TextAnnotation(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func metadataEntryFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> MetadataEntry {
+    try { let val = __swift_bridge__$metadata_entry_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return MetadataEntry(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
 public func conversionResultFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> ConversionResult {
     try { let val = __swift_bridge__$conversion_result_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return ConversionResult(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
@@ -657,8 +663,8 @@ extension ImageMetadataRef {
         { let val = __swift_bridge__$ImageMetadata$title(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func dimensions() -> Optional<RustVec<UInt32>> {
-        { let val = __swift_bridge__$ImageMetadata$dimensions(ptr); if val != nil { return RustVec(ptr: val!) } else { return nil } }()
+    public func dimensions() -> Optional<ImageDimensions> {
+        { let val = __swift_bridge__$ImageMetadata$dimensions(ptr); if val != nil { return ImageDimensions(ptr: val!) } else { return nil } }()
     }
 
     public func imageType() -> RustString {
@@ -1616,6 +1622,95 @@ extension PreprocessingOptionsUpdate: Vectorizable {
 }
 
 
+public class ImageDimensions: ImageDimensionsRefMut {
+    public var isOwned: Bool = true
+
+    public override init(ptr: UnsafeMutableRawPointer) {
+        super.init(ptr: ptr)
+    }
+
+    deinit {
+        if isOwned {
+            __swift_bridge__$ImageDimensions$_free(ptr)
+        }
+    }
+}
+extension ImageDimensions {
+    public convenience init(_ width: UInt32, _ height: UInt32) {
+        self.init(ptr: __swift_bridge__$ImageDimensions$new(width, height))
+    }
+}
+public class ImageDimensionsRefMut: ImageDimensionsRef {
+    public override init(ptr: UnsafeMutableRawPointer) {
+        super.init(ptr: ptr)
+    }
+}
+public class ImageDimensionsRef {
+    public var ptr: UnsafeMutableRawPointer
+
+    public init(ptr: UnsafeMutableRawPointer) {
+        self.ptr = ptr
+    }
+}
+extension ImageDimensionsRef {
+    public func width() -> UInt32 {
+        __swift_bridge__$ImageDimensions$width(ptr)
+    }
+
+    public func height() -> UInt32 {
+        __swift_bridge__$ImageDimensions$height(ptr)
+    }
+}
+extension ImageDimensions: Vectorizable {
+    public static func vecOfSelfNew() -> UnsafeMutableRawPointer {
+        __swift_bridge__$Vec_ImageDimensions$new()
+    }
+
+    public static func vecOfSelfFree(vecPtr: UnsafeMutableRawPointer) {
+        __swift_bridge__$Vec_ImageDimensions$drop(vecPtr)
+    }
+
+    public static func vecOfSelfPush(vecPtr: UnsafeMutableRawPointer, value: ImageDimensions) {
+        __swift_bridge__$Vec_ImageDimensions$push(vecPtr, {value.isOwned = false; return value.ptr;}())
+    }
+
+    public static func vecOfSelfPop(vecPtr: UnsafeMutableRawPointer) -> Optional<Self> {
+        let pointer = __swift_bridge__$Vec_ImageDimensions$pop(vecPtr)
+        if pointer == nil {
+            return nil
+        } else {
+            return (ImageDimensions(ptr: pointer!) as! Self)
+        }
+    }
+
+    public static func vecOfSelfGet(vecPtr: UnsafeMutableRawPointer, index: UInt) -> Optional<ImageDimensionsRef> {
+        let pointer = __swift_bridge__$Vec_ImageDimensions$get(vecPtr, index)
+        if pointer == nil {
+            return nil
+        } else {
+            return ImageDimensionsRef(ptr: pointer!)
+        }
+    }
+
+    public static func vecOfSelfGetMut(vecPtr: UnsafeMutableRawPointer, index: UInt) -> Optional<ImageDimensionsRefMut> {
+        let pointer = __swift_bridge__$Vec_ImageDimensions$get_mut(vecPtr, index)
+        if pointer == nil {
+            return nil
+        } else {
+            return ImageDimensionsRefMut(ptr: pointer!)
+        }
+    }
+
+    public static func vecOfSelfAsPtr(vecPtr: UnsafeMutableRawPointer) -> UnsafePointer<ImageDimensionsRef> {
+        UnsafePointer<ImageDimensionsRef>(OpaquePointer(__swift_bridge__$Vec_ImageDimensions$as_ptr(vecPtr)))
+    }
+
+    public static func vecOfSelfLen(vecPtr: UnsafeMutableRawPointer) -> UInt {
+        __swift_bridge__$Vec_ImageDimensions$len(vecPtr)
+    }
+}
+
+
 public class DocumentStructure: DocumentStructureRefMut {
     public var isOwned: Bool = true
 
@@ -1888,6 +1983,90 @@ extension TextAnnotation: Vectorizable {
 }
 
 
+public class MetadataEntry: MetadataEntryRefMut {
+    public var isOwned: Bool = true
+
+    public override init(ptr: UnsafeMutableRawPointer) {
+        super.init(ptr: ptr)
+    }
+
+    deinit {
+        if isOwned {
+            __swift_bridge__$MetadataEntry$_free(ptr)
+        }
+    }
+}
+public class MetadataEntryRefMut: MetadataEntryRef {
+    public override init(ptr: UnsafeMutableRawPointer) {
+        super.init(ptr: ptr)
+    }
+}
+public class MetadataEntryRef {
+    public var ptr: UnsafeMutableRawPointer
+
+    public init(ptr: UnsafeMutableRawPointer) {
+        self.ptr = ptr
+    }
+}
+extension MetadataEntryRef {
+    public func key() -> RustString {
+        RustString(ptr: __swift_bridge__$MetadataEntry$key(ptr))
+    }
+
+    public func value() -> RustString {
+        RustString(ptr: __swift_bridge__$MetadataEntry$value(ptr))
+    }
+}
+extension MetadataEntry: Vectorizable {
+    public static func vecOfSelfNew() -> UnsafeMutableRawPointer {
+        __swift_bridge__$Vec_MetadataEntry$new()
+    }
+
+    public static func vecOfSelfFree(vecPtr: UnsafeMutableRawPointer) {
+        __swift_bridge__$Vec_MetadataEntry$drop(vecPtr)
+    }
+
+    public static func vecOfSelfPush(vecPtr: UnsafeMutableRawPointer, value: MetadataEntry) {
+        __swift_bridge__$Vec_MetadataEntry$push(vecPtr, {value.isOwned = false; return value.ptr;}())
+    }
+
+    public static func vecOfSelfPop(vecPtr: UnsafeMutableRawPointer) -> Optional<Self> {
+        let pointer = __swift_bridge__$Vec_MetadataEntry$pop(vecPtr)
+        if pointer == nil {
+            return nil
+        } else {
+            return (MetadataEntry(ptr: pointer!) as! Self)
+        }
+    }
+
+    public static func vecOfSelfGet(vecPtr: UnsafeMutableRawPointer, index: UInt) -> Optional<MetadataEntryRef> {
+        let pointer = __swift_bridge__$Vec_MetadataEntry$get(vecPtr, index)
+        if pointer == nil {
+            return nil
+        } else {
+            return MetadataEntryRef(ptr: pointer!)
+        }
+    }
+
+    public static func vecOfSelfGetMut(vecPtr: UnsafeMutableRawPointer, index: UInt) -> Optional<MetadataEntryRefMut> {
+        let pointer = __swift_bridge__$Vec_MetadataEntry$get_mut(vecPtr, index)
+        if pointer == nil {
+            return nil
+        } else {
+            return MetadataEntryRefMut(ptr: pointer!)
+        }
+    }
+
+    public static func vecOfSelfAsPtr(vecPtr: UnsafeMutableRawPointer) -> UnsafePointer<MetadataEntryRef> {
+        UnsafePointer<MetadataEntryRef>(OpaquePointer(__swift_bridge__$Vec_MetadataEntry$as_ptr(vecPtr)))
+    }
+
+    public static func vecOfSelfLen(vecPtr: UnsafeMutableRawPointer) -> UInt {
+        __swift_bridge__$Vec_MetadataEntry$len(vecPtr)
+    }
+}
+
+
 public class ConversionResult: ConversionResultRefMut {
     public var isOwned: Bool = true
 
@@ -1902,8 +2081,8 @@ public class ConversionResult: ConversionResultRefMut {
     }
 }
 extension ConversionResult {
-    public convenience init<GenericIntoRustString: IntoRustString>(_ content: Optional<GenericIntoRustString>, _ document: Optional<DocumentStructure>, _ metadata: HtmlMetadata, _ tables: RustVec<TableData>, _ images: RustVec<GenericIntoRustString>, _ warnings: RustVec<ProcessingWarning>) {
-        self.init(ptr: __swift_bridge__$ConversionResult$new({ if let rustString = optionalStringIntoRustString(content) { rustString.isOwned = false; return rustString.ptr } else { return nil } }(), { if let val = document { val.isOwned = false; return val.ptr } else { return nil } }(), {metadata.isOwned = false; return metadata.ptr;}(), { let val = tables; val.isOwned = false; return val.ptr }(), { let val = images; val.isOwned = false; return val.ptr }(), { let val = warnings; val.isOwned = false; return val.ptr }()))
+    public convenience init<GenericIntoRustString: IntoRustString>(_ content: Optional<GenericIntoRustString>, _ document: Optional<DocumentStructure>, _ metadata: HtmlMetadata, _ tables: RustVec<TableData>, _ warnings: RustVec<ProcessingWarning>) {
+        self.init(ptr: __swift_bridge__$ConversionResult$new({ if let rustString = optionalStringIntoRustString(content) { rustString.isOwned = false; return rustString.ptr } else { return nil } }(), { if let val = document { val.isOwned = false; return val.ptr } else { return nil } }(), {metadata.isOwned = false; return metadata.ptr;}(), { let val = tables; val.isOwned = false; return val.ptr }(), { let val = warnings; val.isOwned = false; return val.ptr }()))
     }
 }
 public class ConversionResultRefMut: ConversionResultRef {

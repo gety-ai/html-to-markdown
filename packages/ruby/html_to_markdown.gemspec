@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name = "html-to-markdown"
-  spec.version = "3.6.0.pre.rc.7"
+  spec.version = "3.6.0.pre.rc.8"
   spec.authors       = ["Kreuzberg Team"]
   spec.summary       = "High-performance HTML to Markdown converter"
   spec.description   = "High-performance HTML to Markdown converter"
@@ -17,6 +17,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.extensions    = ["ext/html_to_markdown_rb/native/extconf.rb"]
 
-  spec.add_dependency "rb_sys", "~> 0.9"
+  spec.add_dependency "rb_sys", ">= 0.9"
   spec.add_dependency "sorbet-runtime", "~> 0.5"
 end

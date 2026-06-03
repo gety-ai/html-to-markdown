@@ -2,10 +2,25 @@
 
 use std::collections::HashMap;
 
-#[cfg(feature = "serde")]
+#[cfg(any(feature = "serde", feature = "metadata"))]
 use serde::{Deserialize, Serialize};
 
 use super::tables::TableGrid;
+
+/// Image dimensions in pixels.
+///
+/// Binding-safe replacement for `(u32, u32)` tuples, which degrade to
+/// `Vec<Vec<String>>` when sanitized for cross-language binding generation.
+/// Used by both [`crate::metadata::ImageMetadata`] and
+/// [`crate::inline_images::InlineImage`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(any(feature = "serde", feature = "metadata"), derive(Serialize, Deserialize))]
+pub struct ImageDimensions {
+    /// Width in pixels.
+    pub width: u32,
+    /// Height in pixels.
+    pub height: u32,
+}
 
 /// A structured document tree representing the semantic content of an HTML document.
 ///
@@ -126,7 +141,7 @@ pub enum NodeContent {
     /// A block of key-value metadata pairs (from `<head>` meta tags).
     MetadataBlock {
         /// Key-value metadata pairs.
-        entries: Vec<(String, String)>,
+        entries: Vec<MetadataEntry>,
     },
     /// A section grouping container (auto-generated from heading hierarchy).
     Group {
@@ -207,6 +222,20 @@ pub enum AnnotationKind {
         #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
         title: Option<String>,
     },
+}
+
+/// A single key-value metadata entry from `<head>` meta tags.
+///
+/// Binding-safe replacement for `(String, String)` tuples used in
+/// [`NodeContent::MetadataBlock`]. Tuple pairs cannot be represented
+/// across language boundaries without lossy degradation.
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub struct MetadataEntry {
+    /// Metadata key (e.g. `"title"`, `"description"`, `"og:title"`).
+    pub key: String,
+    /// Metadata value.
+    pub value: String,
 }
 
 impl Default for NodeContent {

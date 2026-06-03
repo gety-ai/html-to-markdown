@@ -293,6 +293,18 @@ void* __swift_bridge__$Vec_PreprocessingOptionsUpdate$get_mut(void* vec_ptr, uin
 uintptr_t __swift_bridge__$Vec_PreprocessingOptionsUpdate$len(void* vec_ptr);
 void* __swift_bridge__$Vec_PreprocessingOptionsUpdate$as_ptr(void* vec_ptr);
 
+typedef struct ImageDimensions ImageDimensions;
+void __swift_bridge__$ImageDimensions$_free(void* self);
+
+void* __swift_bridge__$Vec_ImageDimensions$new(void);
+void __swift_bridge__$Vec_ImageDimensions$drop(void* vec_ptr);
+void __swift_bridge__$Vec_ImageDimensions$push(void* vec_ptr, void* item_ptr);
+void* __swift_bridge__$Vec_ImageDimensions$pop(void* vec_ptr);
+void* __swift_bridge__$Vec_ImageDimensions$get(void* vec_ptr, uintptr_t index);
+void* __swift_bridge__$Vec_ImageDimensions$get_mut(void* vec_ptr, uintptr_t index);
+uintptr_t __swift_bridge__$Vec_ImageDimensions$len(void* vec_ptr);
+void* __swift_bridge__$Vec_ImageDimensions$as_ptr(void* vec_ptr);
+
 typedef struct DocumentStructure DocumentStructure;
 void __swift_bridge__$DocumentStructure$_free(void* self);
 
@@ -328,6 +340,18 @@ void* __swift_bridge__$Vec_TextAnnotation$get(void* vec_ptr, uintptr_t index);
 void* __swift_bridge__$Vec_TextAnnotation$get_mut(void* vec_ptr, uintptr_t index);
 uintptr_t __swift_bridge__$Vec_TextAnnotation$len(void* vec_ptr);
 void* __swift_bridge__$Vec_TextAnnotation$as_ptr(void* vec_ptr);
+
+typedef struct MetadataEntry MetadataEntry;
+void __swift_bridge__$MetadataEntry$_free(void* self);
+
+void* __swift_bridge__$Vec_MetadataEntry$new(void);
+void __swift_bridge__$Vec_MetadataEntry$drop(void* vec_ptr);
+void __swift_bridge__$Vec_MetadataEntry$push(void* vec_ptr, void* item_ptr);
+void* __swift_bridge__$Vec_MetadataEntry$pop(void* vec_ptr);
+void* __swift_bridge__$Vec_MetadataEntry$get(void* vec_ptr, uintptr_t index);
+void* __swift_bridge__$Vec_MetadataEntry$get_mut(void* vec_ptr, uintptr_t index);
+uintptr_t __swift_bridge__$Vec_MetadataEntry$len(void* vec_ptr);
+void* __swift_bridge__$Vec_MetadataEntry$as_ptr(void* vec_ptr);
 
 typedef struct ConversionResult ConversionResult;
 void __swift_bridge__$ConversionResult$_free(void* self);
@@ -791,6 +815,9 @@ struct __private__OptionBool __swift_bridge__$PreprocessingOptionsUpdate$enabled
 void* __swift_bridge__$PreprocessingOptionsUpdate$preset(void* self);
 struct __private__OptionBool __swift_bridge__$PreprocessingOptionsUpdate$remove_navigation(void* self);
 struct __private__OptionBool __swift_bridge__$PreprocessingOptionsUpdate$remove_forms(void* self);
+void* __swift_bridge__$ImageDimensions$new(uint32_t width, uint32_t height);
+uint32_t __swift_bridge__$ImageDimensions$width(void* self);
+uint32_t __swift_bridge__$ImageDimensions$height(void* self);
 void* __swift_bridge__$DocumentStructure$nodes(void* self);
 void* __swift_bridge__$DocumentStructure$source_format(void* self);
 void* __swift_bridge__$DocumentNode$id(void* self);
@@ -802,7 +829,9 @@ void* __swift_bridge__$DocumentNode$attributes(void* self);
 uint32_t __swift_bridge__$TextAnnotation$start(void* self);
 uint32_t __swift_bridge__$TextAnnotation$end(void* self);
 void* __swift_bridge__$TextAnnotation$kind(void* self);
-void* __swift_bridge__$ConversionResult$new(void* content, void* document, void* metadata, void* tables, void* images, void* warnings);
+void* __swift_bridge__$MetadataEntry$key(void* self);
+void* __swift_bridge__$MetadataEntry$value(void* self);
+void* __swift_bridge__$ConversionResult$new(void* content, void* document, void* metadata, void* tables, void* warnings);
 void* __swift_bridge__$ConversionResult$content(void* self);
 void* __swift_bridge__$ConversionResult$document(void* self);
 void* __swift_bridge__$ConversionResult$metadata(void* self);
@@ -863,9 +892,11 @@ struct __private__ResultPtrAndPtr __swift_bridge__$html_metadata_from_json(void*
 struct __private__ResultPtrAndPtr __swift_bridge__$conversion_options_update_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$preprocessing_options_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$preprocessing_options_update_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$image_dimensions_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$document_structure_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$document_node_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$text_annotation_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$metadata_entry_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$conversion_result_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$table_grid_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$grid_cell_from_json(void* json);

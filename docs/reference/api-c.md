@@ -2,7 +2,7 @@
 title: "C API Reference"
 ---
 
-## C API Reference <span class="version-badge">v3.6.0-rc.7</span>
+## C API Reference <span class="version-badge">v3.6.0-rc.8</span>
 
 ### Functions
 
@@ -120,7 +120,7 @@ metadata, extracted tables, images, and processing warnings.
 | `document` | `HtmDocumentStructure*` | `NULL` | Structured document tree with semantic elements. Populated when `ConversionOptions.include_document_structure` is `true`. `NULL` otherwise (the default), which avoids the overhead of building the tree. When present, the tree mirrors the converted document: headings open `Group` sections, paragraphs and list items carry inline `TextAnnotation`s, and tables reference the same `TableGrid` data exposed in `Self.tables`. Note: this field is independent of the `metadata` feature flag. Document structure collection is always available at runtime; it is gated only by the runtime option, not by a compile-time feature. |
 | `metadata` | `HtmHtmlMetadata` | — | Extracted HTML metadata (title, OG, links, images, structured data). |
 | `tables` | `HtmTableData*` | `NULL` | Extracted tables with structured cell data and markdown representation. |
-| `images` | `const char**` | `NULL` | Extracted inline images (data URIs and SVGs). Populated when `extract_images` is `true` in options. |
+| `images` | `const char**` | `NULL` | Extracted inline images (data URIs and SVGs). Populated when `extract_images` is `true` in options. This field is excluded from binding generation (alef) because `InlineImage` contains binary data (`Vec<u8>`) that cannot be safely represented across language boundaries in a lossless way. Access inline images via the `HtmlExtraction` type returned by the `inline-images` API instead. |
 | `warnings` | `HtmProcessingWarning*` | `NULL` | Non-fatal processing warnings. |
 
 ---
@@ -696,6 +696,22 @@ HtmVisitResult htm_visit_figure_end(HtmNodeContext ctx, const char* output);
 
 ---
 
+#### HtmImageDimensions
+
+Image dimensions in pixels.
+
+Binding-safe replacement for `(u32, u32)` tuples, which degrade to
+`Vec<Vec<String>>` when sanitized for cross-language binding generation.
+Used by both `ImageMetadata` and
+`InlineImage`.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `width` | `uint32_t` | — | Width in pixels. |
+| `height` | `uint32_t` | — | Height in pixels. |
+
+---
+
 #### HtmImageMetadata
 
 Image metadata with source and dimensions.
@@ -708,7 +724,7 @@ for image analysis and optimization.
 | `src` | `const char*` | — | Image source (URL, data URI, or SVG content identifier) |
 | `alt` | `const char**` | `NULL` | Alternative text from alt attribute (for accessibility) |
 | `title` | `const char**` | `NULL` | Title attribute (often shown as tooltip) |
-| `dimensions` | `uint32_t**` | `NULL` | Image dimensions as (width, height) if available |
+| `dimensions` | `HtmImageDimensions*` | `NULL` | Image dimensions in pixels, if available. |
 | `image_type` | `HtmImageType` | — | Image type classification |
 | `attributes` | `void*` | — | Additional HTML attributes |
 
@@ -728,6 +744,21 @@ Represents `<a>` elements with parsed href values, text content, and link type c
 | `link_type` | `HtmLinkType` | — | Link type classification |
 | `rel` | `const char**` | — | Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") |
 | `attributes` | `void*` | — | Additional HTML attributes |
+
+---
+
+#### HtmMetadataEntry
+
+A single key-value metadata entry from `<head>` meta tags.
+
+Binding-safe replacement for `(String, String)` tuples used in
+`NodeContent.MetadataBlock`. Tuple pairs cannot be represented
+across language boundaries without lossy degradation.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `key` | `const char*` | — | Metadata key (e.g. `"title"`, `"description"`, `"og:title"`). |
+| `value` | `const char*` | — | Metadata value. |
 
 ---
 
@@ -1111,7 +1142,7 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 | `HTM_DEFINITION_LIST` | A definition list container. |
 | `HTM_DEFINITION_ITEM` | A definition list entry with term and description. — Fields: `term`: `const char*`, `definition`: `const char*` |
 | `HTM_RAW_BLOCK` | A raw block preserved as-is (e.g. `<script>`, `<style>` content). — Fields: `format`: `const char*`, `content`: `const char*` |
-| `HTM_METADATA_BLOCK` | A block of key-value metadata pairs (from `<head>` meta tags). — Fields: `entries`: `const char***` |
+| `HTM_METADATA_BLOCK` | A block of key-value metadata pairs (from `<head>` meta tags). — Fields: `entries`: `HtmMetadataEntry*` |
 | `HTM_GROUP` | A section grouping container (auto-generated from heading hierarchy). — Fields: `label`: `const char*`, `heading_level`: `uint8_t`, `heading_text`: `const char*` |
 
 ---
@@ -1280,7 +1311,7 @@ Errors that can occur during HTML to Markdown conversion.
 | `HTM_PARSE_ERROR` | HTML parsing error |
 | `HTM_SANITIZATION_ERROR` | HTML sanitization error |
 | `HTM_CONFIG_ERROR` | Invalid configuration |
-| `HTM_IO_ERROR` | I/O error |
+| `HTM_IO_ERROR` | I/O error — stores the error message string so the variant is FFI-safe. Use `ConversionError.from(io_error)` to convert from `std.io.Error`. |
 | `HTM_PANIC` | Internal error caught during conversion |
 | `HTM_INVALID_INPUT` | Invalid input data |
 | `HTM_OTHER` | Generic conversion error |

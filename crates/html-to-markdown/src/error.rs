@@ -20,9 +20,11 @@ pub enum ConversionError {
     #[error("Invalid configuration: {0}")]
     ConfigError(String),
 
-    /// I/O error
+    /// I/O error — stores the error message string so the variant is FFI-safe.
+    ///
+    /// Use `ConversionError::from(io_error)` to convert from `std::io::Error`.
     #[error("I/O error: {0}")]
-    IoError(#[from] std::io::Error),
+    IoError(String),
 
     /// Panic caught during conversion to prevent unwinding across FFI boundaries
     #[error("Internal panic: {0}")]
@@ -40,4 +42,10 @@ pub enum ConversionError {
     /// Generic conversion error
     #[error("Conversion error: {0}")]
     Other(String),
+}
+
+impl From<std::io::Error> for ConversionError {
+    fn from(error: std::io::Error) -> Self {
+        Self::IoError(error.to_string())
+    }
 }

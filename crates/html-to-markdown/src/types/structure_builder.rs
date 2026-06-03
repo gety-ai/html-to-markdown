@@ -6,7 +6,7 @@
 
 use std::collections::HashMap;
 
-use super::document::{AnnotationKind, DocumentNode, DocumentStructure, NodeContent, TextAnnotation};
+use super::document::{AnnotationKind, DocumentNode, DocumentStructure, MetadataEntry, NodeContent, TextAnnotation};
 use super::tables::{GridCell, TableGrid};
 
 // ── Text extraction ───────────────────────────────────────────────────────────
@@ -283,8 +283,8 @@ fn collect_definition_items(dl_tag: &tl::HTMLTag, parser: &tl::Parser) -> Vec<(S
 // ── Head metadata extraction ──────────────────────────────────────────────────
 
 /// Extract `<meta name=… content=…>` and `<title>` entries from a `<head>` element.
-fn extract_head_metadata_entries(head_tag: &tl::HTMLTag, parser: &tl::Parser) -> Vec<(String, String)> {
-    let mut entries: Vec<(String, String)> = Vec::new();
+fn extract_head_metadata_entries(head_tag: &tl::HTMLTag, parser: &tl::Parser) -> Vec<MetadataEntry> {
+    let mut entries: Vec<MetadataEntry> = Vec::new();
 
     let children = head_tag.children();
     for handle in children.top().iter() {
@@ -296,7 +296,10 @@ fn extract_head_metadata_entries(head_tag: &tl::HTMLTag, parser: &tl::Parser) ->
             "title" => {
                 let title = extract_text(child_tag, parser).trim().to_string();
                 if !title.is_empty() {
-                    entries.push(("title".to_string(), title));
+                    entries.push(MetadataEntry {
+                        key: "title".to_string(),
+                        value: title,
+                    });
                 }
             }
             "meta" => {
@@ -305,17 +308,20 @@ fn extract_head_metadata_entries(head_tag: &tl::HTMLTag, parser: &tl::Parser) ->
                     child_tag.attributes().get("name"),
                     child_tag.attributes().get("content"),
                 ) {
-                    entries.push((
-                        meta_name.as_utf8_str().to_string(),
-                        meta_content.as_utf8_str().to_string(),
-                    ));
+                    entries.push(MetadataEntry {
+                        key: meta_name.as_utf8_str().to_string(),
+                        value: meta_content.as_utf8_str().to_string(),
+                    });
                 }
                 // property + content (Open Graph etc.)
                 if let (Some(Some(property)), Some(Some(content))) = (
                     child_tag.attributes().get("property"),
                     child_tag.attributes().get("content"),
                 ) {
-                    entries.push((property.as_utf8_str().to_string(), content.as_utf8_str().to_string()));
+                    entries.push(MetadataEntry {
+                        key: property.as_utf8_str().to_string(),
+                        value: content.as_utf8_str().to_string(),
+                    });
                 }
             }
             _ => {}

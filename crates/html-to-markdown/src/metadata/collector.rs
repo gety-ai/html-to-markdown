@@ -2,7 +2,7 @@
 
 use super::config::MetadataConfig;
 use super::extraction::{extract_document_metadata, extract_structured_data};
-use super::types::{HtmlMetadata, ImageMetadata, ImageType, LinkMetadata};
+use super::types::{HtmlMetadata, ImageDimensions, ImageMetadata, ImageType, LinkMetadata};
 use std::collections::BTreeMap;
 
 /// Internal metadata collector for single-pass extraction.
@@ -141,13 +141,13 @@ impl MetadataCollector {
     /// * `src` - Image source (URL or data URI)
     /// * `alt` - Optional alt text
     /// * `title` - Optional title attribute
-    /// * `dimensions` - Optional (width, height) tuple
+    /// * `dimensions` - Optional image dimensions
     pub(crate) fn add_image(
         &mut self,
         src: String,
         alt: Option<String>,
         title: Option<String>,
-        dimensions: Option<(u32, u32)>,
+        dimensions: Option<ImageDimensions>,
         attributes: BTreeMap<String, String>,
     ) {
         if !self.config.extract_images {

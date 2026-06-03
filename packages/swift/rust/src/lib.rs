@@ -94,7 +94,7 @@ mod ffi {
         fn src(&self) -> String;
         fn alt(&self) -> Option<String>;
         fn title(&self) -> Option<String>;
-        fn dimensions(&self) -> Option<Vec<u32>>;
+        fn dimensions(&self) -> Option<ImageDimensions>;
         #[swift_bridge(swift_name = "imageType")]
         fn image_type(&self) -> String;
         fn attributes(&self) -> String;
@@ -427,6 +427,14 @@ mod ffi {
     }
 
     extern "Rust" {
+        type ImageDimensions;
+        #[swift_bridge(init)]
+        fn new(width: u32, height: u32) -> ImageDimensions;
+        fn width(&self) -> u32;
+        fn height(&self) -> u32;
+    }
+
+    extern "Rust" {
         type DocumentStructure;
         fn nodes(&self) -> Vec<DocumentNode>;
         #[swift_bridge(swift_name = "sourceFormat")]
@@ -451,6 +459,12 @@ mod ffi {
     }
 
     extern "Rust" {
+        type MetadataEntry;
+        fn key(&self) -> String;
+        fn value(&self) -> String;
+    }
+
+    extern "Rust" {
         type ConversionResult;
         #[swift_bridge(init)]
         fn new(
@@ -458,7 +472,6 @@ mod ffi {
             document: Option<DocumentStructure>,
             metadata: HtmlMetadata,
             tables: Vec<TableData>,
-            images: Vec<String>,
             warnings: Vec<ProcessingWarning>,
         ) -> ConversionResult;
         fn content(&self) -> Option<String>;
@@ -718,12 +731,16 @@ mod ffi {
         fn preprocessing_options_from_json(json: String) -> Result<PreprocessingOptions, String>;
         #[swift_bridge(swift_name = "preprocessingOptionsUpdateFromJson")]
         fn preprocessing_options_update_from_json(json: String) -> Result<PreprocessingOptionsUpdate, String>;
+        #[swift_bridge(swift_name = "imageDimensionsFromJson")]
+        fn image_dimensions_from_json(json: String) -> Result<ImageDimensions, String>;
         #[swift_bridge(swift_name = "documentStructureFromJson")]
         fn document_structure_from_json(json: String) -> Result<DocumentStructure, String>;
         #[swift_bridge(swift_name = "documentNodeFromJson")]
         fn document_node_from_json(json: String) -> Result<DocumentNode, String>;
         #[swift_bridge(swift_name = "textAnnotationFromJson")]
         fn text_annotation_from_json(json: String) -> Result<TextAnnotation, String>;
+        #[swift_bridge(swift_name = "metadataEntryFromJson")]
+        fn metadata_entry_from_json(json: String) -> Result<MetadataEntry, String>;
         #[swift_bridge(swift_name = "conversionResultFromJson")]
         fn conversion_result_from_json(json: String) -> Result<ConversionResult, String>;
         #[swift_bridge(swift_name = "tableGridFromJson")]
@@ -961,12 +978,8 @@ impl ImageMetadata {
     pub fn title(&self) -> Option<String> {
         self.0.title.clone()
     }
-    pub fn dimensions(&self) -> Option<Vec<u32>> {
-        self.0.dimensions.as_ref().and_then(|v| {
-            ::serde_json::to_value(v)
-                .ok()
-                .and_then(|j| ::serde_json::from_value(j).ok())
-        })
+    pub fn dimensions(&self) -> Option<ImageDimensions> {
+        self.0.dimensions.clone().map(ImageDimensions)
     }
     pub fn image_type(&self) -> String {
         ImageType::from(self.0.image_type.clone()).to_string()
@@ -1895,6 +1908,25 @@ impl PreprocessingOptionsUpdate {
     }
 }
 
+pub struct ImageDimensions(pub html_to_markdown_rs::ImageDimensions);
+impl ImageDimensions {
+    pub fn new(width: u32, height: u32) -> ImageDimensions {
+        ImageDimensions(html_to_markdown_rs::ImageDimensions { width, height })
+    }
+    pub fn width(&self) -> u32 {
+        ::serde_json::to_value(&self.0.width)
+            .ok()
+            .and_then(|j| ::serde_json::from_value(j).ok())
+            .unwrap_or_default()
+    }
+    pub fn height(&self) -> u32 {
+        ::serde_json::to_value(&self.0.height)
+            .ok()
+            .and_then(|j| ::serde_json::from_value(j).ok())
+            .unwrap_or_default()
+    }
+}
+
 pub struct DocumentStructure(pub html_to_markdown_rs::DocumentStructure);
 impl DocumentStructure {
     pub fn nodes(&self) -> Vec<DocumentNode> {
@@ -1957,6 +1989,16 @@ impl TextAnnotation {
     }
 }
 
+pub struct MetadataEntry(pub html_to_markdown_rs::MetadataEntry);
+impl MetadataEntry {
+    pub fn key(&self) -> String {
+        self.0.key.clone()
+    }
+    pub fn value(&self) -> String {
+        self.0.value.clone()
+    }
+}
+
 pub struct ConversionResult(pub html_to_markdown_rs::ConversionResult);
 impl ConversionResult {
     pub fn new(
@@ -1964,7 +2006,6 @@ impl ConversionResult {
         document: Option<DocumentStructure>,
         metadata: HtmlMetadata,
         tables: Vec<TableData>,
-        images: Vec<String>,
         warnings: Vec<ProcessingWarning>,
     ) -> ConversionResult {
         let mut __target: html_to_markdown_rs::ConversionResult = ::std::default::Default::default();
@@ -1983,7 +2024,6 @@ impl ConversionResult {
         }
         __target.metadata = metadata.0;
         __target.tables = tables.into_iter().map(|w| w.0).collect();
-        // alef: images — Vec field type may differ from IR in non-serde struct, left at default
         __target.warnings = warnings.into_iter().map(|w| w.0).collect();
         ConversionResult(__target)
     }
@@ -1999,7 +2039,6 @@ impl ConversionResult {
     pub fn tables(&self) -> Vec<TableData> {
         self.0.tables.iter().map(|elem| TableData(elem.clone())).collect()
     }
-    // alef: skipped getter `images` — type cannot be bridged through swift-bridge
     pub fn warnings(&self) -> Vec<ProcessingWarning> {
         self.0
             .warnings
@@ -3589,6 +3628,11 @@ pub fn preprocessing_options_update_from_json(json: String) -> Result<Preprocess
         .map(PreprocessingOptionsUpdate)
         .map_err(|e| e.to_string())
 }
+pub fn image_dimensions_from_json(json: String) -> Result<ImageDimensions, String> {
+    serde_json::from_str::<html_to_markdown_rs::ImageDimensions>(&json)
+        .map(ImageDimensions)
+        .map_err(|e| e.to_string())
+}
 pub fn document_structure_from_json(json: String) -> Result<DocumentStructure, String> {
     serde_json::from_str::<html_to_markdown_rs::DocumentStructure>(&json)
         .map(DocumentStructure)
@@ -3602,6 +3646,11 @@ pub fn document_node_from_json(json: String) -> Result<DocumentNode, String> {
 pub fn text_annotation_from_json(json: String) -> Result<TextAnnotation, String> {
     serde_json::from_str::<html_to_markdown_rs::TextAnnotation>(&json)
         .map(TextAnnotation)
+        .map_err(|e| e.to_string())
+}
+pub fn metadata_entry_from_json(json: String) -> Result<MetadataEntry, String> {
+    serde_json::from_str::<html_to_markdown_rs::MetadataEntry>(&json)
+        .map(MetadataEntry)
         .map_err(|e| e.to_string())
 }
 pub fn conversion_result_from_json(json: String) -> Result<ConversionResult, String> {

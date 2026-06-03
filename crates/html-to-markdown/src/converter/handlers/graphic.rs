@@ -176,7 +176,7 @@ pub fn handle_graphic(
             if let Some((attributes_map, width, height)) = metadata_payload {
                 if !src.is_empty() {
                     let dimensions = match (width, height) {
-                        (Some(w), Some(h)) => Some((w, h)),
+                        (Some(w), Some(h)) => Some(crate::metadata::ImageDimensions { width: w, height: h }),
                         _ => None,
                     };
                     collector.borrow_mut().add_image(

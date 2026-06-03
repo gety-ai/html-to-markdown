@@ -123,8 +123,8 @@ pub const ImageMetadata = struct {
     alt: ?[]const u8,
     /// Title attribute (often shown as tooltip)
     title: ?[]const u8,
-    /// Image dimensions as (width, height) if available
-    dimensions: ?[]const u32,
+    /// Image dimensions in pixels, if available.
+    dimensions: ?ImageDimensions,
     /// Image type classification
     image_type: ImageType,
     /// Additional HTML attributes
@@ -436,6 +436,19 @@ pub const PreprocessingOptionsUpdate = struct {
     remove_forms: ?bool,
 };
 
+/// Image dimensions in pixels.
+///
+/// Binding-safe replacement for `(u32, u32)` tuples, which degrade to
+/// `Vec<Vec<String>>` when sanitized for cross-language binding generation.
+/// Used by both `ImageMetadata` and
+/// `InlineImage`.
+pub const ImageDimensions = struct {
+    /// Width in pixels.
+    width: u32,
+    /// Height in pixels.
+    height: u32,
+};
+
 /// A structured document tree representing the semantic content of an HTML document.
 ///
 /// Uses a flat node array with index-based parent/child references for efficient traversal.
@@ -494,6 +507,18 @@ pub const TextAnnotation = struct {
     kind: AnnotationKind,
 };
 
+/// A single key-value metadata entry from `<head>` meta tags.
+///
+/// Binding-safe replacement for `(String, String)` tuples used in
+/// `NodeContent.MetadataBlock`. Tuple pairs cannot be represented
+/// across language boundaries without lossy degradation.
+pub const MetadataEntry = struct {
+    /// Metadata key (e.g. `"title"`, `"description"`, `"og:title"`).
+    key: []const u8,
+    /// Metadata value.
+    value: []const u8,
+};
+
 /// The primary result of HTML conversion and extraction.
 ///
 /// Contains the converted text output, optional structured document tree,
@@ -522,10 +547,6 @@ pub const ConversionResult = struct {
     metadata: HtmlMetadata,
     /// Extracted tables with structured cell data and markdown representation.
     tables: []const TableData,
-    /// Extracted inline images (data URIs and SVGs).
-    ///
-    /// Populated when `extract_images` is `true` in options.
-    images: []const []const u8,
     /// Non-fatal processing warnings.
     warnings: []const ProcessingWarning,
 };
@@ -856,7 +877,7 @@ pub const NodeContent = union(enum) {
         content: []const u8,
     },
     /// A block of key-value metadata pairs (from `<head>` meta tags).
-    metadata_block: []const []const []const u8,
+    metadata_block: []const MetadataEntry,
     /// A section grouping container (auto-generated from heading hierarchy).
     group: struct {
         label: ?[]const u8,
@@ -1304,7 +1325,7 @@ pub const IHtmlVisitor = extern struct {
 };
 
 /// Wrap a `IHtmlVisitor` vtable into a `VisitorHandle` suitable for the
-/// generated options-field setter (e.g. `ConversionOptionsBuilder.visitor`).
+/// generated options-field setter.
 /// The returned handle owns the vtable's function pointers and must be
 /// released with the matching `htm_visitor_handle_free` once the
 /// containing options object is no longer needed.

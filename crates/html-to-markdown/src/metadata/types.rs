@@ -3,6 +3,8 @@
 
 use std::collections::BTreeMap;
 
+pub use crate::types::ImageDimensions;
+
 /// Text directionality of document content.
 ///
 /// Corresponds to the HTML `dir` attribute and `bdi` element directionality.
@@ -376,12 +378,12 @@ impl LinkMetadata {
 /// # Examples
 ///
 /// ```
-/// # use html_to_markdown_rs::metadata::{ImageMetadata, ImageType};
+/// # use html_to_markdown_rs::metadata::{ImageDimensions, ImageMetadata, ImageType};
 /// let img = ImageMetadata {
 ///     src: "https://example.com/image.jpg".to_string(),
 ///     alt: Some("An example image".to_string()),
 ///     title: Some("Example".to_string()),
-///     dimensions: Some((800, 600)),
+///     dimensions: Some(ImageDimensions { width: 800, height: 600 }),
 ///     image_type: ImageType::External,
 ///     attributes: Default::default(),
 /// };
@@ -400,8 +402,8 @@ pub struct ImageMetadata {
     /// Title attribute (often shown as tooltip)
     pub title: Option<String>,
 
-    /// Image dimensions as (width, height) if available
-    pub dimensions: Option<(u32, u32)>,
+    /// Image dimensions in pixels, if available.
+    pub dimensions: Option<ImageDimensions>,
 
     /// Image type classification
     pub image_type: ImageType,

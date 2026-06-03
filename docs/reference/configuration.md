@@ -127,7 +127,7 @@ metadata, extracted tables, images, and processing warnings.
 | `document` | `DocumentStructure \| None` | `None` | Structured document tree with semantic elements. Populated when `ConversionOptions.include_document_structure` is `True`. `None` otherwise (the default), which avoids the overhead of building the tree. When present, the tree mirrors the converted document: headings open `Group` sections, paragraphs and list items carry inline `TextAnnotation`s, and tables reference the same `TableGrid` data exposed in `Self.tables`. Note: this field is independent of the `metadata` feature flag. Document structure collection is always available at runtime; it is gated only by the runtime option, not by a compile-time feature. |
 | `metadata` | `HtmlMetadata` | — | Extracted HTML metadata (title, OG, links, images, structured data). |
 | `tables` | `list[TableData]` | `[]` | Extracted tables with structured cell data and markdown representation. |
-| `images` | `list[str]` | `[]` | Extracted inline images (data URIs and SVGs). Populated when `extract_images` is `True` in options. |
+| `images` | `list[str]` | `[]` | Extracted inline images (data URIs and SVGs). Populated when `extract_images` is `True` in options. This field is excluded from binding generation (alef) because `InlineImage` contains binary data (`Vec<u8>`) that cannot be safely represented across language boundaries in a lossless way. Access inline images via the `HtmlExtraction` type returned by the `inline-images` API instead. |
 | `warnings` | `list[ProcessingWarning]` | `[]` | Non-fatal processing warnings. |
 
 ---

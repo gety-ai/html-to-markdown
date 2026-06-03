@@ -30,7 +30,10 @@ android {
     sourceSets { getByName("main") { jniLibs.srcDirs("src/main/jniLibs") } }
 }
 
-kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_17) } }
+kotlin {
+    jvmToolchain(21)
+    compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
+}
 
 ktlint {
     version.set("1.8.0")
@@ -71,7 +74,7 @@ mavenPublishing {
     coordinates(
         groupId = "dev.kreuzberg",
         artifactId = "html-to-markdown-android",
-        version = "3.6.0-rc.7",
+        version = "3.6.0-rc.8",
     )
 
     pom {

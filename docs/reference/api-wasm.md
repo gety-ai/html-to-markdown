@@ -2,7 +2,7 @@
 title: "WebAssembly API Reference"
 ---
 
-## WebAssembly API Reference <span class="version-badge">v3.6.0-rc.7</span>
+## WebAssembly API Reference <span class="version-badge">v3.6.0-rc.8</span>
 
 ### Functions
 
@@ -120,7 +120,7 @@ metadata, extracted tables, images, and processing warnings.
 | `document` | `DocumentStructure \| null` | `null` | Structured document tree with semantic elements. Populated when `ConversionOptions.include_document_structure` is `true`. `null` otherwise (the default), which avoids the overhead of building the tree. When present, the tree mirrors the converted document: headings open `Group` sections, paragraphs and list items carry inline `TextAnnotation`s, and tables reference the same `TableGrid` data exposed in `Self.tables`. Note: this field is independent of the `metadata` feature flag. Document structure collection is always available at runtime; it is gated only by the runtime option, not by a compile-time feature. |
 | `metadata` | `HtmlMetadata` | — | Extracted HTML metadata (title, OG, links, images, structured data). |
 | `tables` | `Array<TableData>` | `[]` | Extracted tables with structured cell data and markdown representation. |
-| `images` | `Array<string>` | `[]` | Extracted inline images (data URIs and SVGs). Populated when `extract_images` is `true` in options. |
+| `images` | `Array<string>` | `[]` | Extracted inline images (data URIs and SVGs). Populated when `extract_images` is `true` in options. This field is excluded from binding generation (alef) because `InlineImage` contains binary data (`Vec<u8>`) that cannot be safely represented across language boundaries in a lossless way. Access inline images via the `HtmlExtraction` type returned by the `inline-images` API instead. |
 | `warnings` | `Array<ProcessingWarning>` | `[]` | Non-fatal processing warnings. |
 
 ---
@@ -696,6 +696,22 @@ visitFigureEnd(ctx: NodeContext, output: string): VisitResult
 
 ---
 
+#### ImageDimensions
+
+Image dimensions in pixels.
+
+Binding-safe replacement for `(u32, u32)` tuples, which degrade to
+`Vec<Vec<String>>` when sanitized for cross-language binding generation.
+Used by both `ImageMetadata` and
+`InlineImage`.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `width` | `number` | — | Width in pixels. |
+| `height` | `number` | — | Height in pixels. |
+
+---
+
 #### ImageMetadata
 
 Image metadata with source and dimensions.
@@ -708,7 +724,7 @@ for image analysis and optimization.
 | `src` | `string` | — | Image source (URL, data URI, or SVG content identifier) |
 | `alt` | `string \| null` | `null` | Alternative text from alt attribute (for accessibility) |
 | `title` | `string \| null` | `null` | Title attribute (often shown as tooltip) |
-| `dimensions` | `Array<number> \| null` | `null` | Image dimensions as (width, height) if available |
+| `dimensions` | `ImageDimensions \| null` | `null` | Image dimensions in pixels, if available. |
 | `imageType` | `ImageType` | — | Image type classification |
 | `attributes` | `Record<string, string>` | — | Additional HTML attributes |
 
@@ -728,6 +744,21 @@ Represents `<a>` elements with parsed href values, text content, and link type c
 | `linkType` | `LinkType` | — | Link type classification |
 | `rel` | `Array<string>` | — | Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") |
 | `attributes` | `Record<string, string>` | — | Additional HTML attributes |
+
+---
+
+#### MetadataEntry
+
+A single key-value metadata entry from `<head>` meta tags.
+
+Binding-safe replacement for `(String, String)` tuples used in
+`NodeContent.MetadataBlock`. Tuple pairs cannot be represented
+across language boundaries without lossy degradation.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `key` | `string` | — | Metadata key (e.g. `"title"`, `"description"`, `"og:title"`). |
+| `value` | `string` | — | Metadata value. |
 
 ---
 
@@ -1111,7 +1142,7 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 | `DefinitionList` | A definition list container. |
 | `DefinitionItem` | A definition list entry with term and description. — Fields: `term`: `string`, `definition`: `string` |
 | `RawBlock` | A raw block preserved as-is (e.g. `<script>`, `<style>` content). — Fields: `format`: `string`, `content`: `string` |
-| `MetadataBlock` | A block of key-value metadata pairs (from `<head>` meta tags). — Fields: `entries`: `Array<Array<string>>` |
+| `MetadataBlock` | A block of key-value metadata pairs (from `<head>` meta tags). — Fields: `entries`: `Array<MetadataEntry>` |
 | `Group` | A section grouping container (auto-generated from heading hierarchy). — Fields: `label`: `string`, `headingLevel`: `number`, `headingText`: `string` |
 
 ---
@@ -1282,7 +1313,7 @@ Errors are thrown as plain `Error` objects with descriptive messages.
 | `ParseError` | HTML parsing error |
 | `SanitizationError` | HTML sanitization error |
 | `ConfigError` | Invalid configuration |
-| `IoError` | I/O error |
+| `IoError` | I/O error — stores the error message string so the variant is FFI-safe. Use `ConversionError.from(io_error)` to convert from `std.io.Error`. |
 | `Panic` | Internal error caught during conversion |
 | `InvalidInput` | Invalid input data |
 | `Other` | Generic conversion error |

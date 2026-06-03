@@ -9,7 +9,7 @@ import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'lib.freezed.dart';
 
 // These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `HtmlVisitorDartImpl`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `visit_audio`, `visit_blockquote`, `visit_button`, `visit_code_block`, `visit_code_inline`, `visit_custom_element`, `visit_definition_description`, `visit_definition_list_end`, `visit_definition_list_start`, `visit_definition_term`, `visit_details`, `visit_element_end`, `visit_element_start`, `visit_emphasis`, `visit_figcaption`, `visit_figure_end`, `visit_figure_start`, `visit_form`, `visit_heading`, `visit_horizontal_rule`, `visit_iframe`, `visit_image`, `visit_input`, `visit_line_break`, `visit_link`, `visit_list_end`, `visit_list_item`, `visit_list_start`, `visit_mark`, `visit_strikethrough`, `visit_strong`, `visit_subscript`, `visit_summary`, `visit_superscript`, `visit_table_end`, `visit_table_row`, `visit_table_start`, `visit_text`, `visit_underline`, `visit_video`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `visit_audio`, `visit_blockquote`, `visit_button`, `visit_code_block`, `visit_code_inline`, `visit_custom_element`, `visit_definition_description`, `visit_definition_list_end`, `visit_definition_list_start`, `visit_definition_term`, `visit_details`, `visit_element_end`, `visit_element_start`, `visit_emphasis`, `visit_figcaption`, `visit_figure_end`, `visit_figure_start`, `visit_form`, `visit_heading`, `visit_horizontal_rule`, `visit_iframe`, `visit_image`, `visit_input`, `visit_line_break`, `visit_link`, `visit_list_end`, `visit_list_item`, `visit_list_start`, `visit_mark`, `visit_strikethrough`, `visit_strong`, `visit_subscript`, `visit_summary`, `visit_superscript`, `visit_table_end`, `visit_table_row`, `visit_table_start`, `visit_text`, `visit_underline`, `visit_video`
 
 /// Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images,
 /// and warnings.
@@ -67,6 +67,9 @@ Future<PreprocessingOptionsUpdate> createPreprocessingOptionsUpdateFromJson({
   json: json,
 );
 
+Future<ImageDimensions> createImageDimensionsFromJson({required String json}) =>
+    RustLib.instance.api.crateCreateImageDimensionsFromJson(json: json);
+
 Future<DocumentStructure> createDocumentStructureFromJson({
   required String json,
 }) => RustLib.instance.api.crateCreateDocumentStructureFromJson(json: json);
@@ -76,6 +79,9 @@ Future<DocumentNode> createDocumentNodeFromJson({required String json}) =>
 
 Future<TextAnnotation> createTextAnnotationFromJson({required String json}) =>
     RustLib.instance.api.crateCreateTextAnnotationFromJson(json: json);
+
+Future<MetadataEntry> createMetadataEntryFromJson({required String json}) =>
+    RustLib.instance.api.crateCreateMetadataEntryFromJson(json: json);
 
 Future<ConversionResult> createConversionResultFromJson({
   required String json,
@@ -297,7 +303,9 @@ sealed class ConversionError with _$ConversionError {
   const factory ConversionError.configError({required String field0}) =
       ConversionError_ConfigError;
 
-  /// I/O error
+  /// I/O error — stores the error message string so the variant is FFI-safe.
+  ///
+  /// Use `ConversionError::from(io_error)` to convert from `std::io::Error`.
   const factory ConversionError.ioError({required String field0}) =
       ConversionError_IoError;
 
@@ -986,11 +994,6 @@ class ConversionResult {
   /// Extracted tables with structured cell data and markdown representation.
   final List<TableData> tables;
 
-  /// Extracted inline images (data URIs and SVGs).
-  ///
-  /// Populated when `extract_images` is `true` in options.
-  final List<String> images;
-
   /// Non-fatal processing warnings.
   final List<ProcessingWarning> warnings;
 
@@ -999,7 +1002,6 @@ class ConversionResult {
     this.document,
     required this.metadata,
     required this.tables,
-    required this.images,
     required this.warnings,
   });
 
@@ -1009,7 +1011,6 @@ class ConversionResult {
       document.hashCode ^
       metadata.hashCode ^
       tables.hashCode ^
-      images.hashCode ^
       warnings.hashCode;
 
   @override
@@ -1021,7 +1022,6 @@ class ConversionResult {
           document == other.document &&
           metadata == other.metadata &&
           tables == other.tables &&
-          images == other.images &&
           warnings == other.warnings;
 }
 
@@ -1416,6 +1416,33 @@ class HtmlMetadata {
           structuredData == other.structuredData;
 }
 
+/// Image dimensions in pixels.
+///
+/// Binding-safe replacement for `(u32, u32)` tuples, which degrade to
+/// `Vec<Vec<String>>` when sanitized for cross-language binding generation.
+/// Used by both `ImageMetadata` and
+/// `InlineImage`.
+class ImageDimensions {
+  /// Width in pixels.
+  final PlatformInt64 width;
+
+  /// Height in pixels.
+  final PlatformInt64 height;
+
+  const ImageDimensions({required this.width, required this.height});
+
+  @override
+  int get hashCode => width.hashCode ^ height.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ImageDimensions &&
+          runtimeType == other.runtimeType &&
+          width == other.width &&
+          height == other.height;
+}
+
 /// Image metadata with source and dimensions.
 ///
 /// Captures `<img>` elements and inline `<svg>` elements with metadata
@@ -1428,7 +1455,7 @@ class HtmlMetadata {
 ///     src: "https://example.com/image.jpg".to_string(),
 ///     alt: Some("An example image".to_string()),
 ///     title: Some("Example".to_string()),
-///     dimensions: Some((800, 600)),
+///     dimensions: Some(ImageDimensions { width: 800, height: 600 }),
 ///     image_type: ImageType::External,
 ///     attributes: Default::default(),
 /// };
@@ -1445,8 +1472,8 @@ class ImageMetadata {
   /// Title attribute (often shown as tooltip)
   final String? title;
 
-  /// Image dimensions as (width, height) if available
-  final Int64List? dimensions;
+  /// Image dimensions in pixels, if available.
+  final ImageDimensions? dimensions;
 
   /// Image type classification
   final ImageType imageType;
@@ -1617,6 +1644,32 @@ enum ListIndentType {
   tabs,
 }
 
+/// A single key-value metadata entry from `<head>` meta tags.
+///
+/// Binding-safe replacement for `(String, String)` tuples used in
+/// [`NodeContent::MetadataBlock`]. Tuple pairs cannot be represented
+/// across language boundaries without lossy degradation.
+class MetadataEntry {
+  /// Metadata key (e.g. `"title"`, `"description"`, `"og:title"`).
+  final String key;
+
+  /// Metadata value.
+  final String value;
+
+  const MetadataEntry({required this.key, required this.value});
+
+  @override
+  int get hashCode => key.hashCode ^ value.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MetadataEntry &&
+          runtimeType == other.runtimeType &&
+          key == other.key &&
+          value == other.value;
+}
+
 /// Line break syntax in Markdown output.
 ///
 /// Controls how soft line breaks (from `<br>` or line breaks in source) are rendered.
@@ -1713,7 +1766,7 @@ sealed class NodeContent with _$NodeContent {
   /// A block of key-value metadata pairs (from `<head>` meta tags).
   const factory NodeContent.metadataBlock({
     /// Key-value metadata pairs.
-    required List<List<String>> entries,
+    required List<MetadataEntry> entries,
   }) = NodeContent_MetadataBlock;
 
   /// A section grouping container (auto-generated from heading hierarchy).

@@ -2,7 +2,7 @@
 title: "Ruby API Reference"
 ---
 
-## Ruby API Reference <span class="version-badge">v3.6.0-rc.7</span>
+## Ruby API Reference <span class="version-badge">v3.6.0-rc.8</span>
 
 ### Functions
 
@@ -120,7 +120,7 @@ metadata, extracted tables, images, and processing warnings.
 | `document` | `DocumentStructure?` | `nil` | Structured document tree with semantic elements. Populated when `ConversionOptions.include_document_structure` is `true`. `nil` otherwise (the default), which avoids the overhead of building the tree. When present, the tree mirrors the converted document: headings open `Group` sections, paragraphs and list items carry inline `TextAnnotation`s, and tables reference the same `TableGrid` data exposed in `Self.tables`. Note: this field is independent of the `metadata` feature flag. Document structure collection is always available at runtime; it is gated only by the runtime option, not by a compile-time feature. |
 | `metadata` | `HtmlMetadata` | — | Extracted HTML metadata (title, OG, links, images, structured data). |
 | `tables` | `Array<TableData>` | `[]` | Extracted tables with structured cell data and markdown representation. |
-| `images` | `Array<String>` | `[]` | Extracted inline images (data URIs and SVGs). Populated when `extract_images` is `true` in options. |
+| `images` | `Array<String>` | `[]` | Extracted inline images (data URIs and SVGs). Populated when `extract_images` is `true` in options. This field is excluded from binding generation (alef) because `InlineImage` contains binary data (`Vec<u8>`) that cannot be safely represented across language boundaries in a lossless way. Access inline images via the `HtmlExtraction` type returned by the `inline-images` API instead. |
 | `warnings` | `Array<ProcessingWarning>` | `[]` | Non-fatal processing warnings. |
 
 ---
@@ -696,6 +696,22 @@ def visit_figure_end(ctx, output)
 
 ---
 
+#### ImageDimensions
+
+Image dimensions in pixels.
+
+Binding-safe replacement for `(u32, u32)` tuples, which degrade to
+`Vec<Vec<String>>` when sanitized for cross-language binding generation.
+Used by both `ImageMetadata` and
+`InlineImage`.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `width` | `Integer` | — | Width in pixels. |
+| `height` | `Integer` | — | Height in pixels. |
+
+---
+
 #### ImageMetadata
 
 Image metadata with source and dimensions.
@@ -708,7 +724,7 @@ for image analysis and optimization.
 | `src` | `String` | — | Image source (URL, data URI, or SVG content identifier) |
 | `alt` | `String?` | `nil` | Alternative text from alt attribute (for accessibility) |
 | `title` | `String?` | `nil` | Title attribute (often shown as tooltip) |
-| `dimensions` | `Array<Integer>?` | `nil` | Image dimensions as (width, height) if available |
+| `dimensions` | `ImageDimensions?` | `nil` | Image dimensions in pixels, if available. |
 | `image_type` | `ImageType` | — | Image type classification |
 | `attributes` | `Hash{String=>String}` | — | Additional HTML attributes |
 
@@ -728,6 +744,21 @@ Represents `<a>` elements with parsed href values, text content, and link type c
 | `link_type` | `LinkType` | — | Link type classification |
 | `rel` | `Array<String>` | — | Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") |
 | `attributes` | `Hash{String=>String}` | — | Additional HTML attributes |
+
+---
+
+#### MetadataEntry
+
+A single key-value metadata entry from `<head>` meta tags.
+
+Binding-safe replacement for `(String, String)` tuples used in
+`NodeContent.MetadataBlock`. Tuple pairs cannot be represented
+across language boundaries without lossy degradation.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `key` | `String` | — | Metadata key (e.g. `"title"`, `"description"`, `"og:title"`). |
+| `value` | `String` | — | Metadata value. |
 
 ---
 
@@ -1111,7 +1142,7 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 | `definition_list` | A definition list container. |
 | `definition_item` | A definition list entry with term and description. — Fields: `term`: `String`, `definition`: `String` |
 | `raw_block` | A raw block preserved as-is (e.g. `<script>`, `<style>` content). — Fields: `format`: `String`, `content`: `String` |
-| `metadata_block` | A block of key-value metadata pairs (from `<head>` meta tags). — Fields: `entries`: `Array<Array<String>>` |
+| `metadata_block` | A block of key-value metadata pairs (from `<head>` meta tags). — Fields: `entries`: `Array<MetadataEntry>` |
 | `group` | A section grouping container (auto-generated from heading hierarchy). — Fields: `label`: `String`, `heading_level`: `Integer`, `heading_text`: `String` |
 
 ---
@@ -1280,7 +1311,7 @@ Errors that can occur during HTML to Markdown conversion.
 | `parse_error` | HTML parsing error |
 | `sanitization_error` | HTML sanitization error |
 | `config_error` | Invalid configuration |
-| `io_error` | I/O error |
+| `io_error` | I/O error — stores the error message string so the variant is FFI-safe. Use `ConversionError.from(io_error)` to convert from `std.io.Error`. |
 | `panic` | Internal error caught during conversion |
 | `invalid_input` | Invalid input data |
 | `other` | Generic conversion error |

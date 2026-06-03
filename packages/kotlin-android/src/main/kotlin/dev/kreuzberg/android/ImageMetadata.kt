@@ -36,8 +36,8 @@ data class ImageMetadata(
     val alt: String? = null,
     /** Title attribute (often shown as tooltip) */
     val title: String? = null,
-    /** Image dimensions as (width, height) if available */
-    val dimensions: List<Int>? = null,
+    /** Image dimensions in pixels, if available. */
+    val dimensions: ImageDimensions? = null,
     /** Image type classification */
     val imageType: ImageType,
     /** Additional HTML attributes */

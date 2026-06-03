@@ -59,6 +59,11 @@ data class ConversionResult(
      * Extracted inline images (data URIs and SVGs).
      *
      * Populated when `extract_images` is `true` in options.
+     *
+     * This field is excluded from binding generation (alef) because `InlineImage` contains binary
+     * data (`Vec<u8>`) that cannot be safely represented across language boundaries in a lossless
+     * way. Access inline images via the `HtmlExtraction` type returned by the `inline-images` API
+     * instead.
      */
     val images: List<String> = emptyList(),
     /** Non-fatal processing warnings. */

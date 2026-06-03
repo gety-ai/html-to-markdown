@@ -104,7 +104,7 @@ LinkMetadata <- new.env(parent = emptyenv())
 #' @field src Image source (URL, data URI, or SVG content identifier)
 #' @field alt Alternative text from alt attribute (for accessibility)
 #' @field title Title attribute (often shown as tooltip)
-#' @field dimensions Image dimensions as (width, height) if available
+#' @field dimensions Image dimensions in pixels, if available.
 #' @field image_type Image type classification
 #' @field attributes Additional HTML attributes
 #' @export
@@ -309,6 +309,27 @@ PreprocessingOptionsUpdate <- new.env(parent = emptyenv())
 }
 #' @export
 `[[.PreprocessingOptionsUpdate` <- `$.PreprocessingOptionsUpdate`
+#' Image dimensions in pixels
+#'
+#' Binding-safe replacement for `(u32, u32)` tuples, which degrade to
+#' `Vec<Vec<String>>` when sanitized for cross-language binding generation.
+#' Used by both `ImageMetadata` and
+#' `InlineImage`.
+#' @field width Width in pixels.
+#' @field height Height in pixels.
+#' @export
+ImageDimensions <- new.env(parent = emptyenv())
+#' @export
+`$.ImageDimensions` <- function(self, name) {
+  func <- ImageDimensions[[name]]
+  if (identical(names(formals(func))[1], "self")) {
+    function(...) func(self, ...)
+  } else {
+    func
+  }
+}
+#' @export
+`[[.ImageDimensions` <- `$.ImageDimensions`
 #' A styling or semantic annotation that applies to a byte range within a node's text
 #'
 #' Unlike [`DocumentNode`], which captures block-level structure (headings, paragraphs, etc.),
@@ -339,6 +360,26 @@ TextAnnotation <- new.env(parent = emptyenv())
 }
 #' @export
 `[[.TextAnnotation` <- `$.TextAnnotation`
+#' A single key-value metadata entry from `<head>` meta tags
+#'
+#' Binding-safe replacement for `(String, String)` tuples used in
+#' [`NodeContent::MetadataBlock`]. Tuple pairs cannot be represented
+#' across language boundaries without lossy degradation.
+#' @field key Metadata key (e.g. `"title"`, `"description"`, `"og:title"`).
+#' @field value Metadata value.
+#' @export
+MetadataEntry <- new.env(parent = emptyenv())
+#' @export
+`$.MetadataEntry` <- function(self, name) {
+  func <- MetadataEntry[[name]]
+  if (identical(names(formals(func))[1], "self")) {
+    function(...) func(self, ...)
+  } else {
+    func
+  }
+}
+#' @export
+`[[.MetadataEntry` <- `$.MetadataEntry`
 #' A single cell in a table grid
 #' @field content The text content of the cell.
 #' @field row 0-indexed row position.

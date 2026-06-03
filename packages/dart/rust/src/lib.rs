@@ -140,7 +140,7 @@ pub struct LinkMetadata {
 ///     src: "https://example.com/image.jpg".to_string(),
 ///     alt: Some("An example image".to_string()),
 ///     title: Some("Example".to_string()),
-///     dimensions: Some((800, 600)),
+///     dimensions: Some(ImageDimensions { width: 800, height: 600 }),
 ///     image_type: ImageType::External,
 ///     attributes: Default::default(),
 /// };
@@ -155,8 +155,8 @@ pub struct ImageMetadata {
     pub alt: Option<String>,
     /// Title attribute (often shown as tooltip)
     pub title: Option<String>,
-    /// Image dimensions as (width, height) if available
-    pub dimensions: Option<Vec<i64>>,
+    /// Image dimensions in pixels, if available.
+    pub dimensions: Option<ImageDimensions>,
     /// Image type classification
     pub image_type: ImageType,
     /// Additional HTML attributes
@@ -509,6 +509,20 @@ pub struct PreprocessingOptionsUpdate {
     pub remove_forms: Option<bool>,
 }
 
+/// Image dimensions in pixels.
+///
+/// Binding-safe replacement for `(u32, u32)` tuples, which degrade to
+/// `Vec<Vec<String>>` when sanitized for cross-language binding generation.
+/// Used by both `ImageMetadata` and
+/// `InlineImage`.
+#[frb(mirror(ImageDimensions))]
+pub struct ImageDimensions {
+    /// Width in pixels.
+    pub width: i64,
+    /// Height in pixels.
+    pub height: i64,
+}
+
 /// A structured document tree representing the semantic content of an HTML document.
 ///
 /// Uses a flat node array with index-based parent/child references for efficient traversal.
@@ -570,6 +584,19 @@ pub struct TextAnnotation {
     pub kind: AnnotationKind,
 }
 
+/// A single key-value metadata entry from `<head>` meta tags.
+///
+/// Binding-safe replacement for `(String, String)` tuples used in
+/// [`NodeContent::MetadataBlock`]. Tuple pairs cannot be represented
+/// across language boundaries without lossy degradation.
+#[frb(mirror(MetadataEntry))]
+pub struct MetadataEntry {
+    /// Metadata key (e.g. `"title"`, `"description"`, `"og:title"`).
+    pub key: String,
+    /// Metadata value.
+    pub value: String,
+}
+
 /// The primary result of HTML conversion and extraction.
 ///
 /// Contains the converted text output, optional structured document tree,
@@ -609,10 +636,6 @@ pub struct ConversionResult {
     pub metadata: HtmlMetadata,
     /// Extracted tables with structured cell data and markdown representation.
     pub tables: Vec<TableData>,
-    /// Extracted inline images (data URIs and SVGs).
-    ///
-    /// Populated when `extract_images` is `true` in options.
-    pub images: Vec<String>,
     /// Non-fatal processing warnings.
     pub warnings: Vec<ProcessingWarning>,
 }
@@ -1012,7 +1035,7 @@ pub enum NodeContent {
     /// A block of key-value metadata pairs (from `<head>` meta tags).
     MetadataBlock {
         /// Key-value metadata pairs.
-        entries: Vec<Vec<String>>,
+        entries: Vec<MetadataEntry>,
     },
     /// A section grouping container (auto-generated from heading hierarchy).
     Group {
@@ -1301,7 +1324,9 @@ pub enum ConversionError {
     SanitizationError { field0: String },
     /// Invalid configuration
     ConfigError { field0: String },
-    /// I/O error
+    /// I/O error — stores the error message string so the variant is FFI-safe.
+    ///
+    /// Use `ConversionError::from(io_error)` to convert from `std::io::Error`.
     IoError { field0: String },
     /// Panic caught during conversion to prevent unwinding across FFI boundaries
     Panic { field0: String },
@@ -1318,7 +1343,7 @@ impl From<html_to_markdown_rs::metadata::DocumentMetadata> for DocumentMetadata 
         DocumentMetadata {
             title: v.title.map(|s| s.into()),
             description: v.description.map(|s| s.into()),
-            keywords: v.keywords.into_iter().map(|s| s.into()).collect(),
+            keywords: v.keywords.into_iter().map(|s| s.into()).collect::<Vec<_>>(),
             author: v.author.map(|s| s.into()),
             canonical_url: v.canonical_url.map(|s| s.into()),
             base_href: v.base_href.map(|s| s.into()),
@@ -1350,7 +1375,7 @@ impl From<html_to_markdown_rs::metadata::LinkMetadata> for LinkMetadata {
             text: v.text.into(),
             title: v.title.map(|s| s.into()),
             link_type: LinkType::from(v.link_type),
-            rel: v.rel.into_iter().map(|s| s.into()).collect(),
+            rel: v.rel.into_iter().map(|s| s.into()).collect::<Vec<_>>(),
             attributes: v.attributes.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
         }
     }
@@ -1362,7 +1387,7 @@ impl From<html_to_markdown_rs::metadata::ImageMetadata> for ImageMetadata {
             src: v.src.into(),
             alt: v.alt.map(|s| s.into()),
             title: v.title.map(|s| s.into()),
-            dimensions: Default::default(),
+            dimensions: v.dimensions.map(ImageDimensions::from),
             image_type: ImageType::from(v.image_type),
             attributes: v.attributes.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
         }
@@ -1383,10 +1408,14 @@ impl From<html_to_markdown_rs::metadata::HtmlMetadata> for HtmlMetadata {
     fn from(v: html_to_markdown_rs::metadata::HtmlMetadata) -> Self {
         HtmlMetadata {
             document: DocumentMetadata::from(v.document),
-            headers: v.headers.into_iter().map(HeaderMetadata::from).collect(),
-            links: v.links.into_iter().map(LinkMetadata::from).collect(),
-            images: v.images.into_iter().map(ImageMetadata::from).collect(),
-            structured_data: v.structured_data.into_iter().map(StructuredData::from).collect(),
+            headers: v.headers.into_iter().map(HeaderMetadata::from).collect::<Vec<_>>(),
+            links: v.links.into_iter().map(LinkMetadata::from).collect::<Vec<_>>(),
+            images: v.images.into_iter().map(ImageMetadata::from).collect::<Vec<_>>(),
+            structured_data: v
+                .structured_data
+                .into_iter()
+                .map(StructuredData::from)
+                .collect::<Vec<_>>(),
         }
     }
 }
@@ -1419,12 +1448,16 @@ impl From<html_to_markdown_rs::options::ConversionOptions> for ConversionOptions
             sup_symbol: v.sup_symbol.into(),
             newline_style: NewlineStyle::from(v.newline_style),
             code_block_style: CodeBlockStyle::from(v.code_block_style),
-            keep_inline_images_in: v.keep_inline_images_in.into_iter().map(|s| s.into()).collect(),
+            keep_inline_images_in: v
+                .keep_inline_images_in
+                .into_iter()
+                .map(|s| s.into())
+                .collect::<Vec<_>>(),
             preprocessing: PreprocessingOptions::from(v.preprocessing),
             encoding: v.encoding.into(),
             debug: v.debug as _,
-            strip_tags: v.strip_tags.into_iter().map(|s| s.into()).collect(),
-            preserve_tags: v.preserve_tags.into_iter().map(|s| s.into()).collect(),
+            strip_tags: v.strip_tags.into_iter().map(|s| s.into()).collect::<Vec<_>>(),
+            preserve_tags: v.preserve_tags.into_iter().map(|s| s.into()).collect::<Vec<_>>(),
             skip_images: v.skip_images as _,
             url_escape_style: UrlEscapeStyle::from(v.url_escape_style),
             link_style: LinkStyle::from(v.link_style),
@@ -1435,7 +1468,7 @@ impl From<html_to_markdown_rs::options::ConversionOptions> for ConversionOptions
             capture_svg: v.capture_svg as _,
             infer_dimensions: v.infer_dimensions as _,
             max_depth: v.max_depth.map(|x| x as _),
-            exclude_selectors: v.exclude_selectors.into_iter().map(|s| s.into()).collect(),
+            exclude_selectors: v.exclude_selectors.into_iter().map(|s| s.into()).collect::<Vec<_>>(),
             tier_strategy: TierStrategy::from(v.tier_strategy),
             visitor: v.visitor.map(VisitorHandle::from),
         }
@@ -1472,12 +1505,16 @@ impl From<html_to_markdown_rs::options::ConversionOptionsUpdate> for ConversionO
             code_block_style: v.code_block_style.map(CodeBlockStyle::from),
             keep_inline_images_in: v
                 .keep_inline_images_in
-                .map(|vec| vec.into_iter().map(|s| s.into()).collect()),
+                .map(|vec| vec.into_iter().map(|s| s.into()).collect::<Vec<_>>()),
             preprocessing: v.preprocessing.map(PreprocessingOptionsUpdate::from),
             encoding: v.encoding.map(|s| s.into()),
             debug: v.debug.map(|x| x as _),
-            strip_tags: v.strip_tags.map(|vec| vec.into_iter().map(|s| s.into()).collect()),
-            preserve_tags: v.preserve_tags.map(|vec| vec.into_iter().map(|s| s.into()).collect()),
+            strip_tags: v
+                .strip_tags
+                .map(|vec| vec.into_iter().map(|s| s.into()).collect::<Vec<_>>()),
+            preserve_tags: v
+                .preserve_tags
+                .map(|vec| vec.into_iter().map(|s| s.into()).collect::<Vec<_>>()),
             skip_images: v.skip_images.map(|x| x as _),
             url_escape_style: v.url_escape_style.map(UrlEscapeStyle::from),
             link_style: v.link_style.map(LinkStyle::from),
@@ -1490,7 +1527,7 @@ impl From<html_to_markdown_rs::options::ConversionOptionsUpdate> for ConversionO
             max_depth: v.max_depth.flatten().map(|x| x as _),
             exclude_selectors: v
                 .exclude_selectors
-                .map(|vec| vec.into_iter().map(|s| s.into()).collect()),
+                .map(|vec| vec.into_iter().map(|s| s.into()).collect::<Vec<_>>()),
             tier_strategy: v.tier_strategy.map(TierStrategy::from),
             visitor: v.visitor.map(VisitorHandle::from),
         }
@@ -1519,10 +1556,19 @@ impl From<html_to_markdown_rs::options::PreprocessingOptionsUpdate> for Preproce
     }
 }
 
+impl From<html_to_markdown_rs::ImageDimensions> for ImageDimensions {
+    fn from(v: html_to_markdown_rs::ImageDimensions) -> Self {
+        ImageDimensions {
+            width: v.width as _,
+            height: v.height as _,
+        }
+    }
+}
+
 impl From<html_to_markdown_rs::DocumentStructure> for DocumentStructure {
     fn from(v: html_to_markdown_rs::DocumentStructure) -> Self {
         DocumentStructure {
-            nodes: v.nodes.into_iter().map(DocumentNode::from).collect(),
+            nodes: v.nodes.into_iter().map(DocumentNode::from).collect::<Vec<_>>(),
             source_format: v.source_format.map(|s| s.into()),
         }
     }
@@ -1534,8 +1580,8 @@ impl From<html_to_markdown_rs::DocumentNode> for DocumentNode {
             id: v.id.into(),
             content: NodeContent::from(v.content),
             parent: v.parent.map(|x| x as _),
-            children: v.children.into_iter().map(|x| x as _).collect(),
-            annotations: v.annotations.into_iter().map(TextAnnotation::from).collect(),
+            children: v.children.into_iter().map(|x| x as _).collect::<Vec<_>>(),
+            annotations: v.annotations.into_iter().map(TextAnnotation::from).collect::<Vec<_>>(),
             attributes: v
                 .attributes
                 .map(|m| m.into_iter().map(|(k, v)| (k.into(), v.into())).collect()),
@@ -1553,15 +1599,23 @@ impl From<html_to_markdown_rs::TextAnnotation> for TextAnnotation {
     }
 }
 
+impl From<html_to_markdown_rs::MetadataEntry> for MetadataEntry {
+    fn from(v: html_to_markdown_rs::MetadataEntry) -> Self {
+        MetadataEntry {
+            key: v.key.into(),
+            value: v.value.into(),
+        }
+    }
+}
+
 impl From<html_to_markdown_rs::ConversionResult> for ConversionResult {
     fn from(v: html_to_markdown_rs::ConversionResult) -> Self {
         ConversionResult {
             content: v.content.map(|s| s.into()),
             document: v.document.map(DocumentStructure::from),
             metadata: HtmlMetadata::from(v.metadata),
-            tables: v.tables.into_iter().map(TableData::from).collect(),
-            images: Default::default(),
-            warnings: v.warnings.into_iter().map(ProcessingWarning::from).collect(),
+            tables: v.tables.into_iter().map(TableData::from).collect::<Vec<_>>(),
+            warnings: v.warnings.into_iter().map(ProcessingWarning::from).collect::<Vec<_>>(),
         }
     }
 }
@@ -1571,7 +1625,7 @@ impl From<html_to_markdown_rs::TableGrid> for TableGrid {
         TableGrid {
             rows: v.rows as _,
             cols: v.cols as _,
-            cells: v.cells.into_iter().map(GridCell::from).collect(),
+            cells: v.cells.into_iter().map(GridCell::from).collect::<Vec<_>>(),
         }
     }
 }
@@ -1804,10 +1858,7 @@ impl From<html_to_markdown_rs::NodeContent> for NodeContent {
             }
             html_to_markdown_rs::NodeContent::RawBlock { format, content } => NodeContent::RawBlock { format, content },
             html_to_markdown_rs::NodeContent::MetadataBlock { entries } => NodeContent::MetadataBlock {
-                entries: entries
-                    .into_iter()
-                    .map(|(a, b)| vec![a.to_string(), b.to_string()])
-                    .collect(),
+                entries: entries.into_iter().map(MetadataEntry::from).collect(),
             },
             html_to_markdown_rs::NodeContent::Group {
                 label,
@@ -2242,6 +2293,13 @@ pub fn create_preprocessing_options_update_from_json(json: String) -> Result<Pre
 }
 
 #[frb]
+pub fn create_image_dimensions_from_json(json: String) -> Result<ImageDimensions, String> {
+    serde_json::from_str::<html_to_markdown_rs::ImageDimensions>(&json)
+        .map(ImageDimensions::from)
+        .map_err(|e| e.to_string())
+}
+
+#[frb]
 pub fn create_document_structure_from_json(json: String) -> Result<DocumentStructure, String> {
     serde_json::from_str::<html_to_markdown_rs::DocumentStructure>(&json)
         .map(DocumentStructure::from)
@@ -2259,6 +2317,13 @@ pub fn create_document_node_from_json(json: String) -> Result<DocumentNode, Stri
 pub fn create_text_annotation_from_json(json: String) -> Result<TextAnnotation, String> {
     serde_json::from_str::<html_to_markdown_rs::TextAnnotation>(&json)
         .map(TextAnnotation::from)
+        .map_err(|e| e.to_string())
+}
+
+#[frb]
+pub fn create_metadata_entry_from_json(json: String) -> Result<MetadataEntry, String> {
+    serde_json::from_str::<html_to_markdown_rs::MetadataEntry>(&json)
+        .map(MetadataEntry::from)
         .map_err(|e| e.to_string())
 }
 

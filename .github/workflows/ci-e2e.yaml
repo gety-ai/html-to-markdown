@@ -305,7 +305,7 @@ jobs:
         uses: kreuzberg-dev/actions/install-task@v1 # v1
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v8.1.0
+        uses: astral-sh/setup-uv@v8.2.0
         with:
           enable-cache: true
 
@@ -687,7 +687,7 @@ jobs:
         uses: kreuzberg-dev/actions/install-task@v1 # v1
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v8.1.0
+        uses: astral-sh/setup-uv@v8.2.0
         with:
           enable-cache: true
 

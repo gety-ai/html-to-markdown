@@ -183,6 +183,15 @@ typedef struct HTMHtmlMetadata HTMHtmlMetadata;
  */
 typedef struct HTMHtmlVisitor HTMHtmlVisitor;
 /**
+ * Image dimensions in pixels.
+ *
+ * Binding-safe replacement for `(u32, u32)` tuples, which degrade to
+ * `Vec<Vec<String>>` when sanitized for cross-language binding generation.
+ * Used by both `ImageMetadata` and
+ * `InlineImage`.
+ */
+typedef struct HTMImageDimensions HTMImageDimensions;
+/**
  * Image metadata with source and dimensions.
  *
  * Captures `<img>` elements and inline `<svg>` elements with metadata
@@ -192,7 +201,7 @@ typedef struct HTMHtmlVisitor HTMHtmlVisitor;
  *     src: "https://example.com/image.jpg".to_string(),
  *     alt: Some("An example image".to_string()),
  *     title: Some("Example".to_string()),
- *     dimensions: Some((800, 600)),
+ *     dimensions: Some(ImageDimensions { width: 800, height: 600 }),
  *     image_type: ImageType::External,
  *     attributes: Default::default(),
  * };
@@ -245,6 +254,14 @@ typedef struct HTMLinkType HTMLinkType;
  * Controls whether list items are indented with spaces or tabs.
  */
 typedef struct HTMListIndentType HTMListIndentType;
+/**
+ * A single key-value metadata entry from `<head>` meta tags.
+ *
+ * Binding-safe replacement for `(String, String)` tuples used in
+ * [`NodeContent::MetadataBlock`]. Tuple pairs cannot be represented
+ * across language boundaries without lossy degradation.
+ */
+typedef struct HTMMetadataEntry HTMMetadataEntry;
 /**
  * Line break syntax in Markdown output.
  *
@@ -1659,6 +1676,13 @@ char *htm_image_metadata_alt(const HTMImageMetadata *ptr);
 char *htm_image_metadata_title(const HTMImageMetadata *ptr);
 
 /**
+ * Get the `dimensions` field from a `ImageMetadata`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+HTMImageDimensions *htm_image_metadata_dimensions(const HTMImageMetadata *ptr);
+
+/**
  * Get the `image_type` field from a `ImageMetadata`.
  * # Safety
  * Pointer must be a valid handle returned by this library.
@@ -2535,6 +2559,43 @@ int32_t htm_preprocessing_options_update_remove_navigation(const HTMPreprocessin
 int32_t htm_preprocessing_options_update_remove_forms(const HTMPreprocessingOptionsUpdate *ptr);
 
 /**
+ * Create a `ImageDimensions` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `htm_image_dimensions_free`.
+ */
+HTMImageDimensions *htm_image_dimensions_from_json(const char *json);
+
+/**
+ * Serialize a `ImageDimensions` to a JSON string. Returns null on failure.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_image_dimensions_to_json(const HTMImageDimensions *ptr);
+
+/**
+ * Free a `ImageDimensions` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_image_dimensions_free(HTMImageDimensions *ptr);
+
+/**
+ * Get the `width` field from a `ImageDimensions`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+uint32_t htm_image_dimensions_width(const HTMImageDimensions *ptr);
+
+/**
+ * Get the `height` field from a `ImageDimensions`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+uint32_t htm_image_dimensions_height(const HTMImageDimensions *ptr);
+
+/**
  * Create a `DocumentStructure` from a JSON string. Returns null on failure.
  * # Safety
  * JSON string must be valid UTF-8 and null-terminated.
@@ -2679,6 +2740,43 @@ uint32_t htm_text_annotation_end(const HTMTextAnnotation *ptr);
  * Pointer must be a valid handle returned by this library.
  */
 HTMAnnotationKind *htm_text_annotation_kind(const HTMTextAnnotation *ptr);
+
+/**
+ * Create a `MetadataEntry` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `htm_metadata_entry_free`.
+ */
+HTMMetadataEntry *htm_metadata_entry_from_json(const char *json);
+
+/**
+ * Serialize a `MetadataEntry` to a JSON string. Returns null on failure.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_metadata_entry_to_json(const HTMMetadataEntry *ptr);
+
+/**
+ * Free a `MetadataEntry` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_metadata_entry_free(HTMMetadataEntry *ptr);
+
+/**
+ * Get the `key` field from a `MetadataEntry`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *htm_metadata_entry_key(const HTMMetadataEntry *ptr);
+
+/**
+ * Get the `value` field from a `MetadataEntry`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *htm_metadata_entry_value(const HTMMetadataEntry *ptr);
 
 /**
  * Create a `ConversionResult` from a JSON string. Returns null on failure.
@@ -3596,11 +3694,29 @@ char *htm_node_type_to_json(const HTMNodeType *ptr);
 char *htm_node_type_to_string(const HTMNodeType *ptr);
 
 /**
+ * Run `convert` with configured options-field bridge support.
+ *
+ * Returns a heap-allocated [`ConversionResult`] on success, or null on failure.
+ * Check `htm_last_error_code` / `htm_last_error_context` for error details.
+ * The returned pointer must be freed with `htm_conversion_result_free`.
+ *
+ * If a bridge was attached to `options`, it will be passed through to the core call.
+ *
+ * # Safety
+ *
+ * Pointer arguments must be valid for the duration of this call. Returned pointer must be
+ * freed with `htm_conversion_result_free`.
+ */
+HTMConversionResult *htm_convert(const char *html,
+                                 const HTMConversionOptions *options);
+
+/**
  * Attach a vtable visitor bridge to a `ConversionOptions` options struct.
  *
  * The `HtmHtmlVisitorBridge` encapsulates a set of C function pointers that receive visit
- * callbacks during generated conversion.  Call this setter before `htm_convert`
- * to activate visitor callbacks.  Pass `visitor = null` to clear a previously attached visitor.
+ * callbacks during generated conversion. Call this setter before invoking the generated
+ * options-field bridge wrapper to activate visitor callbacks. Pass `visitor = null` to clear
+ * a previously attached visitor.
  *
  * Neither pointer is consumed: the caller retains ownership of both `options` and `visitor`
  * and must free them independently after conversion completes.
@@ -3610,34 +3726,10 @@ char *htm_node_type_to_string(const HTMNodeType *ptr);
  * `options` must be a non-null pointer returned by `htm_conversion_options_new` (or
  * equivalent), valid for write access.  `visitor` must be a non-null pointer returned by
  * `htm_htm_html_visitor_bridge_new`, or null.  Both must remain valid for the duration of any
- * subsequent `htm_convert` call.
+ * subsequent options-field bridge wrapper call.
  */
 void htm_options_set_visitor(HTMConversionOptions *options,
                              struct HTMHtmHtmlVisitorBridge *visitor);
-
-/**
- * Run conversion.
- *
- * Returns a heap-allocated [`ConversionResult`] on success, or null on failure.
- * Check `htm_last_error_code` / `htm_last_error_context` for error details.
- * The returned pointer must be freed with `htm_conversion_result_free`.
- *
- * If a visitor was attached to `options` via `htm_options_set_visitor`, it will
- * receive callbacks during conversion.
- *
- * # Arguments
- *
- * - `html`: null-terminated, UTF-8 HTML input. Must not be null.
- * - `options`: optional conversion options (with optional embedded visitor); pass null for defaults.
- *
- * # Safety
- *
- * `html` must be a valid, non-null, null-terminated UTF-8 string.
- * `options` must be a valid pointer or null.
- * Returned pointer must be freed with `htm_conversion_result_free`.
- */
-HTMConversionResult *htm_convert(const char *html,
-                                 const HTMConversionOptions *options);
 
 /**
  * Create a new visitor handle from a callbacks struct.
@@ -3670,7 +3762,7 @@ struct HTMHtmVisitor *htm_visitor_create(const struct HTMHtmVisitorCallbacks *ca
 void htm_visitor_free(struct HTMHtmVisitor *visitor);
 
 /**
- * Attach a visitor to a [`html_to_markdown_rs::ConversionOptions`] handle before calling `htm_convert`.
+ * Attach a visitor to an options handle before calling `htm_convert`.
  *
  * The visitor will be invoked during conversion via the normal `htm_convert` path.
  * The `visitor` pointer must remain valid until after `htm_convert` returns.
@@ -3690,16 +3782,16 @@ void htm_options_set_visitor_handle(HTMConversionOptions *options,
 /**
  * Run conversion using a callback-based visitor.
  *
- * Returns a heap-allocated `ConversionResult` on success, or null on failure.
+ * Returns a heap-allocated result on success, or null on failure.
  * Check `htm_last_error_code` / `htm_last_error_context` for error details.
- * The returned pointer must be freed with `htm_conversion_result_free`.
+ * The returned pointer must be freed with the matching result free function.
  *
  * # Safety
  *
  * `html` must be a valid, non-null, null-terminated UTF-8 string.
  * `options` must be a valid pointer or null.
  * `visitor` must have been created with `htm_visitor_create`, or be null.
- * Returned pointer must be freed with `htm_conversion_result_free`.
+ * Returned pointer must be freed with the matching result free function.
  */
 HTMConversionResult *htm_convert_with_visitor(const char *html,
                                               const HTMConversionOptions *options,

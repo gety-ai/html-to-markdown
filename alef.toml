@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.21.8"
+alef_version = "0.22.15"
 languages = [
   "python",
   "node",
@@ -245,7 +245,7 @@ functions = []
 methods = []
 
 [crates.include]
-types = ["ConversionOptions", "ConversionResult", "HtmlVisitor", "NodeContext", "VisitResult"]
+types = ["ConversionOptions", "ConversionResult", "HtmlVisitor", "ImageDimensions", "MetadataEntry", "NodeContext", "VisitResult"]
 functions = ["convert"]
 
 [crates.lint.python]
@@ -533,6 +533,7 @@ fields_optional = [
 function = "convert"
 module = "html_to_markdown_rs"
 result_var = "result"
+options_type = "ConversionOptions"
 args = [
   { name = "html", field = "html", type = "string" },
   { name = "options", field = "options", type = "json_object", optional = true },
@@ -743,89 +744,91 @@ function = "convert"
 result_is_json_struct = true
 
 [crates.e2e.registry]
+github_repo = "https://github.com/kreuzberg-dev/html-to-markdown"
 output = "test_apps"
 categories = ["smoke", "conversion"]
 
 [crates.e2e.registry.packages.python]
 name = "html-to-markdown"
-version = ">=3.6.0rc7"
+version = ">=3.6.0rc8"
 
 [crates.e2e.registry.packages.node]
 name = "@kreuzberg/html-to-markdown"
-version = "^3.6.0-rc.7"
+version = "^3.6.0-rc.8"
 
 [crates.e2e.registry.packages.rust]
 name = "html-to-markdown-rs"
-version = "3.6.0-rc.7"
+version = "3.6.0-rc.8"
 
 [crates.e2e.registry.packages.go]
 module = "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
-version = "v3.6.0-rc.7"
+version = "v3.6.0-rc.8"
 
 [crates.e2e.registry.packages.java]
 name = "dev.kreuzberg:html-to-markdown"
-version = "3.6.0-rc.7"
+version = "3.6.0-rc.8"
 
 [crates.e2e.registry.packages.csharp]
 name = "KreuzbergDev.HtmlToMarkdown"
-version = "3.6.0-rc.7"
+version = "3.6.0-rc.8"
 
 [crates.e2e.registry.packages.php]
 name = "kreuzberg-dev/html-to-markdown-rs"
-version = ">=3.6.0-rc.7"
+version = ">=3.6.0-rc.8"
 
 [crates.e2e.registry.packages.ruby]
 name = "html-to-markdown"
-version = "~> 3.6.0.pre.rc.7"
+version = "~> 3.6.0.pre.rc.8"
 
 [crates.e2e.registry.packages.elixir]
 name = "html_to_markdown"
-version = "~> 3.6.0-rc.7"
+version = "~> 3.6.0-rc.8"
 
 [crates.e2e.registry.packages.wasm]
 name = "@kreuzberg/html-to-markdown-wasm"
-version = "^3.6.0-rc.7"
+version = "^3.6.0-rc.8"
 
 [crates.e2e.registry.packages.r]
 name = "htmltomarkdown"
-version = "3.6.0.9007"
+version = "3.6.0.9008"
 
 [crates.e2e.registry.packages.c]
 # Matches `publish.yaml`'s `asset-prefix: html-to-markdown-rs-ffi-` for the
 # upload-release-assets step. Drift causes test_apps/c/download_ffi.sh to 404
 # on the GH release tarball.
 name = "html-to-markdown-rs-ffi"
-version = "3.6.0-rc.7"
+version = "3.6.0-rc.8"
 
 [crates.e2e.registry.packages.kotlin_android]
 name = "dev.kreuzberg:html-to-markdown-android"
-version = "3.6.0-rc.7"
+version = "3.6.0-rc.8"
 
 [crates.e2e.registry.packages.swift]
 name = "HtmlToMarkdown"
-version = "3.6.0-rc.7"
+version = "3.6.0-rc.8"
 
 [crates.e2e.registry.packages.dart]
 name = "h2m"
-version = "^3.6.0-rc.7"
+version = "^3.6.0-rc.8"
 
 [crates.e2e.registry.packages.zig]
 name = "html_to_markdown"
-version = "3.6.0-rc.7"
-# hash populated by `zig fetch --save https://github.com/.../html-to-markdown-zig-v3.5.0.tar.gz`
-# once the v3.5.0 zig tarball lands on the release. Until then the generator
-# emits a placeholder comment in build.zig.zon directing the developer to
-# populate it.
+version = "3.6.0-rc.8"
+# Placeholder hash with embedded version triggers alef's STALE detection (added
+# in v0.22.1) — the generator emits a STALE comment in build.zig.zon and the
+# zig fetch flow auto-recomputes the real multihash at consume time. Update
+# after publishing the first zig tarball: `zig fetch --save <release-url>`.
+hash = "html-to-markdown-3.5.0-STALE_PLACEHOLDER_TO_BE_RESOLVED_BY_ZIG_FETCH"
 
 [crates.e2e.registry.packages.php_ext]
 name = "kreuzberg-dev/html-to-markdown-ext"
-version = "3.6.0-rc.7"
+version = "3.6.0-rc.8"
 
 [crates.e2e.registry.packages.homebrew]
 tap = "kreuzberg-dev/tap"
 cli_formula = "html-to-markdown"
 ffi_formula = "libhtml-to-markdown"
-version = "3.6.0-rc.7"
+version = "3.6.0-rc.8"
 
 [crates.e2e.packages.rust]
 path = "../../crates/html-to-markdown"

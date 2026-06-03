@@ -122,6 +122,7 @@ repos:
     args:
     - check
   - id: shellcheck
+    exclude: ^test_apps/kotlin_android/gradlew$
   - id: clang-tidy
     files: ^crates/html-to-markdown-ffi/tests/c/
   - id: mypy

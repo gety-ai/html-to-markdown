@@ -118,7 +118,7 @@ public typealias LinkMetadata = RustBridge.LinkMetadata
 ///     src: "https://example.com/image.jpg".to_string(),
 ///     alt: Some("An example image".to_string()),
 ///     title: Some("Example".to_string()),
-///     dimensions: Some((800, 600)),
+///     dimensions: Some(ImageDimensions { width: 800, height: 600 }),
 ///     image_type: ImageType::External,
 ///     attributes: Default::default(),
 /// };
@@ -229,6 +229,34 @@ public typealias PreprocessingOptions = RustBridge.PreprocessingOptions
 /// corresponding fields unchanged when applied via [`PreprocessingOptions::apply_update`].
 public typealias PreprocessingOptionsUpdate = RustBridge.PreprocessingOptionsUpdate
 
+/// Image dimensions in pixels.
+///
+/// Binding-safe replacement for `(u32, u32)` tuples, which degrade to
+/// `Vec<Vec<String>>` when sanitized for cross-language binding generation.
+/// Used by both `ImageMetadata` and
+/// `InlineImage`.
+public struct ImageDimensions: Codable, Sendable, Hashable {
+    /// Width in pixels.
+    public let width: UInt32
+    /// Height in pixels.
+    public let height: UInt32
+    public init(width: UInt32, height: UInt32) {
+        self.width = width
+        self.height = height
+    }
+}
+
+// MARK: - Internal FFI conversions for ImageDimensions
+internal extension ImageDimensions {
+    init(_ rb: RustBridge.ImageDimensionsRef) throws {
+        self.width = rb.width()
+        self.height = rb.height()
+    }
+    func intoRust() throws -> RustBridge.ImageDimensions {
+        return RustBridge.ImageDimensions(self.width, self.height)
+    }
+}
+
 /// A structured document tree representing the semantic content of an HTML document.
 ///
 /// Uses a flat node array with index-based parent/child references for efficient traversal.
@@ -276,6 +304,35 @@ internal extension TextAnnotation {
         let data = try JSONEncoder().encode(self)
         let json = String(data: data, encoding: .utf8) ?? "{}"
         return try RustBridge.textAnnotationFromJson(json)
+    }
+}
+
+/// A single key-value metadata entry from `<head>` meta tags.
+///
+/// Binding-safe replacement for `(String, String)` tuples used in
+/// [`NodeContent::MetadataBlock`]. Tuple pairs cannot be represented
+/// across language boundaries without lossy degradation.
+public struct MetadataEntry: Codable, Sendable, Hashable {
+    /// Metadata key (e.g. `"title"`, `"description"`, `"og:title"`).
+    public let key: String
+    /// Metadata value.
+    public let value: String
+    public init(key: String, value: String) {
+        self.key = key
+        self.value = value
+    }
+}
+
+// MARK: - Internal FFI conversions for MetadataEntry
+internal extension MetadataEntry {
+    init(_ rb: RustBridge.MetadataEntryRef) throws {
+        self.key = rb.key().toString()
+        self.value = rb.value().toString()
+    }
+    func intoRust() throws -> RustBridge.MetadataEntry {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "{}"
+        return try RustBridge.metadataEntryFromJson(json)
     }
 }
 
@@ -668,7 +725,7 @@ public enum NodeContent: Codable, Sendable, Hashable {
     /// A raw block preserved as-is (e.g. `<script>`, `<style>` content).
     case rawBlock(format: String, content: String)
     /// A block of key-value metadata pairs (from `<head>` meta tags).
-    case metadataBlock(entries: [[String]])
+    case metadataBlock(entries: [MetadataEntry])
     /// A section grouping container (auto-generated from heading hierarchy).
     case group(label: String?, headingLevel: UInt8?, headingText: String?)
 
@@ -719,7 +776,7 @@ public enum NodeContent: Codable, Sendable, Hashable {
         case "raw_block":
             self = .rawBlock(format: try container.decode(String.self, forKey: .format), content: try container.decode(String.self, forKey: .content))
         case "metadata_block":
-            self = .metadataBlock(entries: try container.decode([[String]].self, forKey: .entries))
+            self = .metadataBlock(entries: try container.decode([MetadataEntry].self, forKey: .entries))
         case "group":
             self = .group(label: try container.decodeIfPresent(String.self, forKey: .label), headingLevel: try container.decodeIfPresent(UInt8.self, forKey: .headingLevel), headingText: try container.decodeIfPresent(String.self, forKey: .headingText))
         default:
@@ -1132,7 +1189,9 @@ public enum ConversionError: Swift.Error {
     case sanitizationError(message: String, field0: String)
     /// Invalid configuration
     case configError(message: String, field0: String)
-    /// I/O error
+    /// I/O error — stores the error message string so the variant is FFI-safe.
+    ///
+    /// Use `ConversionError::from(io_error)` to convert from `std::io::Error`.
     case ioError(message: String, field0: String)
     /// Panic caught during conversion to prevent unwinding across FFI boundaries
     case panic(message: String, field0: String)
@@ -1225,6 +1284,11 @@ public func preprocessingOptionsUpdateFromJson(_ json: String) throws -> Preproc
     return try RustBridge.preprocessingOptionsUpdateFromJson(json)
 }
 
+public func imageDimensionsFromJson(_ json: String) throws -> ImageDimensions {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(ImageDimensions.self, from: data)
+}
+
 public func documentStructureFromJson(_ json: String) throws -> DocumentStructure {
     return try RustBridge.documentStructureFromJson(json)
 }
@@ -1236,6 +1300,11 @@ public func documentNodeFromJson(_ json: String) throws -> DocumentNode {
 public func textAnnotationFromJson(_ json: String) throws -> TextAnnotation {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(TextAnnotation.self, from: data)
+}
+
+public func metadataEntryFromJson(_ json: String) throws -> MetadataEntry {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(MetadataEntry.self, from: data)
 }
 
 public func conversionResultFromJson(_ json: String) throws -> ConversionResult {
@@ -1670,11 +1739,15 @@ extension RustBridge.PreprocessingOptions: @unchecked Sendable {}
 // swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
 extension RustBridge.PreprocessingOptionsUpdate: @unchecked Sendable {}
 // swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.ImageDimensions: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
 extension RustBridge.DocumentStructure: @unchecked Sendable {}
 // swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
 extension RustBridge.DocumentNode: @unchecked Sendable {}
 // swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
 extension RustBridge.TextAnnotation: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.MetadataEntry: @unchecked Sendable {}
 // swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
 extension RustBridge.ConversionResult: @unchecked Sendable {}
 // swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.

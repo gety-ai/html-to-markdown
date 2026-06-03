@@ -134,7 +134,7 @@ pub fn perform_conversion(
                     "source": format!("{}", img.source),
                     "filename": img.filename,
                     "description": img.description,
-                    "dimensions": img.dimensions.map(|(w, h)| json!({"width": w, "height": h})),
+                    "dimensions": img.dimensions.map(|d| json!({"width": d.width, "height": d.height})),
                     "data_base64": base64_encode(&img.data),
                     "attributes": img.attributes,
                 })

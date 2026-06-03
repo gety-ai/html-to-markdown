@@ -7,10 +7,16 @@ pub fn build(b: *std.Build) void {
     const test_step = b.step("test", "Run tests");
 
     // Fetch the published Zig package from the registry.
-    const html_to_markdown_rs_module = b.dependency("html_to_markdown", .{
+    const html_to_markdown_dep = b.dependency("html_to_markdown", .{
         .target = target,
         .optimize = optimize,
-    }).module("html_to_markdown_rs");
+    });
+    const html_to_markdown_rs_module = html_to_markdown_dep.module("html_to_markdown_rs");
+    const html_to_markdown_lib_path = html_to_markdown_dep.path("lib");
+    const html_to_markdown_include_path = html_to_markdown_dep.path("include");
+    html_to_markdown_rs_module.addLibraryPath(html_to_markdown_lib_path);
+    html_to_markdown_rs_module.addIncludePath(html_to_markdown_include_path);
+    html_to_markdown_rs_module.linkSystemLibrary("html_to_markdown_ffi", .{});
 
     const conversion_module = b.createModule(.{
         .root_source_file = b.path("src/conversion_test.zig"),

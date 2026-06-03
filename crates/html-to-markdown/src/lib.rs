@@ -95,8 +95,8 @@ pub(crate) mod wrapper;
 
 pub use exports::*;
 pub use types::{
-    AnnotationKind, ConversionResult, DocumentNode, DocumentStructure, GridCell, NodeContent, ProcessingWarning,
-    TableData, TableGrid, TextAnnotation, WarningKind,
+    AnnotationKind, ConversionResult, DocumentNode, DocumentStructure, GridCell, ImageDimensions, MetadataEntry,
+    NodeContent, ProcessingWarning, TableData, TableGrid, TextAnnotation, WarningKind,
 };
 #[cfg(feature = "visitor")]
 pub use visitor::{NodeContext, NodeType, VisitResult};

@@ -39,7 +39,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 2077345834;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1406531119;
 
 // Section: executor
 
@@ -564,6 +564,34 @@ fn wire__crate__create_html_visitor_impl(
         },
     )
 }
+fn wire__crate__create_image_dimensions_from_json_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "create_image_dimensions_from_json",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_)
+            };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_json = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::create_image_dimensions_from_json(api_json)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
 fn wire__crate__create_image_metadata_from_json_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -614,6 +642,34 @@ fn wire__crate__create_link_metadata_from_json_impl(
             move |context| {
                 transform_result_sse::<_, String>((move || {
                     let output_ok = crate::create_link_metadata_from_json(api_json)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__create_metadata_entry_from_json_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "create_metadata_entry_from_json",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_)
+            };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_json = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::create_metadata_entry_from_json(api_json)?;
                     Ok(output_ok)
                 })())
             }
@@ -986,7 +1042,6 @@ const _: fn() = || {
         let _: Option<crate::DocumentStructure> = ConversionResult.document;
         let _: crate::HtmlMetadata = ConversionResult.metadata;
         let _: Vec<crate::TableData> = ConversionResult.tables;
-        let _: Vec<String> = ConversionResult.images;
         let _: Vec<crate::ProcessingWarning> = ConversionResult.warnings;
     }
     {
@@ -1043,11 +1098,16 @@ const _: fn() = || {
         let _: Vec<crate::StructuredData> = HtmlMetadata.structured_data;
     }
     {
+        let ImageDimensions = None::<crate::ImageDimensions>.unwrap();
+        let _: i64 = ImageDimensions.width;
+        let _: i64 = ImageDimensions.height;
+    }
+    {
         let ImageMetadata = None::<crate::ImageMetadata>.unwrap();
         let _: String = ImageMetadata.src;
         let _: Option<String> = ImageMetadata.alt;
         let _: Option<String> = ImageMetadata.title;
-        let _: Option<Vec<i64>> = ImageMetadata.dimensions;
+        let _: Option<crate::ImageDimensions> = ImageMetadata.dimensions;
         let _: crate::ImageType = ImageMetadata.image_type;
         let _: std::collections::HashMap<String, String> = ImageMetadata.attributes;
     }
@@ -1059,6 +1119,11 @@ const _: fn() = || {
         let _: crate::LinkType = LinkMetadata.link_type;
         let _: Vec<String> = LinkMetadata.rel;
         let _: std::collections::HashMap<String, String> = LinkMetadata.attributes;
+    }
+    {
+        let MetadataEntry = None::<crate::MetadataEntry>.unwrap();
+        let _: String = MetadataEntry.key;
+        let _: String = MetadataEntry.value;
     }
     match None::<crate::NodeContent>.unwrap() {
         crate::NodeContent::Heading { level, text } => {
@@ -1101,7 +1166,7 @@ const _: fn() = || {
             let _: String = content;
         }
         crate::NodeContent::MetadataBlock { entries } => {
-            let _: Vec<Vec<String>> = entries;
+            let _: Vec<crate::MetadataEntry> = entries;
         }
         crate::NodeContent::Group {
             label,
@@ -2059,14 +2124,12 @@ impl SseDecode for crate::ConversionResult {
         let mut var_document = <Option<crate::DocumentStructure>>::sse_decode(deserializer);
         let mut var_metadata = <crate::HtmlMetadata>::sse_decode(deserializer);
         let mut var_tables = <Vec<crate::TableData>>::sse_decode(deserializer);
-        let mut var_images = <Vec<String>>::sse_decode(deserializer);
         let mut var_warnings = <Vec<crate::ProcessingWarning>>::sse_decode(deserializer);
         return crate::ConversionResult {
             content: var_content,
             document: var_document,
             metadata: var_metadata,
             tables: var_tables,
-            images: var_images,
             warnings: var_warnings,
         };
     }
@@ -2231,13 +2294,25 @@ impl SseDecode for i64 {
     }
 }
 
+impl SseDecode for crate::ImageDimensions {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_width = <i64>::sse_decode(deserializer);
+        let mut var_height = <i64>::sse_decode(deserializer);
+        return crate::ImageDimensions {
+            width: var_width,
+            height: var_height,
+        };
+    }
+}
+
 impl SseDecode for crate::ImageMetadata {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_src = <String>::sse_decode(deserializer);
         let mut var_alt = <Option<String>>::sse_decode(deserializer);
         let mut var_title = <Option<String>>::sse_decode(deserializer);
-        let mut var_dimensions = <Option<Vec<i64>>>::sse_decode(deserializer);
+        let mut var_dimensions = <Option<crate::ImageDimensions>>::sse_decode(deserializer);
         let mut var_imageType = <crate::ImageType>::sse_decode(deserializer);
         let mut var_attributes = <std::collections::HashMap<String, String>>::sse_decode(deserializer);
         return crate::ImageMetadata {
@@ -2404,13 +2479,13 @@ impl SseDecode for Vec<crate::LinkMetadata> {
     }
 }
 
-impl SseDecode for Vec<Vec<String>> {
+impl SseDecode for Vec<crate::MetadataEntry> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut len_ = <i32>::sse_decode(deserializer);
         let mut ans_ = Vec::with_capacity(len_ as usize);
         for idx_ in 0..len_ {
-            ans_.push(<Vec<String>>::sse_decode(deserializer));
+            ans_.push(<crate::MetadataEntry>::sse_decode(deserializer));
         }
         return ans_;
     }
@@ -2500,6 +2575,18 @@ impl SseDecode for Vec<crate::TextAnnotation> {
     }
 }
 
+impl SseDecode for crate::MetadataEntry {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_key = <String>::sse_decode(deserializer);
+        let mut var_value = <String>::sse_decode(deserializer);
+        return crate::MetadataEntry {
+            key: var_key,
+            value: var_value,
+        };
+    }
+}
+
 impl SseDecode for crate::NewlineStyle {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2582,7 +2669,7 @@ impl SseDecode for crate::NodeContent {
                 };
             }
             11 => {
-                let mut var_entries = <Vec<Vec<String>>>::sse_decode(deserializer);
+                let mut var_entries = <Vec<crate::MetadataEntry>>::sse_decode(deserializer);
                 return crate::NodeContent::MetadataBlock { entries: var_entries };
             }
             12 => {
@@ -2832,6 +2919,17 @@ impl SseDecode for Option<i64> {
     }
 }
 
+impl SseDecode for Option<crate::ImageDimensions> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::ImageDimensions>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for Option<crate::LinkStyle> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2947,17 +3045,6 @@ impl SseDecode for Option<Vec<String>> {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         if (<bool>::sse_decode(deserializer)) {
             return Some(<Vec<String>>::sse_decode(deserializer));
-        } else {
-            return None;
-        }
-    }
-}
-
-impl SseDecode for Option<Vec<i64>> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        if (<bool>::sse_decode(deserializer)) {
-            return Some(<Vec<i64>>::sse_decode(deserializer));
         } else {
             return None;
         }
@@ -3245,16 +3332,18 @@ fn pde_ffi_dispatcher_primary_impl(
         10 => wire__crate__create_header_metadata_from_json_impl(port, ptr, rust_vec_len, data_len),
         11 => wire__crate__create_html_metadata_from_json_impl(port, ptr, rust_vec_len, data_len),
         12 => wire__crate__create_html_visitor_impl(port, ptr, rust_vec_len, data_len),
-        13 => wire__crate__create_image_metadata_from_json_impl(port, ptr, rust_vec_len, data_len),
-        14 => wire__crate__create_link_metadata_from_json_impl(port, ptr, rust_vec_len, data_len),
-        15 => wire__crate__create_node_context_from_json_impl(port, ptr, rust_vec_len, data_len),
-        16 => wire__crate__create_preprocessing_options_from_json_impl(port, ptr, rust_vec_len, data_len),
-        17 => wire__crate__create_preprocessing_options_update_from_json_impl(port, ptr, rust_vec_len, data_len),
-        18 => wire__crate__create_processing_warning_from_json_impl(port, ptr, rust_vec_len, data_len),
-        19 => wire__crate__create_structured_data_from_json_impl(port, ptr, rust_vec_len, data_len),
-        20 => wire__crate__create_table_data_from_json_impl(port, ptr, rust_vec_len, data_len),
-        21 => wire__crate__create_table_grid_from_json_impl(port, ptr, rust_vec_len, data_len),
-        22 => wire__crate__create_text_annotation_from_json_impl(port, ptr, rust_vec_len, data_len),
+        13 => wire__crate__create_image_dimensions_from_json_impl(port, ptr, rust_vec_len, data_len),
+        14 => wire__crate__create_image_metadata_from_json_impl(port, ptr, rust_vec_len, data_len),
+        15 => wire__crate__create_link_metadata_from_json_impl(port, ptr, rust_vec_len, data_len),
+        16 => wire__crate__create_metadata_entry_from_json_impl(port, ptr, rust_vec_len, data_len),
+        17 => wire__crate__create_node_context_from_json_impl(port, ptr, rust_vec_len, data_len),
+        18 => wire__crate__create_preprocessing_options_from_json_impl(port, ptr, rust_vec_len, data_len),
+        19 => wire__crate__create_preprocessing_options_update_from_json_impl(port, ptr, rust_vec_len, data_len),
+        20 => wire__crate__create_processing_warning_from_json_impl(port, ptr, rust_vec_len, data_len),
+        21 => wire__crate__create_structured_data_from_json_impl(port, ptr, rust_vec_len, data_len),
+        22 => wire__crate__create_table_data_from_json_impl(port, ptr, rust_vec_len, data_len),
+        23 => wire__crate__create_table_grid_from_json_impl(port, ptr, rust_vec_len, data_len),
+        24 => wire__crate__create_text_annotation_from_json_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -3495,7 +3584,6 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::ConversionResult> {
             self.0.document.into_into_dart().into_dart(),
             self.0.metadata.into_into_dart().into_dart(),
             self.0.tables.into_into_dart().into_dart(),
-            self.0.images.into_into_dart().into_dart(),
             self.0.warnings.into_into_dart().into_dart(),
         ]
         .into_dart()
@@ -3662,6 +3750,22 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::HtmlMetadata>> for crat
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::ImageDimensions> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.0.width.into_into_dart().into_dart(),
+            self.0.height.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::ImageDimensions> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::ImageDimensions>> for crate::ImageDimensions {
+    fn into_into_dart(self) -> FrbWrapper<crate::ImageDimensions> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::ImageMetadata> {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -3768,6 +3872,22 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::ListIndentType> {
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::ListIndentType> {}
 impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::ListIndentType>> for crate::ListIndentType {
     fn into_into_dart(self) -> FrbWrapper<crate::ListIndentType> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::MetadataEntry> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.0.key.into_into_dart().into_dart(),
+            self.0.value.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::MetadataEntry> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::MetadataEntry>> for crate::MetadataEntry {
+    fn into_into_dart(self) -> FrbWrapper<crate::MetadataEntry> {
         self.into()
     }
 }
@@ -4518,7 +4638,6 @@ impl SseEncode for crate::ConversionResult {
         <Option<crate::DocumentStructure>>::sse_encode(self.document, serializer);
         <crate::HtmlMetadata>::sse_encode(self.metadata, serializer);
         <Vec<crate::TableData>>::sse_encode(self.tables, serializer);
-        <Vec<String>>::sse_encode(self.images, serializer);
         <Vec<crate::ProcessingWarning>>::sse_encode(self.warnings, serializer);
     }
 }
@@ -4643,13 +4762,21 @@ impl SseEncode for i64 {
     }
 }
 
+impl SseEncode for crate::ImageDimensions {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i64>::sse_encode(self.width, serializer);
+        <i64>::sse_encode(self.height, serializer);
+    }
+}
+
 impl SseEncode for crate::ImageMetadata {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.src, serializer);
         <Option<String>>::sse_encode(self.alt, serializer);
         <Option<String>>::sse_encode(self.title, serializer);
-        <Option<Vec<i64>>>::sse_encode(self.dimensions, serializer);
+        <Option<crate::ImageDimensions>>::sse_encode(self.dimensions, serializer);
         <crate::ImageType>::sse_encode(self.image_type, serializer);
         <std::collections::HashMap<String, String>>::sse_encode(self.attributes, serializer);
     }
@@ -4804,12 +4931,12 @@ impl SseEncode for Vec<crate::LinkMetadata> {
     }
 }
 
-impl SseEncode for Vec<Vec<String>> {
+impl SseEncode for Vec<crate::MetadataEntry> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
-            <Vec<String>>::sse_encode(item, serializer);
+            <crate::MetadataEntry>::sse_encode(item, serializer);
         }
     }
 }
@@ -4881,6 +5008,14 @@ impl SseEncode for Vec<crate::TextAnnotation> {
         for item in self {
             <crate::TextAnnotation>::sse_encode(item, serializer);
         }
+    }
+}
+
+impl SseEncode for crate::MetadataEntry {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.key, serializer);
+        <String>::sse_encode(self.value, serializer);
     }
 }
 
@@ -4958,7 +5093,7 @@ impl SseEncode for crate::NodeContent {
             }
             crate::NodeContent::MetadataBlock { entries } => {
                 <i32>::sse_encode(11, serializer);
-                <Vec<Vec<String>>>::sse_encode(entries, serializer);
+                <Vec<crate::MetadataEntry>>::sse_encode(entries, serializer);
             }
             crate::NodeContent::Group {
                 label,
@@ -5192,6 +5327,16 @@ impl SseEncode for Option<i64> {
     }
 }
 
+impl SseEncode for Option<crate::ImageDimensions> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::ImageDimensions>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for Option<crate::LinkStyle> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -5298,16 +5443,6 @@ impl SseEncode for Option<Vec<String>> {
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
             <Vec<String>>::sse_encode(value, serializer);
-        }
-    }
-}
-
-impl SseEncode for Option<Vec<i64>> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <bool>::sse_encode(self.is_some(), serializer);
-        if let Some(value) = self {
-            <Vec<i64>>::sse_encode(value, serializer);
         }
     }
 }

@@ -9,7 +9,9 @@ pub mod structure_collector;
 mod tables;
 mod warnings;
 
-pub use document::{AnnotationKind, DocumentNode, DocumentStructure, NodeContent, TextAnnotation};
+pub use document::{
+    AnnotationKind, DocumentNode, DocumentStructure, ImageDimensions, MetadataEntry, NodeContent, TextAnnotation,
+};
 pub use result::ConversionResult;
 pub use structure_builder::build_document_structure;
 pub use structure_collector::{StructureCollector, StructureCollectorHandle};

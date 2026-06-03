@@ -146,8 +146,8 @@ pub mod types;
 pub use collector::MetadataCollector;
 pub use config::{DEFAULT_MAX_STRUCTURED_DATA_SIZE, MetadataConfig, MetadataConfigUpdate};
 pub use types::{
-    DocumentMetadata, HeaderMetadata, HtmlMetadata, ImageMetadata, ImageType, LinkMetadata, LinkType, StructuredData,
-    StructuredDataType, TextDirection,
+    DocumentMetadata, HeaderMetadata, HtmlMetadata, ImageDimensions, ImageMetadata, ImageType, LinkMetadata, LinkType,
+    StructuredData, StructuredDataType, TextDirection,
 };
 
 // Internal handle type for shared mutable access during tree traversal

@@ -2,6 +2,7 @@
 use std::collections::BTreeMap;
 
 use crate::error::ConversionError;
+use crate::types::ImageDimensions;
 
 /// Configuration for capturing inline images during conversion.
 #[derive(Debug, Clone)]
@@ -155,8 +156,8 @@ pub struct InlineImage {
     pub filename: Option<String>,
     /// Alt text or other descriptive metadata from the source HTML.
     pub description: Option<String>,
-    /// Image dimensions in pixels (width, height); only present if inferred.
-    pub dimensions: Option<(u32, u32)>,
+    /// Image dimensions in pixels; only present if inferred.
+    pub dimensions: Option<ImageDimensions>,
     /// Where the image originated (data URI or SVG element).
     pub source: InlineImageSource,
     /// Additional HTML attributes from the source element.
@@ -288,7 +289,7 @@ impl InlineImageCollector {
         format: InlineImageFormat,
         filename: Option<String>,
         description: Option<String>,
-        dimensions: Option<(u32, u32)>,
+        dimensions: Option<ImageDimensions>,
         source: InlineImageSource,
         attributes: BTreeMap<String, String>,
     ) -> InlineImage {
@@ -308,7 +309,7 @@ impl InlineImageCollector {
         index: usize,
         data: &[u8],
         format: &InlineImageFormat,
-    ) -> Option<(u32, u32)> {
+    ) -> Option<ImageDimensions> {
         if !self.should_infer_dimensions() {
             return None;
         }
@@ -319,7 +320,10 @@ impl InlineImageCollector {
         }
 
         match image::load_from_memory(data) {
-            Ok(img) => Some((img.width(), img.height())),
+            Ok(img) => Some(ImageDimensions {
+                width: img.width(),
+                height: img.height(),
+            }),
             Err(err) => {
                 self.warn_info(
                     index,
