@@ -838,11 +838,13 @@ jobs:
             # must `install` inside the container before `exec rake` so the
             # lockfile materializes against the container's Ruby version
             # rather than the host's.
-            # Pin below 0.9.128: that container ships Ruby 4.0.2 whose
-            # <ruby/defines.h> pulls <sys/select.h>, which clang cannot
-            # resolve in the mingw cross sysroot. 0.9.127 still ships Ruby 3.x.
+            # Pin gem below 0.9.128 to get the 0.9.127 container, then exclude
+            # Ruby 4.0.2 via RUBY_CC_VERSION — both 0.9.127 and 0.9.128 ship
+            # Ruby 4.0.2 whose <ruby/defines.h> pulls <sys/select.h>, which
+            # clang cannot resolve in the mingw cross sysroot. 0.9.127's
+            # container also ships 3.1.7/3.2.11/3.3.11/3.4.9; pin to those.
             gem install rb_sys -v '< 0.9.128'
-            rb-sys-dock --platform "${{ matrix.dock_platform }}" -- bash -c "bundle install --jobs=4 --retry=3 && bundle exec rake compile && bundle exec rake build"
+            rb-sys-dock --platform "${{ matrix.dock_platform }}" -- bash -c "export RUBY_CC_VERSION=3.4.9:3.3.11:3.2.11:3.1.7 && bundle install --jobs=4 --retry=3 && bundle exec rake compile && bundle exec rake build"
           else
             # Native build on matching architecture
             bundle exec rake compile

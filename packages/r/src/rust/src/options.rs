@@ -4,12 +4,7 @@ use extendr_api::prelude::*;
 
 /// Helper: extract and convert a value from an R list by name.
 fn list_get(list: &List, key: &str) -> Option<Robj> {
-    let names = list.names().ok();
-    names
-        .iter()
-        .zip(list.iter())
-        .find(|(name, _)| name == key)
-        .map(|(_, val)| val)
+    list.iter().find(|(n, _)| *n == key).map(|(_, v)| v)
 }
 
 /// Decode a code block style enum from its string representation.
@@ -19,7 +14,7 @@ fn decode_code_block_style(val: Robj) -> std::result::Result<crate::CodeBlockSty
         "Indented" => Ok(crate::CodeBlockStyle::Indented),
         "Backticks" => Ok(crate::CodeBlockStyle::Backticks),
         "Tildes" => Ok(crate::CodeBlockStyle::Tildes),
-        _ => Err(format!("code_block_style: unknown variant '{{}}'", s)),
+        _ => Err(format!("code_block_style: unknown variant '{}'", s)),
     }
 }
 
@@ -30,7 +25,7 @@ fn decode_heading_style(val: Robj) -> std::result::Result<crate::HeadingStyle, S
         "Underlined" => Ok(crate::HeadingStyle::Underlined),
         "Atx" => Ok(crate::HeadingStyle::Atx),
         "AtxClosed" => Ok(crate::HeadingStyle::AtxClosed),
-        _ => Err(format!("heading_style: unknown variant '{{}}'", s)),
+        _ => Err(format!("heading_style: unknown variant '{}'", s)),
     }
 }
 
@@ -42,7 +37,7 @@ fn decode_highlight_style(val: Robj) -> std::result::Result<crate::HighlightStyl
         "Html" => Ok(crate::HighlightStyle::Html),
         "Bold" => Ok(crate::HighlightStyle::Bold),
         "None" => Ok(crate::HighlightStyle::None),
-        _ => Err(format!("highlight_style: unknown variant '{{}}'", s)),
+        _ => Err(format!("highlight_style: unknown variant '{}'", s)),
     }
 }
 
@@ -52,7 +47,7 @@ fn decode_link_style(val: Robj) -> std::result::Result<crate::LinkStyle, String>
     match s.as_str() {
         "Inline" => Ok(crate::LinkStyle::Inline),
         "Reference" => Ok(crate::LinkStyle::Reference),
-        _ => Err(format!("link_style: unknown variant '{{}}'", s)),
+        _ => Err(format!("link_style: unknown variant '{}'", s)),
     }
 }
 
@@ -62,7 +57,7 @@ fn decode_list_indent_type(val: Robj) -> std::result::Result<crate::ListIndentTy
     match s.as_str() {
         "Spaces" => Ok(crate::ListIndentType::Spaces),
         "Tabs" => Ok(crate::ListIndentType::Tabs),
-        _ => Err(format!("list_indent_type: unknown variant '{{}}'", s)),
+        _ => Err(format!("list_indent_type: unknown variant '{}'", s)),
     }
 }
 
@@ -72,7 +67,7 @@ fn decode_newline_style(val: Robj) -> std::result::Result<crate::NewlineStyle, S
     match s.as_str() {
         "Spaces" => Ok(crate::NewlineStyle::Spaces),
         "Backslash" => Ok(crate::NewlineStyle::Backslash),
-        _ => Err(format!("newline_style: unknown variant '{{}}'", s)),
+        _ => Err(format!("newline_style: unknown variant '{}'", s)),
     }
 }
 
@@ -83,7 +78,7 @@ fn decode_output_format(val: Robj) -> std::result::Result<crate::OutputFormat, S
         "Markdown" => Ok(crate::OutputFormat::Markdown),
         "Djot" => Ok(crate::OutputFormat::Djot),
         "Plain" => Ok(crate::OutputFormat::Plain),
-        _ => Err(format!("output_format: unknown variant '{{}}'", s)),
+        _ => Err(format!("output_format: unknown variant '{}'", s)),
     }
 }
 
@@ -94,7 +89,7 @@ fn decode_preprocessing_preset(val: Robj) -> std::result::Result<crate::Preproce
         "Minimal" => Ok(crate::PreprocessingPreset::Minimal),
         "Standard" => Ok(crate::PreprocessingPreset::Standard),
         "Aggressive" => Ok(crate::PreprocessingPreset::Aggressive),
-        _ => Err(format!("preprocessing_preset: unknown variant '{{}}'", s)),
+        _ => Err(format!("preprocessing_preset: unknown variant '{}'", s)),
     }
 }
 
@@ -105,7 +100,7 @@ fn decode_tier_strategy(val: Robj) -> std::result::Result<crate::TierStrategy, S
         "Auto" => Ok(crate::TierStrategy::Auto),
         "Tier2" => Ok(crate::TierStrategy::Tier2),
         "Tier1" => Ok(crate::TierStrategy::Tier1),
-        _ => Err(format!("tier_strategy: unknown variant '{{}}'", s)),
+        _ => Err(format!("tier_strategy: unknown variant '{}'", s)),
     }
 }
 
@@ -115,7 +110,7 @@ fn decode_url_escape_style(val: Robj) -> std::result::Result<crate::UrlEscapeSty
     match s.as_str() {
         "Angle" => Ok(crate::UrlEscapeStyle::Angle),
         "Percent" => Ok(crate::UrlEscapeStyle::Percent),
-        _ => Err(format!("url_escape_style: unknown variant '{{}}'", s)),
+        _ => Err(format!("url_escape_style: unknown variant '{}'", s)),
     }
 }
 
@@ -125,7 +120,7 @@ fn decode_whitespace_mode(val: Robj) -> std::result::Result<crate::WhitespaceMod
     match s.as_str() {
         "Normalized" => Ok(crate::WhitespaceMode::Normalized),
         "Strict" => Ok(crate::WhitespaceMode::Strict),
-        _ => Err(format!("whitespace_mode: unknown variant '{{}}'", s)),
+        _ => Err(format!("whitespace_mode: unknown variant '{}'", s)),
     }
 }
 
@@ -305,7 +300,10 @@ pub fn decode_options(options: Robj) -> std::result::Result<crate::ConversionOpt
         opts.infer_dimensions = bool::try_from(&v).map_err(|e| format!("infer_dimensions: {e}"))?;
     }
     if let Some(v) = list_get(&list, "max_depth") {
-        opts.max_depth = f64::try_from(&v).map_err(|e| format!("max_depth: {e}"))?;
+        if !v.is_null() {
+            let f64_val = f64::try_from(&v).map_err(|e| format!("max_depth: {e}"))?;
+            opts.max_depth = Some(f64_val);
+        }
     }
     if let Some(v) = list_get(&list, "exclude_selectors") {
         let strings = Strings::try_from(&v).map_err(|e| format!("exclude_selectors: {e}"))?;
@@ -314,9 +312,6 @@ pub fn decode_options(options: Robj) -> std::result::Result<crate::ConversionOpt
     }
     if let Some(v) = list_get(&list, "tier_strategy") {
         opts.tier_strategy = decode_tier_strategy(v)?;
-    }
-    if let Some(v) = list_get(&list, "visitor") {
-        opts.visitor = decode_visitor_handle(v)?;
     }
     // Note: visitor field is skipped — R has no visitor concept, so it remains at default None
 

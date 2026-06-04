@@ -99,7 +99,7 @@ fn image_metadata_to_robj(image: ImageMetadata) -> Robj {
         alt = option_to_robj(image.alt),
         title = option_to_robj(image.title),
         dimensions = match image.dimensions {
-            Some((w, h)) => Robj::from(list!(width = w as i32, height = h as i32)),
+            Some(d) => Robj::from(list!(width = d.width as i32, height = d.height as i32)),
             None => ().into(),
         },
         image_type = image.image_type.to_string(),
@@ -207,7 +207,7 @@ pub fn conversion_result_to_robj(result: ConversionResult) -> Robj {
             .into_iter()
             .map(|img| {
                 let dimensions_robj: Robj = match img.dimensions {
-                    Some((w, h)) => Robj::from(list!(width = w as i32, height = h as i32)),
+                    Some(d) => Robj::from(list!(width = d.width as i32, height = d.height as i32)),
                     None => ().into(),
                 };
                 let attr_names: Vec<&str> = img.attributes.keys().map(|k: &String| k.as_str()).collect();

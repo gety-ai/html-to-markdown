@@ -1386,7 +1386,7 @@ public func visitResultFromJson(_ json: String) throws -> VisitResult {
 }
 
 /// Swift protocol that Swift classes implement to provide visitor callbacks.
-/// Conform to this protocol to intercept HTML→Markdown conversion events.
+/// Conform to this protocol to intercept configured Rust trait bridge events.
 public protocol HtmlVisitorProtocol: AnyObject {
     func visitText(_ ctx: NodeContext, _ text: String) -> VisitResult
     func visitElementStart(_ ctx: NodeContext) -> VisitResult
@@ -1477,7 +1477,7 @@ public extension HtmlVisitorProtocol {
 
 /// Internal adapter: wraps a `HtmlVisitorProtocol` conformer as a `_SwiftHtmlVisitorBoxDelegate`.
 /// Converts swift-bridge raw types (RustString, UInt, etc.) to user-friendly Swift
-/// types before dispatching, and serialises the `VisitResult` return to JSON.
+/// types before dispatching, then serialises configured return values to JSON.
 private final class _HtmlVisitorProtocolAdapter: _SwiftHtmlVisitorBoxDelegate {
     private let inner: any HtmlVisitorProtocol
     init(_ inner: any HtmlVisitorProtocol) { self.inner = inner }

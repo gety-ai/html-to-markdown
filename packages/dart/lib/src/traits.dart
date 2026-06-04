@@ -361,6 +361,3 @@ abstract class HtmlVisitor {
   /// Called after processing a figure `</figure>`.
   Future<VisitResult> visitFigureEnd(NodeContext ctx, String output);
 }
-
-/// Synchronous extractor trait stub — used by e2e test plugin_api stubs.
-abstract class SyncExtractor {}
