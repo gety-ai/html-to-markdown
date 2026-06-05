@@ -1704,7 +1704,7 @@ public func conversionOptionsFromJsonWithVisitor(_ json: String, _ visitor: Visi
 /// # Errors
 ///
 /// Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
-public func convert(html: String, options: ConversionOptions?) throws -> ConversionResult {
+public func convert(html: String, options: ConversionOptions? = nil) throws -> ConversionResult {
     return try RustBridge.convert(html, options)
 }
 

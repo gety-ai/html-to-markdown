@@ -2,7 +2,7 @@
 title: "Rust API Reference"
 ---
 
-## Rust API Reference <span class="version-badge">v3.6.0-rc.12</span>
+## Rust API Reference <span class="version-badge">v3.6.0-rc.13</span>
 
 ### Functions
 
@@ -13,10 +13,10 @@ and warnings.
 
   `impl Into<Option<ConversionOptions>>`, so any of the following call shapes are accepted:
 
-  - `convert(html, ConversionOptions.default())` — bare options.
-  - `convert(html, opts)` — bare options.
-  - `convert(html, Some(opts))` — explicit `Option`.
-  - `convert(html, None)` — fall back to `ConversionOptions.default`.
+- `convert(html, ConversionOptions.default())` — bare options.
+- `convert(html, opts)` — bare options.
+- `convert(html, Some(opts))` — explicit `Option`.
+- `convert(html, None)` — fall back to `ConversionOptions.default`.
 
 **Errors:**
 

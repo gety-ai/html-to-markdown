@@ -472,7 +472,6 @@ ProcessingWarning <- new.env(parent = emptyenv())
 #' @field is_inline Whether this element is treated as inline vs block
 #' @export
 NodeContext <- new.env(parent = emptyenv())
-NodeContext$attributes <- function(self) .Call("wrap__NodeContext__attributes", self, PACKAGE = "htmltomarkdown")
 NodeContext$into_owned <- function(self) .Call("wrap__NodeContext__into_owned", self, PACKAGE = "htmltomarkdown")
 #' @export
 `$.NodeContext` <- function(self, name) {
@@ -485,8 +484,6 @@ NodeContext$into_owned <- function(self) .Call("wrap__NodeContext__into_owned", 
 }
 #' @export
 `[[.NodeContext` <- `$.NodeContext`
-#' @export
-attributes.NodeContext <- function(x, ...) x$attributes(...)
 #' @export
 into_owned.NodeContext <- function(x, ...) x$into_owned(...)
 #' Result of a visitor callback
@@ -684,8 +681,6 @@ AnnotationKind$from_json <- function(json) .Call("wrap__AnnotationKind__from_jso
 }
 #' @export
 `[[.AnnotationKind` <- `$.AnnotationKind`
-#' @export
-attributes <- function(x, ...) UseMethod("attributes")
 #' @export
 into_owned <- function(x, ...) UseMethod("into_owned")
 #' @export
