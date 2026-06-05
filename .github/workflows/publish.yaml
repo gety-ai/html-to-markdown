@@ -818,9 +818,9 @@ jobs:
           bundle install --jobs 4 --retry 3
 
       - uses: kreuzberg-dev/actions/build-ruby-gem@v1
+        if: matrix.dock_platform == ''
         with:
           package-dir: packages/ruby
-          dock-platform: ${{ matrix.dock_platform }}
 
       - name: Build platform gem
         # Inline: each matrix runner builds the gem for its own native platform
