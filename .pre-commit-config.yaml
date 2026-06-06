@@ -12,210 +12,239 @@ repos:
     stages:
     - commit-msg
 - repo: https://github.com/kreuzberg-dev/pre-commit-hooks
-  rev: v1.2.3
+  rev: v2.1.0
   hooks:
-  # ── Structure & generated-asset sync (run first; formatters get the final word) ──
-  - id: ai-rulez-generate
-  - id: alef-sync-versions
-    args:
-    - --no-regen
-  # ── File-level safety ──
-  - id: trailing-whitespace
-    exclude: \.github/copilot-instructions\.md
-  - id: end-of-file-fixer
-    exclude: "(?x)^(\n  \\.github/copilot-instructions\\.md|\n  .*/\\.gitkeep|\n  .*/py\\.typed|\n  packages/java/checkstyle\\\
-      .properties|\n  (e2e/python|e2e/python/tests)/__init__\\.py\n)$\n"
-  - id: check-merge-conflict
-  - id: check-added-large-files
-    exclude: "(?x)^(\n  uv\\.lock\n  |crates/html-to-markdown/tests/fixtures/regressions/.*\n)$\n"
-  - id: detect-private-key
-  - id: check-json
-    exclude: tsconfig\.base\.json
-  - id: check-yaml
-    args:
-    - --allow-multiple-documents
-    - --unsafe
-  - id: check-toml
-  - id: check-case-conflict
-  # ── Formatters (autofixers, in language order) ──
-  - id: pyproject-fmt
-    exclude: ^test_apps/python/pyproject\.toml$
-  - id: ruff-format
-  - id: cargo-sort
-    args:
-    - -w
-    exclude: ^(e2e/rust/|test_apps/rust/|packages/dart/rust/)Cargo\.toml$
-  - id: cargo-fmt
-    args:
-    - --all
-  - id: shfmt
-    args:
-    - -w
-    - -i
-    - '2'
-  - id: clang-format
-    args:
-    - --style=file
-    files: ^crates/html-to-markdown-ffi/tests/c/
-  - id: go-fmt
-    exclude: ^(e2e/|test_apps/)
-  - id: rubocop
-    files: ^packages/ruby/.*\.rb$
-    exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
-  - id: dotnet-format
-    files: ^packages/csharp/.*\.cs$
-  - id: php-cs-fixer
-    files: ^packages/php/.*\.php$
-    exclude: ^packages/php/stubs/
-  - id: mix-format
-    files: ^packages/elixir/
-  - id: ktfmt
-    files: ^packages/kotlin-android/.*\.kts?$
-    args:
-    - --kotlinlang-style
-  - id: swift-format
-    files: ^packages/swift/.*\.swift$
-  - id: dart-format
-    files: ^packages/dart/.*\.dart$
-  - id: zig-fmt
-    files: ^packages/zig/.*\.zig$
-  - id: oxfmt
-  - id: rumdl-fmt
-  - id: textlint
-    files: ^docs/.*\.md$
-    exclude: ^docs/(reference/|api-|snippets/|migration/)
-    args:
-    - --fix
-    - --config
-    - .textlintrc.json
-  # ── Linters & static analysis (non-autofixing checks) ──
-  - id: ruff
-  - id: cargo-check
-    args:
-    - --workspace
-    - --exclude=html-to-markdown-php
-    - --exclude=html-to-markdown-py
-    - --exclude=html-to-markdown-node
-    - --exclude=html_to_markdown_rs-e2e-rust
-    - --all-features
-    - --all-targets
-  - id: cargo-clippy
-    args:
-    - --fix
-    - --allow-dirty
-    - --allow-staged
-    - --workspace
-    - --exclude=html-to-markdown-php
-    - --exclude=html-to-markdown-py
-    - --exclude=html-to-markdown-node
-    - --exclude=html_to_markdown_rs-e2e-rust
-    - --all-features
-    - --all-targets
-    - --
-    - -D
-    - warnings
-  - id: cargo-machete
-    args:
-    - crates/
-    exclude: ^(e2e/|test_apps/)
-  - id: cargo-deny
-    args:
-    - check
-  - id: shellcheck
-    exclude: ^test_apps/kotlin_android/gradlew$
-  - id: clang-tidy
-    files: ^crates/html-to-markdown-ffi/tests/c/
-  - id: mypy
-    exclude: e2e/|tests/|scripts/|^packages/r/
-  - id: golangci-lint
-    exclude: ^(e2e/|test_apps/)
-    env:
-      KREUZBERG_GO_MOD_DIRS: packages/go
-  - id: govulncheck
-    exclude: ^(e2e/|test_apps/)
-    env:
-      KREUZBERG_GO_MOD_DIRS: packages/go
-  - id: rubocop-lint
-    files: ^packages/ruby/.*\.(rb|rbs)$
-    exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
-  - id: steep
-    files: ^packages/ruby/.*\.(rb|rbs)$
-    exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
-  - id: dotnet-format-check
-    files: ^packages/csharp/.*\.cs$
-  - id: phpstan
-    files: ^packages/php/(src|tests)/.*\.php$
-    args:
-    - analyse
-    - --no-progress
-    - --configuration
-    - packages/php/phpstan.neon
-  - id: mix-credo
-    files: ^packages/elixir/
-  - id: checkstyle
-    args:
-    - -c
-    - packages/java/checkstyle.xml
-    - -p
-    - packages/java/checkstyle.properties
-    exclude: ^(\.mvn/wrapper/|e2e/|test_apps/|packages/java/src/)
-  - id: detekt
-    files: ^packages/kotlin-android/.*\.kts?$
-    args:
-    - --build-upon-default-config
-  - id: ktlint
-    files: ^packages/kotlin-android/.*\.kts?$
-  - id: swiftlint
-    files: ^packages/swift/.*\.swift$
-  - id: dart-analyze
-    files: ^packages/dart/.*\.dart$
-    exclude: ^(test_apps/|e2e/dart/)
-  - id: zig-build-check
-    files: ^packages/zig/.*\.zig$
-  - id: oxlint
-  - id: cppcheck
-    args:
-    - --suppress=unusedStructMember
-  - id: cpd
-    args:
-    - --minimum-tokens=120
-    exclude: ^(test_apps/|e2e/java/)
-  - id: actionlint
-  - id: gh-actions-updater
-  - id: typos
-    args:
-    - --force-exclude
-  # ── Documentation lints ──
-  - id: rustdoc-lint
-    files: ^crates/html-to-markdown/src/.*\.rs$
-    exclude: /tests/
-    args:
-    - -p
-    - html-to-markdown-rs
-  - id: pydocstyle
-    files: ^packages/python/.*\.py$
-    exclude: ^packages/python/(tests/|.*_native\.py$)
-  - id: roxygen2-check
-    files: ^packages/r/R/.*\.R$
-  - id: godoc-lint
-    files: ^packages/go/.*\.go$
-    exclude: ^(e2e/|test_apps/)
-    env:
-      KREUZBERG_GO_MOD_DIRS: packages/go
-  - id: javadoc-lint
-    files: ^packages/java/src/main/.*\.java$
-  - id: cs-xmldoc-lint
-    files: ^packages/csharp/HtmlToMarkdown/.*\.cs$
-  - id: phpdoc-lint
-    files: ^packages/php/src/.*\.php$
-  - id: dart-doc-lint
-    files: ^packages/dart/lib/.*\.dart$
-    exclude: ^packages/dart/lib/src/rust/
-  - id: zig-doc-lint
-    files: ^packages/zig/src/.*\.zig$
-    exclude: ^packages/zig/src/html_to_markdown_rs\.zig$
-  # ── Final verification (must run after all autofixers) ──
-  - id: java-verify
-    files: ^packages/java/
-  - id: alef-docs-fresh
-  - id: alef-verify
+    # AI governance
+    - id: ai-rulez-generate
+
+    # File safety
+    - id: trailing-whitespace
+      exclude: \.github/copilot-instructions\.md
+    - id: end-of-file-fixer
+      exclude: "(?x)^(\n  \\.github/copilot-instructions\\.md|\n  .*/\\.gitkeep|\n  .*/py\\.typed|\n  packages/java/checkstyle\\\
+        .properties|\n  (e2e/python|e2e/python/tests)/__init__\\.py\n)$\n"
+    - id: check-merge-conflict
+    - id: check-added-large-files
+      exclude: "(?x)^(\n  uv\\.lock\n  |crates/html-to-markdown/tests/fixtures/regressions/.*\n)$\n"
+    - id: detect-private-key
+    - id: check-case-conflict
+    - id: check-executables-have-shebangs
+    - id: check-shebang-scripts-are-executable
+    - id: mixed-line-ending
+    - id: typos
+      args: ["--force-exclude"]
+    - id: check-json
+      exclude: tsconfig\.base\.json
+    - id: check-yaml
+      args:
+      - --allow-multiple-documents
+      - --unsafe
+    - id: check-toml
+
+    # GitHub Actions
+    - id: actionlint
+    - id: gh-actions-updater
+
+    # Shell
+    - id: shfmt
+      args: ["-w", "-i", "2"]
+    - id: shellcheck
+      exclude: ^test_apps/kotlin_android/gradlew$
+
+    # Markdown
+    - id: rumdl-fmt
+    - id: markdownlint-rumdl-strict
+    - id: textlint
+      files: ^docs/.*\.md$
+      exclude: ^docs/(reference/|api-|snippets/|migration/)
+      args:
+      - --fix
+      - --config
+      - .textlintrc.json
+
+    # Rust — cargo-check dropped in v2.0.0; cargo-clippy with -D warnings supersedes it
+    - id: cargo-fmt
+      args: ["--all"]
+    - id: cargo-clippy
+      args:
+      - --fix
+      - --allow-dirty
+      - --allow-staged
+      - --workspace
+      - --exclude=html-to-markdown-php
+      - --exclude=html-to-markdown-py
+      - --exclude=html-to-markdown-node
+      - --exclude=html_to_markdown_rs-e2e-rust
+      - --all-features
+      - --all-targets
+      - --
+      - -D
+      - warnings
+    - id: cargo-sort
+      args:
+      - -w
+      exclude: ^(e2e/rust/|test_apps/rust/|packages/dart/rust/)Cargo\.toml$
+    - id: cargo-machete
+      args:
+      - crates/
+      exclude: ^(e2e/|test_apps/)
+    - id: cargo-deny
+      args: ["check"]
+    - id: rustdoc-lint
+      files: ^crates/html-to-markdown/src/.*\.rs$
+      exclude: /tests/
+      args:
+      - -p
+      - html-to-markdown-rs
+    - id: rust-max-lines
+      args: ["--max=1000"]
+
+    # Python
+    - id: pyproject-fmt
+      exclude: ^test_apps/python/pyproject\.toml$
+    - id: ruff
+    - id: ruff-format
+    - id: mypy
+      exclude: e2e/|tests/|scripts/|^packages/r/
+    - id: pydocstyle
+      files: ^packages/python/.*\.py$
+      exclude: ^packages/python/(tests/|.*_native\.py$)
+
+    # JS/TS
+    - id: oxlint
+    - id: oxfmt
+    - id: tsc-typecheck
+    - id: tsdoc-lint
+
+    # Go
+    - id: go-fmt
+      exclude: ^(e2e/|test_apps/)
+    - id: golangci-lint
+      exclude: ^(e2e/|test_apps/)
+      env:
+        KREUZBERG_GO_MOD_DIRS: packages/go
+    - id: govulncheck
+      exclude: ^(e2e/|test_apps/)
+      env:
+        KREUZBERG_GO_MOD_DIRS: packages/go
+    - id: godoc-lint
+      files: ^packages/go/.*\.go$
+      exclude: ^(e2e/|test_apps/)
+      env:
+        KREUZBERG_GO_MOD_DIRS: packages/go
+
+    # Java
+    - id: palantir-java-format
+    - id: checkstyle
+      args:
+      - -c
+      - packages/java/checkstyle.xml
+      - -p
+      - packages/java/checkstyle.properties
+      exclude: ^(\.mvn/wrapper/|e2e/|test_apps/|packages/java/src/)
+    - id: pmd
+    - id: cpd
+      args:
+      - --minimum-tokens=120
+      exclude: ^(test_apps/|e2e/java/)
+    - id: java-verify
+      files: ^packages/java/
+    - id: javadoc-lint
+      files: ^packages/java/src/main/.*\.java$
+
+    # Ruby
+    - id: rubocop
+      files: ^packages/ruby/.*\.rb$
+      exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
+    - id: rubocop-lint
+      files: ^packages/ruby/.*\.(rb|rbs)$
+      exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
+    - id: steep
+      files: ^packages/ruby/.*\.(rb|rbs)$
+      exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
+    - id: yard-coverage
+
+    # C#
+    - id: dotnet-format
+      files: ^packages/csharp/.*\.cs$
+    - id: dotnet-format-check
+      files: ^packages/csharp/.*\.cs$
+    - id: cs-xmldoc-lint
+      files: ^packages/csharp/HtmlToMarkdown/.*\.cs$
+
+    # PHP
+    - id: php-cs-fixer
+      files: ^packages/php/.*\.php$
+      exclude: ^packages/php/stubs/
+    - id: phpstan
+      files: ^packages/php/(src|tests)/.*\.php$
+      args:
+      - analyse
+      - --no-progress
+      - --configuration
+      - packages/php/phpstan.neon
+    - id: phpdoc-lint
+      files: ^packages/php/src/.*\.php$
+
+    # Elixir
+    - id: mix-format
+      files: ^packages/elixir/
+    - id: mix-credo
+      files: ^packages/elixir/
+    - id: ex-doc-coverage
+
+    # Dart
+    - id: dart-format
+      files: ^packages/dart/.*\.dart$
+    - id: dart-analyze
+      files: ^packages/dart/.*\.dart$
+      exclude: ^(test_apps/|e2e/dart/)
+    - id: dart-doc-lint
+      files: ^packages/dart/lib/.*\.dart$
+      exclude: ^packages/dart/lib/src/rust/
+
+    # Zig
+    - id: zig-fmt
+      files: ^packages/zig/.*\.zig$
+    - id: zig-build-check
+      files: ^packages/zig/.*\.zig$
+    - id: zig-doc-lint
+      files: ^packages/zig/src/.*\.zig$
+      exclude: ^packages/zig/src/html_to_markdown_rs\.zig$
+
+    # C / C++
+    - id: clang-format
+      args:
+      - --style=file
+      files: ^crates/html-to-markdown-ffi/tests/c/
+    - id: clang-tidy
+      files: ^crates/html-to-markdown-ffi/tests/c/
+    - id: cppcheck
+      args:
+      - --suppress=unusedStructMember
+
+    # Alef bindings (this repo consumes alef-generated bindings)
+    - id: alef-verify
+    - id: alef-sync-versions
+      args:
+      - --no-regen
+    - id: alef-docs-fresh
+    - id: alef-snippets-validate
+
+    # preserved from prior config
+    - id: ktfmt
+      files: ^packages/kotlin-android/.*\.kts?$
+      args:
+      - --kotlinlang-style
+    - id: swift-format
+      files: ^packages/swift/.*\.swift$
+    - id: detekt
+      files: ^packages/kotlin-android/.*\.kts?$
+      args:
+      - --build-upon-default-config
+    - id: ktlint
+      files: ^packages/kotlin-android/.*\.kts?$
+    - id: swiftlint
+      files: ^packages/swift/.*\.swift$
+    - id: roxygen2-check
+      files: ^packages/r/R/.*\.R$
