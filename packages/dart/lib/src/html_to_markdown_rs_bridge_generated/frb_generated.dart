@@ -71,8 +71,14 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   static List<String> _alefHostLibNames() {
     // The Dart-binding Rust crate is `{stem}-dart` (per the cargo manifest
     // template), which produces a cdylib named `lib{stem}_dart.{ext}` on Unix
-    // and `{stem}_dart.dll` on Windows.
-    if (Platform.isMacOS) return const ['libhtml_to_markdown_rs_dart.dylib'];
+    // and `{stem}_dart.dll` on Windows. On macOS, pub.dev-published packages
+    // may ship the binary as a Framework bundle (preferred modern packaging)
+    // — list that first so the loader finds it before the bare dylib.
+    if (Platform.isMacOS)
+      return const [
+        'html_to_markdown_rs_dart.framework/html_to_markdown_rs_dart',
+        'libhtml_to_markdown_rs_dart.dylib',
+      ];
     if (Platform.isWindows) return const ['html_to_markdown_rs_dart.dll'];
     return const ['libhtml_to_markdown_rs_dart.so'];
   }

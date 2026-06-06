@@ -3,7 +3,6 @@
 
 import Foundation
 import RustBridge
-
 /// Document-level metadata extracted from `<head>` and top-level elements.
 ///
 /// Contains all metadata typically used by search engines, social media platforms,
@@ -1318,7 +1317,6 @@ public func convert(_ html: String, _ optionsJson: String) throws -> ConversionR
     let options = try conversionOptionsFromJson(optionsJson)
     return try convert(html: html, options: options)
 }
-
 // MARK: - From-JSON Helpers
 // Public helpers that decode JSON into first-class Swift types.
 // First-class struct types (Codable) use JSONDecoder directly.
@@ -1327,147 +1325,116 @@ public func convert(_ html: String, _ optionsJson: String) throws -> ConversionR
 public func documentMetadataFromJson(_ json: String) throws -> DocumentMetadata {
     return try RustBridge.documentMetadataFromJson(json)
 }
-
 public func headerMetadataFromJson(_ json: String) throws -> HeaderMetadata {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(HeaderMetadata.self, from: data)
 }
-
 public func linkMetadataFromJson(_ json: String) throws -> LinkMetadata {
     return try RustBridge.linkMetadataFromJson(json)
 }
-
 public func imageMetadataFromJson(_ json: String) throws -> ImageMetadata {
     return try RustBridge.imageMetadataFromJson(json)
 }
-
 public func structuredDataFromJson(_ json: String) throws -> StructuredData {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(StructuredData.self, from: data)
 }
-
 public func htmlMetadataFromJson(_ json: String) throws -> HtmlMetadata {
     return try RustBridge.htmlMetadataFromJson(json)
 }
-
 public func conversionOptionsFromJson(_ json: String) throws -> ConversionOptions {
     return try RustBridge.conversionOptionsFromJson(json)
 }
-
 public func conversionOptionsUpdateFromJson(_ json: String) throws -> ConversionOptionsUpdate {
     return try RustBridge.conversionOptionsUpdateFromJson(json)
 }
-
 public func preprocessingOptionsFromJson(_ json: String) throws -> PreprocessingOptions {
     return try RustBridge.preprocessingOptionsFromJson(json)
 }
-
 public func preprocessingOptionsUpdateFromJson(_ json: String) throws -> PreprocessingOptionsUpdate {
     return try RustBridge.preprocessingOptionsUpdateFromJson(json)
 }
-
 public func imageDimensionsFromJson(_ json: String) throws -> ImageDimensions {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(ImageDimensions.self, from: data)
 }
-
 public func documentStructureFromJson(_ json: String) throws -> DocumentStructure {
     return try RustBridge.documentStructureFromJson(json)
 }
-
 public func documentNodeFromJson(_ json: String) throws -> DocumentNode {
     return try RustBridge.documentNodeFromJson(json)
 }
-
 public func textAnnotationFromJson(_ json: String) throws -> TextAnnotation {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(TextAnnotation.self, from: data)
 }
-
 public func metadataEntryFromJson(_ json: String) throws -> MetadataEntry {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(MetadataEntry.self, from: data)
 }
-
 public func conversionResultFromJson(_ json: String) throws -> ConversionResult {
     return try RustBridge.conversionResultFromJson(json)
 }
-
 public func tableGridFromJson(_ json: String) throws -> TableGrid {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(TableGrid.self, from: data)
 }
-
 public func gridCellFromJson(_ json: String) throws -> GridCell {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(GridCell.self, from: data)
 }
-
 public func tableDataFromJson(_ json: String) throws -> TableData {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(TableData.self, from: data)
 }
-
 public func processingWarningFromJson(_ json: String) throws -> ProcessingWarning {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(ProcessingWarning.self, from: data)
 }
-
 public func nodeContextFromJson(_ json: String) throws -> NodeContext {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(NodeContext.self, from: data)
 }
-
 public func textDirectionFromJson(_ json: String) throws -> TextDirection {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(TextDirection.self, from: data)
 }
-
 public func linkTypeFromJson(_ json: String) throws -> LinkType {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(LinkType.self, from: data)
 }
-
 public func imageTypeFromJson(_ json: String) throws -> ImageType {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(ImageType.self, from: data)
 }
-
 public func structuredDataTypeFromJson(_ json: String) throws -> StructuredDataType {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(StructuredDataType.self, from: data)
 }
-
 public func tierStrategyFromJson(_ json: String) throws -> TierStrategy {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(TierStrategy.self, from: data)
 }
-
 public func nodeContentFromJson(_ json: String) throws -> NodeContent {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(NodeContent.self, from: data)
 }
-
 public func annotationKindFromJson(_ json: String) throws -> AnnotationKind {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(AnnotationKind.self, from: data)
 }
-
 public func warningKindFromJson(_ json: String) throws -> WarningKind {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(WarningKind.self, from: data)
 }
-
 public func nodeTypeFromJson(_ json: String) throws -> NodeType {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(NodeType.self, from: data)
 }
-
 public func visitResultFromJson(_ json: String) throws -> VisitResult {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(VisitResult.self, from: data)
 }
-
 /// Swift protocol that Swift classes implement to provide visitor callbacks.
 /// Conform to this protocol to intercept configured Rust trait bridge events.
 public protocol HtmlVisitorProtocol: AnyObject {

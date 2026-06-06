@@ -38,7 +38,10 @@ sealed class NodeContent {
     @com.fasterxml.jackson.databind.annotation.JsonSerialize(
         using = com.fasterxml.jackson.databind.JsonSerializer.None::class
     )
-    data class Heading(val level: Byte, val text: String) : NodeContent()
+    data class Heading(
+        val level: Byte,
+        val text: String,
+    ) : NodeContent()
 
     /** A paragraph of text. */
     @com.fasterxml.jackson.databind.annotation.JsonDeserialize(
@@ -83,8 +86,11 @@ sealed class NodeContent {
     @com.fasterxml.jackson.databind.annotation.JsonSerialize(
         using = com.fasterxml.jackson.databind.JsonSerializer.None::class
     )
-    data class Image(val description: String?, val src: String?, val imageIndex: Int?) :
-        NodeContent()
+    data class Image(
+        val description: String?,
+        val src: String?,
+        val imageIndex: Int?,
+    ) : NodeContent()
 
     /** A code block or inline code. */
     @com.fasterxml.jackson.databind.annotation.JsonDeserialize(
@@ -93,7 +99,10 @@ sealed class NodeContent {
     @com.fasterxml.jackson.databind.annotation.JsonSerialize(
         using = com.fasterxml.jackson.databind.JsonSerializer.None::class
     )
-    data class Code(val text: String, val language: String?) : NodeContent()
+    data class Code(
+        val text: String,
+        val language: String?,
+    ) : NodeContent()
 
     /** A block quote container. */
     object Quote : NodeContent()
@@ -108,7 +117,10 @@ sealed class NodeContent {
     @com.fasterxml.jackson.databind.annotation.JsonSerialize(
         using = com.fasterxml.jackson.databind.JsonSerializer.None::class
     )
-    data class DefinitionItem(val term: String, val definition: String) : NodeContent()
+    data class DefinitionItem(
+        val term: String,
+        val definition: String,
+    ) : NodeContent()
 
     /** A raw block preserved as-is (e.g. `<script>`, `<style>` content). */
     @com.fasterxml.jackson.databind.annotation.JsonDeserialize(
@@ -117,7 +129,10 @@ sealed class NodeContent {
     @com.fasterxml.jackson.databind.annotation.JsonSerialize(
         using = com.fasterxml.jackson.databind.JsonSerializer.None::class
     )
-    data class RawBlock(val format: String, val content: String) : NodeContent()
+    data class RawBlock(
+        val format: String,
+        val content: String,
+    ) : NodeContent()
 
     /** A block of key-value metadata pairs (from `<head>` meta tags). */
     @com.fasterxml.jackson.databind.annotation.JsonDeserialize(
@@ -135,8 +150,11 @@ sealed class NodeContent {
     @com.fasterxml.jackson.databind.annotation.JsonSerialize(
         using = com.fasterxml.jackson.databind.JsonSerializer.None::class
     )
-    data class Group(val label: String?, val headingLevel: Byte?, val headingText: String?) :
-        NodeContent()
+    data class Group(
+        val label: String?,
+        val headingLevel: Byte?,
+        val headingText: String?,
+    ) : NodeContent()
 }
 
 private class NodeContentDeserializer :

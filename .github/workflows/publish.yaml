@@ -830,7 +830,6 @@ jobs:
         # mirrors the kreuzberg sibling's proven Ruby publish path. For Windows
         # we cross-compile inside rb-sys-dock so the GNU toolchain produces a
         # x64-mingw-ucrt gem from the linux runner.
-        working-directory: packages/ruby
         shell: bash
         run: |
           if [ -n "${{ matrix.dock_platform }}" ]; then
@@ -844,13 +843,21 @@ jobs:
             # Ruby 4.0.2 whose <ruby/defines.h> pulls <sys/select.h>, which
             # clang cannot resolve in the mingw cross sysroot. 0.9.127's
             # container also ships 3.1.7/3.2.11/3.3.11/3.4.9; pin to those.
+            #
+            # Run rb-sys-dock from the WORKSPACE ROOT so the container mounts
+            # the whole repo — the gem's Cargo.toml has a path-dep
+            # `html-to-markdown-rs = { path = "../../../../../crates/html-to-markdown" }`
+            # which resolves outside `packages/ruby/` and would not exist in
+            # a container mounted at the gem dir. Use `--directory packages/ruby`
+            # so the container's working dir is still the gem root.
             gem install rb_sys -v '< 0.9.128'
             # Use `env VAR=val` to plant RUBY_CC_VERSION into the *command's* process
             # environment, surviving the container's /etc/profile.d default that
             # otherwise re-introduces Ruby 4.0.2 after `export`.
-            rb-sys-dock --platform "${{ matrix.dock_platform }}" -- env RUBY_CC_VERSION=3.4.9:3.3.11:3.2.11:3.1.7 bash -c "bundle install --jobs=4 --retry=3 && bundle exec rake compile && bundle exec rake build"
+            rb-sys-dock --directory packages/ruby --platform "${{ matrix.dock_platform }}" -- env RUBY_CC_VERSION=3.4.9:3.3.11:3.2.11:3.1.7 bash -c "bundle install --jobs=4 --retry=3 && bundle exec rake compile && bundle exec rake build"
           else
             # Native build on matching architecture
+            cd packages/ruby
             bundle exec rake compile
             bundle exec rake build
           fi
@@ -2343,6 +2350,7 @@ jobs:
           path: swift-checksums
 
       - name: Update Package.swift with version and checksum
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
           CHECKSUM=$(cat swift-checksums/*.checksum | tr -d '[:space:]')
@@ -2353,6 +2361,17 @@ jobs:
 
           echo "Updated Package.swift:"
           head -30 Package.swift
+
+          # Commit the substituted Package.swift back to the rc tag.
+          # The checksum is only known after the artifact bundle is built, but consumers
+          # (test_apps) fetch the tagged tree and need the substituted manifest.
+          # Force-update the tag to point at this post-substitution commit.
+          git config user.name "kreuzberg-dev[bot]"
+          git config user.email "noreply@kreuzberg.dev"
+          git add Package.swift
+          git commit -m "chore(release): substitute Swift checksum for ${VERSION}"
+          git tag -f "v${VERSION}" HEAD
+          git push origin "v${VERSION}" --force-with-lease
 
       - name: Update release notes with artifact URL
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}

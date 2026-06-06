@@ -64,7 +64,10 @@ sealed class AnnotationKind {
     @com.fasterxml.jackson.databind.annotation.JsonSerialize(
         using = com.fasterxml.jackson.databind.JsonSerializer.None::class
     )
-    data class Link(val url: String, val title: String?) : AnnotationKind()
+    data class Link(
+        val url: String,
+        val title: String?,
+    ) : AnnotationKind()
 }
 
 private class AnnotationKindDeserializer :

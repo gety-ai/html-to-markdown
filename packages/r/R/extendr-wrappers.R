@@ -516,7 +516,6 @@ VisitResult <- new.env(parent = emptyenv())
 #' @return A TextDirection enum value
 #' @export
 TextDirection  <- function() list() |> structure(class = "TextDirection")
-
 #' Create a LinkType enum value
 #'
 #' Returns the default LinkType variant.
@@ -524,7 +523,6 @@ TextDirection  <- function() list() |> structure(class = "TextDirection")
 #' @return A LinkType enum value
 #' @export
 LinkType  <- function() list() |> structure(class = "LinkType")
-
 #' Create a ImageType enum value
 #'
 #' Returns the default ImageType variant.
@@ -532,7 +530,6 @@ LinkType  <- function() list() |> structure(class = "LinkType")
 #' @return A ImageType enum value
 #' @export
 ImageType  <- function() list() |> structure(class = "ImageType")
-
 #' Create a StructuredDataType enum value
 #'
 #' Returns the default StructuredDataType variant.
@@ -540,7 +537,6 @@ ImageType  <- function() list() |> structure(class = "ImageType")
 #' @return A StructuredDataType enum value
 #' @export
 StructuredDataType  <- function() list() |> structure(class = "StructuredDataType")
-
 #' Create a TierStrategy enum value
 #'
 #' Returns the default TierStrategy variant.
@@ -548,7 +544,6 @@ StructuredDataType  <- function() list() |> structure(class = "StructuredDataTyp
 #' @return A TierStrategy enum value
 #' @export
 TierStrategy  <- function() list() |> structure(class = "TierStrategy")
-
 #' Create a PreprocessingPreset enum value
 #'
 #' Returns the default PreprocessingPreset variant.
@@ -556,7 +551,6 @@ TierStrategy  <- function() list() |> structure(class = "TierStrategy")
 #' @return A PreprocessingPreset enum value
 #' @export
 PreprocessingPreset  <- function() list() |> structure(class = "PreprocessingPreset")
-
 #' Create a HeadingStyle enum value
 #'
 #' Returns the default HeadingStyle variant.
@@ -564,7 +558,6 @@ PreprocessingPreset  <- function() list() |> structure(class = "PreprocessingPre
 #' @return A HeadingStyle enum value
 #' @export
 HeadingStyle  <- function() list() |> structure(class = "HeadingStyle")
-
 #' Create a ListIndentType enum value
 #'
 #' Returns the default ListIndentType variant.
@@ -572,7 +565,6 @@ HeadingStyle  <- function() list() |> structure(class = "HeadingStyle")
 #' @return A ListIndentType enum value
 #' @export
 ListIndentType  <- function() list() |> structure(class = "ListIndentType")
-
 #' Create a WhitespaceMode enum value
 #'
 #' Returns the default WhitespaceMode variant.
@@ -580,7 +572,6 @@ ListIndentType  <- function() list() |> structure(class = "ListIndentType")
 #' @return A WhitespaceMode enum value
 #' @export
 WhitespaceMode  <- function() list() |> structure(class = "WhitespaceMode")
-
 #' Create a NewlineStyle enum value
 #'
 #' Returns the default NewlineStyle variant.
@@ -588,7 +579,6 @@ WhitespaceMode  <- function() list() |> structure(class = "WhitespaceMode")
 #' @return A NewlineStyle enum value
 #' @export
 NewlineStyle  <- function() list() |> structure(class = "NewlineStyle")
-
 #' Create a CodeBlockStyle enum value
 #'
 #' Returns the default CodeBlockStyle variant.
@@ -596,7 +586,6 @@ NewlineStyle  <- function() list() |> structure(class = "NewlineStyle")
 #' @return A CodeBlockStyle enum value
 #' @export
 CodeBlockStyle  <- function() list() |> structure(class = "CodeBlockStyle")
-
 #' Create a HighlightStyle enum value
 #'
 #' Returns the default HighlightStyle variant.
@@ -604,7 +593,6 @@ CodeBlockStyle  <- function() list() |> structure(class = "CodeBlockStyle")
 #' @return A HighlightStyle enum value
 #' @export
 HighlightStyle  <- function() list() |> structure(class = "HighlightStyle")
-
 #' Create a LinkStyle enum value
 #'
 #' Returns the default LinkStyle variant.
@@ -612,7 +600,6 @@ HighlightStyle  <- function() list() |> structure(class = "HighlightStyle")
 #' @return A LinkStyle enum value
 #' @export
 LinkStyle  <- function() list() |> structure(class = "LinkStyle")
-
 #' Create a UrlEscapeStyle enum value
 #'
 #' Returns the default UrlEscapeStyle variant.
@@ -620,7 +607,6 @@ LinkStyle  <- function() list() |> structure(class = "LinkStyle")
 #' @return A UrlEscapeStyle enum value
 #' @export
 UrlEscapeStyle  <- function() list() |> structure(class = "UrlEscapeStyle")
-
 #' Create a OutputFormat enum value
 #'
 #' Returns the default OutputFormat variant.
@@ -628,7 +614,6 @@ UrlEscapeStyle  <- function() list() |> structure(class = "UrlEscapeStyle")
 #' @return A OutputFormat enum value
 #' @export
 OutputFormat  <- function() list() |> structure(class = "OutputFormat")
-
 #' Create a WarningKind enum value
 #'
 #' Returns the default WarningKind variant.
@@ -636,7 +621,6 @@ OutputFormat  <- function() list() |> structure(class = "OutputFormat")
 #' @return A WarningKind enum value
 #' @export
 WarningKind  <- function() list() |> structure(class = "WarningKind")
-
 #' Create a NodeType enum value
 #'
 #' Returns the default NodeType variant.
@@ -644,7 +628,6 @@ WarningKind  <- function() list() |> structure(class = "WarningKind")
 #' @return A NodeType enum value
 #' @export
 NodeType  <- function() list() |> structure(class = "NodeType")
-
 #' The semantic content type of a document node
 #'
 #' Uses internally tagged representation (`"node_type": "heading"`) for JSON serialization.

@@ -27,7 +27,6 @@ use core_crate::*;
 use html_to_markdown_rs as core_crate; // bring trait methods into scope
 
 const ERROR_CLASS: &str = "dev/kreuzberg/android/HtmlToMarkdownRsBridgeException";
-
 fn runtime() -> &'static Runtime {
     static RT: OnceLock<Runtime> = OnceLock::new();
     RT.get_or_init(|| Runtime::new().expect("create tokio runtime"))
@@ -92,7 +91,6 @@ where
         }
     }
 }
-
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_dev_kreuzberg_android_HtmlToMarkdownRsBridge_nativeConvert(
     mut env: EnvUnowned,

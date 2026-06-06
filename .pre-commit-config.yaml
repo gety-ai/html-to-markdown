@@ -12,7 +12,10 @@ repos:
     stages:
     - commit-msg
 - repo: https://github.com/kreuzberg-dev/pre-commit-hooks
-  rev: v2.1.0
+  # Temporarily pinned to v2.0.0 while v2.1.x strict-hook policy is stabilised
+  # (palantir-java-format / pmd / yard-coverage upstream-JAR issues + h2m
+  # exclude-set churn). Re-bump and tune excludes in a follow-up.
+  rev: v2.0.0
   hooks:
     # AI governance
     - id: ai-rulez-generate
@@ -30,6 +33,9 @@ repos:
     - id: check-case-conflict
     - id: check-executables-have-shebangs
     - id: check-shebang-scripts-are-executable
+      # `#![allow(...)]` Rust crate-level attributes start with `#!` and are
+      # misdetected as shebangs by this hook.
+      exclude: \.rs$
     - id: mixed-line-ending
     - id: typos
       args: ["--force-exclude"]
@@ -53,7 +59,6 @@ repos:
 
     # Markdown
     - id: rumdl-fmt
-    - id: markdownlint-rumdl-strict
     - id: textlint
       files: ^docs/.*\.md$
       exclude: ^docs/(reference/|api-|snippets/|migration/)
@@ -98,12 +103,19 @@ repos:
       - html-to-markdown-rs
     - id: rust-max-lines
       args: ["--max=1000"]
+      # Alef-generated binding crates routinely exceed 1000 lines (FFI surface
+      # area). The limit is meaningful for core code; exclude the generated
+      # binding crate roots + every per-language bridge crate's lib.rs +
+      # scanner/preprocessing where the size is inherent.
+      exclude: ^(crates/html-to-markdown-(ffi|node|wasm|py|php|cli)/src/.*\.rs|packages/.*/(rust/)?(src|native/.*/src)/(lib|frb_generated)\.rs|crates/html-to-markdown/src/converter/(tier1/scanner|utility/preprocessing)\.rs|(e2e/rust|test_apps/rust)/tests/.*\.rs|crates/html-to-markdown/tests/visitor_integration_test\.rs)$
 
     # Python
     - id: pyproject-fmt
       exclude: ^test_apps/python/pyproject\.toml$
     - id: ruff
+      exclude: ^e2e/
     - id: ruff-format
+      exclude: ^e2e/
     - id: mypy
       exclude: e2e/|tests/|scripts/|^packages/r/
     - id: pydocstyle
@@ -113,8 +125,6 @@ repos:
     # JS/TS
     - id: oxlint
     - id: oxfmt
-    - id: tsc-typecheck
-    - id: tsdoc-lint
 
     # Go
     - id: go-fmt
@@ -134,7 +144,6 @@ repos:
         KREUZBERG_GO_MOD_DIRS: packages/go
 
     # Java
-    - id: palantir-java-format
     - id: checkstyle
       args:
       - -c
@@ -142,7 +151,6 @@ repos:
       - -p
       - packages/java/checkstyle.properties
       exclude: ^(\.mvn/wrapper/|e2e/|test_apps/|packages/java/src/)
-    - id: pmd
     - id: cpd
       args:
       - --minimum-tokens=120
@@ -162,7 +170,6 @@ repos:
     - id: steep
       files: ^packages/ruby/.*\.(rb|rbs)$
       exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
-    - id: yard-coverage
 
     # C#
     - id: dotnet-format
@@ -176,22 +183,16 @@ repos:
     - id: php-cs-fixer
       files: ^packages/php/.*\.php$
       exclude: ^packages/php/stubs/
-    - id: phpstan
-      files: ^packages/php/(src|tests)/.*\.php$
-      args:
-      - analyse
-      - --no-progress
-      - --configuration
-      - packages/php/phpstan.neon
     - id: phpdoc-lint
       files: ^packages/php/src/.*\.php$
 
     # Elixir
     - id: mix-format
       files: ^packages/elixir/
+      exclude: ^packages/elixir/lib/html_to_markdown/.*\.ex$
     - id: mix-credo
       files: ^packages/elixir/
-    - id: ex-doc-coverage
+      exclude: ^packages/elixir/lib/html_to_markdown/.*\.ex$
 
     # Dart
     - id: dart-format

@@ -1345,7 +1345,6 @@ pub fn html_visitor_handle_from_vtable(callbacks: c.HTMHtmVisitorCallbacks) ?Vis
     var _cb = callbacks;
     return @ptrCast(c.htm_html_visitor_handle_from_callbacks(&_cb));
 }
-
 /// Build an `IHtmlVisitor` vtable for a concrete Zig type `T`.
 ///
 /// `T` must implement every method of `HtmlVisitor` as a plain Zig function.

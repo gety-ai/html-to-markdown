@@ -47,7 +47,7 @@ kotlin {
 
 dependencies {
     // Published Android AAR from Maven Central (verifies artifact resolution)
-    implementation("dev.kreuzberg:html-to-markdown-android:3.6.0-rc.16")
+    implementation("dev.kreuzberg:html-to-markdown-android:3.6.0-rc.17")
     // Jackson for JSON assertion helpers
     testImplementation("com.fasterxml.jackson.core:jackson-annotations:2.18.2")
     testImplementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
@@ -78,9 +78,9 @@ dependencies {
 }
 
 tasks.register("verifyAarPublished") {
-    description = "Verify the published Android AAR contains jniLibs and classes.jar"
+    description = "Verify the published Android AAR contains jni and classes.jar"
     doLast {
-        val aarCoord = "dev.kreuzberg:html-to-markdown-android:3.6.0-rc.16"
+        val aarCoord = "dev.kreuzberg:html-to-markdown-android:3.6.0-rc.17"
         val (groupId, artifactId, version) = run {
             val parts = aarCoord.split(':')
             Triple(parts[0], parts[1], parts[2])
@@ -109,23 +109,23 @@ tasks.register("verifyAarPublished") {
         println("Verifying AAR contents...")
         ZipFile(aarFile).use { zip ->
             val entries = zip.entries().toList()
-            val hasJniLibs = entries.any { it.name.startsWith("jniLibs/") }
+            val hasJni = entries.any { it.name.startsWith("jni/") }
             val hasClasses = entries.any { it.name == "classes.jar" }
 
-            if (!hasJniLibs) {
-                throw GradleException("AAR missing jniLibs directory")
+            if (!hasJni) {
+                throw GradleException("AAR missing jni directory")
             }
             if (!hasClasses) {
                 throw GradleException("AAR missing classes.jar")
             }
 
             val abiDirs = entries
-                .filter { it.name.startsWith("jniLibs/") }
-                .map { it.name.substringAfter("jniLibs/").substringBefore("/") }
+                .filter { it.name.startsWith("jni/") }
+                .map { it.name.substringAfter("jni/").substringBefore("/") }
                 .filter { it.isNotEmpty() }
                 .distinct()
 
-            println("  + jniLibs: YES")
+            println("  + jni: YES")
             println("  + classes.jar: YES")
             println("  + Android ABIs: " + abiDirs.sorted().joinToString(", "))
             println("\nAAR verification PASSED!")

@@ -3005,86 +3005,47 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 /// opaque struct (FRB v2 cannot generate callable closure types in that shape).
 pub async fn create_html_visitor(
     visit_text: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_element_start: impl Fn(NodeContext) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_element_end: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_link: impl Fn(NodeContext, String, String, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_image: impl Fn(NodeContext, String, String, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_heading: impl Fn(NodeContext, i64, String, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_code_block: impl Fn(NodeContext, Option<String>, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_code_inline: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_list_item: impl Fn(NodeContext, bool, String, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_list_start: impl Fn(NodeContext, bool) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_list_end: impl Fn(NodeContext, bool, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_table_start: impl Fn(NodeContext) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_table_row: impl Fn(NodeContext, Vec<String>, bool) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_table_end: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_blockquote: impl Fn(NodeContext, String, i64) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_strong: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_emphasis: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_strikethrough: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_underline: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_subscript: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_superscript: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_mark: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_line_break: impl Fn(NodeContext) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_horizontal_rule: impl Fn(NodeContext) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_custom_element: impl Fn(NodeContext, String, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_definition_list_start: impl Fn(NodeContext) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_definition_term: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_definition_description: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_definition_list_end: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_form: impl Fn(NodeContext, Option<String>, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_input: impl Fn(NodeContext, String, Option<String>, Option<String>) -> DartFnFuture<VisitResult>
     + Send
     + Sync
     + 'static,
-
     visit_button: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_audio: impl Fn(NodeContext, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_video: impl Fn(NodeContext, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_iframe: impl Fn(NodeContext, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_details: impl Fn(NodeContext, bool) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_summary: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_figure_start: impl Fn(NodeContext) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_figcaption: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
-
     visit_figure_end: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
 ) -> VisitorHandle {
     let __impl = HtmlVisitorDartImpl {
