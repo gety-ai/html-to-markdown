@@ -14,7 +14,7 @@ use crate::converter::utility::preprocessing::sanitize_markdown_url;
 use crate::options::ConversionOptions;
 #[cfg(feature = "visitor")]
 use std::borrow::Cow;
-#[cfg(any(feature = "metadata", feature = "visitor"))]
+#[cfg(feature = "metadata")]
 use std::collections::BTreeMap;
 use tl::{NodeHandle, Parser};
 

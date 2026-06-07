@@ -7,7 +7,7 @@
 //! - Visitor callback integration
 
 use std::borrow::Cow;
-#[cfg(any(feature = "metadata", feature = "inline-images", feature = "visitor"))]
+#[cfg(any(feature = "metadata", feature = "inline-images"))]
 use std::collections::BTreeMap;
 
 use crate::converter::Context;
