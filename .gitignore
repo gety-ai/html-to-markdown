@@ -4,6 +4,8 @@
 # Go FFI download cache (populated by `go generate ./...` post-install)
 packages/go/.lib/
 packages/go/**/.lib/
+test_apps/go/.lib/
+test_apps/go/**/.lib/
 
 # Python
 __pycache__/
@@ -208,7 +210,17 @@ test_apps/kotlin_android/build/
 packages/kotlin-android/build/
 **/.gradle/
 
+# Swift / SwiftPM build cache
+.build/
+.swiftpm/
+Package.resolved
+*.xcodeproj/
+*.xcworkspace/
+DerivedData/
+
 **/logs/
+*.log
+test_apps/**/test_output.log
 
 # BEGIN ai-rulez (DO NOT EDIT - managed by ai-rulez)
 .agents/
