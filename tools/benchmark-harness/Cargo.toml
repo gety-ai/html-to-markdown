@@ -25,7 +25,7 @@ testkit = ["html-to-markdown-rs/testkit"]
 
 [dependencies]
 anyhow = "1"
-clap = { version = "4.5", features = ["derive"] }
+clap = { version = "4.6", features = ["derive"] }
 html-to-markdown-rs = { path = "../../crates/html-to-markdown", features = ["testkit", "visitor"] }
 humantime = "2"
 pretty_assertions = "1"

@@ -83,7 +83,7 @@ mavenPublishing {
     coordinates(
         groupId = "dev.kreuzberg",
         artifactId = "html-to-markdown-android",
-        version = "3.6.0-rc.19",
+        version = "3.6.0-rc.20",
     )
 
     pom {
@@ -98,8 +98,8 @@ mavenPublishing {
         }
         developers {
             developer {
-                name.set("Kreuzberg Team")
-                email.set("")
+                name.set("Na&apos;aman Hirschfeld")
+                email.set("naaman@kreuzberg.dev")
             }
         }
 

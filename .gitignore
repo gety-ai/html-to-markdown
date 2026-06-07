@@ -61,6 +61,7 @@ packages/ruby/ext/**/*.bundle
 packages/ruby/ext/**/mkmf.log
 packages/ruby/ext/**/Makefile
 packages/ruby/tmp/
+packages/ruby/.bundle/
 packages/ruby/vendor/html-to-markdown-rs/
 packages/ruby/vendor/Cargo.toml
 *.gem

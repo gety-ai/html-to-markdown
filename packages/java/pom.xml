@@ -6,7 +6,7 @@
 
     <groupId>dev.kreuzberg</groupId>
     <artifactId>html-to-markdown</artifactId>
-    <version>3.6.0-rc.19</version>
+    <version>3.6.0-rc.20</version>
     <packaging>jar</packaging>
 
     <name>html-to-markdown</name>
@@ -22,7 +22,8 @@
 
     <developers>
         <developer>
-            <name>Kreuzberg Team</name>
+            <name>Na&apos;aman Hirschfeld</name>
+            <email>naaman@kreuzberg.dev</email>
         </developer>
     </developers>
 
