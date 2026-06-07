@@ -22,7 +22,7 @@ repos:
 
     # File safety
     - id: trailing-whitespace
-      exclude: \.github/copilot-instructions\.md
+      exclude: "(?x)^(\n  \\.github/copilot-instructions\\.md\n  |tools/benchmark-harness/snapshots/.*\\.snap\n)$\n"
     - id: end-of-file-fixer
       exclude: "(?x)^(\n  \\.github/copilot-instructions\\.md|\n  .*/\\.gitkeep|\n  .*/py\\.typed|\n  packages/java/checkstyle\\\
         .properties|\n  (e2e/python|e2e/python/tests)/__init__\\.py\n)$\n"

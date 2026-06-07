@@ -1037,7 +1037,7 @@ Python's development practices have also been emulated by other languages. For
  tools[[5]](#cite_note-type_hint-PEP-5)
 2. **[↑](#cite_ref-12)**   - **Tier 1**: 64-bit [Linux](/wiki/Linux "Linux"), [macOS](/wiki/MacOS "MacOS"); 64- and 32-bit [Windows](/wiki/Windows "Windows") 10+[[6]](#cite_note-7)
   - **Tier 2**: E.g. 32-bit [WebAssembly](/wiki/WebAssembly "WebAssembly") (WASI)
-  - **Tier 3**: 64-bit [Android](/wiki/Android_(operating_system) "Android (operating system)"),[[7]](#cite_note-8) [iOS](/wiki/IOS "IOS"), [FreeBSD](/wiki/FreeBSD "FreeBSD"), and (32-bit) [Raspberry Pi OS](/wiki/Raspberry_Pi_OS "Raspberry Pi OS")
+  - **Tier 3**: 64-bit [Android](/wiki/Android_(operating_system) "Android (operating system)"),[[7]](#cite_note-8) [iOS](/wiki/IOS "IOS"), [FreeBSD](/wiki/FreeBSD "FreeBSD"), and (32-bit) [Raspberry Pi OS](/wiki/Raspberry_Pi_OS "Raspberry Pi OS")  
 Unofficial (or has been known to work): Other [Unix-like](/wiki/Unix-like "Unix-like")/[BSD](/wiki/BSD "BSD") variants) and a few other platforms[[8]](#cite_note-9)[[9]](#cite_note-10)[[10]](#cite_note-11)
 3. **[↑](#cite_ref-87)** `del` in Python does not behave the same way `delete` in languages such as [C++](/wiki/C%2B%2B "C++") does, where such a word is
  used to call the [destructor](/wiki/Destructor_(computer_programming) "Destructor (computer programming)") and deallocate heap memory.

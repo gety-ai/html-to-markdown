@@ -676,7 +676,7 @@ There are several common attributes that may appear in many elements :
 - The `lang` attribute identifies the natural language of the
  element's contents, which may be different from that of the rest of the
  document. For example, in an English-language document:
-
+  
 
 ```
 <p>Oh well, <span lang="fr">c'est la vie</span>, as they say in France.</p>
