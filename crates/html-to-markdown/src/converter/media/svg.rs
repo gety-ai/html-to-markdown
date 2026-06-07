@@ -1,7 +1,8 @@
-//! SVG and MathML element handling with serialization and base64 encoding.
+//! SVG and `MathML` element handling with serialization and base64 encoding.
 
 use crate::converter::main_helpers::tag_name_eq;
 use crate::converter::utility::content::normalized_tag_name;
+// reason: BTreeMap is only used when the inline-images feature is active.
 #[allow(unused_imports)]
 use std::collections::BTreeMap;
 use tl::{NodeHandle, Parser};
@@ -231,9 +232,9 @@ pub fn handle_svg(
     }
 }
 
-/// Handle MathML element conversion to Markdown.
+/// Handle `MathML` element conversion to Markdown.
 ///
-/// Serializes MathML to HTML comment and outputs text content with escaping.
+/// Serializes `MathML` to HTML comment and outputs text content with escaping.
 #[allow(clippy::too_many_arguments)]
 pub fn handle_math(
     node_handle: &NodeHandle,

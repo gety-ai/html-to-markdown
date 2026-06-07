@@ -3,7 +3,7 @@
 //! This module provides specialized handling for various media elements:
 //! - **Image**: img tags with inline data URI and metadata collection
 //! - **Graphic**: Custom graphic elements with multiple source attributes
-//! - **SVG**: SVG and MathML elements with serialization and base64 encoding
+//! - **SVG**: SVG and `MathML` elements with serialization and base64 encoding
 //! - **Embedded**: iframe, video, audio, and source elements
 
 pub mod embedded;
@@ -34,7 +34,7 @@ pub use image::handle_inline_data_image;
 /// | `audio` | embedded | Audio elements |
 /// | `picture` | embedded | Responsive image containers |
 /// | `svg` | svg | SVG image elements |
-/// | `math` | svg | MathML elements |
+/// | `math` | svg | `MathML` elements |
 ///
 /// # Return Value
 ///

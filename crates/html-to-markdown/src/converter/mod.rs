@@ -17,14 +17,14 @@
 //! - **[semantic]**: Semantic HTML5 elements (sectioning, figures, interactive elements)
 //! - **[form]**: Form elements (inputs, selects, buttons, fieldsets)
 //! - **[utility]**: Helper functions (DOM traversal, caching, serialization, attributes)
-//! - **[text]**: Text processing and escaping (via crate::text module)
+//! - **[text]**: Text processing and escaping (via `crate::text` module)
 //!
 //! # Public Types
 //!
 //! The main context types used across the conversion pipeline:
 //!
-//! - **[Context]**: Stateful conversion context tracking (e.g., list nesting, code blocks, in_heading)
-//! - **[DomContext]**: DOM relationship cache for efficient tree navigation
+//! - **[Context]**: Stateful conversion context tracking (e.g., list nesting, code blocks, `in_heading`)
+//! - **[`DomContext`]**: DOM relationship cache for efficient tree navigation
 //!
 //! # Conversion Flow
 //!
@@ -58,8 +58,8 @@
 //!
 //! # Visibility Rules
 //!
-//! - **Context & DomContext**: Public types for external module coordination
-//! - **Dispatch functions**: Public for main walk_node caller
+//! - **Context & `DomContext`**: Public types for external module coordination
+//! - **Dispatch functions**: Public for main `walk_node` caller
 //! - **Individual handlers**: Typically pub for direct access if needed
 //! - **Internal utilities**: pub(crate) or pub(super) for module-internal use
 //!
@@ -71,7 +71,7 @@
 //!
 //! # Example Integration
 //!
-//! Once `converter.rs` is refactored to use `converter/main.rs`, the walk_node function
+//! Once `converter.rs` is refactored to use `converter/main.rs`, the `walk_node` function
 //! will use dispatch functions like:
 //!
 //! ```text
@@ -125,6 +125,9 @@ pub use self::main_helpers::trim_trailing_whitespace;
 
 // Re-export helper functions from utility modules (migrated from converter_legacy)
 pub use crate::converter::utility::content::{chomp_inline, get_text_content, normalized_tag_name};
+// reason: serialize_node and serialize_node_to_html are only used when the visitor
+// or inline-images features are active; re-exported here so call sites don't need
+// to know the internal utility path.
 #[allow(unused_imports)]
 pub use crate::converter::utility::serialization::{serialize_node, serialize_node_to_html};
 

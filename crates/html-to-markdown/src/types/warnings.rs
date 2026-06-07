@@ -42,6 +42,6 @@ pub enum WarningKind {
     MalformedHtml,
     /// Sanitization was applied to remove potentially unsafe content.
     SanitizationApplied,
-    /// DOM traversal was truncated because max_depth was exceeded.
+    /// DOM traversal was truncated because `max_depth` was exceeded.
     DepthLimitExceeded,
 }

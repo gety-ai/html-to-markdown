@@ -29,7 +29,7 @@ package dev.kreuzberg.android
  * Specifies the target markup language format for the conversion output.
  */
 enum class OutputFormat {
-    /** Standard Markdown (CommonMark compatible). Default. */
+    /** Standard Markdown (`CommonMark` compatible). Default. */
     @com.fasterxml.jackson.annotation.JsonProperty("Markdown") MARKDOWN,
     /** Djot lightweight markup language. */
     @com.fasterxml.jackson.annotation.JsonProperty("Djot") DJOT,

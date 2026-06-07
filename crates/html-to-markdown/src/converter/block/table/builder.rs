@@ -23,7 +23,7 @@ const MAX_TABLE_COLS: usize = 1000;
 /// * `dom_ctx` - DOM context for tag name resolution
 ///
 /// # Returns
-/// Maximum column count (minimum 1, maximum MAX_TABLE_COLS)
+/// Maximum column count (minimum 1, maximum `MAX_TABLE_COLS`)
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn table_total_columns(
     node_handle: &tl::NodeHandle,

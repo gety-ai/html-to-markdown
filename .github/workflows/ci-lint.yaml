@@ -176,5 +176,5 @@ jobs:
         shell: bash
 
       - name: Validate READMEs
-        run: task generate:generate-readme:check
+        run: task readme:check
         shell: bash

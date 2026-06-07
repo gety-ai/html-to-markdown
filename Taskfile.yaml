@@ -573,7 +573,7 @@ tasks:
     dir: test_apps/python
     cmds:
       - uv sync --no-install-project --no-install-workspace
-      - uv run --no-sync pytest comprehensive_test.py -v
+      - uv run --no-sync pytest tests/test_conversion.py -v
 
   test-apps:test:node:
     desc: "Comprehensive tests for Node package"
@@ -587,39 +587,41 @@ tasks:
     dir: test_apps/ruby
     cmds:
       - bundle install
-      - bundle exec rspec comprehensive_test.rb
+      - bundle exec rspec spec/conversion_spec.rb
 
   test-apps:test:php:
     desc: "Comprehensive tests for PHP package"
     dir: test_apps/php
     cmds:
+      - bash install.sh
       - composer install
-      - vendor/bin/phpunit comprehensive_test.php
+      - vendor/bin/phpunit tests
 
   test-apps:test:go:
     desc: "Comprehensive tests for Go package"
     dir: test_apps/go
     cmds:
       - go mod download
-      - go test -v -run Comprehensive
+      - go test -v -run Test_
 
   test-apps:test:java:
     desc: "Comprehensive tests for Java package"
     dir: test_apps/java
     cmds:
-      - ./mvnw{{if eq .OS "windows"}}.cmd{{end}} test -Dtest=ComprehensiveTest
+      - ./mvnw{{if eq .OS "windows"}}.cmd{{end}} test -Dtest=ConversionTest
 
   test-apps:test:csharp:
     desc: "Comprehensive tests for C# package"
     dir: test_apps/csharp
     cmds:
-      - dotnet test --filter FullyQualifiedName~ComprehensiveTest
+      - dotnet test --filter FullyQualifiedName~ConversionTests
 
   test-apps:test:elixir:
     desc: "Comprehensive tests for Elixir package"
     dir: test_apps/elixir
     cmds:
-      - mix test test/comprehensive_test.exs
+      - mix deps.get
+      - mix test test/conversion_test.exs
 
   test-apps:test:r:
     desc: "Comprehensive tests for R package"

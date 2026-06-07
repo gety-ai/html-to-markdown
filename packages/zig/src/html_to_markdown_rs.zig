@@ -131,12 +131,12 @@ pub const ImageMetadata = struct {
     attributes: std.StringHashMap([]const u8),
 };
 
-/// Structured data block (JSON-LD, Microdata, or RDFa).
+/// Structured data block (JSON-LD, Microdata, or `RDFa`).
 ///
 /// Represents machine-readable structured data found in the document.
 /// JSON-LD blocks are collected as raw JSON strings for flexibility.
 pub const StructuredData = struct {
-    /// Type of structured data (JSON-LD, Microdata, RDFa)
+    /// Type of structured data (JSON-LD, Microdata, `RDFa`)
     data_type: StructuredDataType,
     /// Raw JSON string (for JSON-LD) or serialized representation
     raw_json: []const u8,
@@ -705,7 +705,7 @@ pub const StructuredDataType = enum {
     json_ld,
     /// HTML5 Microdata attributes (itemscope, itemtype, itemprop)
     microdata,
-    /// RDF in Attributes (RDFa) markup
+    /// RDF in Attributes (`RDFa`) markup
     rdfa,
 };
 
@@ -838,7 +838,7 @@ pub const UrlEscapeStyle = enum {
 ///
 /// Specifies the target markup language format for the conversion output.
 pub const OutputFormat = enum {
-    /// Standard Markdown (CommonMark compatible). Default.
+    /// Standard Markdown (`CommonMark` compatible). Default.
     markdown,
     /// Djot lightweight markup language.
     djot,
@@ -937,7 +937,7 @@ pub const WarningKind = enum {
     malformed_html,
     /// Sanitization was applied to remove potentially unsafe content.
     sanitization_applied,
-    /// DOM traversal was truncated because max_depth was exceeded.
+    /// DOM traversal was truncated because `max_depth` was exceeded.
     depth_limit_exceeded,
 };
 
@@ -1173,7 +1173,7 @@ pub fn convert(html: []const u8, options: ?[]const u8) ConversionError![]u8 {
     if (options_z != null and options_handle == null) return _first_error(ConversionError);
     defer if (options_handle) |h| c.htm_conversion_options_free(h);
     const _result = c.htm_convert(html_z, options_handle);
-    if (c.htm_last_error_code() != 0) {
+    if (_result == null) {
         return _first_error(ConversionError);
     }
     return blk: {

@@ -10,6 +10,7 @@ use std::ops::Range;
 /// Returns the index of the first byte NOT part of the tag name
 /// (whitespace, `/`, `>`).
 #[inline]
+#[must_use]
 pub fn scan_tag_name(bytes: &[u8], start: usize) -> usize {
     let mut end = start;
     while end < bytes.len() && is_tag_name_continue(bytes[end]) {
@@ -20,18 +21,21 @@ pub fn scan_tag_name(bytes: &[u8], start: usize) -> usize {
 
 /// True if byte `b` can start an HTML tag name (ASCII letter).
 #[inline]
-pub fn is_tag_name_start(b: u8) -> bool {
+#[must_use]
+pub const fn is_tag_name_start(b: u8) -> bool {
     b.is_ascii_alphabetic()
 }
 
 /// True if byte `b` can continue an HTML tag name (alpha-num, `-`, `_`).
 #[inline]
-pub fn is_tag_name_continue(b: u8) -> bool {
+#[must_use]
+pub const fn is_tag_name_continue(b: u8) -> bool {
     b.is_ascii_alphanumeric() || b == b'-' || b == b'_'
 }
 
 /// Skip ASCII whitespace, returning the new position.
 #[inline]
+#[must_use]
 pub fn skip_ws(bytes: &[u8], mut pos: usize) -> usize {
     while pos < bytes.len() && bytes[pos].is_ascii_whitespace() {
         pos += 1;
@@ -43,6 +47,7 @@ pub fn skip_ws(bytes: &[u8], mut pos: usize) -> usize {
 ///
 /// Returns `(close_bracket_idx, is_self_closing)` where `is_self_closing` is true if the tag ended
 /// with `/>`.  Returns `None` if no `>` was found before the end of input.
+#[must_use]
 pub fn find_tag_close(bytes: &[u8], start: usize) -> Option<(usize, bool)> {
     let mut pos = start;
     let len = bytes.len();
@@ -75,6 +80,7 @@ pub fn find_tag_close(bytes: &[u8], start: usize) -> Option<(usize, bool)> {
 /// `value_range` is `None` for boolean attributes.
 ///
 /// Returns `None` if no attribute could be parsed (e.g. at `>` or `/>` or EOF).
+#[must_use]
 pub fn scan_attribute(bytes: &[u8], pos: usize) -> Option<(Range<usize>, Option<Range<usize>>, usize)> {
     let pos = skip_ws(bytes, pos);
     if pos >= bytes.len() {
@@ -137,6 +143,7 @@ pub fn scan_attribute(bytes: &[u8], pos: usize) -> Option<(Range<usize>, Option<
 ///
 /// Returns a vec of `(key_bytes, Option<value_bytes>)` where slices point
 /// into `bytes`.
+#[must_use]
 pub fn collect_attrs(bytes: &[u8], start: usize, end: usize) -> Vec<(&[u8], Option<&[u8]>)> {
     let mut attrs = Vec::new();
     let mut pos = skip_ws(bytes, start);

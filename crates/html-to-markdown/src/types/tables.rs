@@ -50,7 +50,7 @@ pub struct GridCell {
 }
 
 #[cfg(feature = "serde")]
-fn default_span() -> u32 {
+const fn default_span() -> u32 {
     1
 }
 

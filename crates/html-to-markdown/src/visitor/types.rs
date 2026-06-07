@@ -242,14 +242,14 @@ enum AttributesInner<'a> {
 
 impl<'a> AttributesSource<'a> {
     /// Construct from a borrowed map reference.
-    pub(crate) fn borrowed(map: &'a BTreeMap<String, String>) -> Self {
+    pub(crate) const fn borrowed(map: &'a BTreeMap<String, String>) -> Self {
         Self {
             inner: AttributesInner::Borrowed(map),
         }
     }
 
     /// Construct from an owned map.
-    pub(crate) fn owned(map: BTreeMap<String, String>) -> Self {
+    pub(crate) const fn owned(map: BTreeMap<String, String>) -> Self {
         Self {
             inner: AttributesInner::Owned(map),
         }
@@ -258,7 +258,7 @@ impl<'a> AttributesSource<'a> {
     /// Construct the lazy variant backed by a `tl::HTMLTag`.
     ///
     /// Only callable within the `html-to-markdown-rs` crate.
-    pub(crate) fn lazy(tag: &'a tl::HTMLTag<'a>) -> Self {
+    pub(crate) const fn lazy(tag: &'a tl::HTMLTag<'a>) -> Self {
         Self {
             inner: AttributesInner::Lazy {
                 tag,
@@ -461,7 +461,8 @@ impl<'a> NodeContext<'a> {
     ///
     /// Use this when you already have a `&BTreeMap` that outlives `'a`,
     /// such as [`EMPTY_ATTRS`] for text nodes or a locally-cached map.
-    pub fn with_borrowed_attributes(
+    #[must_use]
+    pub const fn with_borrowed_attributes(
         node_type: NodeType,
         tag_name: Cow<'a, str>,
         attributes: &'a BTreeMap<String, String>,
@@ -485,7 +486,8 @@ impl<'a> NodeContext<'a> {
     ///
     /// Prefer [`NodeContext::with_lazy_attributes`] (pub(crate)) inside the
     /// converter to avoid the eager `collect_tag_attributes` allocation.
-    pub fn with_owned_attributes(
+    #[must_use]
+    pub const fn with_owned_attributes(
         node_type: NodeType,
         tag_name: Cow<'a, str>,
         attributes: BTreeMap<String, String>,
@@ -515,7 +517,7 @@ impl<'a> NodeContext<'a> {
     ///
     /// This constructor is `pub(crate)` to keep `tl` out of the public API.
     #[cfg(feature = "visitor")]
-    pub(crate) fn with_lazy_attributes(
+    pub(crate) const fn with_lazy_attributes(
         node_type: NodeType,
         tag_name: Cow<'a, str>,
         tag: &'a tl::HTMLTag<'a>,

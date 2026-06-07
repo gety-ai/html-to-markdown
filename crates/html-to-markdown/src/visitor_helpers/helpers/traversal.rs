@@ -1,3 +1,7 @@
+// reason: visitor dispatch helper is pub(crate) API surface; used via the visitor feature
+// gate and may not be exercised by all code paths.
+#![allow(dead_code)]
+
 //! Visitor callback dispatch and result handling.
 //!
 //! This module provides the core dispatching logic for synchronous visitor callbacks,
@@ -63,7 +67,6 @@ use crate::visitor::EMPTY_ATTRS;
 ///     None => { /* proceed with default conversion */ }
 /// }
 /// ```
-#[allow(dead_code)]
 #[inline]
 pub fn dispatch_visitor<F>(visitor: &Option<Arc<Mutex<dyn HtmlVisitor + Send>>>, callback: F) -> Result<VisitorDispatch>
 where

@@ -1,7 +1,7 @@
 //! Validation and parsing utilities for option enums.
 //!
 //! This module provides parsing and serialization logic for configuration
-//! enums (HeadingStyle, ListIndentType, etc.) with string conversion support.
+//! enums (`HeadingStyle`, `ListIndentType`, etc.) with string conversion support.
 
 /// Heading style options for Markdown output.
 ///
@@ -247,7 +247,7 @@ impl UrlEscapeStyle {
 /// Specifies the target markup language format for the conversion output.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum OutputFormat {
-    /// Standard Markdown (CommonMark compatible). Default.
+    /// Standard Markdown (`CommonMark` compatible). Default.
     #[default]
     Markdown,
     /// Djot lightweight markup language.

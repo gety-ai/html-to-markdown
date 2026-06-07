@@ -38,7 +38,7 @@ pub fn build_dom_context(dom: &tl::VDom, parser: &tl::Parser, input_len: usize) 
 
 /// Calculate appropriate cache capacity based on input size.
 ///
-/// Returns a cache capacity between 32 and TEXT_CACHE_CAPACITY,
+/// Returns a cache capacity between 32 and `TEXT_CACHE_CAPACITY`,
 /// scaled proportionally to input size (1KB = 1 slot).
 pub fn text_cache_capacity_for_input(input_len: usize) -> NonZeroUsize {
     const TEXT_CACHE_CAPACITY: usize = 256;

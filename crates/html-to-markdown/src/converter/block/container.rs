@@ -101,7 +101,7 @@ pub fn handle_passthrough(
 /// * `_depth` - Current recursion depth (unused)
 /// * `_dom_ctx` - DOM context (unused)
 #[inline]
-pub fn handle_noop(
+pub const fn handle_noop(
     _node_handle: &NodeHandle,
     _parser: &Parser,
     _output: &mut String,

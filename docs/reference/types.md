@@ -298,14 +298,14 @@ to outlive the callback should call `NodeContext.into_owned`.
 
 #### StructuredData
 
-Structured data block (JSON-LD, Microdata, or RDFa).
+Structured data block (JSON-LD, Microdata, or `RDFa`).
 
 Represents machine-readable structured data found in the document.
 JSON-LD blocks are collected as raw JSON strings for flexibility.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `data_type` | `StructuredDataType` | — | Type of structured data (JSON-LD, Microdata, RDFa) |
+| `data_type` | `StructuredDataType` | — | Type of structured data (JSON-LD, Microdata, `RDFa`) |
 | `raw_json` | `String` | — | Raw JSON string (for JSON-LD) or serialized representation |
 | `schema_type` | `Option<String>` | `None` | Schema type if detectable (e.g., "Article", "Event", "Product") |
 
@@ -721,7 +721,7 @@ Specifies the target markup language format for the conversion output.
 
 | Variant | Description |
 |---------|-------------|
-| `Markdown` | Standard Markdown (CommonMark compatible). Default. |
+| `Markdown` | Standard Markdown (`CommonMark` compatible). Default. |
 | `Djot` | Djot lightweight markup language. |
 | `Plain` | Plain text output (no markup, visible text only). |
 
@@ -751,7 +751,7 @@ Identifies the schema/format used for structured data markup.
 |---------|------------|-------------|
 | `JsonLd` | `json_ld` | JSON-LD (JSON for Linking Data) script blocks |
 | `Microdata` | `microdata` | HTML5 Microdata attributes (itemscope, itemtype, itemprop) |
-| `RDFa` | `rdfa` | RDF in Attributes (RDFa) markup |
+| `RDFa` | `rdfa` | RDF in Attributes (`RDFa`) markup |
 
 ---
 
@@ -832,7 +832,7 @@ Categories of processing warnings.
 | `TruncatedInput` | `truncated_input` | The input was truncated due to size limits. |
 | `MalformedHtml` | `malformed_html` | The HTML was malformed but processing continued with best effort. |
 | `SanitizationApplied` | `sanitization_applied` | Sanitization was applied to remove potentially unsafe content. |
-| `DepthLimitExceeded` | `depth_limit_exceeded` | DOM traversal was truncated because max_depth was exceeded. |
+| `DepthLimitExceeded` | `depth_limit_exceeded` | DOM traversal was truncated because `max_depth` was exceeded. |
 
 ---
 

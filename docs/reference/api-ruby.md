@@ -2,7 +2,7 @@
 title: "Ruby API Reference"
 ---
 
-## Ruby API Reference <span class="version-badge">v3.6.0-rc.20</span>
+## Ruby API Reference <span class="version-badge">v3.6.0-rc.21</span>
 
 ### Functions
 
@@ -883,14 +883,14 @@ See `WarningKind` for the full taxonomy of warning categories.
 
 #### StructuredData
 
-Structured data block (JSON-LD, Microdata, or RDFa).
+Structured data block (JSON-LD, Microdata, or `RDFa`).
 
 Represents machine-readable structured data found in the document.
 JSON-LD blocks are collected as raw JSON strings for flexibility.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `data_type` | `StructuredDataType` | — | Type of structured data (JSON-LD, Microdata, RDFa) |
+| `data_type` | `StructuredDataType` | — | Type of structured data (JSON-LD, Microdata, `RDFa`) |
 | `raw_json` | `String` | — | Raw JSON string (for JSON-LD) or serialized representation |
 | `schema_type` | `String?` | `nil` | Schema type if detectable (e.g., "Article", "Event", "Product") |
 
@@ -1013,7 +1013,7 @@ Identifies the schema/format used for structured data markup.
 |-------|-------------|
 | `json_ld` | JSON-LD (JSON for Linking Data) script blocks |
 | `microdata` | HTML5 Microdata attributes (itemscope, itemtype, itemprop) |
-| `rdfa` | RDF in Attributes (RDFa) markup |
+| `rdfa` | RDF in Attributes (`RDFa`) markup |
 
 ---
 
@@ -1169,7 +1169,7 @@ Specifies the target markup language format for the conversion output.
 
 | Value | Description |
 |-------|-------------|
-| `markdown` | Standard Markdown (CommonMark compatible). Default. |
+| `markdown` | Standard Markdown (`CommonMark` compatible). Default. |
 | `djot` | Djot lightweight markup language. |
 | `plain` | Plain text output (no markup, visible text only). |
 
@@ -1230,7 +1230,7 @@ Categories of processing warnings.
 | `truncated_input` | The input was truncated due to size limits. |
 | `malformed_html` | The HTML was malformed but processing continued with best effort. |
 | `sanitization_applied` | Sanitization was applied to remove potentially unsafe content. |
-| `depth_limit_exceeded` | DOM traversal was truncated because max_depth was exceeded. |
+| `depth_limit_exceeded` | DOM traversal was truncated because `max_depth` was exceeded. |
 
 ---
 

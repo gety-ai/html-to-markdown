@@ -2,7 +2,7 @@
 title: "C API Reference"
 ---
 
-## C API Reference <span class="version-badge">v3.6.0-rc.20</span>
+## C API Reference <span class="version-badge">v3.6.0-rc.21</span>
 
 ### Functions
 
@@ -883,14 +883,14 @@ See `WarningKind` for the full taxonomy of warning categories.
 
 #### HtmStructuredData
 
-Structured data block (JSON-LD, Microdata, or RDFa).
+Structured data block (JSON-LD, Microdata, or `RDFa`).
 
 Represents machine-readable structured data found in the document.
 JSON-LD blocks are collected as raw JSON strings for flexibility.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `data_type` | `HtmStructuredDataType` | — | Type of structured data (JSON-LD, Microdata, RDFa) |
+| `data_type` | `HtmStructuredDataType` | — | Type of structured data (JSON-LD, Microdata, `RDFa`) |
 | `raw_json` | `const char*` | — | Raw JSON string (for JSON-LD) or serialized representation |
 | `schema_type` | `const char**` | `NULL` | Schema type if detectable (e.g., "Article", "Event", "Product") |
 
@@ -1013,7 +1013,7 @@ Identifies the schema/format used for structured data markup.
 |-------|-------------|
 | `HTM_JSON_LD` | JSON-LD (JSON for Linking Data) script blocks |
 | `HTM_MICRODATA` | HTML5 Microdata attributes (itemscope, itemtype, itemprop) |
-| `HTM_RDFA` | RDF in Attributes (RDFa) markup |
+| `HTM_RDFA` | RDF in Attributes (`RDFa`) markup |
 
 ---
 
@@ -1169,7 +1169,7 @@ Specifies the target markup language format for the conversion output.
 
 | Value | Description |
 |-------|-------------|
-| `HTM_MARKDOWN` | Standard Markdown (CommonMark compatible). Default. |
+| `HTM_MARKDOWN` | Standard Markdown (`CommonMark` compatible). Default. |
 | `HTM_DJOT` | Djot lightweight markup language. |
 | `HTM_PLAIN` | Plain text output (no markup, visible text only). |
 
@@ -1230,7 +1230,7 @@ Categories of processing warnings.
 | `HTM_TRUNCATED_INPUT` | The input was truncated due to size limits. |
 | `HTM_MALFORMED_HTML` | The HTML was malformed but processing continued with best effort. |
 | `HTM_SANITIZATION_APPLIED` | Sanitization was applied to remove potentially unsafe content. |
-| `HTM_DEPTH_LIMIT_EXCEEDED` | DOM traversal was truncated because max_depth was exceeded. |
+| `HTM_DEPTH_LIMIT_EXCEEDED` | DOM traversal was truncated because `max_depth` was exceeded. |
 
 ---
 

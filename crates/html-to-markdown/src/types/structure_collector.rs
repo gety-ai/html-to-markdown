@@ -7,9 +7,9 @@
 //! # Design
 //!
 //! - **Flat node array** with index-based parent/child links (matches [`DocumentStructure`]).
-//! - **section_stack** tracks the currently-open heading groups (`(level, group_node_index)`).
-//! - **container_stack** tracks open blockquote containers.
-//! - **list_stack** tracks open list containers so `push_list_item` attaches items to the right list.
+//! - **`section_stack`** tracks the currently-open heading groups (`(level, group_node_index)`).
+//! - **`container_stack`** tracks open blockquote containers.
+//! - **`list_stack`** tracks open list containers so `push_list_item` attaches items to the right list.
 //! - IDs are deterministic hashes of `(node_type, text_prefix, index)`.
 
 use std::cell::RefCell;
@@ -53,7 +53,8 @@ impl StructureCollector {
     ///
     /// `StructureCollector` is not `Send` (it uses `Rc<RefCell<…>>` handles internally) and must
     /// not be shared across threads. Create a fresh collector per conversion.
-    pub fn new() -> Self {
+    #[must_use]
+    pub const fn new() -> Self {
         Self {
             nodes: Vec::new(),
             section_stack: Vec::new(),
@@ -351,6 +352,7 @@ impl StructureCollector {
     ///
     /// Returns `(DocumentStructure, Vec<TableData>)`.  The tables vec contains one entry per
     /// `<table>` element that was processed via [`Self::push_table_data`].
+    #[must_use]
     pub fn finish(self) -> (DocumentStructure, Vec<TableData>) {
         let doc = DocumentStructure {
             nodes: self.nodes,

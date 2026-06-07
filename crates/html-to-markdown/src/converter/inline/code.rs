@@ -75,6 +75,8 @@ fn handle_code(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
+    // reason: serialize_node is only used with the visitor feature; walk_node usage
+    // depends on the feature-gated code path below.
     #[allow(unused_imports)]
     use crate::converter::{serialize_node, walk_node};
 
@@ -172,7 +174,7 @@ fn handle_code(
 /// Handle keyboard and sample output elements (<kbd> and <samp> tags).
 ///
 /// These elements are rendered as inline code with:
-/// - Whitespace normalization (via text::normalize_whitespace)
+/// - Whitespace normalization (via `text::normalize_whitespace`)
 /// - Chomp inline handling for prefix/suffix spacing
 /// - Simple single backtick wrapping (no smart escaping for keyboard/sample)
 fn handle_kbd_samp(
@@ -189,7 +191,7 @@ fn handle_kbd_samp(
 
     let Some(node) = node_handle.get(parser) else { return };
 
-    let _tag = match node {
+    let tag = match node {
         tl::Node::Tag(tag) => tag,
         _ => return,
     };
@@ -200,7 +202,7 @@ fn handle_kbd_samp(
     };
 
     let mut content = String::with_capacity(32);
-    let children = _tag.children();
+    let children = tag.children();
     {
         for child_handle in children.top().iter() {
             walk_node(

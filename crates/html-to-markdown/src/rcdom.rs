@@ -13,6 +13,11 @@
 //   `use` imports through `html5ever` (edition 2024 compatibility)
 // - Added module-level clippy allows for vendored code style
 
+// reason: this is vendored upstream code (markup5ever_rcdom v0.36.0) reproduced verbatim
+// to eliminate the pinned "+unofficial" crate dependency. The original code uses panics
+// and expect() calls as part of its internal invariant enforcement. All lints are
+// suppressed on this module to keep the diff from upstream minimal and make future
+// upstream syncs straightforward.
 #![allow(
     clippy::panic,
     clippy::expect_used,

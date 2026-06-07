@@ -72,6 +72,7 @@ pub enum RouterDecision {
 /// | `compact_tables`     | `false` (padded cells: `\| cell \|`)    | Yes — `true`                             |
 /// | `br_in_tables`       | bails on `<br>` in cells                | No — covered by scanner bail             |
 /// | `hocr_spatial_tables`| Tier-2 only (structural gate)           | Already gated above                      |
+#[must_use]
 pub fn classify(report: &PrescanReport, options: &ConversionOptions) -> RouterDecision {
     use crate::options::{
         CodeBlockStyle, HeadingStyle, HighlightStyle, LinkStyle, ListIndentType, NewlineStyle, OutputFormat,

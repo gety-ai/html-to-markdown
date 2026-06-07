@@ -63,6 +63,8 @@ fn handle_strong(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
+    // reason: serialize_node is only used with the visitor feature; other imports depend
+    // on feature-gated code paths in this function.
     #[allow(unused_imports)]
     use crate::converter::{append_inline_suffix, chomp_inline, get_text_content, serialize_node, walk_node};
 
@@ -207,6 +209,8 @@ fn handle_emphasis(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
+    // reason: serialize_node is only used with the visitor feature; other imports depend
+    // on feature-gated code paths in this function.
     #[allow(unused_imports)]
     use crate::converter::{append_inline_suffix, chomp_inline, get_text_content, serialize_node, walk_node};
 

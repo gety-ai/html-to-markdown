@@ -1,5 +1,3 @@
-#![allow(clippy::cast_precision_loss, clippy::cast_sign_loss, clippy::unused_self)]
-
 //! Main conversion options with builder pattern.
 
 use crate::options::preprocessing::PreprocessingOptions;
@@ -300,7 +298,7 @@ macro_rules! builder_setter {
     ($name:ident, $ty:ty) => {
         /// Set the value.
         #[must_use]
-        pub fn $name(mut self, value: $ty) -> Self {
+        pub const fn $name(mut self, value: $ty) -> Self {
             self.0.$name = value;
             self
         }
@@ -406,7 +404,7 @@ impl ConversionOptionsBuilder {
     // Preprocessing
     /// Set the pre-processing options applied to the HTML before conversion.
     #[must_use]
-    pub fn preprocessing(mut self, preprocessing: PreprocessingOptions) -> Self {
+    pub const fn preprocessing(mut self, preprocessing: PreprocessingOptions) -> Self {
         self.0.preprocessing = preprocessing;
         self
     }

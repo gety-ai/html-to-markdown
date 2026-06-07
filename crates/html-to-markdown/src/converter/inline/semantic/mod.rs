@@ -29,8 +29,8 @@ type DomContext = crate::converter::DomContext;
 /// - U: underline with visitor callback support
 /// - Small: pass through without formatting
 /// - Sub/Sup: wrap with configurable symbols
-/// - Var: wrap with italic symbol (strong_em_symbol)
-/// - Dfn: wrap with italic symbol (strong_em_symbol)
+/// - Var: wrap with italic symbol (`strong_em_symbol`)
+/// - Dfn: wrap with italic symbol (`strong_em_symbol`)
 /// - Abbr: pass through content with optional title in parentheses
 /// - Span: pass through content with special handling for OCR words and whitespace
 ///

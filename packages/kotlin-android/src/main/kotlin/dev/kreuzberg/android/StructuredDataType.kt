@@ -33,7 +33,7 @@ enum class StructuredDataType {
     @com.fasterxml.jackson.annotation.JsonProperty("json_ld") JSON_LD,
     /** HTML5 Microdata attributes (itemscope, itemtype, itemprop) */
     @com.fasterxml.jackson.annotation.JsonProperty("microdata") MICRODATA,
-    /** RDF in Attributes (RDFa) markup */
+    /** RDF in Attributes (`RDFa`) markup */
     @com.fasterxml.jackson.annotation.JsonProperty("rdfa") R_D_FA;
 
     @com.fasterxml.jackson.annotation.JsonValue

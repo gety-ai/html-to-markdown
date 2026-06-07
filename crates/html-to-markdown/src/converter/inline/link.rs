@@ -57,6 +57,7 @@ pub fn handle(
     // Import helper functions from parent converter module
     use crate::converter::block::heading::{heading_allows_inline_images, push_heading};
     use crate::converter::utility::content::normalized_tag_name;
+    // reason: serialize_node is only used when the visitor feature is active.
     #[allow(unused_imports)]
     use crate::converter::utility::serialization::serialize_node;
     use crate::converter::{find_single_heading_child, get_text_content, walk_node};
@@ -226,7 +227,7 @@ pub fn handle(
         }
 
         if label.is_empty() && !href.is_empty() && !children.is_empty() {
-            label = href.clone();
+            label.clone_from(&href);
         }
 
         // Truncate label if it exceeds maximum length
@@ -408,14 +409,14 @@ pub fn percent_encode_url(url: &str) -> String {
 /// - With `UrlEscapeStyle::Percent`: every non-unreserved character is percent-encoded
 /// - Unbalanced parentheses in href get escaped when using `Angle` style
 /// - Titles are wrapped in quotes and quotes inside are escaped
-/// - When `default_title` option is true and raw_text equals href, adds href as title
+/// - When `default_title` option is true and `raw_text` equals href, adds href as title
 ///
 /// # Arguments
 /// * `output` - Output buffer to append the link to
 /// * `label` - The link text (already escaped)
 /// * `href` - The URL/destination
 /// * `title` - Optional link title attribute
-/// * `raw_text` - Original unprocessed text (for default_title option)
+/// * `raw_text` - Original unprocessed text (for `default_title` option)
 /// * `options` - Conversion options
 pub fn append_markdown_link(
     output: &mut String,

@@ -1,3 +1,7 @@
+// reason: visitor API helper methods are pub(crate) surface; not all are called in every
+// build configuration but they are part of the intentional visitor API contract.
+#![allow(dead_code)]
+
 //! Content extraction and result handling.
 //!
 //! This module provides the `VisitorDispatch` enum and helper methods for
@@ -8,7 +12,6 @@
 /// This enum represents the outcome of a visitor callback dispatch,
 /// providing a more ergonomic interface for control flow than the
 /// raw `VisitResult` type.
-#[allow(dead_code)]
 #[derive(Debug)]
 pub enum VisitorDispatch {
     /// Continue with default conversion behavior
@@ -26,7 +29,6 @@ pub enum VisitorDispatch {
 
 impl VisitorDispatch {
     /// Check if this dispatch result indicates continuation.
-    #[allow(dead_code)]
     #[inline]
     #[must_use]
     pub const fn is_continue(&self) -> bool {
@@ -34,7 +36,6 @@ impl VisitorDispatch {
     }
 
     /// Check if this dispatch result contains custom output.
-    #[allow(dead_code)]
     #[inline]
     #[must_use]
     pub const fn is_custom(&self) -> bool {
@@ -42,7 +43,6 @@ impl VisitorDispatch {
     }
 
     /// Check if this dispatch result indicates skipping.
-    #[allow(dead_code)]
     #[inline]
     #[must_use]
     pub const fn is_skip(&self) -> bool {
@@ -50,7 +50,6 @@ impl VisitorDispatch {
     }
 
     /// Check if this dispatch result indicates HTML preservation.
-    #[allow(dead_code)]
     #[inline]
     #[must_use]
     pub const fn is_preserve_html(&self) -> bool {
@@ -58,7 +57,6 @@ impl VisitorDispatch {
     }
 
     /// Extract custom output if present.
-    #[allow(dead_code)]
     #[inline]
     #[must_use]
     pub fn into_custom(self) -> Option<String> {
@@ -69,7 +67,6 @@ impl VisitorDispatch {
     }
 
     /// Extract custom output reference if present.
-    #[allow(dead_code)]
     #[inline]
     #[must_use]
     pub fn as_custom(&self) -> Option<&str> {

@@ -1,7 +1,7 @@
 //! Table element handler for HTML to Markdown conversion.
 //!
 //! This module provides specialized handling for table elements including:
-//! - Table structure detection and scanning (TableScan)
+//! - Table structure detection and scanning (`TableScan`)
 //! - Row and cell conversion to Markdown table format
 //! - Cell content processing with colspan/rowspan support
 //! - Layout table detection (tables used for visual layout)
@@ -24,7 +24,7 @@ pub(super) mod utils;
 // Re-export for use in converter.rs
 pub use caption::handle_caption;
 
-/// Dispatches table element handling to the main convert_table function.
+/// Dispatches table element handling to the main `convert_table` function.
 ///
 /// # Usage in converter.rs
 /// ```text

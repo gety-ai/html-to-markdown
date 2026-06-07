@@ -352,7 +352,7 @@ mod tests {
 
     impl HtmlVisitor for CustomLinkVisitor {
         fn visit_link(&mut self, _ctx: &NodeContext<'_>, href: &str, text: &str, _title: Option<&str>) -> VisitResult {
-            VisitResult::Custom(format!("{} ({})", text, href))
+            VisitResult::Custom(format!("{text} ({href})"))
         }
 
         fn visit_image(&mut self, _ctx: &NodeContext<'_>, _src: &str, _alt: &str, _title: Option<&str>) -> VisitResult {

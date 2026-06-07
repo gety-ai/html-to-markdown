@@ -1,4 +1,5 @@
-#![allow(clippy::all, clippy::pedantic, clippy::nursery, missing_docs)]
+// reason: CLI application modules do not expose docs to users; doc coverage not required
+#![allow(missing_docs)]
 
 use encoding_rs::Encoding;
 use reqwest::blocking::Client;

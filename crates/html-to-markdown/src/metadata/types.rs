@@ -1,4 +1,3 @@
-#![allow(clippy::cast_precision_loss, clippy::cast_sign_loss, clippy::unused_self)]
 //! Type definitions for metadata extraction.
 
 use std::collections::BTreeMap;
@@ -142,7 +141,7 @@ pub enum StructuredDataType {
     JsonLd,
     /// HTML5 Microdata attributes (itemscope, itemtype, itemprop)
     Microdata,
-    /// RDF in Attributes (RDFa) markup
+    /// RDF in Attributes (`RDFa`) markup
     #[cfg_attr(feature = "metadata", serde(rename = "rdfa"))]
     RDFa,
 }
@@ -412,7 +411,7 @@ pub struct ImageMetadata {
     pub attributes: BTreeMap<String, String>,
 }
 
-/// Structured data block (JSON-LD, Microdata, or RDFa).
+/// Structured data block (JSON-LD, Microdata, or `RDFa`).
 ///
 /// Represents machine-readable structured data found in the document.
 /// JSON-LD blocks are collected as raw JSON strings for flexibility.
@@ -432,7 +431,7 @@ pub struct ImageMetadata {
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "metadata", derive(serde::Serialize, serde::Deserialize))]
 pub struct StructuredData {
-    /// Type of structured data (JSON-LD, Microdata, RDFa)
+    /// Type of structured data (JSON-LD, Microdata, `RDFa`)
     pub data_type: StructuredDataType,
 
     /// Raw JSON string (for JSON-LD) or serialized representation

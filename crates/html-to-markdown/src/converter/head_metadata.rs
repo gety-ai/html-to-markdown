@@ -1,4 +1,4 @@
-//! Metadata extraction by re-parsing the prescan's head_range slice.
+//! Metadata extraction by re-parsing the prescan's `head_range` slice.
 //!
 //! The prescan walks the input once and captures the byte range of the
 //! `<head>…</head>` content (between the tags) in the **cleaned** buffer.

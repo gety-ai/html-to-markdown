@@ -120,11 +120,11 @@ ImageMetadata <- new.env(parent = emptyenv())
 }
 #' @export
 `[[.ImageMetadata` <- `$.ImageMetadata`
-#' Structured data block (JSON-LD, Microdata, or RDFa)
+#' Structured data block (JSON-LD, Microdata, or `RDFa`)
 #'
 #' Represents machine-readable structured data found in the document.
 #' JSON-LD blocks are collected as raw JSON strings for flexibility.
-#' @field data_type Type of structured data (JSON-LD, Microdata, RDFa)
+#' @field data_type Type of structured data (JSON-LD, Microdata, `RDFa`)
 #' @field raw_json Raw JSON string (for JSON-LD) or serialized representation
 #' @field schema_type Schema type if detectable (e.g., "Article", "Event", "Product")
 #' @export

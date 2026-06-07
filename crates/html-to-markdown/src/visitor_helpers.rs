@@ -1,3 +1,9 @@
+// reason: visitor helper functions and types are part of the visitor API surface
+// (visitor feature gate). They are pub(crate) and available for use by the converter
+// and user code, but not all are exercised in every code path, producing dead_code
+// warnings. The allow is intentional — these are public API helpers, not dead code.
+#![allow(dead_code)]
+
 //! Helper functions for visitor pattern integration.
 //!
 //! This module provides efficient utilities for building visitor contexts,
@@ -69,7 +75,6 @@ use std::borrow::Cow;
 ///     false,
 /// );
 /// ```
-#[allow(dead_code)]
 #[inline]
 pub fn build_node_context<'a>(
     node_type: NodeType,
@@ -140,7 +145,6 @@ pub fn build_node_context<'a>(
 ///     None => { /* proceed with default conversion */ }
 /// }
 /// ```
-#[allow(dead_code)]
 #[inline]
 /// # Errors
 ///
@@ -172,7 +176,6 @@ where
 /// This enum represents the outcome of a visitor callback dispatch,
 /// providing a more ergonomic interface for control flow than the
 /// raw `VisitResult` type.
-#[allow(dead_code)]
 #[derive(Debug)]
 pub enum VisitorDispatch {
     /// Continue with default conversion behavior
@@ -190,7 +193,6 @@ pub enum VisitorDispatch {
 
 impl VisitorDispatch {
     /// Check if this dispatch result indicates continuation.
-    #[allow(dead_code)]
     #[inline]
     #[must_use]
     pub const fn is_continue(&self) -> bool {
@@ -198,7 +200,6 @@ impl VisitorDispatch {
     }
 
     /// Check if this dispatch result contains custom output.
-    #[allow(dead_code)]
     #[inline]
     #[must_use]
     pub const fn is_custom(&self) -> bool {
@@ -206,7 +207,6 @@ impl VisitorDispatch {
     }
 
     /// Check if this dispatch result indicates skipping.
-    #[allow(dead_code)]
     #[inline]
     #[must_use]
     pub const fn is_skip(&self) -> bool {
@@ -214,7 +214,6 @@ impl VisitorDispatch {
     }
 
     /// Check if this dispatch result indicates HTML preservation.
-    #[allow(dead_code)]
     #[inline]
     #[must_use]
     pub const fn is_preserve_html(&self) -> bool {
@@ -222,7 +221,6 @@ impl VisitorDispatch {
     }
 
     /// Extract custom output if present.
-    #[allow(dead_code)]
     #[inline]
     #[must_use]
     pub fn into_custom(self) -> Option<String> {
@@ -233,7 +231,6 @@ impl VisitorDispatch {
     }
 
     /// Extract custom output reference if present.
-    #[allow(dead_code)]
     #[inline]
     #[must_use]
     pub fn as_custom(&self) -> Option<&str> {
@@ -440,7 +437,7 @@ mod tests {
         fn visit_text(&mut self, _ctx: &NodeContext, text: &str) -> VisitResult {
             match self.mode {
                 TestMode::Continue => VisitResult::Continue,
-                TestMode::Custom => VisitResult::Custom(format!("CUSTOM: {}", text)),
+                TestMode::Custom => VisitResult::Custom(format!("CUSTOM: {text}")),
                 TestMode::Skip => VisitResult::Skip,
                 TestMode::PreserveHtml => VisitResult::PreserveHtml,
                 TestMode::Error => VisitResult::Error("test error".to_string()),

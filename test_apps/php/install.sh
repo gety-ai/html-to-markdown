@@ -7,7 +7,7 @@ set -euo pipefail
 
 # Version override: pass as $1 to test an arbitrary tag; defaults to the
 # alef-pinned version from `[crates.e2e.registry.packages.php].version`.
-VERSION="${1:-3.6.0-rc.20}"
+VERSION="${1:-3.6.0-rc.21}"
 
 # PIE >= 1.3.7 supports the array-form `php-ext.download-url-method`
 # our composer.json emits; 1.4.0+ is preferred. Download PIE if we don't
@@ -42,9 +42,15 @@ fi
 EXT_DIR="$(php -r 'echo ini_get("extension_dir");')"
 test -f "$EXT_DIR/html_to_markdown.so" || test -f "$EXT_DIR/html_to_markdown.dylib" || test -f "$EXT_DIR/html_to_markdown.dll"
 
-# Load it explicitly for the smoke test (the verify-install action runs
-# phpunit with this same `-d extension=` flag in CI).
-if ! php -dextension=html_to_markdown -m | grep -qi html_to_markdown; then
+# Export the installed extension path for downstream test runners (composer test).
+# The test app's run_tests.php checks for PIE_INSTALLED_EXTENSION_PATH and loads the extension via `-d`.
+export PIE_INSTALLED_EXTENSION_PATH="$EXT_DIR/html_to_markdown.so"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  export PIE_INSTALLED_EXTENSION_PATH="$EXT_DIR/html_to_markdown.dylib"
+fi
+
+# Verify the extension loads via explicit `-d` flag (same mechanism run_tests.php uses).
+if ! php -d extension=html_to_markdown -m | grep -qi "html_to_markdown"; then
   echo "::error::html_to_markdown extension failed to load after PIE install" >&2
   exit 1
 fi

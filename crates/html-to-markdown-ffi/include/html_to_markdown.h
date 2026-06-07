@@ -345,7 +345,7 @@ typedef struct HTMPreprocessingPreset HTMPreprocessingPreset;
  */
 typedef struct HTMProcessingWarning HTMProcessingWarning;
 /**
- * Structured data block (JSON-LD, Microdata, or RDFa).
+ * Structured data block (JSON-LD, Microdata, or `RDFa`).
  *
  * Represents machine-readable structured data found in the document.
  * JSON-LD blocks are collected as raw JSON strings for flexibility.

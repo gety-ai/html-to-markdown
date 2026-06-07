@@ -20,8 +20,7 @@ pub fn extract_media_src<'a>(tag: &'a HTMLTag<'a>) -> Cow<'a, str> {
     tag.attributes()
         .get("src")
         .flatten()
-        .map(|v| v.as_utf8_str())
-        .unwrap_or_else(|| Cow::Borrowed(""))
+        .map_or_else(|| Cow::Borrowed(""), |v| v.as_utf8_str())
 }
 
 /// Try to find source src from nested source element.
@@ -50,7 +49,7 @@ pub fn is_source_element(tag: &HTMLTag) -> bool {
 /// Determine if media should output source link in markdown.
 ///
 /// Returns true if src is non-empty.
-pub fn should_output_media_link(src: &str) -> bool {
+pub const fn should_output_media_link(src: &str) -> bool {
     !src.is_empty()
 }
 

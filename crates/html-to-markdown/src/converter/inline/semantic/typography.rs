@@ -54,6 +54,8 @@ pub fn handle_subscript(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
+    // reason: serialize_node is only used when the visitor feature is active;
+    // other imports depend on feature-gated code paths.
     #[allow(unused_imports)]
     use crate::converter::{append_inline_suffix, chomp_inline, get_text_content, serialize_node, walk_node};
 
@@ -155,6 +157,8 @@ pub fn handle_superscript(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
+    // reason: serialize_node is only used when the visitor feature is active;
+    // other imports depend on feature-gated code paths.
     #[allow(unused_imports)]
     use crate::converter::{append_inline_suffix, chomp_inline, get_text_content, serialize_node, walk_node};
 
@@ -246,7 +250,7 @@ pub fn handle_superscript(
 
 /// Handle variable element (var tag).
 ///
-/// Wraps content with italic symbol (strong_em_symbol from options).
+/// Wraps content with italic symbol (`strong_em_symbol` from options).
 pub fn handle_variable(
     node_handle: &NodeHandle,
     parser: &Parser,
@@ -283,7 +287,7 @@ pub fn handle_variable(
 
 /// Handle definition element (dfn tag).
 ///
-/// Wraps content with italic symbol (strong_em_symbol from options).
+/// Wraps content with italic symbol (`strong_em_symbol` from options).
 pub fn handle_definition(
     node_handle: &NodeHandle,
     parser: &Parser,
@@ -364,7 +368,7 @@ pub fn handle_abbreviation(
 /// Handle span element.
 ///
 /// Processes span elements with special handling for:
-/// - OCR words (elements with class "ocrx_word"): adds space before if needed
+/// - OCR words (elements with class "`ocrx_word")`: adds space before if needed
 /// - Whitespace normalization in normalized mode: removes single newlines
 /// - Otherwise passes through content normally
 pub fn handle_span(
@@ -491,8 +495,8 @@ mod tests {
         let html = "<p>H<sub>2</sub>O</p>";
         let result = convert(html, Some(make_visitor(SubSkipVisitor))).unwrap();
         let content = result.content.unwrap_or_default();
-        assert!(!content.contains('2'), "sub content should be absent: {}", content);
-        assert!(content.contains('H'), "surrounding text should be present: {}", content);
+        assert!(!content.contains('2'), "sub content should be absent: {content}");
+        assert!(content.contains('H'), "surrounding text should be present: {content}");
     }
 
     #[test]
@@ -502,8 +506,7 @@ mod tests {
         let content = result.content.unwrap_or_default();
         assert!(
             content.contains("REPLACED"),
-            "custom output should be present: {}",
-            content
+            "custom output should be present: {content}"
         );
     }
 
@@ -514,8 +517,7 @@ mod tests {
         let content = result.content.unwrap_or_default();
         assert!(
             content.contains("<sub>2</sub>"),
-            "original html should be preserved: {}",
-            content
+            "original html should be preserved: {content}"
         );
     }
 
@@ -524,7 +526,7 @@ mod tests {
         let html = "<p>E=mc<sup>2</sup></p>";
         let result = convert(html, Some(make_visitor(SupSkipVisitor))).unwrap();
         let content = result.content.unwrap_or_default();
-        assert!(!content.contains('2'), "sup content should be absent: {}", content);
+        assert!(!content.contains('2'), "sup content should be absent: {content}");
     }
 
     #[test]
@@ -534,8 +536,7 @@ mod tests {
         let content = result.content.unwrap_or_default();
         assert!(
             content.contains("REPLACED"),
-            "custom output should be present: {}",
-            content
+            "custom output should be present: {content}"
         );
     }
 
@@ -546,8 +547,7 @@ mod tests {
         let content = result.content.unwrap_or_default();
         assert!(
             content.contains("<sup>2</sup>"),
-            "original html should be preserved: {}",
-            content
+            "original html should be preserved: {content}"
         );
     }
 }

@@ -18,7 +18,7 @@ const MAX_TABLE_COLS: usize = 1000;
 /// * `parser` - HTML parser instance
 ///
 /// # Returns
-/// The colspan value (minimum 1, maximum MAX_TABLE_COLS)
+/// The colspan value (minimum 1, maximum `MAX_TABLE_COLS`)
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn get_colspan(node_handle: &tl::NodeHandle, parser: &tl::Parser) -> usize {
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
@@ -33,14 +33,14 @@ pub fn get_colspan(node_handle: &tl::NodeHandle, parser: &tl::Parser) -> usize {
 
 /// Get both colspan and rowspan in a single lookup.
 ///
-/// More efficient than calling get_colspan and a separate rowspan lookup.
+/// More efficient than calling `get_colspan` and a separate rowspan lookup.
 ///
 /// # Arguments
 /// * `node_handle` - Handle to the cell element
 /// * `parser` - HTML parser instance
 ///
 /// # Returns
-/// A tuple of (colspan, rowspan), both minimum 1 and maximum MAX_TABLE_COLS
+/// A tuple of (colspan, rowspan), both minimum 1 and maximum `MAX_TABLE_COLS`
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn get_colspan_rowspan(node_handle: &tl::NodeHandle, parser: &tl::Parser) -> (usize, usize) {
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
@@ -182,7 +182,7 @@ fn escape_cell_text(text: &str, options: &crate::options::ConversionOptions) -> 
 /// * `node_handle` - Handle to the cell element
 /// * `parser` - HTML parser instance
 /// * `output` - Mutable string to append cell content
-/// * `options` - Conversion options (escape settings, br_in_tables)
+/// * `options` - Conversion options (escape settings, `br_in_tables`)
 /// * `ctx` - Conversion context (visitor, etc)
 /// * `_tag_name` - Tag name (for consistency, not used)
 /// * `dom_ctx` - DOM context for content extraction
@@ -264,13 +264,11 @@ mod tests {
         let content = result.content.unwrap_or_default();
         assert!(
             content.contains("**Bold**") || content.contains("__Bold__"),
-            "bold should be preserved: {}",
-            content
+            "bold should be preserved: {content}"
         );
         assert!(
             content.contains("*italic*") || content.contains("_italic_"),
-            "italic should be preserved: {}",
-            content
+            "italic should be preserved: {content}"
         );
     }
 }

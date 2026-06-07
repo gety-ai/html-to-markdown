@@ -16,7 +16,7 @@ pub struct InlineImageConfig {
 impl InlineImageConfig {
     /// Create a new inline image configuration with an empty list.
     #[must_use]
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             keep_inline_images_in: Vec::new(),
         }
@@ -28,7 +28,7 @@ impl InlineImageConfig {
     ///
     /// * `elements` - A vector of HTML element names where inline images should be kept
     #[must_use]
-    pub fn from_elements(elements: Vec<String>) -> Self {
+    pub const fn from_elements(elements: Vec<String>) -> Self {
         Self {
             keep_inline_images_in: elements,
         }

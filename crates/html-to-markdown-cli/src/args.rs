@@ -1,4 +1,8 @@
-#![allow(clippy::all, clippy::pedantic, clippy::nursery, missing_docs)]
+// reason: CLI application modules do not expose docs to users; doc coverage not required
+#![allow(missing_docs)]
+// reason: the struct has many boolean flags reflecting the CLI surface — reducing them
+// would require breaking the flat Cli struct into nested groups, which complicates clap
+#![allow(clippy::struct_excessive_bools)]
 
 use crate::validators::{
     CliCodeBlockStyle, CliHeadingStyle, CliHighlightStyle, CliLinkStyle, CliListIndentType, CliNewlineStyle,
@@ -165,7 +169,7 @@ pub struct Cli {
     ///
     /// How to format code blocks:
     /// - 'indented': 4-space indentation (default, `CommonMark`)
-    /// - 'backticks': Fenced with backticks (```)
+    /// - `backticks`: Fenced with backticks
     /// - 'tildes': Fenced with tildes (~~~)
     #[arg(long, value_name = "STYLE")]
     #[arg(help_heading = "Code Blocks")]
@@ -243,7 +247,7 @@ pub struct Cli {
     #[arg(help_heading = "Metadata")]
     pub extract_metadata: bool,
 
-    /// Output full ConversionResult as JSON instead of markdown text
+    /// Output full `ConversionResult` as JSON instead of markdown text
     ///
     /// Serializes all result fields (content, metadata, tables, document tree, warnings)
     /// as a JSON object. Use with --include-structure, --extract-inline-images, --no-content
@@ -278,7 +282,7 @@ pub struct Cli {
 
     /// Skip text content generation, only extract metadata and structure
     ///
-    /// Requires --json. Sets output_format to plain text extraction mode;
+    /// Requires --json. Sets `output_format` to plain text extraction mode;
     /// the "content" field in the JSON output will be empty.
     #[arg(long)]
     #[arg(help_heading = "JSON Output")]
@@ -405,7 +409,7 @@ pub struct Cli {
     /// Output format (markdown or djot)
     ///
     /// Choose the output format:
-    /// - 'markdown': Standard Markdown (CommonMark compatible, default)
+    /// - `markdown`: Standard Markdown (`CommonMark` compatible, default)
     /// - 'djot': Djot lightweight markup language
     #[arg(short = 'f', long = "output-format", value_name = "FORMAT")]
     #[arg(help_heading = "Output Format")]
@@ -413,6 +417,8 @@ pub struct Cli {
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, ValueEnum)]
+// reason: clippy considers "PowerShell" to suffix-match "Shell" triggering enum_variant_names;
+// the enum name is the correct name for this type and renaming would be confusing
 #[allow(clippy::enum_variant_names)]
 pub enum Shell {
     Bash,

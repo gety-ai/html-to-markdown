@@ -237,7 +237,7 @@ Specifies the target markup language format for the conversion output.
 
 | Variant | Description |
 |---------|-------------|
-| `Markdown` | Standard Markdown (CommonMark compatible). Default. |
+| `Markdown` | Standard Markdown (`CommonMark` compatible). Default. |
 | `Djot` | Djot lightweight markup language. |
 | `Plain` | Plain text output (no markup, visible text only). |
 

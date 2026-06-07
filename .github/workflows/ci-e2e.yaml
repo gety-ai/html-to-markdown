@@ -305,7 +305,7 @@ jobs:
         uses: kreuzberg-dev/actions/install-task@v1 # v1
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v8
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
 
@@ -507,14 +507,14 @@ jobs:
         shell: bash
 
       - name: Install root Composer dependencies
-        uses: ramsey/composer-install@4
+        uses: ramsey/composer-install@4.0.0
         with:
           dependency-versions: locked
         env:
           COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GITHUB_TOKEN }}"}}'
 
       - name: Install PHP package Composer dependencies
-        uses: ramsey/composer-install@4
+        uses: ramsey/composer-install@4.0.0
         with:
           dependency-versions: locked
           working-directory: packages/php
@@ -687,7 +687,7 @@ jobs:
         uses: kreuzberg-dev/actions/install-task@v1 # v1
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v8
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
 
@@ -920,14 +920,14 @@ jobs:
         shell: bash
 
       - name: Install root Composer dependencies
-        uses: ramsey/composer-install@4
+        uses: ramsey/composer-install@4.0.0
         with:
           dependency-versions: locked
         env:
           COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GITHUB_TOKEN }}"}}'
 
       - name: Install PHP package Composer dependencies
-        uses: ramsey/composer-install@4
+        uses: ramsey/composer-install@4.0.0
         with:
           dependency-versions: locked
           working-directory: packages/php
@@ -1420,6 +1420,16 @@ jobs:
         uses: kreuzberg-dev/actions/setup-swift@v1 # v1
         with:
           version: "6.0"
+
+      - name: Setup PHP
+        # ext-php-rs's build.rs requires a `php` binary on PATH even when the
+        # PHP binding crate isn't the one being built — cargo's workspace
+        # resolver evaluates ALL workspace members for unification. Without
+        # PHP here, `cargo build -p html-to-markdown-rs-swift` fails inside
+        # ext-php-rs's build script.
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
 
       - name: Install alef
         uses: kreuzberg-dev/actions/install-alef@v1 # v1

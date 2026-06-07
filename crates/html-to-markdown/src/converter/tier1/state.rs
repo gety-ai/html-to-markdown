@@ -110,6 +110,7 @@ pub struct Tier1State {
 
 impl Tier1State {
     /// Create a new `Tier1State` pre-allocating output capacity based on `input_len`.
+    #[must_use]
     pub fn new(input_len: usize) -> Self {
         Self {
             stack: Vec::with_capacity(16),
@@ -137,6 +138,7 @@ impl Tier1State {
     }
 
     /// True when the scanner is currently inside a table cell.
+    #[must_use]
     pub fn in_table_cell(&self) -> bool {
         self.table_stack.last().is_some_and(|ts| ts.in_cell)
     }

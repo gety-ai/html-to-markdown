@@ -192,7 +192,7 @@ pub fn handle_fieldset(
 ///
 /// - **Block mode**: Content is wrapped in strong markers (e.g., `**text**`)
 /// - **Inline mode**: Content is rendered without emphasis
-/// - Uses the configured strong/emphasis symbol from ConversionOptions
+/// - Uses the configured strong/emphasis symbol from `ConversionOptions`
 pub fn handle_legend(
     _tag_name: &str,
     node_handle: &tl::NodeHandle,

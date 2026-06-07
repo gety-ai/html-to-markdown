@@ -9,7 +9,7 @@ use std::borrow::Cow;
 use crate::converter::utility::content::is_block_level_element;
 use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-/// State captured at element_start that is reused at element_end.
+/// State captured at `element_start` that is reused at `element_end`.
 ///
 /// Holds the parent tag, sibling index, and inline classification so the
 /// matching `handle_visitor_element_end` call does not re-walk the DOM.
@@ -90,7 +90,7 @@ pub fn handle_visitor_element_start(
 
 /// Handles visitor callback for element end (after processing).
 ///
-/// Reuses the [`VisitorElementState`] captured at element_start so the
+/// Reuses the [`VisitorElementState`] captured at `element_start` so the
 /// parent tag and sibling index are computed exactly once per element.
 /// Attributes are built lazily inside `NodeContext` on first access.
 pub fn handle_visitor_element_end(
@@ -145,7 +145,7 @@ pub fn handle_visitor_element_end(
 pub enum VisitAction {
     /// Continue with normal element processing
     Continue,
-    /// Skip the element entirely (don't process children or call visit_element_end)
+    /// Skip the element entirely (don't process children or call `visit_element_end`)
     Skip,
     /// Custom output was provided, skip normal processing
     Custom,

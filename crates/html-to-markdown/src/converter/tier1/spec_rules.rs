@@ -18,6 +18,7 @@ use crate::converter::tier1::tags::{OptionalCloseRule, TagKind, TagSpec};
 ///    returns `false`
 ///
 /// Then push the new tag.
+#[must_use]
 pub fn should_close_for_new_tag(open: &TagSpec, new: &TagSpec) -> bool {
     match open.optional_close {
         None => false,

@@ -2124,7 +2124,7 @@ enum NodeType {
 ///
 /// Specifies the target markup language format for the conversion output.
 enum OutputFormat {
-  /// Standard Markdown (CommonMark compatible). Default.
+  /// Standard Markdown (`CommonMark` compatible). Default.
   markdown,
 
   /// Djot lightweight markup language.
@@ -2266,7 +2266,7 @@ class ProcessingWarning {
           kind == other.kind;
 }
 
-/// Structured data block (JSON-LD, Microdata, or RDFa).
+/// Structured data block (JSON-LD, Microdata, or `RDFa`).
 ///
 /// Represents machine-readable structured data found in the document.
 /// JSON-LD blocks are collected as raw JSON strings for flexibility.
@@ -2283,7 +2283,7 @@ class ProcessingWarning {
 /// assert_eq!(schema.data_type, StructuredDataType::JsonLd);
 /// ```
 class StructuredData {
-  /// Type of structured data (JSON-LD, Microdata, RDFa)
+  /// Type of structured data (JSON-LD, Microdata, `RDFa`)
   final StructuredDataType dataType;
 
   /// Raw JSON string (for JSON-LD) or serialized representation
@@ -2322,7 +2322,7 @@ enum StructuredDataType {
   /// HTML5 Microdata attributes (itemscope, itemtype, itemprop)
   microdata,
 
-  /// RDF in Attributes (RDFa) markup
+  /// RDF in Attributes (`RDFa`) markup
   rdFa,
 }
 
@@ -2532,7 +2532,7 @@ enum WarningKind {
   /// Sanitization was applied to remove potentially unsafe content.
   sanitizationApplied,
 
-  /// DOM traversal was truncated because max_depth was exceeded.
+  /// DOM traversal was truncated because `max_depth` was exceeded.
   depthLimitExceeded,
 }
 

@@ -222,18 +222,15 @@ mod tests {
         let result = wrap_markdown(markdown, &options);
         assert!(
             result.lines().all(|line| line.len() <= 30 || line.trim().is_empty()),
-            "Some lines exceed wrap width. Got: {}",
-            result
+            "Some lines exceed wrap width. Got: {result}"
         );
         assert!(
             result.contains("> This is a very"),
-            "Missing expected wrapped content. Got: {}",
-            result
+            "Missing expected wrapped content. Got: {result}"
         );
         assert!(
             result.lines().filter(|l| l.starts_with("> ")).count() >= 2,
-            "Expected multiple wrapped blockquote lines. Got: {}",
-            result
+            "Expected multiple wrapped blockquote lines. Got: {result}"
         );
     }
 
@@ -276,13 +273,11 @@ mod tests {
 
         assert!(
             result.contains("- This is a very long list item that should definitely be\n  wrapped"),
-            "First list item not properly wrapped. Got: {}",
-            result
+            "First list item not properly wrapped. Got: {result}"
         );
         assert!(
             result.contains("- Short item"),
-            "Short list item incorrectly modified. Got: {}",
-            result
+            "Short list item incorrectly modified. Got: {result}"
         );
     }
 
@@ -299,15 +294,10 @@ mod tests {
 
         assert!(
             result.lines().all(|line| line.len() <= 60 || line.trim().is_empty()),
-            "Some lines exceed wrap width. Got: {}",
-            result
+            "Some lines exceed wrap width. Got: {result}"
         );
-        assert!(result.contains("1."), "Lost ordered list marker. Got: {}", result);
-        assert!(
-            result.contains("2."),
-            "Lost second ordered list marker. Got: {}",
-            result
-        );
+        assert!(result.contains("1."), "Lost ordered list marker. Got: {result}");
+        assert!(result.contains("2."), "Lost second ordered list marker. Got: {result}");
     }
 
     #[test]
@@ -321,16 +311,14 @@ mod tests {
 
         let result = wrap_markdown(markdown, &options);
 
-        assert!(result.contains("- Item"), "Lost top-level list marker. Got: {}", result);
+        assert!(result.contains("- Item"), "Lost top-level list marker. Got: {result}");
         assert!(
             result.contains("  - Nested"),
-            "Lost nested list structure. Got: {}",
-            result
+            "Lost nested list structure. Got: {result}"
         );
         assert!(
             result.lines().all(|line| line.len() <= 50 || line.trim().is_empty()),
-            "Some lines exceed wrap width. Got: {}",
-            result
+            "Some lines exceed wrap width. Got: {result}"
         );
     }
 
@@ -345,18 +333,16 @@ mod tests {
 
         let result = wrap_markdown(markdown, &options);
 
-        assert!(result.contains("[A](#a)"), "Lost link in list. Got: {}", result);
-        assert!(result.contains("[B](#b)"), "Lost nested link. Got: {}", result);
-        assert!(result.contains("[C](#c)"), "Lost short nested link. Got: {}", result);
+        assert!(result.contains("[A](#a)"), "Lost link in list. Got: {result}");
+        assert!(result.contains("[B](#b)"), "Lost nested link. Got: {result}");
+        assert!(result.contains("[C](#c)"), "Lost short nested link. Got: {result}");
         assert!(
             result.contains("- [A](#a)"),
-            "Lost list structure with link. Got: {}",
-            result
+            "Lost list structure with link. Got: {result}"
         );
         assert!(
             result.contains("  - [B](#b)"),
-            "Lost nested list structure. Got: {}",
-            result
+            "Lost nested list structure. Got: {result}"
         );
     }
 
@@ -371,8 +357,8 @@ mod tests {
 
         let result = wrap_markdown(markdown, &options);
 
-        assert!(result.contains("- "), "Lost list markers. Got: {}", result);
-        assert!(result.contains("Item with text"), "Lost item text. Got: {}", result);
+        assert!(result.contains("- "), "Lost list markers. Got: {result}");
+        assert!(result.contains("Item with text"), "Lost item text. Got: {result}");
     }
 
     #[test]
@@ -386,13 +372,12 @@ mod tests {
 
         let result = wrap_markdown(markdown, &options);
 
-        assert!(result.contains("- [A](#a)"), "Lost top-level link. Got: {}", result);
-        assert!(result.contains("  - [B](#b)"), "Lost nested link B. Got: {}", result);
-        assert!(result.contains("  - [C](#c)"), "Lost nested link C. Got: {}", result);
+        assert!(result.contains("- [A](#a)"), "Lost top-level link. Got: {result}");
+        assert!(result.contains("  - [B](#b)"), "Lost nested link B. Got: {result}");
+        assert!(result.contains("  - [C](#c)"), "Lost nested link C. Got: {result}");
         assert!(
             result.lines().all(|line| line.len() <= 50),
-            "Some lines exceed wrap width:\n{}",
-            result
+            "Some lines exceed wrap width:\n{result}"
         );
     }
 

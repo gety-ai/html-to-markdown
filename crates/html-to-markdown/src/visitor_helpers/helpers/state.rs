@@ -1,3 +1,7 @@
+// reason: visitor API helper functions are pub(crate) surface; not all are called in every
+// build configuration but they are part of the intentional visitor API contract.
+#![allow(dead_code)]
+
 //! Visitor state management and context building.
 //!
 //! This module handles construction of `NodeContext` objects that represent
@@ -54,7 +58,6 @@ use std::borrow::Cow;
 ///     false,
 /// );
 /// ```
-#[allow(dead_code)]
 #[inline]
 pub fn build_node_context<'a>(
     node_type: NodeType,

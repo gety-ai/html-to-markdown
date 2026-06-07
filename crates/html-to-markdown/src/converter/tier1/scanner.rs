@@ -7,12 +7,12 @@
 //! # Supported subset (M9)
 //!
 //! Paragraph, Heading(1-6), Strong, Emphasis, Code (inline), Pre, Hr,
-//! LineBreak, Link, Image, List(Unordered), List(Ordered), ListItem,
+//! `LineBreak`, Link, Image, List(Unordered), List(Ordered), `ListItem`,
 //! Blockquote, Block (div/section/article/etc.), Inline (span/etc.),
 //! Table (GFM — conservative bail set, inline-only cell content).
 //!
-//! Bails on: RawText(script/style/textarea/etc.), DefinitionTerm,
-//! DefinitionDescription, List(Definition), Ignored (head/meta/link),
+//! Bails on: RawText(script/style/textarea/etc.), `DefinitionTerm`,
+//! `DefinitionDescription`, List(Definition), Ignored (head/meta/link),
 //! nested tables, colspan/rowspan != 1, block children in cells,
 //! `<caption>`, section-order violations, multi-line cell content,
 //! and any HTML construct with in-text whitespace complexity or unclosed tags.
@@ -313,7 +313,7 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<String, BailReaso
 /// bailed here.  Table-specific bail reasons are emitted by the table-handling
 /// code in `emit_open` and `emit_close`.
 #[inline]
-fn bail_unsupported(spec: &TagSpec, _offset: usize) -> Result<(), BailReason> {
+const fn bail_unsupported(spec: &TagSpec, _offset: usize) -> Result<(), BailReason> {
     match spec.kind {
         TagKind::DefinitionTerm
         | TagKind::DefinitionDescription
@@ -362,12 +362,11 @@ fn emit_open(
         TagKind::Emphasis => {
             state.cell_or_output_mut().push('*');
         }
-        TagKind::Code => {
+        TagKind::Code
             // When inside <pre>, <code> is transparent — no backtick markers.
-            if !state.escape_ctx.contains(EscapeCtx::PRE) {
+            if !state.escape_ctx.contains(EscapeCtx::PRE) => {
                 state.cell_or_output_mut().push('`');
             }
-        }
         TagKind::Link => open_link(state),
         TagKind::Table => open_table(state),
         TagKind::TableCaption => return Err(BailReason::TableCaption),
@@ -1344,7 +1343,7 @@ fn heading_prefix(n: u8) -> &'static str {
 /// Depth 0 → no indent; depth 1 → two spaces; etc.
 /// Uses the `LIST_ITEM_INDENTS` table for depths 0–7; falls back to
 /// a runtime allocation for deeper nesting (rare).
-fn list_item_indent(depth: u16) -> &'static str {
+const fn list_item_indent(depth: u16) -> &'static str {
     let idx = depth as usize;
     if idx < LIST_ITEM_INDENTS.len() {
         LIST_ITEM_INDENTS[idx]

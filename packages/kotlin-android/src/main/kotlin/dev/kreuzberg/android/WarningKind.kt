@@ -36,7 +36,7 @@ enum class WarningKind {
     @com.fasterxml.jackson.annotation.JsonProperty("malformed_html") MALFORMED_HTML,
     /** Sanitization was applied to remove potentially unsafe content. */
     @com.fasterxml.jackson.annotation.JsonProperty("sanitization_applied") SANITIZATION_APPLIED,
-    /** DOM traversal was truncated because max_depth was exceeded. */
+    /** DOM traversal was truncated because `max_depth` was exceeded. */
     @com.fasterxml.jackson.annotation.JsonProperty("depth_limit_exceeded") DEPTH_LIMIT_EXCEEDED;
 
     @com.fasterxml.jackson.annotation.JsonValue

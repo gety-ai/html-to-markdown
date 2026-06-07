@@ -126,7 +126,7 @@ pub fn handle_details(
 ///
 /// - **Inline mode**: Content is rendered inline without emphasis
 /// - **Block mode**: Content is wrapped in strong markers (e.g., `**text**`)
-/// - Uses the configured strong/emphasis symbol from ConversionOptions
+/// - Uses the configured strong/emphasis symbol from `ConversionOptions`
 ///
 /// # Implementation Details
 ///

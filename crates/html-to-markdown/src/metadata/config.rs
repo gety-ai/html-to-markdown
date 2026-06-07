@@ -16,7 +16,7 @@ pub const DEFAULT_MAX_STRUCTURED_DATA_SIZE: usize = 1_000_000;
 /// - `extract_headers`: Enable heading element extraction (h1-h6) with hierarchy tracking
 /// - `extract_links`: Enable anchor element extraction with link type classification
 /// - `extract_images`: Enable image element extraction with source and dimension metadata
-/// - `extract_structured_data`: Enable structured data extraction (JSON-LD, Microdata, RDFa)
+/// - `extract_structured_data`: Enable structured data extraction (JSON-LD, Microdata, `RDFa`)
 /// - `max_structured_data_size`: Safety limit on total structured data size in bytes
 ///
 /// # Examples
@@ -80,12 +80,12 @@ pub struct MetadataConfig {
     /// - Additional custom attributes
     pub extract_images: bool,
 
-    /// Extract structured data (JSON-LD, Microdata, RDFa).
+    /// Extract structured data (JSON-LD, Microdata, `RDFa`).
     ///
     /// When enabled, collects machine-readable structured data including:
     /// - JSON-LD script blocks with schema detection
     /// - Microdata attributes (itemscope, itemtype, itemprop)
-    /// - RDFa markup
+    /// - `RDFa` markup
     /// - Extracted schema type if detectable
     pub extract_structured_data: bool,
 
@@ -163,7 +163,7 @@ pub struct MetadataConfigUpdate {
     #[cfg_attr(any(feature = "serde", feature = "metadata"), serde(alias = "extract_images"))]
     pub extract_images: Option<bool>,
 
-    /// Optional override for extracting structured data (JSON-LD, Microdata, RDFa).
+    /// Optional override for extracting structured data (JSON-LD, Microdata, `RDFa`).
     ///
     /// When Some(true), enables structured data extraction; Some(false) disables it.
     /// None leaves the current setting unchanged.

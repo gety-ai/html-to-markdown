@@ -313,7 +313,7 @@ fn walk_plain(
                             buf.push_str("- ");
                         }
                         ListContext::Ordered { next_index } => {
-                            let _ = write!(buf, "{}. ", next_index);
+                            let _ = write!(buf, "{next_index}. ");
                             *next_index += 1;
                         }
                         ListContext::None => {

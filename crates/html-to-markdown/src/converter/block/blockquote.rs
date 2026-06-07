@@ -166,7 +166,7 @@ pub fn handle(
     }
 }
 
-/// Serialize a node to HTML (used for PreserveHtml visitor result).
+/// Serialize a node to HTML (used for `PreserveHtml` visitor result).
 #[cfg(feature = "visitor")]
 fn serialize_node_to_html(node_handle: &NodeHandle, parser: &Parser, output: &mut String) {
     use crate::converter::serialize_node_to_html as core_serialize;

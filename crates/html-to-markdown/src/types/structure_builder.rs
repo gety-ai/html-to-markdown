@@ -342,7 +342,7 @@ struct BuilderState {
 }
 
 impl BuilderState {
-    fn new() -> Self {
+    const fn new() -> Self {
         Self {
             nodes: Vec::new(),
             group_stack: Vec::new(),
@@ -395,6 +395,7 @@ impl BuilderState {
 /// assert_eq!(doc.source_format.as_deref(), Some("html"));
 /// assert!(!doc.nodes.is_empty());
 /// ```
+#[must_use]
 pub fn build_document_structure(dom: &tl::VDom<'_>) -> DocumentStructure {
     let parser = dom.parser();
     let mut state = BuilderState::new();
@@ -702,8 +703,7 @@ fn process_tag(
                 tag.attributes()
                     .get("type")
                     .flatten()
-                    .map(|v| v.as_utf8_str().to_string())
-                    .unwrap_or_else(|| "javascript".to_string())
+                    .map_or_else(|| "javascript".to_string(), |v| v.as_utf8_str().to_string())
             } else {
                 "css".to_string()
             };

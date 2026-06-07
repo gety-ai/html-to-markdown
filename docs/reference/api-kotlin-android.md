@@ -2,7 +2,7 @@
 title: "Kotlin (Android) API Reference"
 ---
 
-## Kotlin (Android) API Reference <span class="version-badge">v3.6.0-rc.20</span>
+## Kotlin (Android) API Reference <span class="version-badge">v3.6.0-rc.21</span>
 
 ### Functions
 
@@ -887,14 +887,14 @@ See `WarningKind` for the full taxonomy of warning categories.
 
 #### StructuredData
 
-Structured data block (JSON-LD, Microdata, or RDFa).
+Structured data block (JSON-LD, Microdata, or `RDFa`).
 
 Represents machine-readable structured data found in the document.
 JSON-LD blocks are collected as raw JSON strings for flexibility.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `dataType` | `StructuredDataType` | — | Type of structured data (JSON-LD, Microdata, RDFa) |
+| `dataType` | `StructuredDataType` | — | Type of structured data (JSON-LD, Microdata, `RDFa`) |
 | `rawJson` | `String` | — | Raw JSON string (for JSON-LD) or serialized representation |
 | `schemaType` | `String?` | `null` | Schema type if detectable (e.g., "Article", "Event", "Product") |
 
@@ -1017,7 +1017,7 @@ Identifies the schema/format used for structured data markup.
 |-------|-------------|
 | `JsonLd` | JSON-LD (JSON for Linking Data) script blocks |
 | `Microdata` | HTML5 Microdata attributes (itemscope, itemtype, itemprop) |
-| `RDFa` | RDF in Attributes (RDFa) markup |
+| `RDFa` | RDF in Attributes (`RDFa`) markup |
 
 ---
 
@@ -1173,7 +1173,7 @@ Specifies the target markup language format for the conversion output.
 
 | Value | Description |
 |-------|-------------|
-| `Markdown` | Standard Markdown (CommonMark compatible). Default. |
+| `Markdown` | Standard Markdown (`CommonMark` compatible). Default. |
 | `Djot` | Djot lightweight markup language. |
 | `Plain` | Plain text output (no markup, visible text only). |
 
@@ -1234,7 +1234,7 @@ Categories of processing warnings.
 | `TruncatedInput` | The input was truncated due to size limits. |
 | `MalformedHtml` | The HTML was malformed but processing continued with best effort. |
 | `SanitizationApplied` | Sanitization was applied to remove potentially unsafe content. |
-| `DepthLimitExceeded` | DOM traversal was truncated because max_depth was exceeded. |
+| `DepthLimitExceeded` | DOM traversal was truncated because `max_depth` was exceeded. |
 
 ---
 

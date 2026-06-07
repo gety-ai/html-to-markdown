@@ -163,7 +163,7 @@ pub struct ImageMetadata {
     pub attributes: std::collections::HashMap<String, String>,
 }
 
-/// Structured data block (JSON-LD, Microdata, or RDFa).
+/// Structured data block (JSON-LD, Microdata, or `RDFa`).
 ///
 /// Represents machine-readable structured data found in the document.
 /// JSON-LD blocks are collected as raw JSON strings for flexibility.
@@ -181,7 +181,7 @@ pub struct ImageMetadata {
 /// ```
 #[frb(mirror(StructuredData))]
 pub struct StructuredData {
-    /// Type of structured data (JSON-LD, Microdata, RDFa)
+    /// Type of structured data (JSON-LD, Microdata, `RDFa`)
     pub data_type: StructuredDataType,
     /// Raw JSON string (for JSON-LD) or serialized representation
     pub raw_json: String,
@@ -826,7 +826,7 @@ pub enum StructuredDataType {
     JsonLd,
     /// HTML5 Microdata attributes (itemscope, itemtype, itemprop)
     Microdata,
-    /// RDF in Attributes (RDFa) markup
+    /// RDF in Attributes (`RDFa`) markup
     RDFa,
 }
 
@@ -970,7 +970,7 @@ pub enum UrlEscapeStyle {
 /// Specifies the target markup language format for the conversion output.
 #[frb(mirror(OutputFormat), unignore)]
 pub enum OutputFormat {
-    /// Standard Markdown (CommonMark compatible). Default.
+    /// Standard Markdown (`CommonMark` compatible). Default.
     Markdown,
     /// Djot lightweight markup language.
     Djot,
@@ -1111,7 +1111,7 @@ pub enum WarningKind {
     MalformedHtml,
     /// Sanitization was applied to remove potentially unsafe content.
     SanitizationApplied,
-    /// DOM traversal was truncated because max_depth was exceeded.
+    /// DOM traversal was truncated because `max_depth` was exceeded.
     DepthLimitExceeded,
 }
 

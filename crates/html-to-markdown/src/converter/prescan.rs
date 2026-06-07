@@ -42,6 +42,7 @@ const SELF_CLOSING: [(&[u8], &str); 3] = [(b"<br/>", "<br>"), (b"<hr/>", "<hr>")
 /// Panics if a tag-name byte sequence encountered during script/style stripping
 /// is not valid UTF-8 (this cannot happen in practice because it is always a
 /// sub-slice of the valid UTF-8 input `html`).
+#[must_use]
 pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
     let bytes = html.as_bytes();
     let len = bytes.len();

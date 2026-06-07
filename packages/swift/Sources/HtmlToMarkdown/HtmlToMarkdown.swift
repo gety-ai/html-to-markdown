@@ -127,7 +127,7 @@ public typealias LinkMetadata = RustBridge.LinkMetadata
 /// ```
 public typealias ImageMetadata = RustBridge.ImageMetadata
 
-/// Structured data block (JSON-LD, Microdata, or RDFa).
+/// Structured data block (JSON-LD, Microdata, or `RDFa`).
 ///
 /// Represents machine-readable structured data found in the document.
 /// JSON-LD blocks are collected as raw JSON strings for flexibility.
@@ -144,7 +144,7 @@ public typealias ImageMetadata = RustBridge.ImageMetadata
 /// assert_eq!(schema.data_type, StructuredDataType::JsonLd);
 /// ```
 public struct StructuredData: Codable, Sendable, Hashable {
-    /// Type of structured data (JSON-LD, Microdata, RDFa)
+    /// Type of structured data (JSON-LD, Microdata, `RDFa`)
     public let dataType: StructuredDataType
     /// Raw JSON string (for JSON-LD) or serialized representation
     public let rawJson: String
@@ -627,7 +627,7 @@ public enum LinkType: String, Codable, Sendable, Hashable {
     /// Anchor link within same document (href starts with #)
     case anchor
     /// Internal link within same domain
-    case `internal`
+    case internal_ = "internal"
     /// External link to different domain
     case external
     /// Email link (mailto:)
@@ -674,7 +674,7 @@ public enum StructuredDataType: String, Codable, Sendable, Hashable {
     case jsonLd = "json_ld"
     /// HTML5 Microdata attributes (itemscope, itemtype, itemprop)
     case microdata
-    /// RDF in Attributes (RDFa) markup
+    /// RDF in Attributes (`RDFa`) markup
     case rdFa = "rdfa"
 }
 extension StructuredDataType {
@@ -942,7 +942,7 @@ public enum AnnotationKind: Codable, Sendable, Hashable {
     /// Inline code.
     case code
     /// Subscript text.
-    case `subscript`
+    case subscript_
     /// Superscript text.
     case superscript
     /// Highlighted / marked text.
@@ -971,7 +971,7 @@ public enum AnnotationKind: Codable, Sendable, Hashable {
         case "code":
             self = .code
         case "subscript":
-            self = .`subscript`
+            self = .subscript_
         case "superscript":
             self = .superscript
         case "highlight":
@@ -1000,7 +1000,7 @@ public enum AnnotationKind: Codable, Sendable, Hashable {
             try container.encode("strikethrough", forKey: .annotation_type)
         case .code:
             try container.encode("code", forKey: .annotation_type)
-        case .`subscript`:
+        case .subscript_:
             try container.encode("subscript", forKey: .annotation_type)
         case .superscript:
             try container.encode("superscript", forKey: .annotation_type)
@@ -1034,7 +1034,7 @@ public enum WarningKind: String, Codable, Sendable, Hashable {
     case malformedHtml = "malformed_html"
     /// Sanitization was applied to remove potentially unsafe content.
     case sanitizationApplied = "sanitization_applied"
-    /// DOM traversal was truncated because max_depth was exceeded.
+    /// DOM traversal was truncated because `max_depth` was exceeded.
     case depthLimitExceeded = "depth_limit_exceeded"
 }
 extension WarningKind {
@@ -1105,7 +1105,7 @@ public enum NodeType: String, Codable, Sendable, Hashable {
     /// Underline (u, ins)
     case underline = "Underline"
     /// Subscript (sub)
-    case `subscript` = "Subscript"
+    case subscript_ = "Subscript"
     /// Superscript (sup)
     case superscript = "Superscript"
     /// Mark/highlight (mark)
@@ -1185,7 +1185,7 @@ public enum NodeType: String, Codable, Sendable, Hashable {
     /// Sample output
     case samp = "Samp"
     /// Variable
-    case `var` = "Var"
+    case var_ = "Var"
     /// Citation
     case cite = "Cite"
     /// Quote
@@ -1242,7 +1242,7 @@ extension NodeType {
 /// preserving HTML, or signaling errors.
 public enum VisitResult: Codable, Sendable, Hashable {
     /// Continue with default conversion behavior
-    case `continue`
+    case continue_
     /// Replace default output with custom markdown
     ///
     /// The visitor takes full responsibility for the markdown output

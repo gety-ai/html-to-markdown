@@ -2,7 +2,7 @@
 title: "Python API Reference"
 ---
 
-## Python API Reference <span class="version-badge">v3.6.0-rc.20</span>
+## Python API Reference <span class="version-badge">v3.6.0-rc.21</span>
 
 ### Functions
 
@@ -886,14 +886,14 @@ See `WarningKind` for the full taxonomy of warning categories.
 
 #### StructuredData
 
-Structured data block (JSON-LD, Microdata, or RDFa).
+Structured data block (JSON-LD, Microdata, or `RDFa`).
 
 Represents machine-readable structured data found in the document.
 JSON-LD blocks are collected as raw JSON strings for flexibility.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `data_type` | `StructuredDataType` | — | Type of structured data (JSON-LD, Microdata, RDFa) |
+| `data_type` | `StructuredDataType` | — | Type of structured data (JSON-LD, Microdata, `RDFa`) |
 | `raw_json` | `str` | — | Raw JSON string (for JSON-LD) or serialized representation |
 | `schema_type` | `str \| None` | `None` | Schema type if detectable (e.g., "Article", "Event", "Product") |
 
@@ -1016,7 +1016,7 @@ Identifies the schema/format used for structured data markup.
 |-------|-------------|
 | `JSON_LD` | JSON-LD (JSON for Linking Data) script blocks |
 | `MICRODATA` | HTML5 Microdata attributes (itemscope, itemtype, itemprop) |
-| `RDFA` | RDF in Attributes (RDFa) markup |
+| `RDFA` | RDF in Attributes (`RDFa`) markup |
 
 ---
 
@@ -1172,7 +1172,7 @@ Specifies the target markup language format for the conversion output.
 
 | Value | Description |
 |-------|-------------|
-| `MARKDOWN` | Standard Markdown (CommonMark compatible). Default. |
+| `MARKDOWN` | Standard Markdown (`CommonMark` compatible). Default. |
 | `DJOT` | Djot lightweight markup language. |
 | `PLAIN` | Plain text output (no markup, visible text only). |
 
@@ -1233,7 +1233,7 @@ Categories of processing warnings.
 | `TRUNCATED_INPUT` | The input was truncated due to size limits. |
 | `MALFORMED_HTML` | The HTML was malformed but processing continued with best effort. |
 | `SANITIZATION_APPLIED` | Sanitization was applied to remove potentially unsafe content. |
-| `DEPTH_LIMIT_EXCEEDED` | DOM traversal was truncated because max_depth was exceeded. |
+| `DEPTH_LIMIT_EXCEEDED` | DOM traversal was truncated because `max_depth` was exceeded. |
 
 ---
 

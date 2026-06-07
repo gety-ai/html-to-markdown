@@ -159,6 +159,7 @@ pub enum OptionalCloseRule {
 /// Returns `None` for unknown tags.  Callers **must** lowercase the tag name
 /// before calling; the table keys are all ASCII-lowercase.
 #[inline]
+#[must_use]
 pub fn lookup(tag_name_lower: &[u8]) -> Option<&'static TagSpec> {
     TAGS.get(tag_name_lower)
 }

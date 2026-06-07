@@ -16,7 +16,7 @@ type DomContext = crate::converter::DomContext;
 /// Handle mark (highlight) element with configurable styles.
 ///
 /// Supports multiple highlight styles:
-/// - DoubleEqual: `==highlighted==`
+/// - `DoubleEqual`: `==highlighted==`
 /// - Html: `<mark>highlighted</mark>`
 /// - Bold: `**highlighted**`
 /// - None: just pass through content
@@ -29,6 +29,8 @@ pub fn handle_mark(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
+    // reason: serialize_node is only used when the visitor feature is active;
+    // walk_node depends on feature-gated code paths.
     #[allow(unused_imports)]
     use crate::converter::{get_text_content, serialize_node, walk_node};
 
@@ -147,6 +149,8 @@ pub fn handle_mark(
 ///
 /// Converts to `~~content~~` syntax. Suppresses formatting in code context.
 /// Supports visitor callbacks when the visitor feature is enabled.
+// reason: some parameters are only used when the visitor feature is active;
+// using cfg_attr here is equivalent but more verbose given the function signature.
 #[allow(unused_variables)]
 pub fn handle_strikethrough(
     tag_name: &str,
@@ -523,13 +527,11 @@ mod tests {
         let content = result.content.unwrap_or_default();
         assert!(
             !content.contains("highlighted"),
-            "mark content should be absent: {}",
-            content
+            "mark content should be absent: {content}"
         );
         assert!(
             content.contains("before"),
-            "surrounding text should be present: {}",
-            content
+            "surrounding text should be present: {content}"
         );
     }
 
@@ -540,8 +542,7 @@ mod tests {
         let content = result.content.unwrap_or_default();
         assert!(
             content.contains("REPLACED"),
-            "custom output should be present: {}",
-            content
+            "custom output should be present: {content}"
         );
     }
 
@@ -552,8 +553,7 @@ mod tests {
         let content = result.content.unwrap_or_default();
         assert!(
             content.contains("<mark>highlighted</mark>"),
-            "original html should be preserved: {}",
-            content
+            "original html should be preserved: {content}"
         );
     }
 }

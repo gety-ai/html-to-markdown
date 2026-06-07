@@ -1,5 +1,3 @@
-#![allow(clippy::cast_precision_loss, clippy::cast_sign_loss, clippy::unused_self)]
-
 //! HTML preprocessing configuration options.
 //!
 //! This module provides configuration for document cleanup before conversion,

@@ -1,4 +1,8 @@
-#![allow(clippy::all, clippy::pedantic, clippy::nursery, missing_docs)]
+// reason: CLI application modules do not expose docs to users; doc coverage not required
+#![allow(missing_docs)]
+// reason: enum names repeat the type name intentionally for clap ValueEnum derivation
+// (e.g. CliHeadingStyle::Atx mirrors HeadingStyle::Atx one-to-one)
+#![allow(clippy::enum_variant_names)]
 
 use clap::ValueEnum;
 use html_to_markdown_rs::{
@@ -64,7 +68,7 @@ impl From<CliNewlineStyle> for NewlineStyle {
 pub enum CliCodeBlockStyle {
     /// Indented code blocks: 4 spaces (default)
     Indented,
-    /// Fenced code blocks: ```
+    /// Fenced code blocks (backtick style)
     Backticks,
     /// Fenced code blocks: ~~~
     Tildes,
@@ -142,7 +146,7 @@ impl From<CliPreprocessingPreset> for PreprocessingPreset {
 
 #[derive(Copy, Clone, PartialEq, Eq, ValueEnum)]
 pub enum CliOutputFormat {
-    /// Standard Markdown (CommonMark compatible)
+    /// Standard Markdown (`CommonMark` compatible)
     Markdown,
     /// Djot lightweight markup language
     Djot,

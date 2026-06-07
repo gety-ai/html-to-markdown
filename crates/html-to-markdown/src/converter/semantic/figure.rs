@@ -370,22 +370,16 @@ mod tests {
         let content = result.content.unwrap_or_default();
         assert!(
             content.contains("![Photo](photo.jpg)"),
-            "image should be present: {}",
-            content
+            "image should be present: {content}"
         );
-        assert!(
-            content.contains("A nice photo"),
-            "caption should be present: {}",
-            content
-        );
+        assert!(content.contains("A nice photo"), "caption should be present: {content}");
         // Image and caption should not be on the same line
         let lines: Vec<&str> = content.lines().filter(|l| !l.trim().is_empty()).collect();
         let img_line = lines.iter().position(|l| l.contains("![")).unwrap_or(999);
         let cap_line = lines.iter().position(|l| l.contains("A nice photo")).unwrap_or(999);
         assert!(
             cap_line > img_line,
-            "caption should be on a separate line after image, lines: {:?}",
-            lines
+            "caption should be on a separate line after image, lines: {lines:?}"
         );
     }
 }

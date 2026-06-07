@@ -192,7 +192,7 @@ pub fn handle_link(
         }
 
         if label.is_empty() && !href.is_empty() && !children.is_empty() {
-            label = href.clone();
+            label.clone_from(&href);
         }
 
         // Normalize Wikipedia-style back-reference links: <a href="#cite_ref-N">^</a>

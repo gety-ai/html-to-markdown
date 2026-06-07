@@ -1,4 +1,3 @@
-#![allow(clippy::cast_precision_loss, clippy::cast_sign_loss, clippy::unused_self)]
 //! Metadata extraction for HTML to Markdown conversion.
 //!
 //! This module provides comprehensive, type-safe metadata extraction during HTML-to-Markdown
@@ -8,7 +7,7 @@
 //! - **Headers**: Heading elements (h1-h6) with hierarchy, IDs, and positions
 //! - **Links**: Hyperlinks with type classification (anchor, internal, external, email, phone)
 //! - **Images**: Image elements with source, alt text, dimensions, and type (data URI, external, etc.)
-//! - **Structured data**: JSON-LD, Microdata, and RDFa blocks
+//! - **Structured data**: JSON-LD, Microdata, and `RDFa` blocks
 //!
 //! The implementation follows a single-pass collector pattern for zero-overhead extraction
 //! when metadata features are disabled.
@@ -29,8 +28,8 @@
 //!
 //! - [`TextDirection`]: Document directionality (LTR, RTL, Auto)
 //! - [`LinkType`]: Link classification (Anchor, Internal, External, Email, Phone, Other)
-//! - [`ImageType`]: Image source type (DataUri, External, Relative, InlineSvg)
-//! - [`StructuredDataType`]: Structured data format (JsonLd, Microdata, RDFa)
+//! - [`ImageType`]: Image source type (`DataUri`, External, Relative, `InlineSvg`)
+//! - [`StructuredDataType`]: Structured data format (`JsonLd`, Microdata, `RDFa`)
 //!
 //! ## Structures
 //!
@@ -169,6 +168,9 @@ use std::rc::Rc;
 ///
 /// let metadata = handle.take().finish();
 /// ```
+// reason: MetadataCollectorHandle is the pub(crate) API type for metadata collection;
+// it is only used when the metadata feature is active but must be declared regardless
+// to keep the type alias available for conditional compilation at call sites.
 #[allow(dead_code)]
 pub(crate) type MetadataCollectorHandle = Rc<RefCell<MetadataCollector>>;
 

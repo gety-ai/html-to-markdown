@@ -4,7 +4,7 @@
 //! - **head**: Document metadata container; processes script[type="application/ld+json"]
 //! - **script**: Script elements; extracts JSON-LD structured data when appropriate
 //! - **style**: CSS stylesheet elements; skipped in conversion
-//! - **math**: MathML elements with serialization and HTML comments for preservation
+//! - **math**: `MathML` elements with serialization and HTML comments for preservation
 
 use crate::converter::media::svg::serialize_element;
 use crate::options::ConversionOptions;
@@ -23,7 +23,7 @@ type DomContext = crate::converter::DomContext;
 /// - head: Scans for structured data in script[type="application/ld+json"]
 /// - script: Extracts JSON-LD for structured data collection
 /// - style: Skipped (CSS not relevant in markdown)
-/// - math: Preserves MathML as HTML comments with text content
+/// - math: Preserves `MathML` as HTML comments with text content
 pub fn handle(
     tag_name: &str,
     node_handle: &NodeHandle,
@@ -164,7 +164,7 @@ fn handle_script(
 
 /// Handle math element.
 ///
-/// MathML elements are serialized to HTML and wrapped in a comment to preserve them.
+/// `MathML` elements are serialized to HTML and wrapped in a comment to preserve them.
 /// The text content of the element is also output as plain text.
 fn handle_math(
     node_handle: &NodeHandle,

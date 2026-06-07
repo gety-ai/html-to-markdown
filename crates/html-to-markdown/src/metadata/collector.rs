@@ -1,3 +1,8 @@
+// reason: MetadataCollector and its impl methods are only called when the metadata
+// feature is active. The struct/impl is compiled regardless to keep the module
+// structure consistent, but most methods are unused in non-metadata builds.
+#![allow(dead_code)]
+
 //! Metadata collector for single-pass extraction.
 
 use super::config::MetadataConfig;
@@ -23,7 +28,6 @@ use std::collections::BTreeMap;
 /// - **Optional**: Zero overhead when disabled via feature flags
 /// - **Type-safe**: Strict separation of collection and result types
 #[derive(Debug)]
-#[allow(dead_code)]
 pub struct MetadataCollector {
     pub(super) head_metadata: BTreeMap<String, String>,
     pub(super) headers: Vec<super::types::HeaderMetadata>,
@@ -37,7 +41,6 @@ pub struct MetadataCollector {
     pub(super) dir: Option<String>,
 }
 
-#[allow(dead_code)]
 impl MetadataCollector {
     /// Create a new metadata collector with configuration.
     ///
@@ -257,7 +260,6 @@ impl MetadataCollector {
     ///
     /// Performs final processing, validation, and consolidation of all
     /// collected data into the [`HtmlMetadata`] output structure.
-    #[allow(dead_code)]
     pub(crate) fn finish(self) -> HtmlMetadata {
         let structured_data = extract_structured_data(self.json_ld);
         let document = extract_document_metadata(self.head_metadata, self.lang, self.dir);
@@ -274,7 +276,6 @@ impl MetadataCollector {
     /// Categorize links by type for analysis and filtering.
     ///
     /// Separates collected links into groups by [`LinkType`](super::types::LinkType).
-    #[allow(dead_code)]
     pub(crate) fn categorize_links(&self) -> BTreeMap<String, Vec<&LinkMetadata>> {
         let mut categorized: BTreeMap<String, Vec<&LinkMetadata>> = BTreeMap::new();
 
@@ -289,7 +290,6 @@ impl MetadataCollector {
     /// Count headers by level for structural analysis.
     ///
     /// Returns count of headers at each level (1-6).
-    #[allow(dead_code)]
     pub(crate) fn header_counts(&self) -> BTreeMap<String, usize> {
         let mut counts: BTreeMap<String, usize> = BTreeMap::new();
 

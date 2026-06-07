@@ -1,4 +1,3 @@
-#![allow(clippy::cast_precision_loss, clippy::cast_sign_loss, clippy::unused_self)]
 use std::collections::BTreeMap;
 
 use crate::error::ConversionError;

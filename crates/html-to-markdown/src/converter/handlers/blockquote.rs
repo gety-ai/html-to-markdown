@@ -20,7 +20,7 @@ use std::borrow::Cow;
 ///
 /// This handler processes blockquote elements including:
 /// - Converting inline blockquotes by processing children as inline
-/// - Handling nested blockquotes via blockquote_depth tracking
+/// - Handling nested blockquotes via `blockquote_depth` tracking
 /// - Processing citation URLs from cite attribute
 /// - Invoking visitor callbacks when the visitor feature is enabled
 /// - Adding proper spacing and blockquote prefix formatting

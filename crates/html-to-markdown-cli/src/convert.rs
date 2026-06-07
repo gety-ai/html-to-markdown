@@ -1,4 +1,5 @@
-#![allow(clippy::all, clippy::pedantic, clippy::nursery, missing_docs)]
+// reason: CLI application modules do not expose docs to users; doc coverage not required
+#![allow(missing_docs)]
 
 use crate::args::Cli;
 use crate::output::output_debug_info;
@@ -58,7 +59,7 @@ pub fn build_conversion_options(cli: &Cli) -> ConversionOptions {
         debug: cli.debug,
         strip_tags: cli.strip_tags.clone().unwrap_or(defaults.strip_tags),
         preserve_tags: cli.preserve_tags.clone().unwrap_or(defaults.preserve_tags),
-        output_format: cli.output_format.map_or(OutputFormat::default(), Into::into),
+        output_format: cli.output_format.map_or_else(OutputFormat::default, Into::into),
         include_document_structure: cli.include_structure,
         extract_images: cli.extract_inline_images,
         max_image_size: 5_242_880,
@@ -99,13 +100,13 @@ pub fn perform_conversion(
         let mut json_output = serde_json::Map::new();
 
         // content field — null when --no-content
-        if !cli.no_content {
+        if cli.no_content {
+            json_output.insert("content".into(), serde_json::Value::Null);
+        } else {
             json_output.insert(
                 "content".into(),
                 serde_json::Value::String(result.content.clone().unwrap_or_default()),
             );
-        } else {
-            json_output.insert("content".into(), serde_json::Value::Null);
         }
 
         // tables field — always present

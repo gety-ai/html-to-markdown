@@ -1,4 +1,5 @@
-#![allow(clippy::all, clippy::pedantic, clippy::nursery, missing_docs)]
+// reason: CLI application modules do not expose docs to users; doc coverage not required
+#![allow(missing_docs)]
 
 mod args;
 mod convert;
@@ -109,7 +110,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Err(panic_payload) => {
             let msg = panic_payload
                 .downcast_ref::<String>()
-                .map(|s| s.as_str())
+                .map(String::as_str)
                 .or_else(|| panic_payload.downcast_ref::<&str>().copied())
                 .unwrap_or("unknown panic");
             return Err(format!("internal error during conversion (panic): {msg}").into());

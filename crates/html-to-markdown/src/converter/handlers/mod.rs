@@ -1,7 +1,7 @@
 //! Element handlers extracted from the main conversion pipeline.
 //!
 //! This module contains handler functions for specific HTML elements,
-//! allowing the main walk_node function to delegate to specialized handlers.
+//! allowing the main `walk_node` function to delegate to specialized handlers.
 //!
 //! Each handler takes the standard set of parameters:
 //! - `node_handle`: Reference to the DOM node

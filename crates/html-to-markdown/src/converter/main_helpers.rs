@@ -55,10 +55,7 @@ pub fn trim_line_end_whitespace(output: &mut String) {
 
     let mut cleaned = String::with_capacity(output.len());
     for line in output.split('\n') {
-        let (line, suffix) = line
-            .strip_suffix("  ")
-            .map(|line| (line, "  \n"))
-            .unwrap_or((line, "\n"));
+        let (line, suffix) = line.strip_suffix("  ").map_or((line, "\n"), |line| (line, "  \n"));
         cleaned.push_str(line.trim_end_matches([' ', '\t']));
         cleaned.push_str(suffix);
     }
@@ -286,7 +283,7 @@ pub fn expand_xml_self_closing_tags(input: &str) -> String {
 
 /// Try to repair HTML using html5ever parser.
 ///
-/// Returns Some(repaired_html) if repair was successful, None otherwise.
+/// Returns `Some(repaired_html)` if repair was successful, None otherwise.
 ///
 /// Before feeding the input to the HTML5 parser, XML-style self-closing tags on
 /// non-void elements (e.g. `<ac:parameter name="foo" />`) are expanded to explicit
@@ -319,7 +316,7 @@ pub fn format_metadata_frontmatter(metadata: &BTreeMap<String, String>) -> Strin
     let mut result = String::from("---\n");
     for (key, value) in metadata {
         use std::fmt::Write as _;
-        let _ = writeln!(&mut result, "{}: {}", key, value);
+        let _ = writeln!(&mut result, "{key}: {value}");
     }
     result.push_str("---\n");
     result
@@ -352,7 +349,7 @@ pub fn extract_head_metadata(
                         ) {
                             let name_str = name.as_utf8_str();
                             let content_str = content.as_utf8_str();
-                            metadata.insert(format!("meta-{}", name_str), content_str.to_string());
+                            metadata.insert(format!("meta-{name_str}"), content_str.to_string());
                         }
                         // Also check for property attribute (Open Graph, etc.)
                         if let (Some(property), Some(content)) = (
@@ -361,7 +358,7 @@ pub fn extract_head_metadata(
                         ) {
                             let property_str = property.as_utf8_str();
                             let content_str = content.as_utf8_str();
-                            metadata.insert(format!("meta-{}", property_str), content_str.to_string());
+                            metadata.insert(format!("meta-{property_str}"), content_str.to_string());
                         }
                     }
                     // Look for title tag
