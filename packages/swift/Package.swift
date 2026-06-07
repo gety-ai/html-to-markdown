@@ -46,7 +46,8 @@ let package = Package(
     ),
     .target(
       name: "HtmlToMarkdown", dependencies: ["RustBridge"],
-      path: "Sources/HtmlToMarkdown"),
+      path: "Sources/HtmlToMarkdown",
+      exclude: ["LICENSE"]),
     .testTarget(
       name: "HtmlToMarkdownTests", dependencies: ["HtmlToMarkdown"],
       path: "Tests/HtmlToMarkdownTests"),

@@ -1,10 +1,13 @@
 name: h2m
 description: High-performance HTML to Markdown converter
-version: 3.6.0-rc.17
+version: 3.6.0-rc.18
 repository: https://github.com/kreuzberg-dev/html-to-markdown
 environment:
   sdk: '>=3.11.0 <4.0.0'
+executables:
+  download_libs:
 dependencies:
+  http: '^1.1.0'
   # FRB runtime is pure-Dart; works in both Flutter and server-Dart contexts.
   flutter_rust_bridge: '2.12.0'
   # FRB codegen-2.x emits `@freezed` sealed classes annotated with these.

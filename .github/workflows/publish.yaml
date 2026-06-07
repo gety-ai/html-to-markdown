@@ -439,6 +439,79 @@ jobs:
   # it appends the tarball URL + SHA-256 to the release notes so consumers
   # can copy-paste straight into `build.zig.zon`.
 
+  assemble-zig-package:
+    name: Assemble Zig package with prebuilt FFI libraries
+    needs: [prepare, check-c-ffi, c-ffi-libraries]
+    if: ${{ needs.prepare.outputs.release_zig == 'true' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.ref }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: c-ffi-*
+          path: c-ffi-artifacts
+          merge-multiple: true
+
+      - name: Stage prebuilt FFI libraries into Zig package
+        # Inline: alef zig codegen produces packages/zig/ with include/ (C headers
+        # from the zig backend). This step populates lib/<rid>/ with the prebuilt
+        # C FFI shared libraries for each platform so the tarball is complete.
+        # Platform naming follows alef's Go platform convention: linux-x64,
+        # linux-arm64, darwin-x64, darwin-arm64, windows-x64, windows-arm64.
+        shell: bash
+        run: |
+          mkdir -p packages/zig/lib
+          # Map alef's platform names to the directories produced by c-ffi-libraries job.
+          # c-ffi-libraries matrix produces: c-ffi-{platform}/ where platform is
+          # linux-x64, linux-arm64, darwin-x64, darwin-arm64, windows-x64, windows-arm64.
+          declare -A platform_map=(
+            [linux-x64]="linux-x64"
+            [linux-arm64]="linux-arm64"
+            [darwin-x64]="darwin-x64"
+            [darwin-arm64]="darwin-arm64"
+            [windows-x64]="windows-x64"
+            [windows-arm64]="windows-arm64"
+          )
+
+          for alef_rid in "${!platform_map[@]}"; do
+            artifact_platform="${platform_map[$alef_rid]}"
+            src_dir="c-ffi-artifacts/${artifact_platform}"
+
+            # c-ffi-libraries produces a flat distribution directory per platform
+            # containing the FFI shared library (.so/.dylib/.dll). Find and copy.
+            if [[ -d "$src_dir" ]]; then
+              mkdir -p "packages/zig/lib/${alef_rid}"
+              # Copy all shared library artifacts (.so, .dylib, .dll) from the distribution
+              find "$src_dir" -maxdepth 2 -type f \( -name '*.so' -o -name '*.dylib' -o -name '*.dll' \) \
+                -exec cp {} "packages/zig/lib/${alef_rid}/" \;
+              echo "Staged FFI libraries for $alef_rid:"
+              ls -la "packages/zig/lib/${alef_rid}/"
+            else
+              echo "Warning: no C FFI artifact found for $alef_rid at $src_dir"
+            fi
+          done
+
+      - name: Create Zig package tarball
+        # Inline: archive packages/zig with the populated lib/ subdirectories.
+        # alef zig backend has already generated the source code, build files,
+        # and C headers. This step tarballs the complete package.
+        shell: bash
+        run: |
+          cd packages/zig
+          tar -czf "../../html-to-markdown-rs-zig-v${{ needs.prepare.outputs.version }}.tar.gz" .
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: zig-package-assembled
+          path: html-to-markdown-rs-zig-v${{ needs.prepare.outputs.version }}.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+
   check-zig:
     name: Check Zig package presence
     needs: prepare
@@ -854,7 +927,7 @@ jobs:
             # Use `env VAR=val` to plant RUBY_CC_VERSION into the *command's* process
             # environment, surviving the container's /etc/profile.d default that
             # otherwise re-introduces Ruby 4.0.2 after `export`.
-            rb-sys-dock --directory packages/ruby --platform "${{ matrix.dock_platform }}" -- env RUBY_CC_VERSION=3.4.9:3.3.11:3.2.11:3.1.7 bash -c "bundle install --jobs=4 --retry=3 && bundle exec rake compile && bundle exec rake build"
+            rb-sys-dock --directory packages/ruby --platform "${{ matrix.dock_platform }}" -- env RUBY_CC_VERSION=3.4.9:3.3.11:3.2.11:3.1.7 bash -c "rustup target add x86_64-pc-windows-gnu && bundle install --jobs=4 --retry=3 && bundle exec rake compile && bundle exec rake build"
           else
             # Native build on matching architecture
             cd packages/ruby
@@ -2124,14 +2197,19 @@ jobs:
 
   publish-zig:
     name: Publish Zig package metadata
-    needs: [prepare, check-zig]
-    if: ${{ needs.prepare.outputs.release_zig == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-zig.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    needs: [prepare, check-zig, assemble-zig-package]
+    if: ${{ needs.prepare.outputs.release_zig == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-zig.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') && needs.assemble-zig-package.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.ref }}
           submodules: recursive
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: zig-package-assembled
+          path: .
 
       - uses: kreuzberg-dev/actions/publish-zig@v1
         with:
@@ -2343,6 +2421,7 @@ jobs:
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/download-artifact@v8
         with:
@@ -2351,6 +2430,8 @@ jobs:
 
       - name: Update Package.swift with version and checksum
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
           CHECKSUM=$(cat swift-checksums/*.checksum | tr -d '[:space:]')
@@ -2399,6 +2480,63 @@ jobs:
 
           gh release edit "v${VERSION}" --notes-file /tmp/swift-notes.md
 
+  build-r-package:
+    name: Build R source tarball
+    needs: prepare
+    if: ${{ needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          submodules: recursive
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "release"
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3
+
+      - name: Build R source tarball
+        # The packages/r/configure script vendors the html-to-markdown-rs core
+        # crate from the monorepo at build time; running `R CMD build` inside
+        # the repo therefore produces a self-contained source tarball.
+        working-directory: packages/r
+        run: |
+          R CMD build .
+          ls -la htmltomarkdown_*.tar.gz
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: r-source-tarball
+          path: packages/r/htmltomarkdown_*.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+
+  upload-r-release:
+    name: Upload R source tarball to GitHub Release
+    needs: [prepare, build-r-package]
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.build-r-package.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: r-source-tarball
+          path: dist/r
+
+      - uses: kreuzberg-dev/actions/upload-release-assets@v1
+        with:
+          tag: ${{ needs.prepare.outputs.tag }}
+          working-directory: dist/r
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+          assets: |
+            htmltomarkdown_*.tar.gz
+
   release-finalize:
     name: Finalize GitHub Release
     needs:
@@ -2422,6 +2560,7 @@ jobs:
       - upload-c-ffi-release
       - upload-swift-release
       - update-swift-package-manifest
+      - upload-r-release
     if: |
       always() &&
       !cancelled() &&
@@ -2460,6 +2599,7 @@ jobs:
       - upload-c-ffi-release
       - upload-elixir-release
       - upload-php-pie-release
+      - upload-r-release
       - release-finalize
     if: |
       always() &&

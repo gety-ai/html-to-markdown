@@ -510,6 +510,7 @@ tasks:
     desc: "Smoke test R package"
     dir: test_apps/r
     cmds:
+      - Rscript install.R
       - Rscript -e "library(testthat); library(htmltomarkdown); test_file('tests/test_smoke.R')"
 
   test-apps:smoke:bun:

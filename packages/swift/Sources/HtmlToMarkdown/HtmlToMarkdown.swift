@@ -1765,7 +1765,8 @@ public func conversionOptionsFromJsonWithVisitor(_ json: String, _ visitor: Visi
 ///
 /// Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 public func convert(html: String, options: ConversionOptions? = nil) throws -> ConversionResult {
-    return try RustBridge.convert(html, options)
+        let _rb_html = RustString(html)
+    return try RustBridge.convert(_rb_html, options)
 }
 // swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
 extension RustBridge.DocumentMetadata: @unchecked Sendable {}

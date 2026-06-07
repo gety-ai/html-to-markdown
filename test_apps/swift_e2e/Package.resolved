@@ -1,0 +1,15 @@
+{
+  "originHash" : "8abecbb085dfa737a2a76610353130a5e541585e167cb055ee656b497cf1d074",
+  "pins" : [
+    {
+      "identity" : "html-to-markdown",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kreuzberg-dev/html-to-markdown",
+      "state" : {
+        "revision" : "3dc27465d515e8f2889deb5addc4a9cf5a5a386d",
+        "version" : "3.6.0-rc.16"
+      }
+    }
+  ],
+  "version" : 3
+}
