@@ -580,7 +580,7 @@ tasks:
     dir: test_apps/node
     cmds:
       - pnpm install
-      - pnpm test:comprehensive
+      - pnpm test
 
   test-apps:test:ruby:
     desc: "Comprehensive tests for Ruby gem"

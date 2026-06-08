@@ -1,2 +1,4 @@
 github.com/kreuzberg-dev/html-to-markdown/packages/go/v3 v3.6.0-rc.20 h1:rC19Jf9k+XcquGgz/ULUk5wrvFJvIk0ZzHZdPRl6EwY=
 github.com/kreuzberg-dev/html-to-markdown/packages/go/v3 v3.6.0-rc.20/go.mod h1:x6ArxJ4PLhVqVMYZEVUirqYMcUXc67yhB5kfQapOvDA=
+github.com/kreuzberg-dev/html-to-markdown/packages/go/v3 v3.6.0-rc.22/go.mod h1:x6ArxJ4PLhVqVMYZEVUirqYMcUXc67yhB5kfQapOvDA=
+github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=

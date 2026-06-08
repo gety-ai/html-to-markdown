@@ -2447,20 +2447,28 @@ jobs:
           # The checksum is only known after the artifact bundle is built, but consumers
           # (test_apps) fetch the tagged tree and need the substituted manifest.
           # Force-update the tag to point at this post-substitution commit.
+          #
+          # This workflow is the sole writer for this tag's substituted state, so
+          # `--force-with-lease` adds no safety and breaks against annotated→lightweight
+          # tag conversion (the lease's expected SHA is the annotated tag object, but the
+          # server compares it differently after we replace it with a lightweight tag).
+          # Use plain `--force` and retry transient network failures.
           git config user.name "kreuzberg-dev[bot]"
           git config user.email "noreply@kreuzberg.dev"
           git add Package.swift
           git commit -m "chore(release): substitute Swift checksum for ${VERSION}"
           git tag -f "v${VERSION}" HEAD
-          # `git ls-remote --tags` returns both the tag ref and its peeled
-          # `^{}` form on separate lines for annotated tags. Use `--refs` to
-          # suppress the peeled line, then take a single SHA.
-          EXPECTED=$(git ls-remote --tags --refs origin "v${VERSION}" | awk '{print $1}' | head -1)
-          if [ -n "$EXPECTED" ]; then
-            git push origin "v${VERSION}" --force-with-lease="refs/tags/v${VERSION}:${EXPECTED}"
-          else
-            git push origin "v${VERSION}" --force
-          fi
+          for attempt in 1 2 3; do
+            if git push origin "v${VERSION}" --force; then
+              break
+            fi
+            if [ "$attempt" = 3 ]; then
+              echo "::error::Failed to push tag v${VERSION} after 3 attempts"
+              exit 1
+            fi
+            echo "Push attempt ${attempt} failed, retrying in 5s..."
+            sleep 5
+          done
 
       - name: Update release notes with artifact URL
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
