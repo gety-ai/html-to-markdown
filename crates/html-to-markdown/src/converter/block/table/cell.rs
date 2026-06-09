@@ -148,12 +148,10 @@ pub fn cell_text_content(
     }
 
     let text = text.trim();
-    if options.br_in_tables {
+    if options.br_in_tables || !text.contains('\n') {
         text.to_string()
-    } else if text.contains('\n') {
-        text.replace('\n', " ")
     } else {
-        text.to_string()
+        text.replace('\n', " ")
     }
 }
 
@@ -228,22 +226,22 @@ pub fn convert_table_cell(
     }
 
     let text = text.trim();
-    let text = if options.br_in_tables {
+    let text_for_output: Cow<str> = if options.br_in_tables || !text.contains('\n') {
         // When br_in_tables is enabled, markdown line breaks from <br> HTML tags
-        // are already properly formatted, just pass them through unchanged
-        text.to_string()
-    } else if text.contains('\n') {
-        text.replace('\n', " ")
+        // are already properly formatted, just pass them through unchanged.
+        // Also, if no newlines present, just use the trimmed slice.
+        Cow::Borrowed(text)
     } else {
-        text.to_string()
+        // Only allocate if we need to replace newlines
+        Cow::Owned(text.replace('\n', " "))
     };
 
     let colspan = get_colspan(node_handle, parser);
 
     output.push(' ');
-    output.push_str(&text);
+    output.push_str(&text_for_output);
     if let Some(width) = col_width {
-        let text_len = text.chars().count();
+        let text_len = text_for_output.chars().count();
         if text_len < width {
             for _ in 0..(width - text_len) {
                 output.push(' ');
