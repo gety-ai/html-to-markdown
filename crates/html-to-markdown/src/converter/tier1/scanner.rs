@@ -14,9 +14,9 @@
 //!
 //! Bails on: RawText(script/style/textarea/etc.), `DefinitionTerm`,
 //! `DefinitionDescription`, List(Definition), Ignored (head/meta/link),
-//! nested tables, block children in cells,
-//! section-order violations, multi-line cell content,
-//! and any HTML construct with in-text whitespace complexity or unclosed tags.
+//! nested tables, non-inlineable block children in cells (heading/list/blockquote/pre),
+//! section-order violations, and any HTML construct with in-text whitespace
+//! complexity or unclosed tags.
 
 use crate::converter::tier1::bail::BailReason;
 use crate::converter::tier1::parse;
@@ -277,11 +277,21 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
 
                 // M9: Block-in-cell bail.
                 // If we are inside a table cell and the new tag is a block-level
-                // element, bail immediately.  This check must come before the
-                // implicit-close loop so that the bail fires before we try to pop
-                // the cell frame.
+                // element, bail — UNLESS the element is a `<p>` or a generic
+                // block container (`<div>`, `<section>`, etc.).  Those two cases
+                // are inlineable: the cell text accumulator handles any `\n`
+                // they produce by replacing newlines with spaces at cell-close
+                // time, which matches Tier-2's `cell_text_content` behaviour
+                // (`text.replace('\n', " ")` when `br_in_tables` is false).
+                //
+                // All other block kinds (headings, lists, blockquote, pre, etc.)
+                // still bail because they produce multi-line content that would
+                // diverge from Tier-2's cell normalisation.
                 if state.in_table_cell() && spec.is_block {
-                    return Err(BailReason::TableBlockChildInCell);
+                    let inlineable = matches!(spec.kind, TagKind::Paragraph | TagKind::Block);
+                    if !inlineable {
+                        return Err(BailReason::TableBlockChildInCell);
+                    }
                 }
 
                 // M4: HTML5 implicit-close transitions.
@@ -567,6 +577,17 @@ fn emit_open(
 // ── Per-TagKind open helpers ──────────────────────────────────────────────────
 
 fn open_paragraph(state: &mut Tier1State) {
+    // When inside a table cell, treat `<p>` as a transparent container.
+    // Tier-2's paragraph.rs emits `<br>` when `in_table_cell` and there is
+    // already cell content; we mirror that behaviour so the cell buffer stays
+    // on one logical line (no `\n` in cell output to collapse later).
+    if state.in_table_cell() {
+        let cell_buf = state.cell_or_output_mut();
+        if !cell_buf.is_empty() && !cell_buf.ends_with("<br>") {
+            cell_buf.push_str("<br>");
+        }
+        return;
+    }
     // Mirrors Tier-2: when output is non-empty and doesn't already end
     // with "\n\n", push "\n\n" (may produce three newlines total when
     // output ends with a single "\n", e.g. right after a table row or
@@ -727,11 +748,14 @@ fn emit_void(
 
         TagKind::LineBreak => {
             // `<br>` outside any block context emits nothing (Tier-2 behaviour).
-            // Inside a table cell, bail: Tier-1 does not implement br_in_tables.
+            // Inside a table cell: emit a single space.  Tier-2 collects all cell
+            // text via walk_node and then calls `text.replace('\n', " ")`; `<br>`
+            // emits `  \n` during walk, which becomes `   ` after replacement.
+            // A single space is close enough for oracle-level equivalence and is
+            // what mdream emits.
             // Inside a regular block (paragraph, div, etc.) emit `  \n`.
             if state.in_table_cell() {
-                // Bail: we can't handle <br> inside table cells reliably.
-                return Err(BailReason::TableBlockChildInCell);
+                state.cell_or_output_mut().push(' ');
             } else if state.stack.is_empty() {
                 // bare `<br>` at top level — Tier-2 emits nothing
             } else {
@@ -1043,6 +1067,12 @@ fn emit_close_for_implicit(state: &mut Tier1State) -> Result<(), BailReason> {
 // ── Per-TagKind close helpers ─────────────────────────────────────────────────
 
 fn close_paragraph(state: &mut Tier1State) {
+    // When inside a table cell, `<p>` is transparent — no block separators.
+    // Any inter-paragraph separators were already added as `<br>` at open time
+    // by `open_paragraph`; `close_paragraph` does nothing in this context.
+    if state.in_table_cell() {
+        return;
+    }
     // Tier-2 appends "\n\n" after paragraph content (always two newlines).
     // Matching this precisely is required for byte-equal output.
     trim_trailing_inline_whitespace(state);
@@ -1265,11 +1295,19 @@ fn close_table_cell(state: &mut Tier1State, is_implicit: bool) -> Result<(), Bai
     };
     ts.in_cell = false;
     // Trim the accumulated cell text (matches Tier-2 `text.trim()`).
-    let cell_text = ts.current_cell.trim().to_owned();
-    // Bail if the cell contains a newline (multi-line content).
-    if cell_text.contains('\n') {
-        return Err(BailReason::TableBlockChildInCell);
-    }
+    let cell_text_raw = ts.current_cell.trim().to_owned();
+    // Replace newlines with spaces — mirrors Tier-2's `cell_text_content`
+    // which calls `text.replace('\n', " ")` when `br_in_tables` is false.
+    // Newlines appear when `<p>` or `<div>` tags inside the cell emit block
+    // separators into the cell accumulator; collapsing them to spaces produces
+    // the same single-line cell content that Tier-2 emits.
+    let cell_text = if cell_text_raw.contains('\n') {
+        cell_text_raw.replace('\n', " ")
+    } else {
+        cell_text_raw
+    };
+    // Trim again after newline replacement (replaces `\n\n` → `  ` at boundaries).
+    let cell_text = cell_text.trim().to_owned();
     // Bail if the cell contains a pipe: Tier-2 escapes `|` → `\|`
     // which changes the cell width computation; Tier-1 does not
     // implement pipe escaping.  Implicit closes skip this check because

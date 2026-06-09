@@ -295,19 +295,16 @@ fn test_colspan_handled_natively() {
     tier1_run(html).expect("Tier-1 should not bail on colspan");
 }
 
-/// Test 16: `<td><p>x</p></td>` → `TableBlockChildInCell`.
+/// Test 16: `<td><p>x</p></td>` — Phase F: `<p>` is now inlined (no bail).
 #[test]
-fn test_bail_block_child_paragraph() {
+fn test_paragraph_in_cell_handled_natively() {
     let html = "<table>\
         <tr><th>H</th></tr>\
         <tr><td><p>x</p></td></tr>\
     </table>";
-    let err = tier1_run(html).unwrap_err();
-    assert!(
-        matches!(err, BailReason::TableBlockChildInCell),
-        "expected TableBlockChildInCell, got {err:?}"
-    );
-    assert_eq!(tier1(html), tier2(html));
+    // Tier-1 must not bail; output must match Tier-2.
+    let t1 = tier1_run(html).expect("Tier-1 should not bail on <p> in cell");
+    assert_eq!(t1, tier2(html));
 }
 
 /// Test 17: `<td><ul><li>x</li></ul></td>` → `TableBlockChildInCell`.
