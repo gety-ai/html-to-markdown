@@ -1,21 +1,138 @@
 //! Text processing utilities for Markdown conversion.
 
-use regex::Regex;
 use std::borrow::Cow;
-use std::sync::LazyLock;
 
-/// Regex for escaping miscellaneous characters
-static ESCAPE_MISC_RE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"([\\&<`\[\]>~#=+|\-])").expect("valid regex pattern"));
+/// Returns true when the byte is one of the misc-escape characters:
+/// `\` `&` `<` `` ` `` `[` `]` `>` `~` `#` `=` `+` `|` `-`.
+#[inline]
+const fn is_misc_escape(b: u8) -> bool {
+    matches!(
+        b,
+        b'\\' | b'&' | b'<' | b'`' | b'[' | b']' | b'>' | b'~' | b'#' | b'=' | b'+' | b'|' | b'-'
+    )
+}
 
-/// Regex for escaping numbered lists
-static ESCAPE_NUMBERED_LIST_RE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"([0-9])([.)])").expect("valid regex pattern"));
+/// Returns true when the byte is one of the CommonMark ASCII-punctuation
+/// characters that `escape_ascii` requests backslash-escaping for.
+#[inline]
+const fn is_ascii_punct(b: u8) -> bool {
+    matches!(
+        b,
+        b'!' | b'"'
+            | b'#'
+            | b'$'
+            | b'%'
+            | b'&'
+            | b'\''
+            | b'('
+            | b')'
+            | b'*'
+            | b'+'
+            | b','
+            | b'-'
+            | b'.'
+            | b'/'
+            | b':'
+            | b';'
+            | b'<'
+            | b'='
+            | b'>'
+            | b'?'
+            | b'@'
+            | b'['
+            | b'\\'
+            | b']'
+            | b'^'
+            | b'_'
+            | b'`'
+            | b'{'
+            | b'|'
+            | b'}'
+            | b'~'
+    )
+}
 
-/// Regex for escaping ASCII punctuation (CommonMark spec example 12)
-/// Matches: `! " # $ % & ' ( ) * + , - . / : ; < = > ? @ [ \ ] ^ _ \` { | } ~`
-static ESCAPE_ASCII_RE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"([!\x22#$%&\x27()*+,\-./:;<=>?@\[\\\]^_`{|}~])").expect("valid regex pattern"));
+/// Append the escaped form of `text` to `dest` in a single pass.
+///
+/// Replaces the previous regex-based pipeline (three sequential `regex::replace_all`
+/// calls plus two `String::replace` calls).  All escape flags are honoured in one
+/// byte walk; runs of non-special bytes are bulk-copied via `push_str` so multi-byte
+/// UTF-8 codepoints flow through unchanged without per-byte char conversion.
+///
+/// Callers that need a `Cow` return type should use `escape` instead.
+#[allow(clippy::fn_params_excessive_bools)]
+pub fn escape_into(
+    dest: &mut String,
+    text: &str,
+    escape_misc: bool,
+    escape_asterisks: bool,
+    escape_underscores: bool,
+    escape_ascii: bool,
+) {
+    if text.is_empty() {
+        return;
+    }
+    if escape_ascii {
+        escape_ascii_into(dest, text);
+        return;
+    }
+    let bytes = text.as_bytes();
+    let mut run_start = 0;
+    let mut i = 0;
+    while i < bytes.len() {
+        let b = bytes[i];
+        let needs_misc = escape_misc && is_misc_escape(b);
+        // Numbered-list escape: `.` / `)` are escaped iff the previous input
+        // byte is an ASCII digit.  Read from `bytes`, not from `dest` — at
+        // this point in the loop the digit is still inside the pending run
+        // `bytes[run_start..i]` and has not been flushed.
+        let needs_numbered = escape_misc && (b == b'.' || b == b')') && i > 0 && bytes[i - 1].is_ascii_digit();
+        let needs_star = escape_asterisks && b == b'*';
+        let needs_under = escape_underscores && b == b'_';
+        if needs_misc || needs_numbered || needs_star || needs_under {
+            if i > run_start {
+                dest.push_str(&text[run_start..i]);
+            }
+            dest.push('\\');
+            dest.push(b as char);
+            i += 1;
+            run_start = i;
+        } else {
+            i += 1;
+        }
+    }
+    if i > run_start {
+        dest.push_str(&text[run_start..]);
+    }
+}
+
+/// Append the `escape_ascii` form of `text` to `dest` in a single pass.
+///
+/// Every byte in `is_ascii_punct` is prefixed with `\`.  Non-ASCII bytes
+/// (UTF-8 continuation bytes for multi-byte codepoints) flow through
+/// unchanged in bulk runs.
+fn escape_ascii_into(dest: &mut String, text: &str) {
+    let bytes = text.as_bytes();
+    let mut run_start = 0;
+    let mut i = 0;
+    while i < bytes.len() {
+        let b = bytes[i];
+        if is_ascii_punct(b) {
+            if i > run_start {
+                dest.push_str(&text[run_start..i]);
+            }
+            dest.push('\\');
+            dest.push(b as char);
+            i += 1;
+            run_start = i;
+        } else {
+            i += 1;
+        }
+    }
+    if i > run_start {
+        dest.push_str(&text[run_start..]);
+    }
+}
 
 /// Escape Markdown special characters in text.
 ///
@@ -29,7 +146,8 @@ static ESCAPE_ASCII_RE: LazyLock<Regex> =
 ///
 /// # Returns
 ///
-/// Escaped text
+/// Escaped text — `Cow::Borrowed(text)` when no escaping was necessary, otherwise
+/// `Cow::Owned` containing the escaped string.
 #[allow(clippy::fn_params_excessive_bools)]
 pub fn escape(
     text: &str,
@@ -46,91 +164,31 @@ pub fn escape(
         return Cow::Borrowed(text);
     }
 
-    if escape_ascii
-        && !text.as_bytes().iter().any(|b| {
-            matches!(
-                b,
-                b'!' | b'"'
-                    | b'#'
-                    | b'$'
-                    | b'%'
-                    | b'&'
-                    | b'\''
-                    | b'('
-                    | b')'
-                    | b'*'
-                    | b'+'
-                    | b','
-                    | b'-'
-                    | b'.'
-                    | b'/'
-                    | b':'
-                    | b';'
-                    | b'<'
-                    | b'='
-                    | b'>'
-                    | b'?'
-                    | b'@'
-                    | b'['
-                    | b'\\'
-                    | b']'
-                    | b'^'
-                    | b'_'
-                    | b'`'
-                    | b'{'
-                    | b'|'
-                    | b'}'
-                    | b'~'
-            )
-        })
-    {
+    // Single-pass scan to determine whether any byte needs escaping.  Returns
+    // `Cow::Borrowed` immediately when the answer is no, avoiding the
+    // destination String allocation entirely for the common "clean" case.
+    let needs_any = text.as_bytes().iter().any(|&b| {
+        if escape_ascii {
+            return is_ascii_punct(b);
+        }
+        (escape_misc && (is_misc_escape(b) || b == b'.' || b == b')'))
+            || (escape_asterisks && b == b'*')
+            || (escape_underscores && b == b'_')
+    });
+    if !needs_any {
         return Cow::Borrowed(text);
     }
 
-    if !escape_ascii && escape_misc && !escape_asterisks && !escape_underscores {
-        let needs_misc = text.as_bytes().iter().any(|b| {
-            matches!(
-                b,
-                b'\\' | b'&' | b'<' | b'`' | b'[' | b']' | b'>' | b'~' | b'#' | b'=' | b'+' | b'|' | b'-'
-            )
-        });
-        let needs_numbered = text.as_bytes().iter().any(|b| matches!(b, b'.' | b')'));
-        if !needs_misc && !needs_numbered {
-            return Cow::Borrowed(text);
-        }
-    }
-
-    let mut result: Cow<'_, str> = Cow::Borrowed(text);
-
-    if escape_ascii {
-        result = match ESCAPE_ASCII_RE.replace_all(result.as_ref(), r"\$1") {
-            Cow::Borrowed(_) => result,
-            Cow::Owned(s) => Cow::Owned(s),
-        };
-        return result;
-    }
-
-    if escape_misc {
-        result = match ESCAPE_MISC_RE.replace_all(result.as_ref(), r"\$1") {
-            Cow::Borrowed(_) => result,
-            Cow::Owned(s) => Cow::Owned(s),
-        };
-
-        result = match ESCAPE_NUMBERED_LIST_RE.replace_all(result.as_ref(), r"$1\$2") {
-            Cow::Borrowed(_) => result,
-            Cow::Owned(s) => Cow::Owned(s),
-        };
-    }
-
-    if escape_asterisks && result.contains('*') {
-        result = Cow::Owned(result.replace('*', r"\*"));
-    }
-
-    if escape_underscores && result.contains('_') {
-        result = Cow::Owned(result.replace('_', r"\_"));
-    }
-
-    result
+    let mut dest = String::with_capacity(text.len() + 8);
+    escape_into(
+        &mut dest,
+        text,
+        escape_misc,
+        escape_asterisks,
+        escape_underscores,
+        escape_ascii,
+    );
+    Cow::Owned(dest)
 }
 
 /// Extract boundary whitespace from text (chomp).
