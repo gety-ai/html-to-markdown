@@ -117,24 +117,26 @@ pub fn process_text_node(
         text.into_owned()
     } else if ctx.in_table_cell {
         // Always escape * and _ in table cells to prevent unintended emphasis.
-        let escaped = if options.whitespace_mode == crate::options::WhitespaceMode::Normalized {
-            let normalized_text = text::normalize_whitespace_cow(text.as_ref());
-            let escaped_result = text::escape(
-                normalized_text.as_ref(),
-                options.escape_misc,
-                true,
-                true,
-                options.escape_ascii,
-            );
-            escaped_result.into_owned()
+        // When escape_misc is false the previous implementation appended a
+        // post-pass `String::replace('|', "\\|")`.  We fold the pipe escape
+        // into the misc set so the byte-loop handles it in the same walk,
+        // avoiding a second allocation.
+        let normalized_text = if options.whitespace_mode == crate::options::WhitespaceMode::Normalized {
+            text::normalize_whitespace_cow(text.as_ref())
         } else {
-            text::escape(text.as_ref(), options.escape_misc, true, true, options.escape_ascii).into_owned()
+            Cow::Borrowed(text.as_ref())
         };
-        if options.escape_misc {
-            escaped
-        } else {
-            escaped.replace('|', r"\|")
+        let src = normalized_text.as_ref();
+        let mut out = String::with_capacity(src.len());
+        text::escape_into(&mut out, src, options.escape_misc, true, true, options.escape_ascii);
+        if !options.escape_misc {
+            // `|` is part of the misc set, so it's already escaped when
+            // escape_misc is true.  Otherwise we need a targeted pass.
+            if out.contains('|') {
+                out = out.replace('|', r"\|");
+            }
         }
+        out
     } else if options.whitespace_mode == crate::options::WhitespaceMode::Strict {
         text::escape(
             text.as_ref(),
