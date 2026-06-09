@@ -10,23 +10,32 @@
 
 use std::borrow::Cow;
 use std::collections::BTreeMap;
+use std::ops::Range;
 
-use crate::converter::prescan::PrescanReport;
+use crate::converter::main_helpers::{extract_head_metadata, format_metadata_frontmatter};
 use crate::options::ConversionOptions;
 use crate::text;
 
 /// Attempt to extract YAML frontmatter from the document head.
 ///
+/// `head_range` is the byte range of `<head>…</head>` content within `html`.
+/// Originally captured by `prescan::run`; since Phase C the Tier-1 scanner
+/// computes it directly during its single pass.
+///
 /// Returns `Some(frontmatter_string)` when `options.extract_metadata` is
-/// true AND the prescan captured a head range AND at least one metadata
-/// field was found.  Returns `None` otherwise — callers should prepend the
-/// returned string to the body only when `Some` is returned.
-pub fn extract_frontmatter(html: &str, report: &PrescanReport, options: &ConversionOptions) -> Option<String> {
+/// true AND `head_range` is `Some` AND at least one metadata field was
+/// found.  Returns `None` otherwise — callers should prepend the returned
+/// string to the body only when `Some` is returned.
+pub fn extract_frontmatter(
+    html: &str,
+    head_range: Option<&Range<usize>>,
+    options: &ConversionOptions,
+) -> Option<String> {
     if !options.extract_metadata {
         return None;
     }
 
-    let head_range = report.head_range.as_ref()?;
+    let head_range = head_range?;
 
     // Guard: the head range must be within the html slice bounds.
     if head_range.end > html.len() {
@@ -53,7 +62,17 @@ pub fn extract_frontmatter(html: &str, report: &PrescanReport, options: &Convers
     };
 
     let parser = dom.parser();
-    let metadata = extract_metadata_from_dom(&dom, parser);
+    // Delegate to the canonical Tier-2 extractor so the two tiers agree on
+    // key names / casing / value normalisation byte-for-byte.  Walk the
+    // synthesised wrapper's children to find the `<head>` node first.
+    let mut metadata = BTreeMap::new();
+    for child_handle in dom.children() {
+        let m = extract_head_metadata(child_handle, parser, options);
+        if !m.is_empty() {
+            metadata = m;
+            break;
+        }
+    }
 
     if metadata.is_empty() {
         return None;
@@ -220,26 +239,10 @@ fn extract_link(tag: &tl::HTMLTag, metadata: &mut BTreeMap<String, String>) {
     }
 }
 
-/// Format a metadata map as YAML frontmatter.
-///
-/// Byte-equivalent to `crate::converter::format_metadata_frontmatter`.
-fn format_metadata_frontmatter(metadata: &BTreeMap<String, String>) -> String {
-    debug_assert!(!metadata.is_empty());
-
-    let mut lines = vec!["---".to_string()];
-    for (key, value) in metadata {
-        let needs_quotes = value.contains(':') || value.contains('#') || value.contains('[') || value.contains(']');
-        if needs_quotes {
-            let escaped = value.replace('\\', "\\\\").replace('"', "\\\"");
-            lines.push(format!("{key}: \"{escaped}\""));
-        } else {
-            lines.push(format!("{key}: {value}"));
-        }
-    }
-    lines.push("---".to_string());
-
-    lines.join("\n") + "\n\n"
-}
+// `format_metadata_frontmatter` is re-exported from
+// `crate::converter::main_helpers` so Tier-1 and Tier-2 share the exact same
+// formatter and produce byte-identical YAML frontmatter for the same metadata
+// map.
 
 /// ASCII-lowercase a `Cow<str>` tag name without allocation when already lower.
 fn normalize_tag_name(raw: Cow<'_, str>) -> Cow<'_, str> {

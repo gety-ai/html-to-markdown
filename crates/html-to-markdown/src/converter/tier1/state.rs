@@ -115,6 +115,12 @@ pub struct Tier1State {
     /// every non-link tag frame (24 bytes × every tag on Wikipedia pages with
     /// thousands of tags), and avoids per-frame `Clone` cost.
     pub link_stack: Vec<(Option<String>, Option<String>)>,
+    /// Byte range of `<head>…</head>` content (between the tags) in the
+    /// input the scanner walked.  Populated by the `TagKind::Ignored`
+    /// dispatch when a non-void Ignored tag (`<head>`) is encountered;
+    /// `tier1::run` forwards the slice to `head_metadata::extract_frontmatter`
+    /// so the YAML frontmatter pass still works without a `PrescanReport`.
+    pub head_range: Option<std::ops::Range<usize>>,
 }
 
 impl Tier1State {
@@ -132,6 +138,7 @@ impl Tier1State {
             last_block_sep_pos: 0,
             table_stack: Vec::new(),
             link_stack: Vec::new(),
+            head_range: None,
         }
     }
 

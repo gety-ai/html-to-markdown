@@ -56,13 +56,36 @@ use crate::options::ConversionOptions;
 /// Returns `Err(BailReason::*)` when the scanner encounters a construct it
 /// cannot handle.  The dispatcher falls back to Tier-2 transparently.
 pub fn run(html: &str, report: &PrescanReport, options: &ConversionOptions) -> Result<String, bail::BailReason> {
-    let body = scanner::scan(html, options)?;
+    let scanner::ScanOutput { body, head_range } = scanner::scan(html, options)?;
+
+    // Phase C: prefer the head range the scanner discovered during its single
+    // walk over `html`.  Fall back to the prescan's range when the caller
+    // pre-walked the input and produced one (legacy / Tier-2 fallback path).
+    let scanner_range_for_call;
+    let head_range_ref = if head_range.is_some() {
+        scanner_range_for_call = head_range;
+        scanner_range_for_call.as_ref()
+    } else {
+        report.head_range.as_ref()
+    };
 
     // Prepend YAML frontmatter when metadata extraction is requested.
     // `head_metadata::extract_frontmatter` re-parses only the head slice (cheap).
-    if let Some(frontmatter) = crate::converter::head_metadata::extract_frontmatter(html, report, options) {
-        let mut output = String::with_capacity(frontmatter.len() + body.len());
+    //
+    // The frontmatter returned by the shared Tier-2 formatter ends with a
+    // single `\n` after the closing `---`.  Tier-2's walker subsequently
+    // gets `\n\n` from the first paragraph's leading separator (collapse
+    // squashes the resulting `\n\n\n` to `\n\n`).  Tier-1 already trimmed
+    // its body to a single trailing `\n` and has no walker pass to add the
+    // separator, so insert one explicitly: emit `\n` between frontmatter
+    // (`...---\n`) and the body (`first-paragraph...`) to land on
+    // `...---\n\nfirst-paragraph...`.
+    if let Some(frontmatter) = crate::converter::head_metadata::extract_frontmatter(html, head_range_ref, options) {
+        let mut output = String::with_capacity(frontmatter.len() + body.len() + 1);
         output.push_str(&frontmatter);
+        if !body.is_empty() && !body.starts_with('\n') && !frontmatter.ends_with("\n\n") {
+            output.push('\n');
+        }
         output.push_str(&body);
         return Ok(output);
     }

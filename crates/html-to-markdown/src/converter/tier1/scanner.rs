@@ -60,8 +60,20 @@ const LIST_ITEM_INDENTS: [&str; 8] = [
     "              ",
 ];
 
+/// Successful output of the Tier-1 scanner.
+#[derive(Debug, Clone, Default)]
+pub struct ScanOutput {
+    /// Accumulated Markdown body.
+    pub body: String,
+    /// Byte range of `<head>…</head>` content (if a `<head>` was seen) in
+    /// the input the scanner walked.  Forwarded by `tier1::run` to
+    /// `head_metadata::extract_frontmatter` so the YAML frontmatter step
+    /// works without a `PrescanReport`.
+    pub head_range: Option<std::ops::Range<usize>>,
+}
+
 /// Entry point for the Tier-1 scanner.
-pub fn scan(html: &str, options: &ConversionOptions) -> Result<String, BailReason> {
+pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailReason> {
     let bytes = html.as_bytes();
     let mut state = Tier1State::new(html.len());
     let mut pos = 0usize;
@@ -141,17 +153,49 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<String, BailReaso
                 // content (STRIP_CONTENT_TAGS); Tier-2 does the same.  Skip
                 // them inline so we don't bail to Tier-2 just because a page
                 // contains an empty `<script></script>` left over from
-                // prescan.  Other `Ignored` tags (head/meta/link) still bail
-                // — see `bail_unsupported`.  Other `RawText` kinds
-                // (textarea/title/xmp/iframe/noscript/noembed/noframes) keep
-                // their text content in Tier-2 and must continue to bail
-                // until Tier-1 learns to emit it correctly.
+                // prescan.  Other `RawText` kinds (textarea / title / xmp /
+                // iframe / noscript / noembed / noframes) keep their text
+                // content in Tier-2 and must continue to bail until Tier-1
+                // learns to emit it correctly.
                 if matches!(spec.kind, TagKind::Ignored) && spec.is_rawtext {
                     let open_end = match parse::find_tag_close(bytes, name_end) {
                         Some(close) => close.0 + 1,
                         None => bytes.len(),
                     };
                     pos = find_raw_text_close(bytes, open_end, name_lower).unwrap_or(bytes.len());
+                    text_start = pos;
+                    continue;
+                }
+
+                // Non-rawtext `Ignored` tags (`<head>`, `<meta>`, `<link>`):
+                // Tier-2 does not emit any markdown from their bodies — head
+                // is consumed by metadata extraction; meta/link are void.
+                // Silent-skip them here so Tier-1 can be invoked on inputs
+                // that contain a `<head>` (the common case for full HTML
+                // documents) without bailing.  For non-void `<head>`, capture
+                // the content range on `state.head_range` so `tier1::run` can
+                // hand it to `head_metadata::extract_frontmatter` when
+                // metadata extraction is enabled.
+                if matches!(spec.kind, TagKind::Ignored) {
+                    let open_end = match parse::find_tag_close(bytes, name_end) {
+                        Some(close) => close.0 + 1,
+                        None => bytes.len(),
+                    };
+                    if spec.is_void {
+                        pos = open_end;
+                        text_start = pos;
+                        continue;
+                    }
+                    // Non-void: scan for matching close tag, record the
+                    // [open_end .. close_start] range as head content.
+                    let (close_start, close_end) = match find_close_tag_range(bytes, open_end, name_lower) {
+                        Some(pair) => pair,
+                        None => (bytes.len(), bytes.len()),
+                    };
+                    if state.head_range.is_none() {
+                        state.head_range = Some(open_end..close_start);
+                    }
+                    pos = close_end;
                     text_start = pos;
                     continue;
                 }
@@ -333,7 +377,10 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<String, BailReaso
         }
     }
 
-    Ok(state.output)
+    Ok(ScanOutput {
+        body: state.output,
+        head_range: state.head_range,
+    })
 }
 
 // ── Bail guard ────────────────────────────────────────────────────────────────
@@ -343,6 +390,46 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<String, BailReaso
 /// Table-related tags are now handled by the scanner (M9); they are no longer
 /// bailed here.  Table-specific bail reasons are emitted by the table-handling
 /// code in `emit_open` and `emit_close`.
+/// Locate the matching close tag for `tag_name` starting at `open_end`.
+///
+/// Returns `Some((close_start, close_end))` where `close_start` is the byte
+/// index of the `<` opening the `</tag>` close and `close_end` is the byte
+/// index immediately after its `>`.  `None` when no matching close exists.
+///
+/// Used by `<head>` silent-skip to record the content slice
+/// (`open_end..close_start`) for metadata extraction while advancing past the
+/// entire `<head>…</head>` block.
+fn find_close_tag_range(bytes: &[u8], open_end: usize, tag_name: &[u8]) -> Option<(usize, usize)> {
+    let len = bytes.len();
+    let mut idx = open_end;
+    while idx < len {
+        match memchr3(b'<', b'<', b'<', &bytes[idx..]) {
+            Some(off) => idx += off,
+            None => return None,
+        }
+        if idx + 2 < len && bytes[idx + 1] == b'/' {
+            let after_slash = idx + 2;
+            if after_slash + tag_name.len() <= len
+                && bytes[after_slash..after_slash + tag_name.len()].eq_ignore_ascii_case(tag_name)
+            {
+                let post_name = after_slash + tag_name.len();
+                if matches!(bytes.get(post_name), Some(b'>' | b'/' | b' ' | b'\t' | b'\n' | b'\r')) {
+                    let mut j = post_name;
+                    while j < len && bytes[j] != b'>' {
+                        j += 1;
+                    }
+                    if j < len {
+                        return Some((idx, j + 1));
+                    }
+                    return None;
+                }
+            }
+        }
+        idx += 1;
+    }
+    None
+}
+
 /// Skip the body of a raw-text element (script/style/textarea/iframe/…).
 ///
 /// `open_end` is the byte index immediately after the tag's `>`.  `tag_name`
@@ -400,8 +487,10 @@ const fn bail_unsupported(spec: &TagSpec, _offset: usize) -> Result<(), BailReas
         // listed here only to make the match exhaustive over TagKind::RawText.
         TagKind::RawText(_) => Err(BailReason::Classifier),
 
-        // head / meta / link are Ignored — we can silently skip them when void,
-        // but if they have children (weird HTML) we bail.
+        // `Ignored` tags (head/meta/link/script/style) are now handled inline
+        // by the main scan loop (see the dispatch above `bail_unsupported`).
+        // The match arm is kept for exhaustiveness — it cannot fire in
+        // practice.
         TagKind::Ignored => Err(BailReason::Classifier),
 
         _ => Ok(()),

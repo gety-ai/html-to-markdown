@@ -85,11 +85,20 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
             // Skip Tier-1 entirely; fall through to the Tier-2 path below.
         }
         crate::options::TierStrategy::Auto => {
+            // Phase C: skip the prescan pre-pass for the Tier-1 attempt.  The
+            // scanner now handles every construct prescan used to strip
+            // (script/style, head, meta/link, doctype, comments, self-closing
+            // void tags) inline, and bails cleanly on the constructs the
+            // router used to gate on (SVG, CDATA, custom elements, bare `<`).
+            // For routing we still consult the option-based gates in
+            // `classify`; we pass a default `PrescanReport` whose fields are
+            // all false because the scanner will detect any structural
+            // edge-case during its single walk.
             let normalized = normalize_input(html)?;
-            let (cleaned, report) = crate::converter::prescan::run(normalized.as_ref());
-            let decision = crate::converter::tier1::router::classify(&report, &options);
+            let stub_report = crate::converter::prescan::PrescanReport::default();
+            let decision = crate::converter::tier1::router::classify(&stub_report, &options);
             if decision == crate::converter::tier1::RouterDecision::Tier1 {
-                match crate::converter::tier1::run(cleaned.as_ref(), &report, &options) {
+                match crate::converter::tier1::run(normalized.as_ref(), &stub_report, &options) {
                     Ok(markdown) => {
                         return Ok(crate::types::ConversionResult {
                             content: Some(markdown),
@@ -103,7 +112,9 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
                         });
                     }
                     Err(_bail) => {
-                        // Fall through to Tier-2 with the already-normalized input.
+                        // Tier-1 bailed — fall through to Tier-2 with the
+                        // already-normalized input.  Tier-2 runs its own
+                        // prescan internally via `convert_html_impl`.
                         precomputed_normalized = Some(normalized);
                     }
                 }
@@ -115,10 +126,12 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
         #[cfg(any(test, feature = "testkit"))]
         crate::options::TierStrategy::Tier1 => {
             // Testkit path: bypass the classifier and force Tier-1, with
-            // Tier-2 fallback on bail.
+            // Tier-2 fallback on bail.  Like the Auto path, skip the prescan
+            // pre-pass — the scanner handles every construct it would have
+            // stripped or bails cleanly.
             let normalized = normalize_input(html)?;
-            let (cleaned, report) = crate::converter::prescan::run(normalized.as_ref());
-            match crate::converter::tier1::run(cleaned.as_ref(), &report, &options) {
+            let stub_report = crate::converter::prescan::PrescanReport::default();
+            match crate::converter::tier1::run(normalized.as_ref(), &stub_report, &options) {
                 Ok(markdown) => {
                     return Ok(crate::types::ConversionResult {
                         content: Some(markdown),
@@ -132,7 +145,6 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
                     });
                 }
                 Err(_bail) => {
-                    // Fall through to Tier-2 with the already-normalized input.
                     precomputed_normalized = Some(normalized);
                 }
             }
