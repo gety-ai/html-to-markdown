@@ -22,8 +22,6 @@ pub enum RouterDecision {
 /// - `report.had_custom_elements` — custom elements require spec-edge handling
 /// - `report.had_cdata` — CDATA sections are not supported by Tier-1
 /// - `report.had_unescaped_lt` — bare `<` that the prescan escaped
-/// - `report.has_svg` — inline SVG triggers Tier-1 bail mid-scan; route
-///   directly to Tier-2 to skip the wasted setup
 /// - `options.wrap` — wrapping logic lives in the Tier-2 path (for now)
 /// - `options.convert_as_inline` — inline-conversion mode not yet in Tier-1
 /// - `options.hocr_spatial_tables` — hOCR spatial reconstruction is Tier-2 only
@@ -35,6 +33,9 @@ pub enum RouterDecision {
 ///
 /// `options.extract_metadata` no longer forces Tier-2: Tier-1 re-parses the
 /// prescan's `head_range` slice and produces byte-identical YAML frontmatter.
+///
+/// `report.has_svg` no longer forces Tier-2: Phase I teaches the scanner to
+/// emit `<svg>` elements as base64 data URIs matching Tier-2 byte-for-byte.
 ///
 /// `options.keep_inline_images_in` (inline-images feature) is now handled
 /// natively in Tier-1; it no longer forces a Tier-2 route.
@@ -82,7 +83,6 @@ pub fn classify(report: &PrescanReport, options: &ConversionOptions) -> RouterDe
     if report.had_custom_elements
         || report.had_cdata
         || report.had_unescaped_lt
-        || report.has_svg
         || options.wrap
         || options.convert_as_inline
         || options.preprocessing.preset != PreprocessingPreset::Standard

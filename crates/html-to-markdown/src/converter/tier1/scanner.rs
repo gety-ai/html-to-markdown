@@ -4,13 +4,14 @@
 //! output buffer.  On any construct it cannot handle exactly, returns a
 //! [`BailReason`] so the dispatcher can fall back to Tier-2.
 //!
-//! # Supported subset (M9 + Phase E)
+//! # Supported subset (M9 + Phase E + Phase I)
 //!
 //! Paragraph, Heading(1-6), Strong, Emphasis, Code (inline), Pre, Hr,
 //! `LineBreak`, Link, Image, List(Unordered), List(Ordered), `ListItem`,
 //! Blockquote, Block (div/section/article/center/etc.), Inline (span/etc.),
 //! Table (GFM — conservative bail set, inline-only cell content),
-//! and custom elements (tag names containing `-`, treated as Block containers).
+//! SVG (emitted as base64 data URI — Phase I), and custom elements (tag names
+//! containing `-`, treated as Block containers).
 //!
 //! Bails on: RawText(script/style/textarea/etc.), `DefinitionTerm`,
 //! `DefinitionDescription`, List(Definition), Ignored (head/meta/link),
@@ -157,6 +158,42 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                 // Lowercase the tag name into a stack buffer (max 32 bytes)
                 let mut name_buf = [0u8; MAX_TAG_NAME_BYTES];
                 let name_lower = lowercase_into(tag_name_bytes, &mut name_buf);
+
+                // Phase I: `<svg>` — emit as base64 data URI matching Tier-2's
+                // `handle_svg` output.  The entire subtree (open tag through
+                // `</svg>`) is consumed here; the scanner skips past it without
+                // pushing anything on the open-tag stack.
+                //
+                // `tl::parse` is called on just the SVG fragment to normalize
+                // attribute order via `serialize_element` (which sorts attrs
+                // alphabetically — raw source bytes differ, so slicing alone is
+                // not byte-identical with Tier-2 output).
+                if name_lower == b"svg" {
+                    let tag_open_start = pos;
+                    let Some((close_pos, is_self_closing)) = parse::find_tag_close(bytes, name_end) else {
+                        // Unclosed SVG open tag — skip to end; Tier-2 handles it.
+                        pos = bytes.len();
+                        text_start = pos;
+                        continue;
+                    };
+                    let open_tag_end = close_pos + 1;
+
+                    let svg_end = if is_self_closing {
+                        // `<svg ... />` — self-closing, no children.
+                        open_tag_end
+                    } else {
+                        // Find matching `</svg>` with depth tracking.
+                        find_svg_close(bytes, open_tag_end).unwrap_or(bytes.len())
+                    };
+
+                    let svg_slice = &html[tag_open_start..svg_end];
+
+                    emit_svg_from_slice(svg_slice, tag_open_start, &mut state, options)?;
+
+                    pos = svg_end;
+                    text_start = pos;
+                    continue;
+                }
 
                 // Resolve the tag spec.  Custom elements (names containing `-`)
                 // are not in the static TAGS table but are treated as generic
@@ -468,6 +505,198 @@ fn find_close_tag_range(bytes: &[u8], open_end: usize, tag_name: &[u8]) -> Optio
         idx += 1;
     }
     None
+}
+
+// ── SVG helpers ───────────────────────────────────────────────────────────────
+
+/// Find the byte offset immediately after the matching `</svg>` close tag,
+/// starting from `open_end` (the byte after the `>` of the opening `<svg ...>`).
+///
+/// Tracks nesting depth so nested `<svg>` elements (valid in SVG 1.1) are
+/// handled correctly.  Returns `None` when no matching close is found.
+fn find_svg_close(bytes: &[u8], open_end: usize) -> Option<usize> {
+    const SVG_NAME: &[u8] = b"svg";
+    let len = bytes.len();
+    let mut idx = open_end;
+    let mut depth = 1usize;
+    while idx < len {
+        match memchr::memchr(b'<', &bytes[idx..]) {
+            Some(off) => idx += off,
+            None => return None,
+        }
+        if idx + 1 < len && bytes[idx + 1] == b'/' {
+            // Possible `</svg…>`
+            let name_start = idx + 2;
+            if name_start + SVG_NAME.len() <= len
+                && bytes[name_start..name_start + SVG_NAME.len()].eq_ignore_ascii_case(SVG_NAME)
+            {
+                let after = name_start + SVG_NAME.len();
+                if matches!(
+                    bytes.get(after),
+                    Some(b'>' | b'/' | b' ' | b'\t' | b'\n' | b'\r') | None
+                ) {
+                    depth -= 1;
+                    if depth == 0 {
+                        // Walk to the closing `>`
+                        let mut j = after;
+                        while j < len && bytes[j] != b'>' {
+                            j += 1;
+                        }
+                        return Some(j + 1);
+                    }
+                }
+            }
+        } else if idx + 1 < len {
+            // Possible nested `<svg…>` open tag
+            let name_start = idx + 1;
+            if name_start + SVG_NAME.len() <= len
+                && bytes[name_start..name_start + SVG_NAME.len()].eq_ignore_ascii_case(SVG_NAME)
+            {
+                let after = name_start + SVG_NAME.len();
+                if matches!(
+                    bytes.get(after),
+                    Some(b'>' | b'/' | b' ' | b'\t' | b'\n' | b'\r') | None
+                ) {
+                    // Walk to end of the open tag to determine self-closing.
+                    let mut j = after;
+                    let mut in_q: Option<u8> = None;
+                    let tag_end = loop {
+                        if j >= len {
+                            break len;
+                        }
+                        match bytes[j] {
+                            b'"' | b'\'' => {
+                                if let Some(q) = in_q {
+                                    if q == bytes[j] {
+                                        in_q = None;
+                                    }
+                                } else {
+                                    in_q = Some(bytes[j]);
+                                }
+                            }
+                            b'>' if in_q.is_none() => {
+                                break j + 1;
+                            }
+                            _ => {}
+                        }
+                        j += 1;
+                    };
+                    // Self-closing (`/>`) does not increment depth.
+                    let is_self_closing = tag_end >= 2 && bytes[tag_end - 2] == b'/';
+                    if !is_self_closing {
+                        depth += 1;
+                    }
+                }
+            }
+        }
+        idx += 1;
+    }
+    None
+}
+
+/// Emit a `<svg>` element as a Markdown base64 data URI, matching Tier-2's
+/// `handle_svg` output byte-for-byte.
+///
+/// `svg_slice` is the raw HTML source bytes for the entire `<svg…>…</svg>`
+/// element.  We re-parse it with `tl::parse` to get the canonical attribute
+/// order that `serialize_element` produces (it sorts attributes alphabetically,
+/// so raw-source slicing would diverge from Tier-2).
+///
+/// Mirrors Tier-2's `media/svg.rs::handle_svg`:
+/// - Walks children for a `<title>` tag → alt text.  Default: "SVG Image".
+/// - Calls `serialize_element` on the root SVG node.
+/// - Base64-encodes (STANDARD engine) the serialized bytes.
+/// - Emits `![{title}](data:image/svg+xml;base64,{b64})`.
+/// - When `options.skip_images` → emits nothing (matches Tier-2 skip).
+fn emit_svg_from_slice(
+    svg_slice: &str,
+    svg_start_offset: usize,
+    state: &mut Tier1State,
+    options: &ConversionOptions,
+) -> Result<(), BailReason> {
+    // CDATA inside SVG cannot be processed correctly without the prescan's
+    // entity-escaping transformation.  Bail to Tier-2 so it sees the
+    // prescan-normalized form (where `<![CDATA[` is escaped to `&lt;![CDATA[`).
+    if svg_slice.contains("<![CDATA[") {
+        return Err(BailReason::Cdata {
+            offset: svg_start_offset,
+        });
+    }
+
+    if options.skip_images {
+        return Ok(());
+    }
+
+    use crate::converter::media::svg::serialize_element;
+    use base64::{Engine as _, engine::general_purpose::STANDARD};
+
+    // Re-parse just the SVG fragment.  Wrap it in a minimal document so
+    // tl has proper context — the same pattern used by head_metadata.rs.
+    let wrapped = format!("<html><body>{svg_slice}</body></html>");
+    let dom = match tl::parse(&wrapped, tl::ParserOptions::default()) {
+        Ok(d) => d,
+        Err(_) => {
+            // Parse failure: emit nothing rather than bail — matches
+            // Tier-2's silent skip on serialization failure.
+            return Ok(());
+        }
+    };
+    let parser = dom.parser();
+
+    // Locate the first `<svg>` node in the parsed fragment.
+    let svg_handle = dom.nodes().iter().enumerate().find_map(|(i, node)| {
+        if let tl::Node::Tag(tag) = node {
+            if tag.name().as_utf8_str().as_ref().eq_ignore_ascii_case("svg") {
+                Some(tl::NodeHandle::new(i as u32))
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    });
+
+    let Some(handle) = svg_handle else {
+        return Ok(());
+    };
+
+    // Extract title from a direct `<title>` child, mirroring Tier-2.
+    let title = if let Some(tl::Node::Tag(svg_tag)) = handle.get(parser) {
+        let mut found = String::from("SVG Image");
+        for child_handle in svg_tag.children().top().iter() {
+            if let Some(tl::Node::Tag(child)) = child_handle.get(parser) {
+                if child.name().as_utf8_str().as_ref().eq_ignore_ascii_case("title") {
+                    // Collect text content of the <title> tag.
+                    let mut text = String::new();
+                    for grandchild in child.children().top().iter() {
+                        if let Some(tl::Node::Raw(raw)) = grandchild.get(parser) {
+                            text.push_str(&raw.as_utf8_str());
+                        }
+                    }
+                    let trimmed = text.trim().to_owned();
+                    if !trimmed.is_empty() {
+                        found = trimmed;
+                    }
+                    break;
+                }
+            }
+        }
+        found
+    } else {
+        String::from("SVG Image")
+    };
+
+    let svg_html = serialize_element(&handle, parser);
+    let base64_svg = STANDARD.encode(svg_html.as_bytes());
+
+    let dest = state.cell_or_output_mut();
+    dest.push_str("![");
+    dest.push_str(&title);
+    dest.push_str("](data:image/svg+xml;base64,");
+    dest.push_str(&base64_svg);
+    dest.push(')');
+
+    Ok(())
 }
 
 /// Skip the body of a raw-text element (script/style/textarea/iframe/…).

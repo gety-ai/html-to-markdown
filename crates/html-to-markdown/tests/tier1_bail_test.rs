@@ -101,19 +101,16 @@ fn scanner_bails_on_cdata_direct() {
 }
 
 #[test]
-fn bails_on_cdata_or_classifier_via_prescan() {
-    // After prescanning, CDATA is escaped to `&lt;![CDATA[...]` so the scanner
-    // won't see it.  SVG is not in the Tier-1 tag table, so the scanner bails
-    // on UnknownCustomElement or Classifier depending on tag lookup semantics.
-    // Any bail is acceptable here — the key assertion is transparent fallback.
+fn svg_with_cdata_handled_natively_via_prescan() {
+    // After prescanning, CDATA inside SVG is escaped to `&lt;![CDATA[...]` so
+    // the scanner no longer sees raw CDATA.  Phase I teaches Tier-1 to emit
+    // `<svg>` elements as base64 data URIs, so this input is now handled
+    // natively (no bail).  The final output from Tier-1 must match Tier-2.
     let html = "<svg><![CDATA[xxx]]></svg><p>x</p>";
-    let err = tier1_run(html).unwrap_err();
+    // tier1_run prescans first — CDATA is escaped, then SVG is emitted as base64.
     assert!(
-        matches!(
-            err,
-            BailReason::Cdata { .. } | BailReason::Classifier | BailReason::UnknownCustomElement { .. }
-        ),
-        "expected a bail reason, got {err:?}"
+        tier1_run(html).is_ok(),
+        "expected success: SVG with CDATA handled after prescan"
     );
     assert_eq!(force_tier1(html), tier2(html));
 }
