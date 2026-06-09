@@ -138,5 +138,13 @@ pub fn classify(report: &PrescanReport, options: &ConversionOptions) -> RouterDe
         return RouterDecision::Tier2;
     }
 
+    // visitor: Tier-1 does not fire visitor callbacks. When a visitor is
+    // registered, route to Tier-2 so element_start/element_end and
+    // skip_subtree directives are honored.
+    #[cfg(feature = "visitor")]
+    if options.visitor.is_some() {
+        return RouterDecision::Tier2;
+    }
+
     RouterDecision::Tier1
 }
