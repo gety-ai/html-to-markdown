@@ -9,7 +9,7 @@
 //!   - `Cdata`                    — covered in `tier1_bail_test.rs`
 //!   - `UnknownCustomElement`     — covered in `tier1_bail_test.rs`
 //!   - `TableRowspanColspan`      — Phase F: now handled natively; test checks correct output
-//!   - `TableBlockChildInCell`    — Phase F: <p>/<div>/<br> now handled; <ul>/<blockquote>/<pre> still bail
+//!   - `TableBlockChildInCell`    — Phase J: <p>/<div>/<br>/<ul>/<ol>/<h1>-<h6> handled; <blockquote>/<pre> still bail
 //!   - `TableNestedTable`         — NEW (this file)
 //!   - `TableCaption`             — Phase F: now handled natively; test checks correct output
 //!   - `TableSectionOrder`        — NEW (this file, two orderings)
@@ -113,14 +113,13 @@ fn should_handle_br_in_table_cell() {
 }
 
 #[test]
-fn should_still_bail_on_list_in_table_cell() {
-    // <ul> inside a table cell still bails — list content cannot be inlined.
+fn should_handle_list_in_table_cell() {
+    // Phase J: <ul>/<ol> inside a table cell are now handled natively.
+    // Tier-1 emits the list items without bullet markers (matching Tier-2's
+    // `in_table_cell` path), and the cell accumulator collapses newlines to spaces.
     let html = "<table><tr><td><ul><li>item</li></ul></td></tr></table>";
-    let err = tier1_run(html).unwrap_err();
-    assert!(
-        matches!(err, BailReason::TableBlockChildInCell),
-        "expected TableBlockChildInCell for <ul> in cell, got {err:?}"
-    );
+    let t1 = tier1_run(html).expect("Tier-1 should not bail on <ul> in cell");
+    assert_eq!(t1, tier2(html), "<ul>-in-cell output must match Tier-2");
 }
 
 // ── TableNestedTable ──────────────────────────────────────────────────────────

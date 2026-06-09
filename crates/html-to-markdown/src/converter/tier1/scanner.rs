@@ -311,42 +311,53 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
 
                 // Non-void open tag: emit opening markdown + push stack frame
 
-                // M9: Nested-table bail — must come before the block-in-cell
-                // check because <table> is a block element, and TableNestedTable
-                // is a more specific reason than TableBlockChildInCell.
+                // M9: Nested-table bail — must come before the implicit-close
+                // loop and the block-in-cell check because <table> is a block
+                // element, and TableNestedTable is a more specific reason than
+                // TableBlockChildInCell.
                 if matches!(spec.kind, TagKind::Table) && !state.table_stack.is_empty() {
                     return Err(BailReason::TableNestedTable);
                 }
 
-                // M9: Block-in-cell bail.
-                // If we are inside a table cell and the new tag is a block-level
-                // element, bail — UNLESS the element is a `<p>` or a generic
-                // block container (`<div>`, `<section>`, etc.).  Those two cases
-                // are inlineable: the cell text accumulator handles any `\n`
-                // they produce by replacing newlines with spaces at cell-close
-                // time, which matches Tier-2's `cell_text_content` behaviour
-                // (`text.replace('\n', " ")` when `br_in_tables` is false).
-                //
-                // All other block kinds (headings, lists, blockquote, pre, etc.)
-                // still bail because they produce multi-line content that would
-                // diverge from Tier-2's cell normalisation.
-                if state.in_table_cell() && spec.is_block {
-                    let inlineable = matches!(spec.kind, TagKind::Paragraph | TagKind::Block);
-                    if !inlineable {
-                        return Err(BailReason::TableBlockChildInCell);
-                    }
-                }
-
                 // M4: HTML5 implicit-close transitions.
-                // Before pushing the new tag, check whether any open tag at the
-                // top of the stack should be implicitly closed per the HTML5
-                // optional-tag rules.  Repeat until no more implicit closes fire
-                // (handles e.g. <li><li><li> or <p><p>).
+                // Run BEFORE the block-in-cell check so that structural table
+                // elements like `<tr>` correctly close any open `<td>`/`<th>`
+                // before the block check evaluates `in_table_cell()`.  Without
+                // this ordering, `<th>h1<tr>` would fire the bail even though
+                // `<tr>` is not a content element inside the cell.
                 while let Some(top) = state.stack.last() {
                     if !spec_rules::should_close_for_new_tag(top.spec, spec) {
                         break;
                     }
                     emit_close_for_implicit(&mut state)?;
+                }
+
+                // M9: Block-in-cell bail.
+                // Evaluated AFTER M4 implicit closes so that table-structural
+                // elements (e.g. a `<tr>` following an unclosed `<th>`) correctly
+                // collapse the cell state before the check runs.
+                //
+                // Allow `<p>`, `<div>/<section>/…` (TagKind::Block), `<ul>/<ol>`,
+                // and `<h1>-<h6>` inside cells — each has cell-aware open/close
+                // helpers that redirect their output to the cell accumulator and
+                // match Tier-2's `cell_text_content` normalisation
+                // (`text.replace('\n', " ")` when `br_in_tables` is false).
+                //
+                // All other block kinds (blockquote, pre, etc.) still bail because
+                // they produce multi-line content that would diverge from Tier-2's
+                // cell normalisation.
+                if state.in_table_cell() && spec.is_block {
+                    let inlineable = matches!(
+                        spec.kind,
+                        TagKind::Paragraph
+                            | TagKind::Block
+                            | TagKind::List(_)
+                            | TagKind::ListItem
+                            | TagKind::Heading(_)
+                    );
+                    if !inlineable {
+                        return Err(BailReason::TableBlockChildInCell);
+                    }
                 }
 
                 let prev_ctx = state.escape_ctx;
@@ -833,6 +844,13 @@ fn open_paragraph(state: &mut Tier1State) {
 }
 
 fn open_heading(state: &mut Tier1State) {
+    // When inside a table cell, Tier-2 does NOT add a leading separator before
+    // the heading (`needs_leading_sep = false` when `in_table_cell`).  The
+    // heading text is emitted directly into the cell accumulator with no `#`
+    // prefix and no surrounding newlines.
+    if state.in_table_cell() {
+        return;
+    }
     state.ensure_blank_line();
 }
 
@@ -845,6 +863,20 @@ fn open_pre(state: &mut Tier1State) {
 }
 
 fn open_list(state: &mut Tier1State, kind: ListKind) {
+    // When inside a table cell, mirror Tier-2's `add_list_leading_separator`:
+    // push `<br>` if there is already cell content (but not if it already ends
+    // with `|`, ` `, or `<br>`).  Do not touch `state.output`.
+    if state.in_table_cell() {
+        let cell_buf = state.cell_or_output_mut();
+        if !cell_buf.is_empty() && !cell_buf.ends_with('|') && !cell_buf.ends_with(' ') && !cell_buf.ends_with("<br>") {
+            cell_buf.push_str("<br>");
+        }
+        state.list_depth = state.list_depth.saturating_add(1);
+        if matches!(kind, ListKind::Unordered) {
+            state.ul_depth = state.ul_depth.saturating_add(1);
+        }
+        return;
+    }
     // Lists at the top level need a blank line if there's preceding content.
     // Inside a list item (`list_depth > 0`) just a newline is enough.
     if !state.output.is_empty() {
@@ -870,6 +902,18 @@ fn open_list(state: &mut Tier1State, kind: ListKind) {
 const TIER1_BULLETS: [u8; 3] = [b'-', b'*', b'+'];
 
 fn open_list_item(state: &mut Tier1State) {
+    // When inside a table cell, Tier-2 does NOT emit bullet/number prefixes
+    // for list items (see list/item.rs: `if !ctx.in_table_cell { ... bullet ... }`).
+    // The cell accumulator already receives the raw text; separators are handled
+    // by the `\n` → ` ` replacement at cell-close time.
+    if state.in_table_cell() {
+        // For ordered lists we still need to increment the counter so that
+        // subsequent items get the right index if we ever exit the cell context.
+        if find_parent_list_kind(&state.stack) == Some(ListKind::Ordered) {
+            increment_ol_counter(&mut state.stack);
+        }
+        return;
+    }
     // Emit the list item marker.
     let parent_kind = find_parent_list_kind(&state.stack);
     let indent_depth = state.list_depth.saturating_sub(1);
@@ -1320,6 +1364,29 @@ fn close_paragraph(state: &mut Tier1State) {
 /// closed headings have already had their content flushed through the normal
 /// path, so we just prepend the prefix unconditionally.
 fn close_heading(state: &mut Tier1State, frame: &OpenTag, n: u8, is_implicit: bool) -> Result<(), BailReason> {
+    // When inside a table cell, Tier-2 emits the heading text directly into
+    // the cell accumulator — no `#` prefix, no block separators.  The
+    // `frame.content_start` is a position in the CELL buffer (set by
+    // `cell_or_output_mut().len()` at emit_open time), so all position
+    // arithmetic must use the cell buffer, not `state.output`.
+    if state.in_table_cell() {
+        // Trim trailing inline whitespace from the cell buffer.
+        let cell_buf = state.cell_or_output_mut();
+        while cell_buf.ends_with(' ') || cell_buf.ends_with('\t') {
+            cell_buf.pop();
+        }
+        if !is_implicit {
+            let content = &state.cell_or_output_mut()[frame.content_start..];
+            if content.trim().is_empty() {
+                // Empty heading in a cell: roll back to content_start.
+                let len = frame.content_start;
+                state.cell_or_output_mut().truncate(len);
+            }
+        }
+        // No prefix, no trailing separator — just the raw text in the cell.
+        return Ok(());
+    }
+
     trim_trailing_inline_whitespace(state);
 
     if !is_implicit {
@@ -1414,6 +1481,12 @@ fn close_list(state: &mut Tier1State, kind: ListKind) {
     if matches!(kind, ListKind::Unordered) {
         state.ul_depth = state.ul_depth.saturating_sub(1);
     }
+    // When inside a table cell, Tier-2 does NOT add a trailing newline after
+    // the list — the cell accumulator handles any separators via the
+    // `\n → space` replacement at cell-close time.
+    if state.in_table_cell() {
+        return;
+    }
     // Ensure the list ends with exactly one newline before any following content.
     if !state.output.ends_with('\n') {
         state.output.push('\n');
@@ -1421,6 +1494,17 @@ fn close_list(state: &mut Tier1State, kind: ListKind) {
 }
 
 fn close_list_item(state: &mut Tier1State) {
+    // When inside a table cell, Tier-2 does NOT add a trailing newline after
+    // each list item (see list/item.rs: `if !ctx.in_table_cell { ... \n ... }`).
+    // Items are concatenated directly in the cell accumulator.
+    if state.in_table_cell() {
+        // Trim trailing inline whitespace from the cell buffer.
+        let cell_buf = state.cell_or_output_mut();
+        while cell_buf.ends_with(' ') || cell_buf.ends_with('\t') {
+            cell_buf.pop();
+        }
+        return;
+    }
     trim_trailing_inline_whitespace(state);
     state.ensure_newline();
 }

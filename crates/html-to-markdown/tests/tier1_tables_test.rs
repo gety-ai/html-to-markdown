@@ -298,19 +298,17 @@ fn test_paragraph_in_cell_handled_natively() {
     assert_eq!(t1, tier2(html));
 }
 
-/// Test 17: `<td><ul><li>x</li></ul></td>` → `TableBlockChildInCell`.
+/// Test 17: `<td><ul><li>x</li></ul></td>` — Phase J: handled natively.
+/// Tier-1 emits list items without bullet markers, matching Tier-2's
+/// `in_table_cell` path which skips prefixes and separators.
 #[test]
-fn test_bail_block_child_list() {
+fn test_list_in_cell_handled_natively() {
     let html = "<table>\
         <tr><th>H</th></tr>\
         <tr><td><ul><li>x</li></ul></td></tr>\
     </table>";
-    let err = tier1_run(html).unwrap_err();
-    assert!(
-        matches!(err, BailReason::TableBlockChildInCell),
-        "expected TableBlockChildInCell, got {err:?}"
-    );
-    assert_eq!(tier1(html), tier2(html));
+    let t1 = tier1_run(html).expect("Tier-1 should not bail on <ul> in cell");
+    assert_eq!(t1, tier2(html), "<ul>-in-cell output must match Tier-2");
 }
 
 /// Test 18: nested `<table>` → `TableNestedTable`.
