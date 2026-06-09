@@ -66,36 +66,28 @@ fn force_tier1(html: &str) -> String {
     convert(html, Some(opts)).unwrap().content.unwrap_or_default()
 }
 
-// ── Tripwire 1: LiteralLt ─────────────────────────────────────────────────────
+// ── Tripwire 1: lenient literal `<` handling ──────────────────────────────────
+//
+// Tier-1 used to bail with `BailReason::LiteralLt` on any `<` not followed by
+// a tag-name-start byte. The scanner now emits the bare `<` as text and
+// continues, matching Tier-2's html5ever / astral-tl behaviour (both parse
+// `<x` where x is whitespace/digit as a text node). Document the new
+// behaviour with byte-equality assertions against Tier-2.
 
 #[test]
-fn bails_on_literal_lt_in_text() {
-    // `<` not followed by a tag-name start byte → LiteralLt.
-    // The prescan escapes this to `&lt;` so we must use tier1_raw.
+fn lenient_literal_lt_in_text() {
+    // `<` followed by whitespace — emit verbatim.
     let html = "<p>a < b</p>";
-    assert!(matches!(tier1_raw(html).unwrap_err(), BailReason::LiteralLt { .. }));
-    // Fallback via convert still produces correct output.
+    assert!(tier1_raw(html).is_ok());
     assert_eq!(force_tier1(html), tier2(html));
 }
 
 #[test]
-fn bails_on_literal_lt_numeric() {
-    // Another common case: `3 < 5`
+fn lenient_literal_lt_numeric() {
+    // `<` followed by digit — emit verbatim.
     let html = "<p>3 < 5</p>";
-    assert!(matches!(tier1_raw(html).unwrap_err(), BailReason::LiteralLt { .. }));
+    assert!(tier1_raw(html).is_ok());
     assert_eq!(force_tier1(html), tier2(html));
-}
-
-#[test]
-fn literal_lt_offset_is_correct() {
-    // The `<` that triggers the bail appears at known offset.
-    // `<p>` = 3 bytes, `a ` = 2 bytes → offset 5.
-    let html = "<p>a < b</p>";
-    if let Err(BailReason::LiteralLt { offset }) = tier1_raw(html) {
-        assert_eq!(offset, 5, "expected literal '<' at byte 5");
-    } else {
-        panic!("expected LiteralLt");
-    }
 }
 
 // ── Tripwire 2: Cdata ─────────────────────────────────────────────────────────

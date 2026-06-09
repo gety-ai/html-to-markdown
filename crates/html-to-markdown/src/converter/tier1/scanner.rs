@@ -138,9 +138,15 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     continue;
                 }
 
-                // Not a tag-name-start byte → literal `<`
+                // Not a tag-name-start byte → literal `<` in text. Tier-2
+                // emits these verbatim (html5ever/astral-tl both parse a
+                // bare `<x` as a text node). Emit the `<` and continue so
+                // we don't bail on commonly-unescaped source like `x < 5`.
                 if !parse::is_tag_name_start(next) {
-                    return Err(BailReason::LiteralLt { offset: pos });
+                    flush_text(&mut state, "<", pos)?;
+                    pos += 1;
+                    text_start = pos;
+                    continue;
                 }
 
                 // Opening tag
