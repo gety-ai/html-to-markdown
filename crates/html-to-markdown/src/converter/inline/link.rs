@@ -159,9 +159,17 @@ pub fn handle(
             }
         }
 
-        // Collect link label from children
-        let children: Vec<_> = tag.children().top().iter().copied().collect();
-        let (inline_label, _block_nodes, saw_block) = collect_link_label_text(&children, parser, dom_ctx);
+        // Collect link label from children.  Reuse the `DomContext` children
+        // cache when present (built once during `record_node_hierarchy`)
+        // instead of re-collecting per `<a>` tag.
+        let owned_children: Vec<tl::NodeHandle>;
+        let children: &[tl::NodeHandle] = if let Some(c) = dom_ctx.children_of(node_handle.get_inner()) {
+            c.as_slice()
+        } else {
+            owned_children = tag.children().top().iter().copied().collect();
+            owned_children.as_slice()
+        };
+        let (inline_label, _block_nodes, saw_block) = collect_link_label_text(children, parser, dom_ctx);
         let mut label = if saw_block {
             let mut content = String::new();
             let link_ctx = Context {
@@ -170,7 +178,7 @@ pub fn handle(
                 in_link: true,
                 ..ctx.clone()
             };
-            for child_handle in &children {
+            for child_handle in children {
                 let mut child_buf = String::new();
                 walk_node(
                     child_handle,
@@ -202,7 +210,7 @@ pub fn handle(
                 in_link: true,
                 ..ctx.clone()
             };
-            for child_handle in &children {
+            for child_handle in children {
                 walk_node(
                     child_handle,
                     parser,
