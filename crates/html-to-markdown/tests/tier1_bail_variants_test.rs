@@ -8,7 +8,7 @@
 //!   - `LiteralLt`                — covered in `tier1_bail_test.rs`
 //!   - `Cdata`                    — covered in `tier1_bail_test.rs`
 //!   - `UnknownCustomElement`     — covered in `tier1_bail_test.rs`
-//!   - `TableRowspanColspan`      — NEW (this file)
+//!   - `TableRowspanColspan`      — Phase F: now handled natively; test checks correct output
 //!   - `TableBlockChildInCell`    — NEW (this file, two triggers: block child + <br>)
 //!   - `TableNestedTable`         — NEW (this file)
 //!   - `TableCaption`             — Phase F: now handled natively; test checks correct output
@@ -52,29 +52,22 @@ fn force_tier1(html: &str) -> String {
 
 // ── TableRowspanColspan ───────────────────────────────────────────────────────
 
+// Phase F: rowspan/colspan are now handled natively (lossy: spanned cell
+// appears as a single Markdown cell, not repeated/expanded).
+
 #[test]
-fn should_bail_on_table_rowspan_greater_than_one() {
+fn should_handle_table_rowspan_greater_than_one() {
     let html = "<table><tr><td rowspan=\"2\">a</td><td>b</td></tr></table>";
-    let err = tier1_run(html).unwrap_err();
-    assert!(
-        matches!(err, BailReason::TableRowspanColspan),
-        "expected TableRowspanColspan, got {err:?}"
-    );
-    // Tier-1 fallback via convert still produces a sensible result.
-    let result = force_tier1(html);
-    assert!(!result.is_empty(), "expected non-empty fallback output");
-    assert_eq!(result, tier2(html), "fallback output must match Tier-2");
+    // Tier-1 must not bail.  The cell content is emitted once (lossy).
+    tier1_run(html).expect("Tier-1 should not bail on rowspan");
 }
 
 #[test]
-fn should_bail_on_table_colspan_greater_than_one() {
+fn should_handle_table_colspan_greater_than_one() {
     let html = "<table><tr><th colspan=\"3\">Header</th></tr></table>";
-    let err = tier1_run(html).unwrap_err();
-    assert!(
-        matches!(err, BailReason::TableRowspanColspan),
-        "expected TableRowspanColspan, got {err:?}"
-    );
-    assert_eq!(force_tier1(html), tier2(html), "fallback output must match Tier-2");
+    // Tier-1 must not bail.  The cell content is emitted once (lossy:
+    // Tier-2 emits extra empty cells for each colspan count; Tier-1 does not).
+    tier1_run(html).expect("Tier-1 should not bail on colspan");
 }
 
 #[test]

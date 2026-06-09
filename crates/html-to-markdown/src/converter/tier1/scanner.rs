@@ -14,7 +14,7 @@
 //!
 //! Bails on: RawText(script/style/textarea/etc.), `DefinitionTerm`,
 //! `DefinitionDescription`, List(Definition), Ignored (head/meta/link),
-//! nested tables, colspan/rowspan != 1, block children in cells,
+//! nested tables, block children in cells,
 //! section-order violations, multi-line cell content,
 //! and any HTML construct with in-text whitespace complexity or unclosed tags.
 
@@ -694,20 +694,13 @@ fn open_table_row(state: &mut Tier1State) {
 
 fn open_table_cell(
     state: &mut Tier1State,
-    attrs: &[(&[u8], Option<&[u8]>)],
+    _attrs: &[(&[u8], Option<&[u8]>)],
     is_header: bool,
 ) -> Result<(), BailReason> {
-    // Check rowspan / colspan — bail if either != 1.
-    let span_val = |key: &[u8]| -> u32 {
-        find_attr(attrs, key)
-            .and_then(|b| std::str::from_utf8(b).ok())
-            .and_then(|s| s.trim().parse::<u32>().ok())
-            .unwrap_or(1)
-    };
-    if span_val(b"rowspan") != 1 || span_val(b"colspan") != 1 {
-        return Err(BailReason::TableRowspanColspan);
-    }
-    // Start accumulating cell text.
+    // rowspan/colspan are now accepted — emit the cell content as a single
+    // Markdown cell (lossy: a spanned cell appears once, not repeated).
+    // This matches mdream and most converters.  The cell text is still
+    // trimmed and pipe-escaped by close_table_cell.
     if let Some(ts) = state.table_stack.last_mut() {
         ts.current_cell.clear();
         ts.in_cell = true;
