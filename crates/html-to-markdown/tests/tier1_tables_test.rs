@@ -343,20 +343,17 @@ fn test_bail_nested_table() {
     assert_eq!(tier1(html), tier2(html));
 }
 
-/// Test 19: `<caption>` → `TableCaption`.
+/// Test 19: `<caption>` — Phase F: now handled natively; no bail.
 #[test]
-fn test_bail_caption() {
+fn test_caption_handled_natively() {
     let html = "<table>\
         <caption>My Caption</caption>\
         <tr><th>H</th></tr>\
         <tr><td>D</td></tr>\
     </table>";
-    let err = tier1_run(html).unwrap_err();
-    assert!(
-        matches!(err, BailReason::TableCaption),
-        "expected TableCaption, got {err:?}"
-    );
-    assert_eq!(tier1(html), tier2(html));
+    // Tier-1 must succeed and produce byte-equal output to Tier-2.
+    let t1 = tier1_run(html).expect("Tier-1 should not bail on <caption>");
+    assert_eq!(t1, tier2(html), "caption output must match Tier-2");
 }
 
 /// Test 20: `<tbody>` after `<tfoot>` open → `TableSectionOrder`.

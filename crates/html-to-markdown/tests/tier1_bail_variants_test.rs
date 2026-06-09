@@ -11,7 +11,7 @@
 //!   - `TableRowspanColspan`      — NEW (this file)
 //!   - `TableBlockChildInCell`    — NEW (this file, two triggers: block child + <br>)
 //!   - `TableNestedTable`         — NEW (this file)
-//!   - `TableCaption`             — NEW (this file)
+//!   - `TableCaption`             — Phase F: now handled natively; test checks correct output
 //!   - `TableSectionOrder`        — NEW (this file, two orderings)
 
 #![cfg(feature = "testkit")]
@@ -139,16 +139,15 @@ fn should_bail_on_nested_table_inside_cell() {
 }
 
 // ── TableCaption ──────────────────────────────────────────────────────────────
+// Caption is now handled natively by Tier-1 (no longer a bail reason).
 
 #[test]
-fn should_bail_on_table_caption_element() {
+fn should_handle_table_caption_element() {
     let html = "<table><caption>My table</caption><tr><td>a</td></tr></table>";
-    let err = tier1_run(html).unwrap_err();
-    assert!(
-        matches!(err, BailReason::TableCaption),
-        "expected TableCaption, got {err:?}"
-    );
-    assert_eq!(force_tier1(html), tier2(html), "fallback output must match Tier-2");
+    // Tier-1 must succeed (no bail) and produce byte-equal output to Tier-2.
+    let t1 = tier1_run(html).expect("Tier-1 should not bail on <caption>");
+    let t2 = tier2(html);
+    assert_eq!(t1, t2, "Tier-1 caption output must match Tier-2");
 }
 
 // ── TableSectionOrder ─────────────────────────────────────────────────────────

@@ -15,7 +15,7 @@
 //! Bails on: RawText(script/style/textarea/etc.), `DefinitionTerm`,
 //! `DefinitionDescription`, List(Definition), Ignored (head/meta/link),
 //! nested tables, colspan/rowspan != 1, block children in cells,
-//! `<caption>`, section-order violations, multi-line cell content,
+//! section-order violations, multi-line cell content,
 //! and any HTML construct with in-text whitespace complexity or unclosed tags.
 
 use crate::converter::tier1::bail::BailReason;
@@ -548,7 +548,7 @@ fn emit_open(
             }
         TagKind::Link => open_link(state),
         TagKind::Table => open_table(state),
-        TagKind::TableCaption => return Err(BailReason::TableCaption),
+        TagKind::TableCaption => open_table_caption(state),
         TagKind::TableHead => open_table_head(state)?,
         TagKind::TableBody => open_table_body(state)?,
         TagKind::TableFoot => open_table_foot(state),
@@ -649,6 +649,13 @@ fn open_table(state: &mut Tier1State) {
     state
         .table_stack
         .push(crate::converter::tier1::state::TableState::default());
+}
+
+fn open_table_caption(state: &mut Tier1State) {
+    if let Some(ts) = state.table_stack.last_mut() {
+        ts.caption_buf.clear();
+        ts.in_caption = true;
+    }
 }
 
 fn open_table_head(state: &mut Tier1State) -> Result<(), BailReason> {
@@ -920,9 +927,7 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
         }
         TagKind::TableRow => close_table_row(state),
         TagKind::TableCell { .. } => close_table_cell(state, false)?,
-        TagKind::TableCaption => {
-            // Should have been caught at open, but handle gracefully.
-        }
+        TagKind::TableCaption => close_table_caption(state),
         // Generic block container close: when it produced visible content,
         // ensure a paragraph-break separator follows so the next sibling
         // doesn't run together with this div's last byte.  Mirrors Tier-2's
@@ -1180,8 +1185,12 @@ fn close_table(state: &mut Tier1State) -> Result<(), BailReason> {
     //
     // If those conditions could apply to this table, we bail rather than
     // emit a GFM table that Tier-2 would have rendered differently.
-    if !ts.has_th {
-        // No <th>: check if Tier-2 would take the layout path.
+    //
+    // When a <caption> is present, Tier-2 always takes the GFM path
+    // regardless of <th> presence (has_caption short-circuits the layout check).
+    let has_caption = ts.caption_text.is_some();
+    if !ts.has_th && !has_caption {
+        // No <th> and no <caption>: check if Tier-2 would take the layout path.
         let row_count = ts.rows.len();
 
         // Inconsistent column counts → layout table in Tier-2.
@@ -1215,6 +1224,23 @@ fn close_table_head(state: &mut Tier1State) {
 fn close_table_body(state: &mut Tier1State) {
     if let Some(ts) = state.table_stack.last_mut() {
         ts.seen_tbody_close = true;
+    }
+}
+
+/// Finalise a `<caption>` element.
+///
+/// Mirrors Tier-2's `builder.rs` caption handling: trim the collected text,
+/// replace `-` with `\-` to prevent Markdown table-separator interpretation,
+/// and store the result in `ts.caption_text` for emission before the table body.
+fn close_table_caption(state: &mut Tier1State) {
+    let Some(ts) = state.table_stack.last_mut() else {
+        return;
+    };
+    ts.in_caption = false;
+    let raw = std::mem::take(&mut ts.caption_buf);
+    let trimmed = raw.trim();
+    if !trimmed.is_empty() {
+        ts.caption_text = Some(trimmed.replace('-', r"\-"));
     }
 }
 
@@ -1303,11 +1329,12 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
         return Ok(());
     }
 
-    // Inside a table but outside a cell: discard text (whitespace between
-    // structural tags like <table>...<tr> or <tr>...<td>).
+    // Inside a table but outside a cell or caption: discard text (whitespace
+    // between structural tags like <table>...<tr> or <tr>...<td>).
     // Tier-2 processes only tag children explicitly, ignoring text nodes at
-    // this level.
-    if !state.table_stack.is_empty() && !state.in_table_cell() {
+    // this level.  Caption content is the exception — Tier-2 walks caption
+    // children and accumulates their text into the caption output.
+    if !state.table_stack.is_empty() && !state.in_table_cell() && !state.in_table_caption() {
         return Ok(());
     }
 
@@ -1796,6 +1823,29 @@ fn indent_pre_lines(raw: &str) -> String {
 ///
 /// Never — empty-table guard returns early.
 fn emit_gfm_table(state: &mut Tier1State, ts: crate::converter::tier1::state::TableState) {
+    // Emit caption (if any) BEFORE the table body.
+    //
+    // Mirrors Tier-2 builder.rs caption handling: `*escaped_text*\n\n`.
+    // Tier-2 emits the caption as part of the table child loop, which runs
+    // before the rows are rendered, so the caption appears even when there
+    // are no table rows.  The caption text has already been trimmed and
+    // hyphen-escaped when `</caption>` was processed.
+    if let Some(ref caption) = ts.caption_text {
+        if !caption.is_empty() {
+            // Ensure the caption starts after any preceding content.
+            if !state.output.is_empty() && !state.output.ends_with("\n\n") {
+                if state.output.ends_with('\n') {
+                    state.output.push('\n');
+                } else {
+                    state.output.push_str("\n\n");
+                }
+            }
+            state.output.push('*');
+            state.output.push_str(caption);
+            state.output.push_str("*\n\n");
+        }
+    }
+
     if ts.rows.is_empty() {
         return;
     }

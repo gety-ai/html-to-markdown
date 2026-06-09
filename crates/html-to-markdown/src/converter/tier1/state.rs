@@ -29,6 +29,15 @@ pub struct TableState {
     pub in_thead: bool,
     /// True while the scanner is inside a `<td>` or `<th>`.
     pub in_cell: bool,
+    /// True while the scanner is accumulating `<caption>` content.
+    pub in_caption: bool,
+    /// Raw text accumulated during a `<caption>` element.
+    pub caption_buf: String,
+    /// Trimmed, hyphen-escaped caption text ready for emission.
+    ///
+    /// `None` if no `<caption>` was seen; `Some("")` if the caption was empty
+    /// (Tier-2 emits nothing for an empty caption, so we match that).
+    pub caption_text: Option<String>,
     /// True after the first `<tbody>` has closed — used to detect
     /// `<tbody>` → `<tfoot>` → `<tbody>` ordering violations.
     pub seen_tbody_close: bool,
@@ -143,7 +152,8 @@ impl Tier1State {
     }
 
     /// Return a mutable reference to the current cell buffer when inside a
-    /// table cell, or to `self.output` otherwise.
+    /// table cell, the caption buffer when inside a `<caption>`, or to
+    /// `self.output` otherwise.
     ///
     /// This is the single dispatch point for "where does inline text land."
     pub fn cell_or_output_mut(&mut self) -> &mut String {
@@ -151,8 +161,17 @@ impl Tier1State {
             if ts.in_cell {
                 return &mut ts.current_cell;
             }
+            if ts.in_caption {
+                return &mut ts.caption_buf;
+            }
         }
         &mut self.output
+    }
+
+    /// True when the scanner is currently accumulating `<caption>` content.
+    #[must_use]
+    pub fn in_table_caption(&self) -> bool {
+        self.table_stack.last().is_some_and(|ts| ts.in_caption)
     }
 
     /// True when the scanner is currently inside a table cell.
