@@ -67,8 +67,16 @@ pub fn handle(
 
     if let Some(node) = node_handle.get(parser) {
         if let tl::Node::Tag(tag) = node {
-            let children = tag.children();
-            let child_handles: Vec<_> = children.top().iter().collect();
+            // `DomContext::children_of` returns the cached `Vec<NodeHandle>` built
+            // during the initial DOM walk in `build_dom_context`.  Falling back to
+            // a freshly collected Vec keeps this safe when the cache miss happens
+            // (e.g. dynamically synthesised handles in tests), but on the hot
+            // path every paragraph reuses the existing allocation.
+            let id = node_handle.get_inner();
+            let child_handles: std::borrow::Cow<'_, [tl::NodeHandle]> = match dom_ctx.children_of(id) {
+                Some(children) => std::borrow::Cow::Borrowed(children.as_slice()),
+                None => std::borrow::Cow::Owned(tag.children().top().iter().copied().collect()),
+            };
 
             for (i, child_handle) in child_handles.iter().enumerate() {
                 if let Some(node) = child_handle.get(parser) {
