@@ -920,14 +920,14 @@ fn emit_open(
                 state.cell_or_output_mut().push_str("==");
             }
         }
-        TagKind::Code
-            // When inside <pre>, <code> is transparent — no backtick markers.
-            if !state.escape_ctx.contains(EscapeCtx::PRE) => {
-                state.cell_or_output_mut().push('`');
-            }
+        // Phase CC: defer the open backtick marker — close_code does
+        // smart escaping based on the content (mirrors Tier-2's
+        // render_code_with_escaping at inline/code.rs:260).  Inside an
+        // outer <code> or <pre>, the inner code is transparent.
+        TagKind::Code if !state.escape_ctx.contains(EscapeCtx::PRE) && !state.escape_ctx.contains(EscapeCtx::CODE) => {}
         // When inside <pre>, a nested <code class="language-X"> contributes
         // the language tag for the enclosing fence.
-        TagKind::Code if state.pre_lang.is_none() => {
+        TagKind::Code if state.pre_lang.is_none() && state.escape_ctx.contains(EscapeCtx::PRE) => {
             if let Some(lang) = extract_language_from_class(attrs) {
                 state.pre_lang = Some(lang);
             }
@@ -1408,7 +1408,7 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8], options: &Conversio
         TagKind::Inserted
             if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) => {}
         TagKind::Inserted => close_inline_marker(state, &frame, "=="),
-        TagKind::Code => close_code(state),
+        TagKind::Code => close_code(state, &frame),
         TagKind::Link => close_link(state, &frame),
         TagKind::List(ListKind::Definition) => close_dl(state, &frame),
         TagKind::List(kind) => close_list(state, kind),
@@ -1635,7 +1635,7 @@ fn emit_close_for_implicit(state: &mut Tier1State, options: &ConversionOptions) 
         TagKind::Inserted
             if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) => {}
         TagKind::Inserted => close_inline_marker(state, &frame, "=="),
-        TagKind::Code => close_code(state),
+        TagKind::Code => close_code(state, &frame),
         TagKind::Link => close_link(state, &frame),
         TagKind::List(ListKind::Definition) => close_dl(state, &frame),
         TagKind::List(kind) => close_list(state, kind),
@@ -1789,11 +1789,77 @@ fn close_pre(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOption
     state.pre_lang = None;
 }
 
-fn close_code(state: &mut Tier1State) {
-    // When inside <pre>, <code> is transparent — no backtick markers.
-    // The escape_ctx was already restored to prev_escape_ctx above.
-    if !state.escape_ctx.contains(EscapeCtx::PRE) {
-        state.cell_or_output_mut().push('`');
+fn close_code(state: &mut Tier1State, frame: &OpenTag) {
+    // escape_ctx was already restored to prev (outer) context above.
+    // When inside <pre> or an outer <code>, this <code> is transparent —
+    // no backtick markers, content already emitted in place.
+    if state.escape_ctx.contains(EscapeCtx::PRE) || state.escape_ctx.contains(EscapeCtx::CODE) {
+        return;
+    }
+    // Phase CC: smart backtick escaping (mirrors inline/code.rs:260).
+    // Open emitted nothing; content from `frame.content_start` to buf
+    // end is the raw code content.  Choose num_backticks + delimiter
+    // spaces from that slice, then truncate and re-emit wrapped.
+    let buf = state.cell_or_output_mut();
+    let content_start = frame.content_start.min(buf.len());
+    if content_start >= buf.len() {
+        // No content emitted between open and close — Tier-2 emits
+        // nothing for empty <code></code>.
+        return;
+    }
+
+    let contains_backtick = buf[content_start..].contains('`');
+
+    let (needs_spaces, num_backticks) = {
+        let content = &buf[content_start..];
+        let first_char = content.chars().next();
+        let last_char = content.chars().last();
+        let starts_with_space = first_char == Some(' ');
+        let ends_with_space = last_char == Some(' ');
+        let starts_with_backtick = first_char == Some('`');
+        let ends_with_backtick = last_char == Some('`');
+        let all_spaces = content.chars().all(|c| c == ' ');
+
+        let needs_delimiter_spaces = all_spaces
+            || starts_with_backtick
+            || ends_with_backtick
+            || (starts_with_space && ends_with_space && contains_backtick);
+
+        let num_backticks = if contains_backtick {
+            let max_consecutive = content
+                .chars()
+                .fold((0usize, 0usize), |(max, current), c| {
+                    if c == '`' {
+                        let new_current = current + 1;
+                        (max.max(new_current), new_current)
+                    } else {
+                        (max, 0)
+                    }
+                })
+                .0;
+            if max_consecutive == 1 { 2 } else { 1 }
+        } else {
+            1
+        };
+        (needs_delimiter_spaces, num_backticks)
+    };
+
+    // Splice in the open marker before the content.  Cheap path: build
+    // the wrap prefix/suffix as &str pieces and use String::insert_str.
+    // (We push the suffix at the end without an extra allocation.)
+    let mut prefix = String::with_capacity(num_backticks + 1);
+    for _ in 0..num_backticks {
+        prefix.push('`');
+    }
+    if needs_spaces {
+        prefix.push(' ');
+    }
+    buf.insert_str(content_start, &prefix);
+    if needs_spaces {
+        buf.push(' ');
+    }
+    for _ in 0..num_backticks {
+        buf.push('`');
     }
 }
 
