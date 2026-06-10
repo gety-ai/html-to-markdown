@@ -1002,6 +1002,9 @@ fn open_list(state: &mut Tier1State, kind: ListKind) {
     let current_list_depth = state.list_depth;
     {
         let dest = state.cell_or_output_mut();
+        // Drop trailing horizontal whitespace from inter-tag preservation
+        // (Phase U-2) before the block separator.
+        crate::converter::tier1::state::trim_trailing_horizontal(dest);
         if !dest.is_empty() {
             if current_list_depth == 0 {
                 // Top-level list: ensure blank line before
@@ -1407,6 +1410,12 @@ fn close_block_container(state: &mut Tier1State, frame: &OpenTag) {
         // Empty block — no content emitted, no separator needed.
         return;
     }
+    // Drop trailing horizontal whitespace (left over from inter-tag whitespace
+    // preservation) before emitting the block separator.  Same rationale as
+    // `ensure_blank_line` (Phase U-2).
+    while buf.ends_with(' ') || buf.ends_with('\t') {
+        buf.pop();
+    }
     if buf.ends_with("\n\n") {
         return;
     }
@@ -1494,12 +1503,21 @@ fn close_button(state: &mut Tier1State, frame: &OpenTag) {
         return;
     }
     let dest = state.cell_or_output_mut();
-    if dest.len() > frame.content_start && !dest.ends_with("\n\n") {
-        if dest.ends_with('\n') {
-            dest.push('\n');
-        } else {
-            dest.push_str("\n\n");
-        }
+    if dest.len() <= frame.content_start {
+        return;
+    }
+    // Drop trailing horizontal whitespace from the inter-tag fix before the
+    // block separator (Phase U-2).
+    while dest.ends_with(' ') || dest.ends_with('\t') {
+        dest.pop();
+    }
+    if dest.ends_with("\n\n") {
+        return;
+    }
+    if dest.ends_with('\n') {
+        dest.push('\n');
+    } else {
+        dest.push_str("\n\n");
     }
 }
 
@@ -2043,8 +2061,10 @@ fn ends_with_ordered_marker(s: &str) -> bool {
     i < len - 2 && (i == 0 || !bytes[i - 1].is_ascii_digit())
 }
 
-/// Returns `true` when the output tail is an inline-close marker emitted by
-/// Tier-1, signalling that the next token follows a just-closed inline element.
+/// Returns `true` when the output tail is an explicit inline-element close
+/// marker emitted by Tier-1.  These markers signal that the next whitespace
+/// text node is between two inline siblings and should collapse to a single
+/// space — even when the whitespace run contains a newline (Phase U-2).
 ///
 /// Recognised markers:
 /// - `**` — `</strong>` / `</b>` close
@@ -2052,37 +2072,28 @@ fn ends_with_ordered_marker(s: &str) -> bool {
 /// - `` ` `` — `</code>` close
 /// - `)` — `</a>` (link) close, e.g. `](href)`
 ///
-/// Block edges (`\n`, empty output) are explicitly excluded so that
-/// inter-block whitespace is never preserved by this predicate.
-fn output_ends_with_inline_close(output: &str) -> bool {
-    if output.is_empty() {
+/// Block edges (`\n`, empty output, trailing space) are explicitly excluded.
+fn output_ends_with_inline_close_marker(output: &str) -> bool {
+    if output.is_empty() || output.ends_with('\n') || output.ends_with(' ') || output.ends_with('\t') {
         return false;
     }
-    // Exclude block edges: output ends with a newline (paragraph/block close).
-    if output.ends_with('\n') {
+    if output.ends_with("**") || output.ends_with('`') || output.ends_with(')') {
+        return true;
+    }
+    output.ends_with('*') && !output.ends_with("**")
+}
+
+/// Returns `true` when the output tail is a non-marker text character —
+/// e.g. ending in a letter, digit, or punctuation other than the inline-
+/// close markers.  Text-tail preservation only fires for *horizontal*
+/// whitespace runs (no `\n`/`\r`) because we cannot tell at flush time
+/// whether the next tag is inline or block; preserving a space across a
+/// newline-bearing run risks `text \n\n<list>` regressions.
+fn output_ends_with_inline_text(output: &str) -> bool {
+    if output.is_empty() || output.ends_with('\n') || output.ends_with(' ') || output.ends_with('\t') {
         return false;
     }
-    // Exclude already-spaced output: don't double-emit.
-    if output.ends_with(' ') {
-        return false;
-    }
-    // Strong close `**`.
-    if output.ends_with("**") {
-        return true;
-    }
-    // Emphasis close `*` (only a lone `*`, not the second char of `**`).
-    if output.ends_with('*') && !output.ends_with("**") {
-        return true;
-    }
-    // Code close `` ` ``.
-    if output.ends_with('`') {
-        return true;
-    }
-    // Link close `)` from `](href)`.
-    if output.ends_with(')') {
-        return true;
-    }
-    false
+    !output_ends_with_inline_close_marker(output)
 }
 
 fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(), BailReason> {
@@ -2167,18 +2178,19 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
     // the common block-between-blocks case and the inline cases are caught
     // by the inline-frame check above.
     //
-    // Exception (Phase U): when the output tail is an inline-close marker
-    // (`**`, `*`, `` ` ``, `)` from a link), a whitespace-only text node
-    // between two adjacent inline elements must become a single space.
-    // Without this `</strong> <em>` would emit `**a***b*` instead of
-    // `**a** *b*`.
+    // Exception (Phase U + U-2): when the output tail is inline content
+    // (text or `**`/`*`/`` ` ``/`)` close markers) AND we're NOT at a
+    // block edge, a whitespace-only text node between siblings must
+    // become a single space.  Without this `</strong> <em>` would emit
+    // `**a***b*` and `<span>Open Search Bar</span>\n<button>` would lose
+    // the space before the button's content.
     //
-    // The guard is restricted to *horizontal* whitespace only (spaces and
-    // tabs, no `\n`/`\r`): a text node containing a newline is structural
-    // block-level whitespace between siblings (e.g. `</a>\n<div>`) and must
-    // not be preserved as a space.  Block edges are additionally excluded by
-    // `output_ends_with_inline_close` itself (it returns false when output
-    // ends with `\n` or is empty).
+    // Phase U-2 dropped the original "horizontal whitespace only" guard:
+    // a newline-bearing whitespace run between two inline siblings still
+    // collapses to a single space in Tier-2.  The "what if next tag is a
+    // block?" regression is now handled later in `ensure_blank_line` and
+    // `close_block_container`, which trim trailing horizontal whitespace
+    // before emitting `\n\n`.
     if !in_pre && !state.in_table_cell() && raw_is_whitespace {
         // When inside a <summary> accumulation buffer, treat the context as
         // inline (like strong/emphasis): inter-element spaces must be
@@ -2191,12 +2203,28 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
                 )
             });
         if !inside_inline {
-            let raw_is_horizontal = raw.bytes().all(|b| b == b' ' || b == b'\t');
             // Use the active buffer (summary buf or main output) for the
-            // inline-close check so spaces between adjacent inline elements
-            // inside a summary are preserved correctly.
+            // tail check so spaces between adjacent inline elements inside
+            // a summary are preserved correctly.
             let active_tail: &str = state.cell_or_output_mut();
-            if raw_is_horizontal && output_ends_with_inline_close(active_tail) {
+            let raw_is_horizontal = raw.bytes().all(|b| b == b' ' || b == b'\t');
+            // Inline-close marker tail (`**`/`*`/`` ` ``/`)`): preserve a
+            // single space across newline-bearing whitespace too — these
+            // markers can only appear after just-closed inline elements,
+            // so the surrounding context is inline-flow even if the source
+            // wrote `</strong>\n<a>`.
+            let push_space = if output_ends_with_inline_close_marker(active_tail) {
+                true
+            } else if output_ends_with_inline_text(active_tail) {
+                // Text tail: only safe when the run is horizontal-only.
+                // Otherwise a following block tag (e.g. `text\n<ul>`) leaves
+                // a stray trailing space the next separator can't trim
+                // through every emission site.
+                raw_is_horizontal
+            } else {
+                false
+            };
+            if push_space {
                 let dest = state.cell_or_output_mut();
                 dest.push(' ');
             }

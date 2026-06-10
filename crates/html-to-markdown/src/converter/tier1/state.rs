@@ -230,16 +230,29 @@ impl Tier1State {
 
     /// Ensure the output ends with exactly two newlines (blank-line separator).
     /// If the output is empty, do nothing.
+    ///
+    /// Trailing ASCII spaces / tabs (introduced by the inter-tag whitespace
+    /// preservation in `flush_text`) are trimmed before the separator is
+    /// appended.  Without this trim, `<span>foo</span> <div>bar</div>` would
+    /// emit `foo \n\nbar` with a stray trailing space — a regression flagged
+    /// during Phase U development.  Trimming here makes "preserve a space
+    /// optimistically, drop on block boundary" safe.
     pub fn ensure_blank_line(&mut self) {
         let out = &mut self.output;
         if out.is_empty() {
             return;
+        }
+        // Drop any trailing horizontal whitespace before deciding the separator.
+        while out.ends_with(' ') || out.ends_with('\t') {
+            out.pop();
         }
         if out.ends_with("\n\n") {
             return;
         }
         if out.ends_with('\n') {
             out.push('\n');
+        } else if out.is_empty() {
+            // Output was entirely trailing whitespace before the trim — nothing to separate.
         } else {
             out.push_str("\n\n");
         }
@@ -250,5 +263,14 @@ impl Tier1State {
         if !self.output.is_empty() && !self.output.ends_with('\n') {
             self.output.push('\n');
         }
+    }
+}
+
+/// Trim trailing ASCII horizontal whitespace (spaces and tabs) from a string
+/// buffer.  Used before emitting block separators to drop the optimistic
+/// inter-tag space pushed by `flush_text` (Phase U-2).
+pub(crate) fn trim_trailing_horizontal(buf: &mut String) {
+    while buf.ends_with(' ') || buf.ends_with('\t') {
+        buf.pop();
     }
 }
