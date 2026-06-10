@@ -924,8 +924,9 @@ fn open_paragraph(state: &mut Tier1State) {
     // with "\n\n", push "\n\n" (may produce three newlines total when
     // output ends with a single "\n", e.g. right after a table row or
     // an `<hr>`).
-    if !state.output.is_empty() && !state.output.ends_with("\n\n") {
-        state.output.push_str("\n\n");
+    let dest = state.cell_or_output_mut();
+    if !dest.is_empty() && !dest.ends_with("\n\n") {
+        dest.push_str("\n\n");
     }
 }
 
@@ -986,14 +987,24 @@ fn open_list(state: &mut Tier1State, kind: ListKind) {
     }
     // Lists at the top level need a blank line if there's preceding content.
     // Inside a list item (`list_depth > 0`) just a newline is enough.
-    if !state.output.is_empty() {
-        if state.list_depth == 0 {
-            // Top-level list: ensure blank line before
-            state.ensure_blank_line();
-        } else {
-            // Nested list inside a list item: just newline
-            if !state.output.ends_with('\n') {
-                state.output.push('\n');
+    let current_list_depth = state.list_depth;
+    {
+        let dest = state.cell_or_output_mut();
+        if !dest.is_empty() {
+            if current_list_depth == 0 {
+                // Top-level list: ensure blank line before
+                if !dest.ends_with("\n\n") {
+                    if dest.ends_with('\n') {
+                        dest.push('\n');
+                    } else {
+                        dest.push_str("\n\n");
+                    }
+                }
+            } else {
+                // Nested list inside a list item: just newline
+                if !dest.ends_with('\n') {
+                    dest.push('\n');
+                }
             }
         }
     }
@@ -1128,8 +1139,17 @@ fn emit_void(
 ) -> Result<(), BailReason> {
     match spec.kind {
         TagKind::Hr => {
-            state.ensure_blank_line();
-            state.output.push_str("---\n");
+            {
+                let dest = state.cell_or_output_mut();
+                if !dest.is_empty() && !dest.ends_with("\n\n") {
+                    if dest.ends_with('\n') {
+                        dest.push('\n');
+                    } else {
+                        dest.push_str("\n\n");
+                    }
+                }
+            }
+            state.cell_or_output_mut().push_str("---\n");
         }
 
         TagKind::LineBreak => {
@@ -1145,7 +1165,7 @@ fn emit_void(
             } else if state.stack.is_empty() {
                 // bare `<br>` at top level — Tier-2 emits nothing
             } else {
-                state.output.push_str("  \n");
+                state.cell_or_output_mut().push_str("  \n");
             }
         }
 
@@ -1470,7 +1490,7 @@ fn close_paragraph(state: &mut Tier1State) {
     // Tier-2 appends "\n\n" after paragraph content (always two newlines).
     // Matching this precisely is required for byte-equal output.
     trim_trailing_inline_whitespace(state);
-    state.output.push_str("\n\n");
+    state.cell_or_output_mut().push_str("\n\n");
 }
 
 /// Close a heading element.
@@ -1634,8 +1654,9 @@ fn close_list(state: &mut Tier1State, kind: ListKind) {
         return;
     }
     // Ensure the list ends with exactly one newline before any following content.
-    if !state.output.ends_with('\n') {
-        state.output.push('\n');
+    let dest = state.cell_or_output_mut();
+    if !dest.ends_with('\n') {
+        dest.push('\n');
     }
 }
 
@@ -1652,7 +1673,10 @@ fn close_list_item(state: &mut Tier1State) {
         return;
     }
     trim_trailing_inline_whitespace(state);
-    state.ensure_newline();
+    let dest = state.cell_or_output_mut();
+    if !dest.is_empty() && !dest.ends_with('\n') {
+        dest.push('\n');
+    }
 }
 
 // ── Definition-list helpers ───────────────────────────────────────────────────
@@ -2769,8 +2793,9 @@ fn emit_gfm_table(state: &mut Tier1State, ts: crate::converter::tier1::state::Ta
 /// Trim trailing spaces and tabs from the end of the output (used before
 /// closing block elements that trim trailing whitespace in Tier-2).
 fn trim_trailing_inline_whitespace(state: &mut Tier1State) {
-    while state.output.ends_with(' ') || state.output.ends_with('\t') {
-        state.output.pop();
+    let buf = state.cell_or_output_mut();
+    while buf.ends_with(' ') || buf.ends_with('\t') {
+        buf.pop();
     }
 }
 
