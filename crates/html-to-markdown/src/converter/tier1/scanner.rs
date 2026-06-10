@@ -97,6 +97,10 @@ pub struct ScanOutput {
 pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailReason> {
     let bytes = html.as_bytes();
     let mut state = Tier1State::new(html.len());
+    // Phase DD: Tier-2 runs an html5ever roundtrip when custom-element
+    // tags are present in the source, which canonicalizes attribute
+    // entities.  Mirror that for byte-equality.
+    state.canonicalize_attr_entities = crate::converter::main_helpers::has_custom_element_tags(html);
     let mut pos = 0usize;
     let mut text_start = 0usize;
 
@@ -1238,15 +1242,35 @@ fn emit_void(
             let alt = find_attr(attrs, b"alt").unwrap_or_default();
             let title = find_attr(attrs, b"title");
 
+            // Phase DD: src gets entity-decoding (URL semantics).
+            // For alt/title:
+            //   • With custom-element tags → T2 ran html5ever roundtrip
+            //     and canonicalized entities; decode + re-encode the
+            //     special set to match.
+            //   • Without → T2 just yields tl's raw attribute bytes;
+            //     keep entities verbatim.
             let src = decode_attr(src)?;
-            let alt = decode_attr(alt)?;
+            let canonicalize = state.canonicalize_attr_entities;
+            let alt_owned;
+            let alt: &str = if canonicalize {
+                alt_owned = canonicalize_attr_entities(&decode_attr(alt)?).into_owned();
+                &alt_owned
+            } else {
+                std::str::from_utf8(alt).map_err(|_| BailReason::Classifier)?
+            };
 
             let keep_as_markdown = should_keep_image_as_markdown(html, &state.stack, options);
 
             let dest = state.cell_or_output_mut();
             if keep_as_markdown {
                 if let Some(title_bytes) = title {
-                    let title_str = decode_attr(title_bytes)?;
+                    let title_owned;
+                    let title_str: &str = if canonicalize {
+                        title_owned = canonicalize_attr_entities(&decode_attr(title_bytes)?).into_owned();
+                        &title_owned
+                    } else {
+                        std::str::from_utf8(title_bytes).map_err(|_| BailReason::Classifier)?
+                    };
                     // measured: write! is slower on this workload (Stage 5c)
                     #[allow(clippy::format_push_string)]
                     dest.push_str(&format!("![{alt}]({src} \"{title_str}\")"));
@@ -1258,7 +1282,7 @@ fn emit_void(
             } else {
                 // Strip to alt-text only — mirrors Tier-2 behaviour when the image
                 // is in a heading whose tag is not in `keep_inline_images_in`.
-                dest.push_str(&alt);
+                dest.push_str(alt);
             }
         }
 
@@ -2870,6 +2894,33 @@ fn decode_attr(bytes: &[u8]) -> Result<String, BailReason> {
     // use 0 as the base so the entity name is still reported.
     decode_entities_into(&mut out, s, 0)?;
     Ok(out)
+}
+
+/// Canonicalize the special-character set in an attribute value to match
+/// the output produced by html5ever's serializer (which Tier-2 runs on
+/// HTML containing custom elements).  Numeric forms like `&#x22;` decode
+/// to `"` and re-encode to the canonical named form `&quot;`; literal
+/// special chars are also escaped.  Matches the set in
+/// `html5ever::serialize::escape_for_attribute`.
+fn canonicalize_attr_entities(input: &str) -> std::borrow::Cow<'_, str> {
+    let needs_escape = input
+        .bytes()
+        .any(|b| matches!(b, b'&' | b'<' | b'>' | b'"') || b == 0xC2);
+    if !needs_escape {
+        return std::borrow::Cow::Borrowed(input);
+    }
+    let mut out = String::with_capacity(input.len() + 8);
+    for c in input.chars() {
+        match c {
+            '&' => out.push_str("&amp;"),
+            '<' => out.push_str("&lt;"),
+            '>' => out.push_str("&gt;"),
+            '"' => out.push_str("&quot;"),
+            '\u{a0}' => out.push_str("&nbsp;"),
+            _ => out.push(c),
+        }
+    }
+    std::borrow::Cow::Owned(out)
 }
 
 // ── Stack helpers ─────────────────────────────────────────────────────────────

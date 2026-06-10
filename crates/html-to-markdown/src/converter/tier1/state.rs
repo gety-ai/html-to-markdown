@@ -148,6 +148,12 @@ pub struct Tier1State {
     /// A stack (rather than a single `Option`) handles pathological nested
     /// `<summary>` input without panicking.
     pub summary_buf_stack: Vec<String>,
+    /// Tier-2 runs HTML through an html5ever roundtrip when the source
+    /// contains custom-element tags; the roundtrip canonicalizes
+    /// attribute entities (e.g. `&#x22;` → `&quot;`).  Tier-1 sets this
+    /// flag at the start of `scan` so the image emit path mirrors the
+    /// canonicalization for byte-equality (Phase DD).
+    pub canonicalize_attr_entities: bool,
 }
 
 impl Tier1State {
@@ -168,6 +174,7 @@ impl Tier1State {
             head_range: None,
             pre_lang: None,
             summary_buf_stack: Vec::new(),
+            canonicalize_attr_entities: false,
         }
     }
 
