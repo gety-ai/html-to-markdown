@@ -987,6 +987,16 @@ fn open_paragraph(state: &mut Tier1State) {
     // output ends with a single "\n", e.g. right after a table row or
     // an `<hr>`).
     let dest = state.cell_or_output_mut();
+    // Phase EE: when the paragraph is the first child of a list-item
+    // (output ends with a freshly-emitted bullet like `- ` or `1. `),
+    // the paragraph content joins the bullet inline.  Tier-2's
+    // paragraph.rs achieves this by checking the parent and skipping
+    // the leading `\n\n` for the first block child.  Check BEFORE
+    // `trim_trailing_horizontal`, which would strip the trailing
+    // space from the bullet.
+    if dest.ends_with("- ") || dest.ends_with("* ") || dest.ends_with("+ ") || ends_with_ordered_marker(dest) {
+        return;
+    }
     // Drop trailing horizontal whitespace from inter-tag preservation
     // (Phase U-2) before the block separator.
     crate::converter::tier1::state::trim_trailing_horizontal(dest);
@@ -1436,7 +1446,7 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8], options: &Conversio
         TagKind::Link => close_link(state, &frame),
         TagKind::List(ListKind::Definition) => close_dl(state, &frame),
         TagKind::List(kind) => close_list(state, kind),
-        TagKind::ListItem => close_list_item(state),
+        TagKind::ListItem => close_list_item(state, &frame),
         TagKind::DefinitionTerm => close_dt(state),
         TagKind::DefinitionDescription => close_dd(state),
         TagKind::Hr => {
@@ -1663,7 +1673,7 @@ fn emit_close_for_implicit(state: &mut Tier1State, options: &ConversionOptions) 
         TagKind::Link => close_link(state, &frame),
         TagKind::List(ListKind::Definition) => close_dl(state, &frame),
         TagKind::List(kind) => close_list(state, kind),
-        TagKind::ListItem => close_list_item(state),
+        TagKind::ListItem => close_list_item(state, &frame),
         TagKind::DefinitionTerm => close_dt(state),
         TagKind::DefinitionDescription => close_dd(state),
         TagKind::TableCell { .. } => close_table_cell(state, true)?,
@@ -1938,7 +1948,7 @@ fn close_list(state: &mut Tier1State, kind: ListKind) {
     }
 }
 
-fn close_list_item(state: &mut Tier1State) {
+fn close_list_item(state: &mut Tier1State, frame: &OpenTag) {
     // When inside a table cell, Tier-2 does NOT add a trailing newline after
     // each list item (see list/item.rs: `if !ctx.in_table_cell { ... \n ... }`).
     // Items are concatenated directly in the cell accumulator.
@@ -1952,7 +1962,24 @@ fn close_list_item(state: &mut Tier1State) {
     }
     trim_trailing_inline_whitespace(state);
     let dest = state.cell_or_output_mut();
-    if !dest.is_empty() && !dest.ends_with('\n') {
+    // Phase EE: loose-list separator.  When this item had block-level
+    // children (its content range contains a `\n\n` block separator),
+    // mirror Tier-2's `handle_li` ensure_trailing_blank_line behaviour
+    // so the next sibling `<li>` starts after a blank line.  Plain text
+    // items still get the tight `\n` terminator.
+    let had_block_children = {
+        let start = frame.content_start.min(dest.len());
+        dest[start..].contains("\n\n")
+    };
+    if had_block_children {
+        if !dest.ends_with("\n\n") {
+            if dest.ends_with('\n') {
+                dest.push('\n');
+            } else {
+                dest.push_str("\n\n");
+            }
+        }
+    } else if !dest.is_empty() && !dest.ends_with('\n') {
         dest.push('\n');
     }
 }
@@ -2264,6 +2291,11 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
     }
 
     let in_pre = state.escape_ctx.contains(EscapeCtx::PRE);
+    // Phase EE: inside `<code>` text is verbatim — Tier-2's handle_code
+    // walks children and pushes their text without normalize_whitespace,
+    // so `\n` and runs of spaces inside `<code>` survive into the
+    // wrapped span.  Treat as `in_pre` for the no-collapse path.
+    let in_code = state.escape_ctx.contains(EscapeCtx::CODE);
 
     // Inter-block whitespace strip: in a block-edge context (output empty,
     // ends with a newline, or ends with a list-item marker like "- " /
@@ -2410,7 +2442,7 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
 
     let has_entities = raw.contains('&');
 
-    if in_pre {
+    if in_pre || in_code {
         if has_entities {
             let dest = state.cell_or_output_mut();
             decode_entities_into(dest, raw, base_offset)?;
