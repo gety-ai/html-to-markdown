@@ -121,6 +121,19 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     continue;
                 }
 
+                // `<?` — processing instruction.  Tier-2's `tl::parse` drops
+                // these entirely (a malformed `<?>` in mdn-array becomes
+                // empty in the output).  Tier-1 mirrors by skipping to the
+                // next `>` and discarding the run.  If no `>` exists, fall
+                // through to the literal-lt branch below.
+                if next == b'?'
+                    && let Some(end) = memchr::memchr(b'>', &bytes[pos + 1..])
+                {
+                    pos = pos + 1 + end + 1;
+                    text_start = pos;
+                    continue;
+                }
+
                 // `</` — closing tag
                 if next == b'/' {
                     let name_start = pos + 2;
