@@ -851,6 +851,24 @@ fn emit_open(
     spec: &'static TagSpec,
     attrs: &[(&[u8], Option<&[u8]>)],
 ) -> Result<(), BailReason> {
+    // Phase V: when a block-level tag opens inside a link, bail.  Tier-2's
+    // link handler collapses block children (img alt, paragraph text) into
+    // an inline link label; replicating that in Tier-1 requires content
+    // capture similar to Phase R's summary buffer.  Until that lands, bail
+    // so Tier-2's fallback handles the collapse.
+    if matches!(
+        spec.kind,
+        TagKind::Block
+            | TagKind::Paragraph
+            | TagKind::Heading(_)
+            | TagKind::Blockquote
+            | TagKind::Pre
+            | TagKind::List(_)
+            | TagKind::Table
+    ) && state.stack.iter().any(|f| matches!(f.spec.kind, TagKind::Link))
+    {
+        return Err(BailReason::Classifier);
+    }
     match spec.kind {
         TagKind::Paragraph => open_paragraph(state),
         TagKind::Heading(_) => open_heading(state),
