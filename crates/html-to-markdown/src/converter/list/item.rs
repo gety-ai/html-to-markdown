@@ -269,14 +269,17 @@ pub fn handle_li(
             let last_line_start = output.rfind('\n').map_or(0, |pos| pos + 1);
             let last_line = &output[last_line_start..];
 
-            let (marker, text_content) = if is_task_list {
+            // Compute marker as Cow to keep static/owned cases zero-alloc
+            // where possible, and borrow text_content directly from the
+            // output buffer.  Both are passed as &str to visit_list_item.
+            let (marker, text_start) = if is_task_list {
                 let task_marker = if task_checked { "- [x]" } else { "- [ ]" };
                 let text_start = last_line.find(task_marker).map_or(0, |pos| pos + task_marker.len());
-                (task_marker.to_string(), last_line[text_start..].trim().to_string())
+                (Cow::Borrowed(task_marker), text_start)
             } else if ctx.in_ordered_list {
                 let marker_text = format!("{}.", ctx.list_counter);
                 let text_start = last_line.find(&marker_text).map_or(0, |pos| pos + marker_text.len());
-                (marker_text, last_line[text_start..].trim().to_string())
+                (Cow::Owned(marker_text), text_start)
             } else {
                 let bullets: Vec<char> = options.bullets.chars().collect();
                 let bullet_index = if ctx.ul_depth > 0 { ctx.ul_depth - 1 } else { 0 };
@@ -285,14 +288,16 @@ pub fn handle_li(
                 } else {
                     bullets[bullet_index % bullets.len()]
                 };
-                let bullet_str = bullet.to_string();
                 let text_start = last_line.find(bullet).map_or(0, |pos| pos + 1);
-                (bullet_str, last_line[text_start..].trim().to_string())
+                let mut buf = String::with_capacity(bullet.len_utf8());
+                buf.push(bullet);
+                (Cow::Owned(buf), text_start)
             };
+            let text_content = last_line[text_start..].trim();
 
             let visit_result = {
                 let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
-                visitor.visit_list_item(&node_ctx, ctx.in_ordered_list, &marker, &text_content)
+                visitor.visit_list_item(&node_ctx, ctx.in_ordered_list, &marker, text_content)
             };
             match visit_result {
                 VisitResult::Continue => {}
