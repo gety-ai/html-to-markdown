@@ -1907,6 +1907,48 @@ fn ends_with_ordered_marker(s: &str) -> bool {
     i < len - 2 && (i == 0 || !bytes[i - 1].is_ascii_digit())
 }
 
+/// Returns `true` when the output tail is an inline-close marker emitted by
+/// Tier-1, signalling that the next token follows a just-closed inline element.
+///
+/// Recognised markers:
+/// - `**` — `</strong>` / `</b>` close
+/// - `*` — `</em>` / `</i>` close (only a lone `*`, not part of `**`)
+/// - `` ` `` — `</code>` close
+/// - `)` — `</a>` (link) close, e.g. `](href)`
+///
+/// Block edges (`\n`, empty output) are explicitly excluded so that
+/// inter-block whitespace is never preserved by this predicate.
+fn output_ends_with_inline_close(output: &str) -> bool {
+    if output.is_empty() {
+        return false;
+    }
+    // Exclude block edges: output ends with a newline (paragraph/block close).
+    if output.ends_with('\n') {
+        return false;
+    }
+    // Exclude already-spaced output: don't double-emit.
+    if output.ends_with(' ') {
+        return false;
+    }
+    // Strong close `**`.
+    if output.ends_with("**") {
+        return true;
+    }
+    // Emphasis close `*` (only a lone `*`, not the second char of `**`).
+    if output.ends_with('*') && !output.ends_with("**") {
+        return true;
+    }
+    // Code close `` ` ``.
+    if output.ends_with('`') {
+        return true;
+    }
+    // Link close `)` from `](href)`.
+    if output.ends_with(')') {
+        return true;
+    }
+    false
+}
+
 fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(), BailReason> {
     if raw.is_empty() {
         return Ok(());
@@ -1978,6 +2020,19 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
     // Tier-1's heuristic we collapse it to nothing — matches Tier-2 for
     // the common block-between-blocks case and the inline cases are caught
     // by the inline-frame check above.
+    //
+    // Exception (Phase U): when the output tail is an inline-close marker
+    // (`**`, `*`, `` ` ``, `)` from a link), a whitespace-only text node
+    // between two adjacent inline elements must become a single space.
+    // Without this `</strong> <em>` would emit `**a***b*` instead of
+    // `**a** *b*`.
+    //
+    // The guard is restricted to *horizontal* whitespace only (spaces and
+    // tabs, no `\n`/`\r`): a text node containing a newline is structural
+    // block-level whitespace between siblings (e.g. `</a>\n<div>`) and must
+    // not be preserved as a space.  Block edges are additionally excluded by
+    // `output_ends_with_inline_close` itself (it returns false when output
+    // ends with `\n` or is empty).
     if !in_pre && !state.in_table_cell() && raw_is_whitespace {
         let inside_inline = state.stack.iter().any(|frame| {
             matches!(
@@ -1986,6 +2041,10 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
             )
         });
         if !inside_inline {
+            let raw_is_horizontal = raw.bytes().all(|b| b == b' ' || b == b'\t');
+            if raw_is_horizontal && output_ends_with_inline_close(&state.output) {
+                state.output.push(' ');
+            }
             return Ok(());
         }
     }
@@ -2580,7 +2639,25 @@ fn indent_pre_lines(raw: &str) -> String {
         if line.trim().is_empty() {
             // Preserve empty lines without adding trailing spaces.
         } else {
-            result.push_str(&line[min_indent.min(line.len())..]);
+            // Convert char-count `min_indent` into a byte offset by walking
+            // `char_indices`.  Indexing `line[min_indent..]` directly panics
+            // when the leading whitespace contains multibyte characters such
+            // as `\u{a0}` (NBSP).  Mirrors Tier-2's `dedent_code_block`
+            // (text/processing.rs:38-50).
+            let mut remaining = min_indent;
+            let mut cut = 0;
+            for (idx, ch) in line.char_indices() {
+                if remaining == 0 {
+                    break;
+                }
+                if ch.is_whitespace() {
+                    remaining -= 1;
+                    cut = idx + ch.len_utf8();
+                } else {
+                    break;
+                }
+            }
+            result.push_str(&line[cut..]);
         }
         result.push('\n');
     }
