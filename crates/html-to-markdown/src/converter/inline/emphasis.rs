@@ -304,7 +304,7 @@ fn handle_emphasis(
             } else if let Some(class_value) = tag
                 .attributes()
                 .get("class")
-                .and_then(|v| v.as_ref().map(|val| val.as_utf8_str().to_string()))
+                .and_then(|v| v.as_ref().map(|val| val.as_utf8_str()))
             {
                 if class_value.contains("caret") && !output.ends_with(' ') {
                     output.push_str(" > ");
@@ -334,7 +334,7 @@ fn handle_emphasis(
             } else if let Some(class_value) = tag
                 .attributes()
                 .get("class")
-                .and_then(|v| v.as_ref().map(|val| val.as_utf8_str().to_string()))
+                .and_then(|v| v.as_ref().map(|val| val.as_utf8_str()))
             {
                 if class_value.contains("caret") && !output.ends_with(' ') {
                     output.push_str(" > ");
