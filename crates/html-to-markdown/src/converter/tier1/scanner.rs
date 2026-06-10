@@ -912,6 +912,14 @@ fn emit_open(
                 state.cell_or_output_mut().push_str("~~");
             }
         }
+        TagKind::Inserted => {
+            // Tier-2's handle_inserted emits `==` markers unconditionally for
+            // <ins>.  Mirror Strikethrough's in-code/pre suppression for
+            // consistency (no `==` inside backtick spans / fenced blocks).
+            if !state.escape_ctx.contains(EscapeCtx::CODE) && !state.escape_ctx.contains(EscapeCtx::PRE) {
+                state.cell_or_output_mut().push_str("==");
+            }
+        }
         TagKind::Code
             // When inside <pre>, <code> is transparent — no backtick markers.
             if !state.escape_ctx.contains(EscapeCtx::PRE) => {
@@ -1397,6 +1405,9 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8], options: &Conversio
         TagKind::Strikethrough
             if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) => {}
         TagKind::Strikethrough => close_inline_marker(state, &frame, "~~"),
+        TagKind::Inserted
+            if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) => {}
+        TagKind::Inserted => close_inline_marker(state, &frame, "=="),
         TagKind::Code => close_code(state),
         TagKind::Link => close_link(state, &frame),
         TagKind::List(ListKind::Definition) => close_dl(state, &frame),
@@ -1621,6 +1632,9 @@ fn emit_close_for_implicit(state: &mut Tier1State, options: &ConversionOptions) 
         TagKind::Strikethrough
             if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) => {}
         TagKind::Strikethrough => close_inline_marker(state, &frame, "~~"),
+        TagKind::Inserted
+            if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) => {}
+        TagKind::Inserted => close_inline_marker(state, &frame, "=="),
         TagKind::Code => close_code(state),
         TagKind::Link => close_link(state, &frame),
         TagKind::List(ListKind::Definition) => close_dl(state, &frame),

@@ -35,6 +35,10 @@ pub enum TagKind {
     /// GFM/CommonMark output.  Mirrors Tier-2's
     /// `inline/semantic/marks.rs::handle_strikethrough`.
     Strikethrough,
+    /// Inserted/underlined text (`<ins>`).  Emits `==content==` in
+    /// GFM/CommonMark output.  Mirrors Tier-2's
+    /// `inline/semantic/marks.rs::handle_inserted`.
+    Inserted,
     /// Inline `code`.
     Code,
     /// `<br>` — forces a line break.
@@ -334,7 +338,7 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
     b"del"    => inline(TagKind::Strikethrough),
     b"strike" => inline(TagKind::Strikethrough),
     b"u"      => inline(TagKind::Inline),
-    b"ins"    => inline(TagKind::Inline),
+    b"ins"    => inline(TagKind::Inserted),
 
     // ── Inline marks ──────────────────────────────────────────────────────────
     b"mark"   => inline(TagKind::Inline),
