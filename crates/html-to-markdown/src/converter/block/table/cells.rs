@@ -201,17 +201,27 @@ pub fn convert_table_row(
 
     #[cfg(feature = "visitor")]
     let cell_contents: Vec<String> = if ctx.visitor.is_some() {
+        // Build the per-cell context once instead of cloning ctx per cell
+        // (mirrors the same hoist for the rendering path below).
+        let collect_ctx = super::super::super::Context {
+            in_table_cell: true,
+            ..ctx.clone()
+        };
         cells
             .iter()
             .map(|cell_handle| {
                 let mut text = String::new();
-                let cell_ctx = super::super::super::Context {
-                    in_table_cell: true,
-                    ..ctx.clone()
-                };
                 if let Some(tl::Node::Tag(tag)) = cell_handle.get(parser) {
                     for child_handle in tag.children().top().iter() {
-                        super::super::super::walk_node(child_handle, parser, &mut text, options, &cell_ctx, 0, dom_ctx);
+                        super::super::super::walk_node(
+                            child_handle,
+                            parser,
+                            &mut text,
+                            options,
+                            &collect_ctx,
+                            0,
+                            dom_ctx,
+                        );
                     }
                 }
                 crate::text::normalize_whitespace_cow(&text).trim().to_string()
