@@ -130,6 +130,12 @@ pub struct Tier1State {
     /// `tier1::run` forwards the slice to `head_metadata::extract_frontmatter`
     /// so the YAML frontmatter pass still works without a `PrescanReport`.
     pub head_range: Option<std::ops::Range<usize>>,
+    /// Language code extracted from the current `<pre>` or its nested `<code>`
+    /// child's `class` attribute (`language-X` or `lang-X`).  Used by
+    /// `close_pre` to emit the language tag after the opening backtick fence.
+    /// Reset to `None` after each `</pre>` so nested same-level blocks don't
+    /// inherit a stale language.
+    pub pre_lang: Option<String>,
 }
 
 impl Tier1State {
@@ -148,6 +154,7 @@ impl Tier1State {
             table_stack: Vec::new(),
             link_stack: Vec::new(),
             head_range: None,
+            pre_lang: None,
         }
     }
 

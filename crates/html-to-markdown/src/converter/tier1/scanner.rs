@@ -132,7 +132,7 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                         parse::find_tag_close(bytes, name_end).ok_or(BailReason::LiteralLt { offset: pos })?;
 
                     let tag_name_bytes = &bytes[name_start..name_end];
-                    emit_close(&mut state, tag_name_bytes)?;
+                    emit_close(&mut state, tag_name_bytes, options)?;
 
                     pos = close_bracket.0 + 1;
                     text_start = pos;
@@ -293,6 +293,13 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                 // Bail on <pre> when code_block_style is not Indented.
                 // Tier-1 only implements 4-space indented code blocks; other styles
                 // (Backticks, Tildes) require Tier-2's fenced-block logic.
+                // Phase Q (partial): Tier-1's open_pre/close_pre now contain
+                // backtick-fence emission code, but the SVG/link handling
+                // diverges from Tier-2 on default-style fixtures that would
+                // newly route to Tier-1 (mdream/vuejs-docs.html etc.).  Until
+                // those divergences are fixed, keep the bail in place for
+                // any non-Indented style so the testkit-forced Tier-1 path
+                // still falls through to Tier-2 and oracle stays at 28/29.
                 if matches!(spec.kind, TagKind::Pre)
                     && options.code_block_style != crate::options::CodeBlockStyle::Indented
                 {
@@ -314,9 +321,12 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                 // common case; only collect for the kinds whose emit paths
                 // actually consult attributes.
                 let attrs: Vec<(&[u8], Option<&[u8]>)> = match spec.kind {
-                    TagKind::Link | TagKind::Image | TagKind::List(ListKind::Ordered) | TagKind::TableCell { .. } => {
-                        parse::collect_attrs(bytes, name_end, attrs_end)
-                    }
+                    TagKind::Link
+                    | TagKind::Image
+                    | TagKind::List(ListKind::Ordered)
+                    | TagKind::TableCell { .. }
+                    | TagKind::Pre
+                    | TagKind::Code => parse::collect_attrs(bytes, name_end, attrs_end),
                     _ => Vec::new(),
                 };
 
@@ -349,7 +359,7 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     if !spec_rules::should_close_for_new_tag(top.spec, spec) {
                         break;
                     }
-                    emit_close_for_implicit(&mut state)?;
+                    emit_close_for_implicit(&mut state, options)?;
                 }
 
                 // M9: Block-in-cell bail.
@@ -467,7 +477,7 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
         while matches!(buf.as_bytes().last(), Some(b' ' | b'\t' | b'\n' | b'\r')) {
             buf.pop();
         }
-        emit_close_for_implicit(&mut state)?;
+        emit_close_for_implicit(&mut state, options)?;
     }
 
     // Collapse runs of 3+ consecutive newlines to exactly 2, matching Tier-2's
@@ -815,7 +825,7 @@ fn emit_open(
         TagKind::Paragraph => open_paragraph(state),
         TagKind::Heading(_) => open_heading(state),
         TagKind::Blockquote => open_blockquote(state),
-        TagKind::Pre => open_pre(state),
+        TagKind::Pre => open_pre(state, attrs),
         TagKind::List(ListKind::Definition) => open_dl(state),
         TagKind::List(kind) => open_list(state, kind),
         TagKind::ListItem => open_list_item(state),
@@ -832,6 +842,13 @@ fn emit_open(
             if !state.escape_ctx.contains(EscapeCtx::PRE) => {
                 state.cell_or_output_mut().push('`');
             }
+        // When inside <pre>, a nested <code class="language-X"> contributes
+        // the language tag for the enclosing fence.
+        TagKind::Code if state.pre_lang.is_none() => {
+            if let Some(lang) = extract_language_from_class(attrs) {
+                state.pre_lang = Some(lang);
+            }
+        }
         TagKind::Link => open_link(state),
         TagKind::Table => open_table(state),
         TagKind::TableCaption => open_table_caption(state),
@@ -888,8 +905,29 @@ fn open_blockquote(state: &mut Tier1State) {
     state.ensure_blank_line();
 }
 
-fn open_pre(state: &mut Tier1State) {
+fn open_pre(state: &mut Tier1State, attrs: &[(&[u8], Option<&[u8]>)]) {
     state.ensure_blank_line();
+    // Capture language from <pre class="language-X">; nested <code class="...">
+    // can still override later if pre had no language hint.
+    if let Some(lang) = extract_language_from_class(attrs) {
+        state.pre_lang = Some(lang);
+    }
+}
+
+/// Extract the language tag from a `class` attribute matching `language-X`
+/// or `lang-X`.  Mirrors Tier-2's `extract_language_from_pre`.
+fn extract_language_from_class(attrs: &[(&[u8], Option<&[u8]>)]) -> Option<String> {
+    let class_bytes = find_attr(attrs, b"class")?;
+    let class = std::str::from_utf8(class_bytes).ok()?;
+    for cls in class.split_ascii_whitespace() {
+        if let Some(rest) = cls.strip_prefix("language-") {
+            return Some(rest.to_owned());
+        }
+        if let Some(rest) = cls.strip_prefix("lang-") {
+            return Some(rest.to_owned());
+        }
+    }
+    None
 }
 
 fn open_list(state: &mut Tier1State, kind: ListKind) {
@@ -1180,7 +1218,7 @@ fn eq_ascii_ignore_case(a: &[u8], b: &[u8]) -> bool {
 
 // ── Close-tag emission ────────────────────────────────────────────────────────
 
-fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailReason> {
+fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8], options: &ConversionOptions) -> Result<(), BailReason> {
     // Lowercase the tag name to look it up in the spec table.
     let mut name_buf = [0u8; MAX_TAG_NAME_BYTES];
     let name_lower = lowercase_into(tag_name_bytes, &mut name_buf);
@@ -1212,7 +1250,7 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
         }
         if top.spec.optional_close.is_some() {
             // This top-of-stack element has an optional close rule; implicitly close it.
-            emit_close_for_implicit(state)?;
+            emit_close_for_implicit(state, options)?;
         } else {
             // Top element does not have optional close and doesn't match — genuine mismatch.
             break;
@@ -1235,7 +1273,7 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
         TagKind::Paragraph => close_paragraph(state),
         TagKind::Heading(n) => close_heading(state, &frame, n, false)?,
         TagKind::Blockquote => close_blockquote(state, &frame),
-        TagKind::Pre => close_pre(state, &frame),
+        TagKind::Pre => close_pre(state, &frame, options),
         TagKind::Strong => close_inline_marker(state, &frame, "**"),
         TagKind::Emphasis => close_inline_marker(state, &frame, "*"),
         TagKind::Code => close_code(state),
@@ -1332,7 +1370,7 @@ fn close_inline_marker(state: &mut Tier1State, frame: &OpenTag, marker: &str) {
 /// Mirrors `emit_close` but skips the stack-pop search (we always close the
 /// literal top frame) and skips the tag-name lookup (we use the frame's spec
 /// directly).
-fn emit_close_for_implicit(state: &mut Tier1State) -> Result<(), BailReason> {
+fn emit_close_for_implicit(state: &mut Tier1State, options: &ConversionOptions) -> Result<(), BailReason> {
     let frame = state.stack.pop().ok_or_else(|| BailReason::DepthMismatch {
         tag: String::from("(implicit)"),
         expected: 1,
@@ -1347,7 +1385,7 @@ fn emit_close_for_implicit(state: &mut Tier1State) -> Result<(), BailReason> {
         TagKind::Paragraph => close_paragraph(state),
         TagKind::Heading(n) => close_heading(state, &frame, n, true)?,
         TagKind::Blockquote => close_blockquote(state, &frame),
-        TagKind::Pre => close_pre(state, &frame),
+        TagKind::Pre => close_pre(state, &frame, options),
         TagKind::Strong => close_inline_marker(state, &frame, "**"),
         TagKind::Emphasis => close_inline_marker(state, &frame, "*"),
         TagKind::Code => close_code(state),
@@ -1468,12 +1506,36 @@ fn close_blockquote(state: &mut Tier1State, frame: &OpenTag) {
     state.output.push_str(&prefixed);
 }
 
-fn close_pre(state: &mut Tier1State, frame: &OpenTag) {
-    // Indent every line by 4 spaces.
+fn close_pre(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptions) {
+    use crate::options::CodeBlockStyle;
     let raw = state.output[frame.content_start..].to_owned();
-    let indented = indent_pre_lines(&raw);
     state.output.truncate(frame.content_start);
-    state.output.push_str(&indented);
+    match options.code_block_style {
+        CodeBlockStyle::Indented => {
+            let indented = indent_pre_lines(&raw);
+            state.output.push_str(&indented);
+        }
+        CodeBlockStyle::Backticks => {
+            state.output.push_str("```");
+            if let Some(lang) = state.pre_lang.take() {
+                state.output.push_str(&lang);
+            } else if !options.code_language.is_empty() {
+                state.output.push_str(&options.code_language);
+            }
+            state.output.push('\n');
+            state.output.push_str(&raw);
+            state.output.push('\n');
+            state.output.push_str("```\n");
+        }
+        // Tildes are router-gated; this arm is unreachable in practice but
+        // kept exhaustive.
+        CodeBlockStyle::Tildes => {
+            let indented = indent_pre_lines(&raw);
+            state.output.push_str(&indented);
+        }
+    }
+    // Reset for the next <pre>.
+    state.pre_lang = None;
 }
 
 fn close_code(state: &mut Tier1State) {
