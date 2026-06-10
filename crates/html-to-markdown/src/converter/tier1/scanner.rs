@@ -1590,6 +1590,13 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag) {
     // Link state was pushed to state.link_stack at open; pop it now.
     let (href, title) = state.link_stack.pop().unwrap_or((None, None));
     let dest = state.cell_or_output_mut();
+    // Trim trailing whitespace inside the link label so `[text  ](url)`
+    // collapses to `[text](url)` — matches Tier-2's normalize_link_label
+    // at utility/content.rs:145 (kimbrain.html and similar source HTML
+    // with whitespace before </a>).
+    let trim_start = frame.content_start.min(dest.len());
+    let trimmed_end = dest[trim_start..].trim_end_matches(|c: char| c.is_whitespace()).len();
+    dest.truncate(trim_start + trimmed_end);
     if let Some(href) = href {
         if let Some(title) = title {
             // measured: write! is slower on this workload (Stage 5c)
