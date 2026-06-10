@@ -19,7 +19,6 @@ pub enum RouterDecision {
 ///
 /// # Structural / prescan gates (pre-existing)
 ///
-/// - `report.had_custom_elements` — custom elements require spec-edge handling
 /// - `report.had_cdata` — CDATA sections are not supported by Tier-1
 /// - `report.had_unescaped_lt` — bare `<` that the prescan escaped
 /// - `options.wrap` — wrapping logic lives in the Tier-2 path (for now)
@@ -39,6 +38,11 @@ pub enum RouterDecision {
 ///
 /// `options.keep_inline_images_in` (inline-images feature) is now handled
 /// natively in Tier-1; it no longer forces a Tier-2 route.
+///
+/// `report.had_custom_elements` no longer forces Tier-2 (Phase FF): the scanner
+/// passes unknown tags through transparently via `CUSTOM_ELEMENT_BLOCK_SPEC`,
+/// and Phase DD canonicalizes image alt/title entities for custom-element
+/// pages via a separate `has_custom_element_tags(html)` recheck in `scan()`.
 ///
 /// # Style-option gates (A1 — router style-option gate)
 ///
@@ -80,8 +84,7 @@ pub fn classify(report: &PrescanReport, options: &ConversionOptions) -> RouterDe
         PreprocessingPreset, UrlEscapeStyle, WhitespaceMode,
     };
 
-    if report.had_custom_elements
-        || report.had_cdata
+    if report.had_cdata
         || report.had_unescaped_lt
         || options.wrap
         || options.convert_as_inline
