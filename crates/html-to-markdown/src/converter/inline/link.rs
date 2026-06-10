@@ -75,16 +75,17 @@ pub fn handle(
         let decoded = crate::text::decode_html_entities(&v.as_utf8_str());
         sanitize_markdown_url(&decoded).into_owned()
     });
-    let title = tag
-        .attributes()
-        .get("title")
-        .flatten()
-        .map(|v| v.as_utf8_str().to_string());
+    // Hold title as a Cow borrowed from the tag's attribute bytes (Tier-2
+    // hot-spot pass III): avoids per-link String allocation when no entity
+    // decoding is needed.  Consumers below use `.as_deref()` (`Option<&str>`),
+    // which works the same for either Cow variant.
+    let title = tag.attributes().get("title").flatten().map(|v| v.as_utf8_str());
 
     if let Some(href) = href_attr {
-        let raw_text = crate::text::normalize_whitespace(&get_text_content(node_handle, parser, dom_ctx))
-            .trim()
-            .to_string();
+        // Hot-spot pass III: keep normalized text as owned-once + borrow trim
+        // result, instead of re-allocating via `trim().to_string()`.
+        let raw_text_owned = crate::text::normalize_whitespace(&get_text_content(node_handle, parser, dom_ctx));
+        let raw_text = raw_text_owned.trim();
 
         // If we're already inside a link, just render the text content, don't create a nested link
         if ctx.in_link {
@@ -102,12 +103,12 @@ pub fn handle(
             && !options.default_title
             && !href.is_empty()
             && has_uri_scheme(href.as_str())
-            && (raw_text == href || (href.starts_with("mailto:") && raw_text == href[7..]));
+            && (raw_text == href || (href.starts_with("mailto:") && raw_text == &href[7..]));
 
         if is_autolink {
             output.push('<');
-            if href.starts_with("mailto:") && raw_text == href[7..] {
-                output.push_str(&raw_text);
+            if href.starts_with("mailto:") && raw_text == &href[7..] {
+                output.push_str(raw_text);
             } else {
                 output.push_str(&href);
             }
@@ -148,7 +149,7 @@ pub fn handle(
                             &escaped_label,
                             href.as_str(),
                             title.as_deref(),
-                            raw_text.as_str(),
+                            raw_text,
                             options,
                             ctx.reference_collector.as_ref(),
                         );
@@ -231,7 +232,7 @@ pub fn handle(
         }
 
         if label.is_empty() && !raw_text.is_empty() {
-            label = normalize_link_label(&raw_text);
+            label = normalize_link_label(raw_text);
         }
 
         if label.is_empty() && !href.is_empty() && !children.is_empty() {
@@ -340,9 +341,13 @@ pub fn handle(
                     let value = value_opt.map(|v| v.to_string()).unwrap_or_default();
                     attributes_map.insert(key_str, value);
                 }
-                collector
-                    .borrow_mut()
-                    .add_link(href.clone(), label, title.clone(), rel_attr, attributes_map);
+                collector.borrow_mut().add_link(
+                    href.clone(),
+                    label,
+                    title.as_deref().map(str::to_string),
+                    rel_attr,
+                    attributes_map,
+                );
             }
         }
     } else {
