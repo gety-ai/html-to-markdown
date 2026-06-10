@@ -81,6 +81,10 @@ pub enum TagKind {
     /// `<summary>` — disclosure summary; content collected into a buffer and
     /// emitted as `**…**\n\n` (strong-wrap).
     Summary,
+    /// `<figcaption>` — figure caption; content collected into a buffer and
+    /// emitted as `*…*\n\n` (italic-wrap). Mirrors Tier-2's
+    /// `semantic/figure.rs::handle_figcaption`.
+    Figcaption,
     /// `<button>` — clickable button. Tier-2 (`form/elements.rs:592-594`)
     /// emits `\n\n` after the button's content in block mode but no leading
     /// separator; mirror with close-only block-separator semantics.
@@ -298,7 +302,7 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
     b"summary" => block(TagKind::Summary),
     b"dialog"  => block(TagKind::Block),
     b"figure"  => block(TagKind::Block),
-    b"figcaption" => block(TagKind::Block),
+    b"figcaption" => block(TagKind::Figcaption),
 
     // ── Paragraph ────────────────────────────────────────────────────────────
     b"p" => block_opt(TagKind::Paragraph, OptionalCloseRule::CloseOnBlockChild),

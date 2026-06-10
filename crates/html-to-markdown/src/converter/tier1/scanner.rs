@@ -420,6 +420,7 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                         TagKind::Paragraph
                             | TagKind::Block
                             | TagKind::Summary
+                            | TagKind::Figcaption
                             | TagKind::List(_)
                             | TagKind::ListItem
                             | TagKind::Heading(_)
@@ -894,7 +895,11 @@ fn emit_open(
             // strong markers.  Mirror that by not pushing `**` when inside
             // a summary, so `<strong>b</strong>` inside `<summary>` emits
             // just `b` instead of `**b**`.
-            if !state.in_summary() {
+            // Phase FF-2: figcaption uses the same buffer stack but
+            // Tier-2 does NOT set in_strong for figcaption children, so
+            // emit `**` normally when the topmost wrap-buf is a
+            // figcaption (or there's no wrap-buf at all).
+            if !state.summary_at_top() {
                 state.cell_or_output_mut().push_str("**");
             }
         }
@@ -948,6 +953,10 @@ fn emit_open(
         }
         // Summary: push accumulation buffer so children redirect into it (Phase R).
         TagKind::Summary => open_summary(state),
+        // Figcaption: same buffer mechanism as summary (Phase FF-2); the
+        // wrap delimiter differs (`*…*` vs `**…**`) and is emitted by
+        // close_figcaption.
+        TagKind::Figcaption => open_figcaption(state),
         // Button: no leading separator (matches Tier-2 handle_button which
         // does nothing on open).  Close-side `\n\n` is emitted by close_button.
         TagKind::Button => {}
@@ -1424,7 +1433,7 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8], options: &Conversio
         TagKind::Blockquote => close_blockquote(state, &frame),
         TagKind::Pre => close_pre(state, &frame, options),
         // Strong: suppress close marker when inside summary (see open strong guard).
-        TagKind::Strong if state.in_summary() => {}
+        TagKind::Strong if state.summary_at_top() => {}
         TagKind::Strong => close_inline_marker(state, &frame, "**"),
         TagKind::Emphasis => close_inline_marker(state, &frame, "*"),
         // Strikethrough: also transparent inside <code>/<pre>; mirrors open guard.
@@ -1461,6 +1470,8 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8], options: &Conversio
         TagKind::Block => close_block_container(state, &frame),
         // Summary: pop accumulation buffer, trim, emit `**…**\n\n` (Phase R).
         TagKind::Summary => close_summary(state, &frame),
+        // Figcaption: pop accumulation buffer, trim, emit `*…*\n\n` (Phase FF-2).
+        TagKind::Figcaption => close_figcaption(state, &frame),
         // Button (Phase T): emit `\n\n` when content was produced — mirrors
         // Tier-2 `form/elements.rs:592-594`.  No leading separator on open.
         TagKind::Button => close_button(state, &frame),
@@ -1523,7 +1534,7 @@ fn close_block_container(state: &mut Tier1State, frame: &OpenTag) {
 /// No leading separator is emitted on open; deferred to `close_summary`
 /// once we know whether the content is non-empty.
 fn open_summary(state: &mut Tier1State) {
-    state.push_summary_buf();
+    state.push_summary_buf(crate::converter::tier1::state::WrapKind::Summary);
 }
 
 /// Close a `<summary>` element.
@@ -1569,6 +1580,48 @@ fn close_summary(state: &mut Tier1State, _frame: &OpenTag) {
     dest.push_str("**");
     dest.push_str(trimmed);
     dest.push_str("**\n\n");
+}
+
+// ── Figcaption italic-wrap (Phase FF-2) ──────────────────────────────────────
+
+/// Open a `<figcaption>` element.
+///
+/// Reuses the summary accumulation buffer stack — children write into it,
+/// `close_figcaption` pops + wraps with `*…*\n\n` (vs Summary's `**…**`).
+fn open_figcaption(state: &mut Tier1State) {
+    state.push_summary_buf(crate::converter::tier1::state::WrapKind::Figcaption);
+}
+
+/// Close a `<figcaption>` element.
+///
+/// Mirrors Tier-2's `semantic/figure.rs::handle_figcaption`:
+/// - collect children into a local buffer
+/// - trim
+/// - prepend single-space-or-blank-line separator
+/// - emit `*{trimmed}*\n\n`
+///
+/// An empty/whitespace-only caption emits nothing (Tier-2 returns early).
+fn close_figcaption(state: &mut Tier1State, _frame: &OpenTag) {
+    let buf = match state.pop_summary_buf() {
+        Some(b) => b,
+        None => return,
+    };
+    let trimmed = buf.trim();
+    if trimmed.is_empty() {
+        return;
+    }
+    let writing_to_cell = state.in_table_cell();
+    let dest = state.cell_or_output_mut();
+    if !writing_to_cell && !dest.is_empty() && !dest.ends_with("\n\n") {
+        if dest.ends_with('\n') {
+            dest.push('\n');
+        } else {
+            dest.push_str("\n\n");
+        }
+    }
+    dest.push('*');
+    dest.push_str(trimmed);
+    dest.push_str("*\n\n");
 }
 
 /// Close a `<button>` (Phase T).  When the button produced visible content,
@@ -1651,7 +1704,7 @@ fn emit_close_for_implicit(state: &mut Tier1State, options: &ConversionOptions) 
         TagKind::Blockquote => close_blockquote(state, &frame),
         TagKind::Pre => close_pre(state, &frame, options),
         // Strong: suppress close marker when inside summary (see open strong guard).
-        TagKind::Strong if state.in_summary() => {}
+        TagKind::Strong if state.summary_at_top() => {}
         TagKind::Strong => close_inline_marker(state, &frame, "**"),
         TagKind::Emphasis => close_inline_marker(state, &frame, "*"),
         // Strikethrough: also transparent inside <code>/<pre>; mirrors open guard.
@@ -1672,6 +1725,8 @@ fn emit_close_for_implicit(state: &mut Tier1State, options: &ConversionOptions) 
         TagKind::TableRow => close_table_row(state),
         // Summary: pop accumulation buffer, trim, emit `**…**\n\n` (Phase R).
         TagKind::Summary => close_summary(state, &frame),
+        // Figcaption: pop accumulation buffer, trim, emit `*…*\n\n` (Phase FF-2).
+        TagKind::Figcaption => close_figcaption(state, &frame),
         // Button (Phase T): emit `\n\n` on EOF close just like explicit close.
         TagKind::Button => close_button(state, &frame),
         // Generic block/inline: no closing marker.

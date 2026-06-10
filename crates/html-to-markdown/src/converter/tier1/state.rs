@@ -98,6 +98,23 @@ pub struct OpenTag {
 /// Minimum capacity for each summary accumulation buffer.
 const SUMMARY_BUF_CAPACITY: usize = 64;
 
+/// Discriminator for entries in the wrap-buffer stack.
+///
+/// Both `<summary>` (Phase R) and `<figcaption>` (Phase FF-2) collect
+/// children into an accumulation buffer before wrapping with delimiters,
+/// but they differ on strong-marker suppression: Tier-2 sets
+/// `in_strong: true` for summary children (suppresses nested `**…**`)
+/// but uses the default context for figcaption children.  Tag each
+/// buffer with its kind so `Tier1State::summary_at_top` can answer the
+/// suppression check correctly.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WrapKind {
+    /// `<summary>` strong-wrap buffer.
+    Summary,
+    /// `<figcaption>` italic-wrap buffer.
+    Figcaption,
+}
+
 /// Mutable state threaded through the entire Tier-1 scan pass.
 pub struct Tier1State {
     /// Open-tag stack; one frame per currently-open element.
@@ -139,15 +156,22 @@ pub struct Tier1State {
     /// Reset to `None` after each `</pre>` so nested same-level blocks don't
     /// inherit a stale language.
     pub pre_lang: Option<String>,
-    /// Stack of `<summary>` accumulation buffers.
+    /// Stack of `<summary>` and `<figcaption>` accumulation buffers.
     ///
-    /// Pushed when a non-cell `<summary>` opens; all child text accumulates
-    /// here instead of in `output`.  On `</summary>`, the buffer is popped,
-    /// trimmed, and emitted as `**…**\n\n` into the parent destination.
+    /// Pushed when a non-cell `<summary>`/`<figcaption>` opens; all child
+    /// text accumulates here instead of in `output`.  On close, the buffer
+    /// is popped, trimmed, and emitted with the wrap delimiters into the
+    /// parent destination (`**…**\n\n` for Summary, `*…*\n\n` for
+    /// Figcaption).
     ///
-    /// A stack (rather than a single `Option`) handles pathological nested
-    /// `<summary>` input without panicking.
-    pub summary_buf_stack: Vec<String>,
+    /// Each entry carries a [`WrapKind`] discriminator so the strong-marker
+    /// suppression in scanner.rs can distinguish "currently inside a
+    /// summary" from "currently inside a figcaption" — Tier-2 only sets the
+    /// `in_strong: true` collection context for summary children.
+    ///
+    /// A stack (rather than a single `Option`) handles pathological nesting
+    /// without panicking.
+    pub summary_buf_stack: Vec<(WrapKind, String)>,
     /// Tier-2 runs HTML through an html5ever roundtrip when the source
     /// contains custom-element tags; the roundtrip canonicalizes
     /// attribute entities (e.g. `&#x22;` → `&quot;`).  Tier-1 sets this
@@ -193,7 +217,7 @@ impl Tier1State {
     ///
     /// This is the single dispatch point for "where does inline text land."
     pub fn cell_or_output_mut(&mut self) -> &mut String {
-        if let Some(buf) = self.summary_buf_stack.last_mut() {
+        if let Some((_, buf)) = self.summary_buf_stack.last_mut() {
             return buf;
         }
         if let Some(ts) = self.table_stack.last_mut() {
@@ -207,20 +231,36 @@ impl Tier1State {
         &mut self.output
     }
 
-    /// True when the scanner is currently accumulating `<summary>` content.
+    /// True when the scanner is currently accumulating `<summary>` or
+    /// `<figcaption>` content (any wrap-buffer is on the stack).
+    ///
+    /// Whitespace and text-normalization paths use this — both wrap kinds
+    /// share the same collection-mode semantics.
     #[must_use]
     pub fn in_summary(&self) -> bool {
         !self.summary_buf_stack.is_empty()
     }
 
-    /// Push a fresh summary accumulation buffer onto the stack.
-    pub fn push_summary_buf(&mut self) {
-        self.summary_buf_stack.push(String::with_capacity(SUMMARY_BUF_CAPACITY));
+    /// True when the topmost wrap-buffer is specifically a `<summary>`
+    /// (Phase R), as opposed to a `<figcaption>` (Phase FF-2).
+    ///
+    /// Used to suppress nested `**…**` strong markers, since Tier-2 only
+    /// sets `in_strong: true` for summary children.
+    #[must_use]
+    pub fn summary_at_top(&self) -> bool {
+        matches!(self.summary_buf_stack.last(), Some((WrapKind::Summary, _)))
     }
 
-    /// Pop the top summary accumulation buffer and return it.
+    /// Push a fresh wrap accumulation buffer onto the stack, tagged with
+    /// the given [`WrapKind`].
+    pub fn push_summary_buf(&mut self, kind: WrapKind) {
+        self.summary_buf_stack
+            .push((kind, String::with_capacity(SUMMARY_BUF_CAPACITY)));
+    }
+
+    /// Pop the top wrap accumulation buffer and return it (kind discarded).
     pub fn pop_summary_buf(&mut self) -> Option<String> {
-        self.summary_buf_stack.pop()
+        self.summary_buf_stack.pop().map(|(_, buf)| buf)
     }
 
     /// True when the scanner is currently accumulating `<caption>` content.
