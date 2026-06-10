@@ -256,6 +256,27 @@ fn handles_definition_list_inline() {
 }
 
 #[test]
+fn handles_link_text_across_newline() {
+    // Phase Q.3: text inside an `<a>` that spans a newline (e.g. pretty-printed
+    // HTML wrapping link text across lines) must collapse the newline to a
+    // single space, matching Tier-2's `normalize_link_label`.  Tier-1's
+    // text-handler previously preserved the newline verbatim, producing
+    // `[Skip to main\n  content](...)` instead of `[Skip to main content](...)`.
+    let html = "<a href=\"#main-content\">Skip to main\n  content</a>";
+    assert!(tier1_run(html).is_ok());
+    assert_eq!(force_tier1(html), tier2(html));
+}
+
+#[test]
+fn handles_strong_text_across_newline() {
+    // Q.3 sanity: `<strong>` does NOT normalize newlines (only `<a>` does).
+    // Tier-2 keeps the literal newline in strong text.
+    let html = "<p><strong>bold\ntext</strong></p>";
+    assert!(tier1_run(html).is_ok());
+    assert_eq!(force_tier1(html), tier2(html));
+}
+
+#[test]
 fn handles_script_inline() {
     // Phase B: scanner skips `<script>` content inline by jumping to the
     // matching close tag.  Prescan also pre-strips script content

@@ -1979,25 +1979,43 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
         return Ok(());
     }
 
+    // Inside an `<a>` link frame, Tier-2's `normalize_link_label` replaces
+    // newlines with spaces before whitespace collapsing.  Mirror that here so
+    // text spanning `\n` inside an `<a>` (e.g. `<a>Skip to main\n  content</a>`)
+    // collapses to `[Skip to main content]` instead of leaking the newline.
+    // `<strong>`/`<em>` do NOT normalize newlines in Tier-2 — only links do.
+    let inside_inline = state.stack.iter().any(|frame| matches!(frame.spec.kind, TagKind::Link));
+
     // Outside `<pre>`: collapse runs of space/tab into a single space, decode
-    // entities, write directly into the output (or cell) buffer.  Newlines preserved.
+    // entities, write directly into the output (or cell) buffer.  Newlines preserved
+    // unless inside an inline frame (see above).
     if !has_entities {
         // No entities. Quick check: does this text have collapsible whitespace?
-        // Use a fast memchr2 to find the first space/tab; if not found, we can
-        // take the hot path. If found, check if it's followed by another space/tab.
-        if memchr::memchr2(b' ', b'\t', raw.as_bytes()).is_none() {
-            // No whitespace at all; safe to push as-is.
+        // Use a fast memchr2/3 to find the first space/tab(/newline); if not
+        // found, we can take the hot path.
+        let needle_present = if inside_inline {
+            memchr3(b' ', b'\t', b'\n', raw.as_bytes()).is_some()
+        } else {
+            memchr::memchr2(b' ', b'\t', raw.as_bytes()).is_some()
+        };
+        if !needle_present {
             state.cell_or_output_mut().push_str(raw);
             return Ok(());
         }
-        // Has whitespace; check if it's collapsible (double) by running
-        // the collapse logic.
         let dest = state.cell_or_output_mut();
-        return decode_and_collapse_into(dest, raw, false, base_offset);
+        return if inside_inline {
+            decode_and_collapse_into_inline(dest, raw, false, base_offset)
+        } else {
+            decode_and_collapse_into(dest, raw, false, base_offset)
+        };
     }
 
     let dest = state.cell_or_output_mut();
-    decode_and_collapse_into(dest, raw, has_entities, base_offset)
+    if inside_inline {
+        decode_and_collapse_into_inline(dest, raw, has_entities, base_offset)
+    } else {
+        decode_and_collapse_into(dest, raw, has_entities, base_offset)
+    }
 }
 
 /// Decode HTML entities directly into `out` (no intermediate allocation).
@@ -2044,15 +2062,47 @@ fn decode_and_collapse_into(
     has_entities: bool,
     base_offset: usize,
 ) -> Result<(), BailReason> {
+    decode_and_collapse_into_inner(out, s, has_entities, base_offset, false)
+}
+
+/// Collapse like `decode_and_collapse_into` but treat `\n`/`\r` as collapsible
+/// whitespace too.  Used for text inside `<a>`/`<strong>`/`<em>` frames where
+/// Tier-2's `normalize_link_label` first replaces newlines with spaces, then
+/// runs whitespace normalization.
+fn decode_and_collapse_into_inline(
+    out: &mut String,
+    s: &str,
+    has_entities: bool,
+    base_offset: usize,
+) -> Result<(), BailReason> {
+    decode_and_collapse_into_inner(out, s, has_entities, base_offset, true)
+}
+
+fn decode_and_collapse_into_inner(
+    out: &mut String,
+    s: &str,
+    has_entities: bool,
+    base_offset: usize,
+    collapse_newlines: bool,
+) -> Result<(), BailReason> {
     let bytes = s.as_bytes();
     let mut i = 0;
     let mut prev_was_space = false;
     while i < bytes.len() {
-        // Fast path: use memchr3 to find next special byte (space/tab/&).
-        let next_special = if has_entities {
-            memchr3(b' ', b'\t', b'&', &bytes[i..]).map(|pos| i + pos)
-        } else {
-            memchr::memchr2(b' ', b'\t', &bytes[i..]).map(|pos| i + pos)
+        let next_special = match (has_entities, collapse_newlines) {
+            (true, true) => {
+                // Cold path: inline frame with entities. Find min of two memchr3 calls.
+                let s_pos = memchr3(b' ', b'\t', b'\n', &bytes[i..]).map(|pos| i + pos);
+                let e_pos = memchr::memchr(b'&', &bytes[i..]).map(|pos| i + pos);
+                match (s_pos, e_pos) {
+                    (Some(a), Some(b)) => Some(a.min(b)),
+                    (Some(a), None) | (None, Some(a)) => Some(a),
+                    (None, None) => None,
+                }
+            }
+            (true, false) => memchr3(b' ', b'\t', b'&', &bytes[i..]).map(|pos| i + pos),
+            (false, true) => memchr3(b' ', b'\t', b'\n', &bytes[i..]).map(|pos| i + pos),
+            (false, false) => memchr::memchr2(b' ', b'\t', &bytes[i..]).map(|pos| i + pos),
         };
 
         if let Some(pos) = next_special {
@@ -2062,6 +2112,13 @@ fn decode_and_collapse_into(
             }
             match bytes[pos] {
                 b' ' | b'\t' => {
+                    if !prev_was_space {
+                        out.push(' ');
+                    }
+                    prev_was_space = true;
+                    i = pos + 1;
+                }
+                b'\n' if collapse_newlines => {
                     if !prev_was_space {
                         out.push(' ');
                     }
