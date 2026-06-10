@@ -31,6 +31,10 @@ pub enum TagKind {
     Strong,
     /// Italic/emphasis (`<em>`, `<i>`).
     Emphasis,
+    /// Strikethrough (`<del>`, `<s>`, `<strike>`).  Emits `~~content~~` in
+    /// GFM/CommonMark output.  Mirrors Tier-2's
+    /// `inline/semantic/marks.rs::handle_strikethrough`.
+    Strikethrough,
     /// Inline `code`.
     Code,
     /// `<br>` — forces a line break.
@@ -326,9 +330,9 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
     b"b"      => inline(TagKind::Strong),
     b"em"     => inline(TagKind::Emphasis),
     b"i"      => inline(TagKind::Emphasis),
-    b"s"      => inline(TagKind::Inline),
-    b"del"    => inline(TagKind::Inline),
-    b"strike" => inline(TagKind::Inline),
+    b"s"      => inline(TagKind::Strikethrough),
+    b"del"    => inline(TagKind::Strikethrough),
+    b"strike" => inline(TagKind::Strikethrough),
     b"u"      => inline(TagKind::Inline),
     b"ins"    => inline(TagKind::Inline),
 
