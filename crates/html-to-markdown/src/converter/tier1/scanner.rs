@@ -857,8 +857,17 @@ fn emit_open(
         TagKind::TableFoot => open_table_foot(state),
         TagKind::TableRow => open_table_row(state),
         TagKind::TableCell { is_header } => open_table_cell(state, attrs, is_header)?,
-        // Block containers: just track them on the stack (no inline marker).
-        TagKind::Block | TagKind::Inline => {}
+        // Block containers: emit a leading blank-line separator when there's
+        // already preceding content.  Mirrors Tier-2's div/sectioning handlers
+        // (block/div.rs:88, semantic/sectioning.rs:71) which prefix block
+        // content with `\n\n` to separate from siblings.  Skipped in table
+        // cells (cells stay on one logical line).
+        TagKind::Block => {
+            if !state.in_table_cell() {
+                state.ensure_blank_line();
+            }
+        }
+        TagKind::Inline => {}
         // All other kinds (LineBreak, Hr, Image, etc.) are void — they never
         // reach emit_open because the void/self-closing branch fires first.
         _ => {}
