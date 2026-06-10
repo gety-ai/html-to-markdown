@@ -122,3 +122,14 @@ fn summary_inside_table_cell_transparent() {
     </table>";
     assert_matches_tier2(html);
 }
+
+/// Phase R-3: mdn-array fixture pattern — multi-line indented summary content
+/// with a single `<div>` containing inline children must collapse newlines
+/// and inter-tag whitespace to single spaces under the strong-wrap.  Without
+/// the R-3 fix Tier-1 emits `**Baseline\n \n Widely available\n \n ***`
+/// instead of T2's `**Baseline Widely available  ***`.
+#[test]
+fn summary_multiline_indented_div_with_span() {
+    let html = "<summary>\n        <div class=\"status-title\">\n\n                Baseline\n                <span class=\"not-bold\">\n                  Widely available\n                </span>\n                 *\n\n        </div>\n      </summary>";
+    assert_matches_tier2(html);
+}

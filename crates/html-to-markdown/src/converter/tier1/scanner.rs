@@ -2156,16 +2156,25 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
     // (it becomes the single space after `normalize_whitespace`).  Only
     // post-content paragraphs see "\n\n" before them, which the
     // `output.ends_with('\n')` check above already handles.
+    // Phase R-3: inside `<summary>`, any tag's body-start is also an inline
+    // frame edge.  Tier-2's handle_summary collects all children with
+    // text-normalization in effect; leading whitespace inside `<span>`,
+    // `<div>`, `<p>` (etc.) bodies gets stripped just like inside `<a>`.
+    let in_summary_snapshot = state.in_summary();
     let at_inline_frame_start = match state.stack.last() {
         Some(frame) => {
             let cs = frame.content_start;
             let kind = frame.spec.kind;
             let buf_len = state.cell_or_output_mut().len();
             cs >= buf_len
-                && matches!(
+                && (matches!(
                     kind,
                     TagKind::Link | TagKind::Strong | TagKind::Emphasis | TagKind::Code
-                )
+                ) || (in_summary_snapshot
+                    && matches!(
+                        kind,
+                        TagKind::Inline | TagKind::Block | TagKind::Paragraph | TagKind::Heading(_)
+                    )))
         }
         None => false,
     };
@@ -2284,7 +2293,14 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
     // text spanning `\n` inside an `<a>` (e.g. `<a>Skip to main\n  content</a>`)
     // collapses to `[Skip to main content]` instead of leaking the newline.
     // `<strong>`/`<em>` do NOT normalize newlines in Tier-2 — only links do.
-    let inside_inline = state.stack.iter().any(|frame| matches!(frame.spec.kind, TagKind::Link));
+    //
+    // `<summary>` is treated the same as `<a>` here (Phase R-3): Tier-2's
+    // handle_summary collects children into a local content buffer and
+    // wraps in `**...**\n\n`; the surrounding text-normalization layer
+    // collapses internal newline runs to single spaces before emission.
+    // Without this, summary content with multi-line inline children leaks
+    // `\n  \n  ` between text runs.
+    let inside_inline = state.in_summary() || state.stack.iter().any(|frame| matches!(frame.spec.kind, TagKind::Link));
 
     // Outside `<pre>`: collapse runs of space/tab into a single space, decode
     // entities, write directly into the output (or cell) buffer.  Newlines preserved
