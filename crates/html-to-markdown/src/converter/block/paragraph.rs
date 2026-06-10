@@ -113,9 +113,9 @@ pub fn handle(
             // `content_start_pos` pointing at the interior of a multibyte character.
             // Clamp to the nearest valid char boundary to avoid a slice panic (#380).
             let safe_start = crate::converter::utility::content::floor_char_boundary(output, content_start_pos);
-            let text = output[safe_start..].trim().to_string();
+            let text = output[safe_start..].trim();
             if !text.is_empty() {
-                sc.borrow_mut().push_paragraph(&text);
+                sc.borrow_mut().push_paragraph(text);
             }
         }
     }
