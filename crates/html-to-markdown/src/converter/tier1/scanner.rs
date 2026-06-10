@@ -354,6 +354,8 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                             | TagKind::List(_)
                             | TagKind::ListItem
                             | TagKind::Heading(_)
+                            | TagKind::DefinitionTerm
+                            | TagKind::DefinitionDescription
                     );
                     if !inlineable {
                         return Err(BailReason::TableBlockChildInCell);
@@ -758,10 +760,6 @@ fn find_raw_text_close(bytes: &[u8], open_end: usize, tag_name: &[u8]) -> Option
 #[inline]
 const fn bail_unsupported(spec: &TagSpec, _offset: usize) -> Result<(), BailReason> {
     match spec.kind {
-        TagKind::DefinitionTerm | TagKind::DefinitionDescription | TagKind::List(ListKind::Definition) => {
-            Err(BailReason::Classifier)
-        }
-
         // Raw-text content tags are handled inline by the main scan loop
         // (see find_raw_text_close).  They never reach this point in practice;
         // listed here only to make the match exhaustive over TagKind::RawText.
@@ -789,8 +787,11 @@ fn emit_open(
         TagKind::Heading(_) => open_heading(state),
         TagKind::Blockquote => open_blockquote(state),
         TagKind::Pre => open_pre(state),
+        TagKind::List(ListKind::Definition) => open_dl(state),
         TagKind::List(kind) => open_list(state, kind),
         TagKind::ListItem => open_list_item(state),
+        TagKind::DefinitionTerm => open_dt(state),
+        TagKind::DefinitionDescription => open_dd(state),
         TagKind::Strong => {
             state.cell_or_output_mut().push_str("**");
         }
@@ -1210,8 +1211,11 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
         TagKind::Emphasis => close_inline_marker(state, &frame, "*"),
         TagKind::Code => close_code(state),
         TagKind::Link => close_link(state, &frame),
+        TagKind::List(ListKind::Definition) => close_dl(state, &frame),
         TagKind::List(kind) => close_list(state, kind),
         TagKind::ListItem => close_list_item(state),
+        TagKind::DefinitionTerm => close_dt(state),
+        TagKind::DefinitionDescription => close_dd(state),
         TagKind::Hr => {
             // Should not happen (hr is void), but handle gracefully.
         }
@@ -1235,7 +1239,7 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
         // Void-only kinds that never have open frames:
         TagKind::LineBreak | TagKind::Image => {}
         // Explicitly no-op: all remaining known kinds not listed above.
-        TagKind::DefinitionTerm | TagKind::DefinitionDescription | TagKind::RawText(_) | TagKind::Ignored => {}
+        TagKind::RawText(_) | TagKind::Ignored => {}
     }
 
     Ok(())
@@ -1319,8 +1323,11 @@ fn emit_close_for_implicit(state: &mut Tier1State) -> Result<(), BailReason> {
         TagKind::Emphasis => close_inline_marker(state, &frame, "*"),
         TagKind::Code => close_code(state),
         TagKind::Link => close_link(state, &frame),
+        TagKind::List(ListKind::Definition) => close_dl(state, &frame),
         TagKind::List(kind) => close_list(state, kind),
         TagKind::ListItem => close_list_item(state),
+        TagKind::DefinitionTerm => close_dt(state),
+        TagKind::DefinitionDescription => close_dd(state),
         TagKind::TableCell { .. } => close_table_cell(state, true)?,
         TagKind::TableRow => close_table_row(state),
         // Generic block/inline: no closing marker.
@@ -1334,8 +1341,6 @@ fn emit_close_for_implicit(state: &mut Tier1State) -> Result<(), BailReason> {
         | TagKind::TableBody
         | TagKind::TableFoot
         | TagKind::TableCaption
-        | TagKind::DefinitionTerm
-        | TagKind::DefinitionDescription
         | TagKind::RawText(_)
         | TagKind::Ignored => {}
     }
@@ -1507,6 +1512,98 @@ fn close_list_item(state: &mut Tier1State) {
     }
     trim_trailing_inline_whitespace(state);
     state.ensure_newline();
+}
+
+// ── Definition-list helpers ───────────────────────────────────────────────────
+//
+// Tier-2 reference: crates/html-to-markdown/src/converter/list/definition.rs.
+// Tier-2 builds the full <dl> content in a buffer, trims it, then emits with
+// "\n\n" boundaries. <dt> emits trimmed term + "\n"; <dd> emits trimmed
+// description + "\n\n". Tier-1 streams the same shape by:
+//   - open_dl: ensure blank line; record content_start on the frame
+//   - close_dt: trim trailing whitespace, push "\n"
+//   - close_dd: trim trailing whitespace, push "\n\n"
+//   - close_dl: trim leading/trailing whitespace inside the dl range, then
+//               normalise the trailing separator to "\n\n"
+//
+// Bails on dl/dt/dd are removed (see bail_unsupported). Implicit close of an
+// open dt/dd when a sibling dt/dd opens is wired via OptionalCloseRule::
+// CloseSiblingDtDd in spec_rules.rs and runs the same close_dt/close_dd path
+// through emit_close_for_implicit.
+
+fn open_dl(state: &mut Tier1State) {
+    if state.in_table_cell() {
+        return;
+    }
+    state.ensure_blank_line();
+}
+
+const fn open_dt(_state: &mut Tier1State) {
+    // No marker; content streams into the current buffer. close_dt adds the
+    // trailing newline.
+}
+
+const fn open_dd(_state: &mut Tier1State) {
+    // No marker; content streams into the current buffer. close_dd adds the
+    // trailing paragraph separator.
+}
+
+fn close_dt(state: &mut Tier1State) {
+    if state.in_table_cell() {
+        return;
+    }
+    trim_trailing_inline_whitespace(state);
+    let buf = state.cell_or_output_mut();
+    if buf.is_empty() || buf.ends_with('\n') {
+        return;
+    }
+    buf.push('\n');
+}
+
+fn close_dd(state: &mut Tier1State) {
+    if state.in_table_cell() {
+        return;
+    }
+    trim_trailing_inline_whitespace(state);
+    let buf = state.cell_or_output_mut();
+    if buf.is_empty() {
+        return;
+    }
+    // Normalise to exactly "\n\n" at the end.
+    if buf.ends_with("\n\n") {
+        return;
+    }
+    if buf.ends_with('\n') {
+        buf.push('\n');
+    } else {
+        buf.push_str("\n\n");
+    }
+}
+
+fn close_dl(state: &mut Tier1State, frame: &OpenTag) {
+    if state.in_table_cell() {
+        return;
+    }
+    let buf = state.cell_or_output_mut();
+    // Empty dl: emit nothing (matches Tier-2 which skips when trimmed content
+    // is empty).
+    if buf.len() <= frame.content_start {
+        return;
+    }
+    // Tier-2 trims the dl's accumulated content, so any trailing whitespace
+    // from the last dt/dd close should collapse to a single "\n\n" separator.
+    while buf.len() > frame.content_start {
+        let last = buf.as_bytes()[buf.len() - 1];
+        if matches!(last, b' ' | b'\t' | b'\n' | b'\r') {
+            buf.pop();
+        } else {
+            break;
+        }
+    }
+    if buf.len() == frame.content_start {
+        return;
+    }
+    buf.push_str("\n\n");
 }
 
 fn close_table(state: &mut Tier1State) -> Result<(), BailReason> {

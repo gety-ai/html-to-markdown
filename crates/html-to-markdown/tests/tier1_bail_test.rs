@@ -257,13 +257,12 @@ fn table_now_handled_by_tier1() {
 }
 
 #[test]
-fn bails_on_definition_list() {
+fn handles_definition_list_inline() {
+    // Phase K: scanner emits <dl>/<dt>/<dd> natively, matching Tier-2's
+    // plain-block format (no Pandoc colon syntax). dt → trimmed + "\n";
+    // dd → trimmed + "\n\n"; dl wrapper trims and ensures "\n\n" boundaries.
     let html = "<dl><dt>key</dt><dd>value</dd></dl>";
-    let err = tier1_run(html).unwrap_err();
-    assert!(
-        matches!(err, BailReason::Classifier),
-        "expected Classifier, got {err:?}"
-    );
+    assert!(tier1_run(html).is_ok(), "Tier-1 should handle dl inline (no bail)");
     assert_eq!(force_tier1(html), tier2(html));
 }
 
