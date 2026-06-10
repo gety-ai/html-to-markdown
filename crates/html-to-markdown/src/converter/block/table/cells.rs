@@ -261,6 +261,14 @@ pub fn convert_table_row(
         }
     }
 
+    // Build the per-cell context once for the entire row.  Tier-2 hot-spot
+    // pass III: avoids cloning `Context` (which holds several Rc<HashSet> and
+    // optional collector handles) on every cell in wikipedia-class tables.
+    let cell_ctx = super::super::super::Context {
+        in_table_cell: true,
+        ..ctx.clone()
+    };
+
     if has_span {
         let mut col_index = 0;
         let mut cell_iter = cells.iter();
@@ -289,7 +297,16 @@ pub fn convert_table_row(
 
             if let Some(cell_handle) = cell_iter.next() {
                 let col_width = col_widths.get(col_index).copied();
-                convert_table_cell(cell_handle, parser, &mut row_text, options, ctx, "", dom_ctx, col_width);
+                convert_table_cell(
+                    cell_handle,
+                    parser,
+                    &mut row_text,
+                    options,
+                    &cell_ctx,
+                    "",
+                    dom_ctx,
+                    col_width,
+                );
 
                 let (colspan, rowspan) = get_colspan_rowspan(cell_handle, parser);
 
@@ -305,7 +322,16 @@ pub fn convert_table_row(
     } else {
         for (cell_idx, cell_handle) in cells.iter().enumerate() {
             let col_width = col_widths.get(cell_idx).copied();
-            convert_table_cell(cell_handle, parser, &mut row_text, options, ctx, "", dom_ctx, col_width);
+            convert_table_cell(
+                cell_handle,
+                parser,
+                &mut row_text,
+                options,
+                &cell_ctx,
+                "",
+                dom_ctx,
+                col_width,
+            );
         }
     }
 

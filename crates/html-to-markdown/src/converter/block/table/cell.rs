@@ -191,17 +191,14 @@ pub fn convert_table_cell(
     parser: &tl::Parser,
     output: &mut String,
     options: &crate::options::ConversionOptions,
-    ctx: &super::super::super::Context,
+    // Caller passes a context with `in_table_cell = true` already set, so we
+    // avoid cloning it per cell (hot path on wikipedia-class tables).
+    cell_ctx: &super::super::super::Context,
     _tag_name: &str,
     dom_ctx: &super::super::super::DomContext,
     col_width: Option<usize>,
 ) {
     let mut text = String::with_capacity(128);
-
-    let cell_ctx = super::super::super::Context {
-        in_table_cell: true,
-        ..ctx.clone()
-    };
 
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
         let children = tag.children();
@@ -212,7 +209,7 @@ pub fn convert_table_cell(
 
         if has_tag_child {
             for child_handle in children.top().iter() {
-                super::super::super::walk_node(child_handle, parser, &mut text, options, &cell_ctx, 0, dom_ctx);
+                super::super::super::walk_node(child_handle, parser, &mut text, options, cell_ctx, 0, dom_ctx);
             }
         } else {
             let raw = dom_ctx.text_content(*node_handle, parser);
