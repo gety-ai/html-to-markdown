@@ -195,6 +195,26 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     continue;
                 }
 
+                // Phase N: `<template>` — inert script container; Tier-2 drops
+                // its content (see plain_text.rs SKIP_TAGS).  Skip the entire
+                // subtree without emitting anything.  Self-closing form is rare
+                // but handled.
+                if name_lower == b"template" {
+                    let Some((close_pos, is_self_closing)) = parse::find_tag_close(bytes, name_end) else {
+                        pos = bytes.len();
+                        text_start = pos;
+                        continue;
+                    };
+                    let open_tag_end = close_pos + 1;
+                    pos = if is_self_closing {
+                        open_tag_end
+                    } else {
+                        find_balanced_close(bytes, open_tag_end, b"template").unwrap_or(bytes.len())
+                    };
+                    text_start = pos;
+                    continue;
+                }
+
                 // Resolve the tag spec.  Custom elements (names containing `-`)
                 // are not in the static TAGS table but are treated as generic
                 // block containers — Tier-2 emits their inner content as plain
@@ -528,7 +548,14 @@ fn find_close_tag_range(bytes: &[u8], open_end: usize, tag_name: &[u8]) -> Optio
 /// Tracks nesting depth so nested `<svg>` elements (valid in SVG 1.1) are
 /// handled correctly.  Returns `None` when no matching close is found.
 fn find_svg_close(bytes: &[u8], open_end: usize) -> Option<usize> {
-    const SVG_NAME: &[u8] = b"svg";
+    find_balanced_close(bytes, open_end, b"svg")
+}
+
+/// Find the byte offset immediately after the matching close tag for
+/// `tag_name`, starting from `open_end` (the byte after the `>` of the
+/// opening tag).  Tracks nesting depth so nested same-name elements are
+/// handled correctly.  Returns `None` when no matching close is found.
+fn find_balanced_close(bytes: &[u8], open_end: usize, tag_name: &[u8]) -> Option<usize> {
     let len = bytes.len();
     let mut idx = open_end;
     let mut depth = 1usize;
@@ -538,19 +565,17 @@ fn find_svg_close(bytes: &[u8], open_end: usize) -> Option<usize> {
             None => return None,
         }
         if idx + 1 < len && bytes[idx + 1] == b'/' {
-            // Possible `</svg…>`
             let name_start = idx + 2;
-            if name_start + SVG_NAME.len() <= len
-                && bytes[name_start..name_start + SVG_NAME.len()].eq_ignore_ascii_case(SVG_NAME)
+            if name_start + tag_name.len() <= len
+                && bytes[name_start..name_start + tag_name.len()].eq_ignore_ascii_case(tag_name)
             {
-                let after = name_start + SVG_NAME.len();
+                let after = name_start + tag_name.len();
                 if matches!(
                     bytes.get(after),
                     Some(b'>' | b'/' | b' ' | b'\t' | b'\n' | b'\r') | None
                 ) {
                     depth -= 1;
                     if depth == 0 {
-                        // Walk to the closing `>`
                         let mut j = after;
                         while j < len && bytes[j] != b'>' {
                             j += 1;
@@ -560,12 +585,11 @@ fn find_svg_close(bytes: &[u8], open_end: usize) -> Option<usize> {
                 }
             }
         } else if idx + 1 < len {
-            // Possible nested `<svg…>` open tag
             let name_start = idx + 1;
-            if name_start + SVG_NAME.len() <= len
-                && bytes[name_start..name_start + SVG_NAME.len()].eq_ignore_ascii_case(SVG_NAME)
+            if name_start + tag_name.len() <= len
+                && bytes[name_start..name_start + tag_name.len()].eq_ignore_ascii_case(tag_name)
             {
-                let after = name_start + SVG_NAME.len();
+                let after = name_start + tag_name.len();
                 if matches!(
                     bytes.get(after),
                     Some(b'>' | b'/' | b' ' | b'\t' | b'\n' | b'\r') | None
