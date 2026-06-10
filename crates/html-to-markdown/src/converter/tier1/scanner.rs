@@ -2037,7 +2037,7 @@ fn decode_entity_at(
     s: &str,
     amp_pos: usize,
     out: &mut String,
-    base_offset: usize,
+    _base_offset: usize,
 ) -> Result<usize, BailReason> {
     let amp = amp_pos;
     let mut end = amp + 1;
@@ -2049,12 +2049,11 @@ fn decode_entity_at(
         if decode_entity_into(out, entity) {
             return Ok(end + 1);
         }
-        // Entity found (`&name;`) but not in the decode table or invalid
-        // numeric reference — bail rather than silently passing it through.
-        return Err(BailReason::UnknownEntity {
-            name: entity.into(),
-            offset: base_offset + amp,
-        });
+        // Phase N3: entity name (`&name;`) not in Tier-1's decode table.
+        // Tier-2 and mdream pass these through verbatim instead of decoding.
+        // Push the raw `&name;` and advance past it.
+        out.push_str(&s[amp..=end]);
+        return Ok(end + 1);
     }
     out.push('&');
     Ok(amp + 1)
