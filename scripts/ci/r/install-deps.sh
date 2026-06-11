@@ -15,4 +15,4 @@ if command -v apt-get >/dev/null 2>&1; then
     libfribidi-dev
 fi
 
-Rscript -e 'for (pkg in c("devtools", "testthat", "rextendr", "lintr", "styler", "covr", "remotes")) { if (!requireNamespace(pkg, quietly = TRUE)) install.packages(pkg, repos = "https://cran.r-project.org") }'
+Rscript -e 'for (pkg in c("devtools", "testthat", "rextendr", "lintr", "styler", "covr", "remotes")) { if (!requireNamespace(pkg, quietly = TRUE)) install.packages(pkg, repos = "https://cran.r-project.org", type = "binary") }'
