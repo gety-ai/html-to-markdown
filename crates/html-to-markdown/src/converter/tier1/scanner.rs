@@ -379,13 +379,13 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
 
                 // Non-void open tag: emit opening markdown + push stack frame
 
-                // M9: Nested-table bail — must come before the implicit-close
-                // loop and the block-in-cell check because <table> is a block
-                // element, and TableNestedTable is a more specific reason than
-                // TableBlockChildInCell.
-                if matches!(spec.kind, TagKind::Table) && !state.table_stack.is_empty() {
-                    return Err(BailReason::TableNestedTable);
-                }
+                // Phase HH: nested tables are NO LONGER bailed here.  An inner
+                // table is opened with `inline_mode = true` (set inside
+                // `open_table`), and on `</table>` the rendered GFM markdown
+                // is written into the parent cell buffer rather than
+                // `state.output`.  The parent cell's newline-collapse step
+                // then flattens the inner table to a single inline run,
+                // matching Tier-2's behaviour.
 
                 // M4: HTML5 implicit-close transitions.
                 // Run BEFORE the block-in-cell check so that structural table
@@ -428,6 +428,7 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                             | TagKind::Heading(_)
                             | TagKind::DefinitionTerm
                             | TagKind::DefinitionDescription
+                            | TagKind::Table
                     );
                     if !inlineable {
                         return Err(BailReason::TableBlockChildInCell);
@@ -1142,12 +1143,15 @@ fn open_link(state: &mut Tier1State) {
 }
 
 fn open_table(state: &mut Tier1State) {
-    // The nested-table check was already done in the main scanner loop
-    // (before this emit_open call) to ensure TableNestedTable takes
-    // priority over TableBlockChildInCell.
-    state
-        .table_stack
-        .push(crate::converter::tier1::state::TableState::default());
+    // Phase HH: nested tables are no longer a bail; an inner table inherits
+    // `inline_mode = true` so its final GFM rendering writes into the parent
+    // cell buffer rather than `state.output`.  The parent cell's newline
+    // collapse then flattens the inner table to a single inline run.
+    let inline_mode = !state.table_stack.is_empty();
+    state.table_stack.push(crate::converter::tier1::state::TableState {
+        inline_mode,
+        ..Default::default()
+    });
 }
 
 fn open_table_caption(state: &mut Tier1State) {
@@ -2180,7 +2184,19 @@ fn close_table(state: &mut Tier1State) -> Result<(), BailReason> {
             return Err(BailReason::Classifier);
         }
     }
-    emit_gfm_table(state, ts);
+    // Phase HH: a nested table writes its GFM rendering into the parent
+    // cell buffer; the parent's `close_table_cell` then collapses the
+    // resulting newlines to spaces.  An outer table writes to the main
+    // output buffer as before.
+    if ts.inline_mode {
+        if let Some(outer) = state.table_stack.last_mut() {
+            outer.had_nested_table = true;
+        }
+        let target = state.cell_or_output_mut();
+        emit_gfm_table(target, ts);
+    } else {
+        emit_gfm_table(&mut state.output, ts);
+    }
     Ok(())
 }
 
@@ -2258,7 +2274,15 @@ fn close_table_cell(state: &mut Tier1State, is_implicit: bool) -> Result<(), Bai
     // which changes the cell width computation; Tier-1 does not
     // implement pipe escaping.  Implicit closes skip this check because
     // they are triggered during structural teardown, not fresh cell data.
-    if !is_implicit && cell_text.contains('|') {
+    //
+    // Phase HH exception: when a nested table emitted GFM markdown into
+    // this cell, the literal pipes are part of the inner table's
+    // rendering — Tier-2 does NOT escape them either.  `had_nested_table`
+    // gates the skip; reset it so subsequent cells in the same row are
+    // still pipe-checked.
+    let allow_pipes = ts.had_nested_table;
+    ts.had_nested_table = false;
+    if !is_implicit && !allow_pipes && cell_text.contains('|') {
         return Err(BailReason::TableBlockChildInCell);
     }
     ts.current_row.push(cell_text);
@@ -3205,7 +3229,7 @@ fn indent_pre_lines(raw: &str) -> String {
 /// # Panics
 ///
 /// Never — empty-table guard returns early.
-fn emit_gfm_table(state: &mut Tier1State, ts: crate::converter::tier1::state::TableState) {
+fn emit_gfm_table(target: &mut String, ts: crate::converter::tier1::state::TableState) {
     // Emit caption (if any) BEFORE the table body.
     //
     // Mirrors Tier-2 builder.rs caption handling: `*escaped_text*\n\n`.
@@ -3216,16 +3240,16 @@ fn emit_gfm_table(state: &mut Tier1State, ts: crate::converter::tier1::state::Ta
     if let Some(ref caption) = ts.caption_text {
         if !caption.is_empty() {
             // Ensure the caption starts after any preceding content.
-            if !state.output.is_empty() && !state.output.ends_with("\n\n") {
-                if state.output.ends_with('\n') {
-                    state.output.push('\n');
+            if !target.is_empty() && !target.ends_with("\n\n") {
+                if target.ends_with('\n') {
+                    target.push('\n');
                 } else {
-                    state.output.push_str("\n\n");
+                    target.push_str("\n\n");
                 }
             }
-            state.output.push('*');
-            state.output.push_str(caption);
-            state.output.push_str("*\n\n");
+            target.push('*');
+            target.push_str(caption);
+            target.push_str("*\n\n");
         }
     }
 
@@ -3236,11 +3260,11 @@ fn emit_gfm_table(state: &mut Tier1State, ts: crate::converter::tier1::state::Ta
     // Pre-table separator: mirrors Tier-2's `convert_table` logic exactly.
     // Tier-2 (block/table/mod.rs): `if !output.is_empty() && !output.ends_with("\n\n")`
     // — only adds separator when there is existing output (no leading blank lines).
-    if !state.output.is_empty() && !state.output.ends_with("\n\n") {
-        if state.output.ends_with('\n') {
-            state.output.push('\n');
+    if !target.is_empty() && !target.ends_with("\n\n") {
+        if target.ends_with('\n') {
+            target.push('\n');
         } else {
-            state.output.push_str("\n\n");
+            target.push_str("\n\n");
         }
     }
 
@@ -3259,34 +3283,34 @@ fn emit_gfm_table(state: &mut Tier1State, ts: crate::converter::tier1::state::Ta
 
     for (row_index, row) in ts.rows.iter().enumerate() {
         // Row: `|` then each cell as ` text |` (padded to col_width like Tier-2).
-        state.output.push('|');
+        target.push('|');
         for (i, cell) in row.iter().enumerate() {
-            state.output.push(' ');
-            state.output.push_str(cell);
+            target.push(' ');
+            target.push_str(cell);
             // Pad to column width (mirrors Tier-2 cell.rs padding logic).
             let cell_len = cell.chars().count();
             let col_w = col_widths.get(i).copied().unwrap_or(0);
             for _ in cell_len..col_w {
-                state.output.push(' ');
+                target.push(' ');
             }
-            state.output.push_str(" |");
+            target.push_str(" |");
         }
-        state.output.push('\n');
+        target.push('\n');
 
         // After row 0 (the header row), emit the separator row.
         // Tier-2: col_widths.get(i).unwrap_or(0).max(MIN_SEPARATOR_DASHES).
         if row_index == 0 {
-            state.output.push_str("| ");
+            target.push_str("| ");
             for i in 0..col_count.max(1) {
                 if i > 0 {
-                    state.output.push_str(" | ");
+                    target.push_str(" | ");
                 }
                 let dash_count = col_widths.get(i).copied().unwrap_or(0).max(MIN_SEPARATOR_DASHES);
                 for _ in 0..dash_count {
-                    state.output.push('-');
+                    target.push('-');
                 }
             }
-            state.output.push_str(" |\n");
+            target.push_str(" |\n");
         }
     }
 }

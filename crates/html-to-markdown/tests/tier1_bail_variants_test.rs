@@ -122,17 +122,18 @@ fn should_handle_list_in_table_cell() {
     assert_eq!(t1, tier2(html), "<ul>-in-cell output must match Tier-2");
 }
 
-// ── TableNestedTable ──────────────────────────────────────────────────────────
+// ── TableNestedTable (Phase HH: now handled natively) ────────────────────────
+// Phase HH flattens a nested `<table>` inside a parent cell to inline GFM
+// markdown.  The parent cell's newline collapse then squashes the inner
+// table's `\n`-separated rows into a single inline run, matching Tier-2.
+// The `TableNestedTable` bail variant is retained for back-compat but is
+// no longer reachable from the scanner.
 
 #[test]
-fn should_bail_on_nested_table_inside_cell() {
+fn should_handle_nested_table_inside_cell() {
     let html = "<table><tr><td><table><tr><td>inner</td></tr></table></td></tr></table>";
-    let err = tier1_run(html).unwrap_err();
-    assert!(
-        matches!(err, BailReason::TableNestedTable),
-        "expected TableNestedTable, got {err:?}"
-    );
-    assert_eq!(force_tier1(html), tier2(html), "fallback output must match Tier-2");
+    let t1 = tier1_run(html).expect("Tier-1 should not bail on nested <table> (Phase HH)");
+    assert_eq!(t1, tier2(html), "nested-table output must match Tier-2");
 }
 
 // ── TableCaption ──────────────────────────────────────────────────────────────

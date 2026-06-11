@@ -58,6 +58,21 @@ pub struct TableState {
     /// Column count of the first row (used to detect inconsistent column counts
     /// across rows, which triggers Tier-2's layout-table path).
     pub first_row_col_count: Option<usize>,
+    /// True when this table is nested inside another table's cell.
+    ///
+    /// On `</table>`, the rendered GFM markdown is appended to the parent
+    /// cell buffer (rather than `state.output`).  The parent cell's later
+    /// newline-collapse step then flattens the inner table to a single
+    /// inline run, matching Tier-2's behaviour where inner tables emit
+    /// full GFM into the cell text and the cell collapses `\n` → space.
+    pub inline_mode: bool,
+    /// True when at least one nested table has emitted GFM markdown into
+    /// this table's current cell.  Set by `close_table` on the parent
+    /// frame when popping an `inline_mode = true` child.  Read by
+    /// `close_table_cell` to skip the literal-pipe bail — nested-table
+    /// rendering legitimately introduces unescaped `|` characters that
+    /// Tier-2 also emits without escaping.
+    pub had_nested_table: bool,
 }
 
 bitflags::bitflags! {
@@ -273,6 +288,18 @@ impl Tier1State {
     #[must_use]
     pub fn in_table_cell(&self) -> bool {
         self.table_stack.last().is_some_and(|ts| ts.in_cell)
+    }
+
+    /// True when ANY frame on the table stack has `in_cell = true`.
+    ///
+    /// With nested tables (Phase HH), the inner table's frame may have
+    /// `in_cell = false` while an outer frame still has `in_cell = true`
+    /// — for example between `<td>` siblings of the inner table while the
+    /// outer cell that wraps it is still open.  Use this for inter-cell
+    /// whitespace guards that must drop text outside *any* active cell.
+    #[must_use]
+    pub fn in_any_table_cell(&self) -> bool {
+        self.table_stack.iter().any(|ts| ts.in_cell)
     }
 
     /// Ensure the output ends with exactly two newlines (blank-line separator).
