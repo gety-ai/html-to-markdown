@@ -965,10 +965,30 @@ fn emit_open(
         // Block containers: emit a leading blank-line separator when there's
         // already preceding content.  Mirrors Tier-2's div/sectioning handlers
         // (block/div.rs:88, semantic/sectioning.rs:71) which prefix block
-        // content with `\n\n` to separate from siblings.  Skipped in table
-        // cells (cells stay on one logical line).
+        // content with `\n\n` to separate from siblings.
+        //
+        // Inside a table cell, Tier-2's div.rs:60 treats a sibling-div as a
+        // "table continuation" and emits `"  \n"` (two-space + newline) when
+        // the cell already has non-`|`/non-`<br>` content.  After
+        // `close_table_cell`'s `replace('\n', ' ')` step, this becomes a 3-space
+        // run between sibling divs — matching Tier-2's lists_timeline cell
+        // layout `[link]   [other-link]`.  Without this, Tier-1 emits 1 space.
         TagKind::Block => {
-            if !state.in_table_cell() {
+            if state.in_table_cell() {
+                let cell_buf = state.cell_or_output_mut();
+                if !cell_buf.is_empty()
+                    && !cell_buf.ends_with('|')
+                    && !cell_buf.ends_with("<br>")
+                    && !cell_buf.ends_with("  \n")
+                {
+                    // Trim trailing horizontal whitespace, then append the
+                    // table-continuation line break.  Mirrors div.rs:75-85.
+                    while cell_buf.ends_with(' ') || cell_buf.ends_with('\t') {
+                        cell_buf.pop();
+                    }
+                    cell_buf.push_str("  \n");
+                }
+            } else {
                 state.ensure_blank_line();
             }
         }
@@ -2553,7 +2573,13 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
     let is_block_edge =
         active_empty || active_ends_newline || active_ends_list_marker || active_ends_ordered || at_inline_frame_start;
     let raw_is_whitespace = raw.bytes().all(|b| b == b' ' || b == b'\t' || b == b'\n' || b == b'\r');
-    if !in_pre && !state.in_table_cell() && is_block_edge && raw_is_whitespace {
+    if !in_pre && is_block_edge && raw_is_whitespace {
+        // Drop block-edge whitespace anywhere — including inside table cells.
+        // A cell-open `<td>`/`<th>` produces a fresh empty buffer; the
+        // pretty-printer's inter-tag whitespace before the first child would
+        // otherwise leak as a leading space into the cell, breaking the
+        // 3-space gap heuristic (`  \n` from `<div>` open becomes 4 spaces
+        // instead of 3 after `replace('\n', ' ')`).
         return Ok(());
     }
     // Tier-2 text_node.rs:100-113 collapses whitespace-only text nodes
@@ -2565,6 +2591,17 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
     // when at a block edge (cell just opened) so the cell doesn't start
     // with a stray space.
     if !in_pre && state.in_table_cell() && raw_is_whitespace && !is_block_edge {
+        // Tier-2's text_node.rs:80-98 drops whitespace text between non-inline
+        // siblings: when the parent is a list (`<ul>`/`<ol>`/`<dl>`), the
+        // inter-`<li>` whitespace returns without pushing because the next
+        // sibling `<li>` is a block, not inline.  Mirror that here so adjacent
+        // `<li>` siblings in a cell concatenate without separation
+        // (`[v](u1)[t](u2)` not `[v](u1) [t](u2)`).  For inline parents
+        // (`<span>`/`<a>`/`<td>` direct inline-sibling case), keep the
+        // single-space fold.
+        if matches!(state.stack.last().map(|f| f.spec.kind), Some(TagKind::List(_))) {
+            return Ok(());
+        }
         let dest = state.cell_or_output_mut();
         if !dest.is_empty() && !dest.ends_with(' ') && !dest.ends_with('\n') {
             dest.push(' ');
