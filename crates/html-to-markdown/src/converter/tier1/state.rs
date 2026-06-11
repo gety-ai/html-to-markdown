@@ -168,6 +168,13 @@ pub struct Tier1State {
     /// Stack of in-progress table states.  Pushed on `<table>` open, popped on
     /// `</table>` close.  Depth > 1 is a nested-table bail.
     pub table_stack: Vec<TableState>,
+    /// Stack of `title` attribute values for currently-open `<abbr>` elements.
+    ///
+    /// `None` if the element had no (or an empty) title; `Some(t)` if a
+    /// non-empty title was present.  On `</abbr>` close, the trimmed title
+    /// is emitted as `" (title)"` after the abbreviation text, mirroring
+    /// Tier-2's `semantic/attributes.rs::handle_abbr` (line 104-111).
+    pub abbr_titles: Vec<Option<String>>,
     /// Stack of `(href, title)` pairs for currently-open `<a>` elements.
     ///
     /// HTML5 forbids nested `<a>`, but the stack handles malformed input safely.
@@ -226,6 +233,7 @@ impl Tier1State {
             last_block_sep_pos: 0,
             table_stack: Vec::new(),
             link_stack: Vec::new(),
+            abbr_titles: Vec::new(),
             head_range: None,
             pre_lang: None,
             summary_buf_stack: Vec::new(),

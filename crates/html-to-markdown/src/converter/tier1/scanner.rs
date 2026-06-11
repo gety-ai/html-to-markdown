@@ -357,15 +357,22 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                 // Most tag kinds (headings, paragraphs, emphasis, code, etc.) do
                 // not read attributes during emit.  Skip the allocation in the
                 // common case; only collect for the kinds whose emit paths
-                // actually consult attributes.
-                let attrs: Vec<(&[u8], Option<&[u8]>)> = match spec.kind {
+                // actually consult attributes.  `<abbr>` is `TagKind::Inline`
+                // but its `title` attribute is read at open time to mirror
+                // Tier-2's `handle_abbr` — include it in the collect-set.
+                let needs_attrs = matches!(
+                    spec.kind,
                     TagKind::Link
-                    | TagKind::Image
-                    | TagKind::List(ListKind::Ordered)
-                    | TagKind::TableCell { .. }
-                    | TagKind::Pre
-                    | TagKind::Code => parse::collect_attrs(bytes, name_end, attrs_end),
-                    _ => Vec::new(),
+                        | TagKind::Image
+                        | TagKind::List(ListKind::Ordered)
+                        | TagKind::TableCell { .. }
+                        | TagKind::Pre
+                        | TagKind::Code
+                ) || name_lower == b"abbr";
+                let attrs: Vec<(&[u8], Option<&[u8]>)> = if needs_attrs {
+                    parse::collect_attrs(bytes, name_end, attrs_end)
+                } else {
+                    Vec::new()
                 };
 
                 pos = close.0 + 1;
@@ -444,6 +451,17 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                 if matches!(spec.kind, TagKind::Link) {
                     let (href, title) = extract_link_attrs(&attrs)?;
                     state.link_stack.push((href, title));
+                }
+                // Mirror Tier-2's `semantic/attributes.rs::handle_abbr`:
+                // capture the abbreviation's `title` attribute and emit
+                // `" (title)"` after the abbr's text content at close time.
+                if name_lower == b"abbr" {
+                    let title = find_attr(&attrs, b"title")
+                        .and_then(|b| std::str::from_utf8(b).ok())
+                        .map(str::trim)
+                        .filter(|s| !s.is_empty())
+                        .map(str::to_owned);
+                    state.abbr_titles.push(title);
                 }
 
                 emit_open(&mut state, spec, &attrs)?;
@@ -1496,8 +1514,18 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8], options: &Conversio
         // Button (Phase T): emit `\n\n` when content was produced — mirrors
         // Tier-2 `form/elements.rs:592-594`.  No leading separator on open.
         TagKind::Button => close_button(state, &frame),
-        // Inline containers (span/etc.): no separator.
-        TagKind::Inline => {}
+        // Inline containers (span/etc.): no separator.  For `<abbr>` pop the
+        // title side-stack and emit ` (title)` after the abbr's text content.
+        TagKind::Inline => {
+            if name_lower == b"abbr" {
+                if let Some(Some(title)) = state.abbr_titles.pop() {
+                    let dest = state.cell_or_output_mut();
+                    dest.push_str(" (");
+                    dest.push_str(&title);
+                    dest.push(')');
+                }
+            }
+        }
         // Void-only kinds that never have open frames:
         TagKind::LineBreak | TagKind::Image => {}
         // Explicitly no-op: all remaining known kinds not listed above.
@@ -2018,6 +2046,15 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag) {
     let trim_start = frame.content_start.min(dest.len());
     let trimmed_end = dest[trim_start..].trim_end_matches(|c: char| c.is_whitespace()).len();
     dest.truncate(trim_start + trimmed_end);
+    // Wikipedia back-reference normalisation (Tier-2 `handlers/link.rs:208`):
+    // a label of exactly `^` paired with an `#anchor` href is rewritten to
+    // `↑` so it does not look like Markdown's footnote syntax.
+    if let Some(href_str) = href.as_deref() {
+        if href_str.starts_with('#') && dest.len() == trim_start + 1 && dest.as_bytes()[trim_start] == b'^' {
+            dest.truncate(trim_start);
+            dest.push('↑');
+        }
+    }
     if let Some(href) = href {
         if let Some(title) = title {
             // measured: write! is slower on this workload (Stage 5c)
