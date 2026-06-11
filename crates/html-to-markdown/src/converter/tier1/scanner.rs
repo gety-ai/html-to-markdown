@@ -267,6 +267,26 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     };
                     pos = find_raw_text_close(bytes, open_end, name_lower).unwrap_or(bytes.len());
                     text_start = pos;
+                    // Tier-2 observed behaviour (medium_python "walrus operator"
+                    // case): after walking through a `<style>` block whose
+                    // content emits nothing, the subsequent inline sibling
+                    // emission gets a separating space inserted (matching the
+                    // `<style></style><span>X</span>` → `" X"` pattern).
+                    // Mirror this here: when the output buffer's tail looks
+                    // like inline text content (no trailing whitespace, no
+                    // `<br>` sentinel), push a single space.
+                    if name_lower == b"style" {
+                        let dest = state.cell_or_output_mut();
+                        let ends_with_word = !dest.is_empty()
+                            && !dest.ends_with(' ')
+                            && !dest.ends_with('\t')
+                            && !dest.ends_with('\n')
+                            && !dest.ends_with('<')
+                            && !dest.ends_with("<br>");
+                        if ends_with_word {
+                            dest.push(' ');
+                        }
+                    }
                     continue;
                 }
 
