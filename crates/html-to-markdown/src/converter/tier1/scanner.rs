@@ -2621,6 +2621,19 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
             }
             return Ok(());
         }
+        // Inside an inline frame (`<a>`/`<strong>`/`<em>`/`<code>`) or summary
+        // accumulation: a whitespace-only text node (often the indent run
+        // between two inline siblings like `</span>\n  <a>`) must collapse to
+        // a single ASCII space — Tier-2's text-node normalize_whitespace folds
+        // any `\n` + spaces run into one space.  Without this, Tier-1 falls
+        // through to `decode_and_collapse_into` which preserves the `\n` and
+        // emits `*[a](x)\n [b](y)*` where Tier-2 has `*[a](x) [b](y)*`.
+        let active_tail: &str = state.cell_or_output_mut();
+        if !active_tail.is_empty() && !active_tail.ends_with(' ') && !active_tail.ends_with('\n') {
+            let dest = state.cell_or_output_mut();
+            dest.push(' ');
+        }
+        return Ok(());
     }
     // Even when the text is not entirely whitespace, strip its LEADING
     // whitespace when:
