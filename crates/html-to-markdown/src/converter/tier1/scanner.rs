@@ -2510,6 +2510,64 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
     // wrapped span.  Treat as `in_pre` for the no-collapse path.
     let in_code = state.escape_ctx.contains(EscapeCtx::CODE);
 
+    // Phase NN: text containing Unicode whitespace (NBSP `\u{00A0}`, hair
+    // space `\u{200A}`, etc., or their entity forms) folds those to ASCII
+    // space — but only when the chunk has non-whitespace content.
+    // Mirrors Tier-2 `text_node.rs:124` and `:154` which run
+    // `normalize_whitespace_cow` on text outside `<code>`/`<pre>` (folding
+    // Unicode space chars).  The whitespace-only branch at `:80-112`
+    // preserves a pure-NBSP text node between inline siblings as-is (e.g.
+    // `<a>X</a>&nbsp;<a>Y</a>` keeps the NBSP).  Without this rule,
+    // `First<NBSP>appeared` reaches the buffer verbatim where Tier-2 outputs
+    // `First appeared`.
+    let raw_owned_nbsp;
+    let raw: &str = if !in_pre && !in_code {
+        // Quick check: does the chunk have any Unicode-whitespace source
+        // (NBSP literal/entity or any non-ASCII whitespace char)?
+        let has_nbsp_entity =
+            raw.contains("&nbsp;") || raw.contains("&#160;") || raw.contains("&#xa0;") || raw.contains("&#xA0;");
+        let has_unicode_ws_literal = raw.bytes().any(|b| b >= 0x80)
+            && raw
+                .chars()
+                .any(|c| c.is_whitespace() && c != ' ' && c != '\t' && c != '\n' && c != '\r');
+        if has_nbsp_entity || has_unicode_ws_literal {
+            // Treat the chunk as logically whitespace-only when stripping
+            // NBSP entities leaves only whitespace characters.
+            let stripped = raw
+                .replace("&nbsp;", "")
+                .replace("&#160;", "")
+                .replace("&#xa0;", "")
+                .replace("&#xA0;", "");
+            let is_logically_whitespace = stripped.chars().all(char::is_whitespace);
+            if is_logically_whitespace {
+                raw
+            } else {
+                // Fold all non-ASCII Unicode whitespace and the NBSP entities
+                // to ASCII space, leaving ASCII whitespace untouched (those
+                // are handled by the downstream collapse).
+                let mut tmp = String::with_capacity(raw.len());
+                let after_entities = raw
+                    .replace("&nbsp;", " ")
+                    .replace("&#160;", " ")
+                    .replace("&#xa0;", " ")
+                    .replace("&#xA0;", " ");
+                for c in after_entities.chars() {
+                    if c.is_whitespace() && c != ' ' && c != '\t' && c != '\n' && c != '\r' {
+                        tmp.push(' ');
+                    } else {
+                        tmp.push(c);
+                    }
+                }
+                raw_owned_nbsp = tmp;
+                raw_owned_nbsp.as_str()
+            }
+        } else {
+            raw
+        }
+    } else {
+        raw
+    };
+
     // Inter-block whitespace strip: in a block-edge context (output empty,
     // ends with a newline, or ends with a list-item marker like "- " /
     // "1. "), whitespace-only text between adjacent elements (the
