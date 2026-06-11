@@ -25,7 +25,7 @@ typedef struct HTMCodeBlockStyle HTMCodeBlockStyle;
 /**
  * Main conversion options for HTML to Markdown conversion.
  *
- * Use [`ConversionOptions::builder()`] to construct, or [`Default::default()`] for defaults.
+ * Use `ConversionOptions.builder()` to construct, or `Default.default()` for defaults.
  * \code
  * use html_to_markdown_rs::{ConversionOptions, HeadingStyle};
  *
@@ -41,7 +41,7 @@ typedef struct HTMConversionOptions HTMConversionOptions;
  * Partial update for `ConversionOptions`.
  *
  * Uses `Option<T>` fields for selective updates. Bindings use this to construct
- * options from language-native types. Prefer [`ConversionOptionsBuilder`] for Rust code.
+ * options from language-native types. Prefer `ConversionOptionsBuilder` for Rust code.
  */
 typedef struct HTMConversionOptionsUpdate HTMConversionOptionsUpdate;
 /**
@@ -153,12 +153,12 @@ typedef struct HTMHtmlMetadata HTMHtmlMetadata;
  * - `Custom(text)` â replace the rendering with `text`.
  * - `Error(message)` â abort conversion with `message`.
  *
- * **Language idioms.** In Rust, return one of the [`VisitResult`] variants directly.
+ * **Language idioms.** In Rust, return one of the `VisitResult` variants directly.
  * In Python, Ruby, JavaScript/TypeScript, and other duck-typed bindings, define a
  * plain class (no base class required) and return either a string (`"continue"`,
  * `"skip"`, `"preserve_html"`) or a tagged map (`{"custom": "..."}`,
  * `{"error": "..."}`) â the binding converts the return value to the corresponding
- * [`VisitResult`] variant automatically.
+ * `VisitResult` variant automatically.
  *
  * # Method Naming Convention
  *
@@ -239,7 +239,7 @@ typedef struct HTMLinkMetadata HTMLinkMetadata;
  * Link rendering style in Markdown output.
  *
  * Controls whether links and images use inline `text (url)` syntax or
- * reference-style `[text][1]` syntax with definitions collected at the end.
+ * reference-style ``text`[1]` syntax with definitions collected at the end.
  */
 typedef struct HTMLinkStyle HTMLinkStyle;
 /**
@@ -258,7 +258,7 @@ typedef struct HTMListIndentType HTMListIndentType;
  * A single key-value metadata entry from `<head>` meta tags.
  *
  * Binding-safe replacement for `(String, String)` tuples used in
- * [`NodeContent::MetadataBlock`]. Tuple pairs cannot be represented
+ * `NodeContent.MetadataBlock`. Tuple pairs cannot be represented
  * across language boundaries without lossy degradation.
  */
 typedef struct HTMMetadataEntry HTMMetadataEntry;
@@ -282,17 +282,17 @@ typedef struct HTMNodeContent HTMNodeContent;
  *
  * ## Attributes
  *
- * Access attributes via [`NodeContext::attributes`], which returns
+ * Access attributes via `NodeContext.attributes`, which returns
  * `&BTreeMap<String, String>`. When the context was built with
- * [`NodeContext::with_lazy_attributes`] (the hot path inside the converter),
+ * `NodeContext.with_lazy_attributes` (the hot path inside the converter),
  * the map is only materialized on the first call â if the visitor never reads
  * attributes, the allocation is skipped.
  *
  * ## Lifetimes
  *
- * String fields use [`Cow<'_, str>`] so the converter can pass slices directly
+ * String fields use `Cow<'_, str>` so the converter can pass slices directly
  * out of the parsed DOM without allocating. Visitor implementations that need
- * to outlive the callback should call [`NodeContext::into_owned`].
+ * to outlive the callback should call `NodeContext.into_owned`.
  */
 typedef struct HTMNodeContext HTMNodeContext;
 /**
@@ -317,7 +317,7 @@ typedef struct HTMPreprocessingOptions HTMPreprocessingOptions;
  *
  * This struct uses `Option<T>` to represent optional fields that can be selectively updated.
  * Only specified fields (Some values) will override existing options; None values leave the
- * corresponding fields unchanged when applied via [`PreprocessingOptions::apply_update`].
+ * corresponding fields unchanged when applied via `PreprocessingOptions.apply_update`.
  */
 typedef struct HTMPreprocessingOptionsUpdate HTMPreprocessingOptionsUpdate;
 /**
@@ -341,7 +341,7 @@ typedef struct HTMPreprocessingPreset HTMPreprocessingPreset;
  * - **Strict pipelines**: treat any warning as a hard error by checking
  *   `result.warnings.is_empty()` before using the output.
  *
- * See [`WarningKind`] for the full taxonomy of warning categories.
+ * See `WarningKind` for the full taxonomy of warning categories.
  */
 typedef struct HTMProcessingWarning HTMProcessingWarning;
 /**
@@ -377,7 +377,7 @@ typedef struct HTMTableGrid HTMTableGrid;
 /**
  * A styling or semantic annotation that applies to a byte range within a node's text.
  *
- * Unlike [`DocumentNode`], which captures block-level structure (headings, paragraphs, etc.),
+ * Unlike `DocumentNode`, which captures block-level structure (headings, paragraphs, etc.),
  * a `TextAnnotation` describes inline-level markup â bold, italic, links, code spans, and
  * similar â that spans a contiguous run of bytes inside `DocumentNode::content`'s text field.
  *
@@ -388,7 +388,7 @@ typedef struct HTMTableGrid HTMTableGrid;
  * Multiple annotations on the same node can overlap (e.g. bold-italic text), and they are
  * stored in the order they are encountered during DOM traversal.
  *
- * See [`AnnotationKind`] for the full list of supported annotation types.
+ * See `AnnotationKind` for the full list of supported annotation types.
  */
 typedef struct HTMTextAnnotation HTMTextAnnotation;
 /**
@@ -3104,7 +3104,7 @@ int32_t htm_node_context_is_inline(const HTMNodeContext *ptr);
 /**
  * Return a reference to the attribute map.
  *
- * If the context was built with [`NodeContext::with_lazy_attributes`], the
+ * If the context was built with `NodeContext.with_lazy_attributes`, the
  * map is materialized on the first call and cached for subsequent calls.
  * If this method is never called, no allocation occurs for attributes.
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
@@ -3115,7 +3115,7 @@ char *htm_node_context_attributes(const HTMNodeContext *this_);
 /**
  * Construct a `NodeContext` with an owned attribute map.
  *
- * Prefer [`NodeContext::with_lazy_attributes`] (pub(crate)) inside the
+ * Prefer `NodeContext.with_lazy_attributes` (pub(crate)) inside the
  * converter to avoid the eager `collect_tag_attributes` allocation.
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
