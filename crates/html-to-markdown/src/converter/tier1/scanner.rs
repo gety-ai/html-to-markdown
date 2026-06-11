@@ -2046,6 +2046,19 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag) {
     let trim_start = frame.content_start.min(dest.len());
     let trimmed_end = dest[trim_start..].trim_end_matches(|c: char| c.is_whitespace()).len();
     dest.truncate(trim_start + trimmed_end);
+    // Mirror Tier-2's `normalize_whitespace_cow` step inside
+    // `normalize_link_label` (utility/content.rs:144): any Unicode whitespace
+    // in the link label (notably NBSP `\u{00a0}`) collapses to a single ASCII
+    // space.  Tier-1 otherwise emits `[Designed\u{a0}by](url)` where Tier-2
+    // emits `[Designed by](url)`.
+    if dest[trim_start..].contains('\u{00a0}') {
+        let normalised: String = dest[trim_start..]
+            .chars()
+            .map(|c| if c == '\u{00a0}' { ' ' } else { c })
+            .collect();
+        dest.truncate(trim_start);
+        dest.push_str(&normalised);
+    }
     // Wikipedia back-reference normalisation (Tier-2 `handlers/link.rs:208`):
     // a label of exactly `^` paired with an `#anchor` href is rewritten to
     // `↑` so it does not look like Markdown's footnote syntax.
