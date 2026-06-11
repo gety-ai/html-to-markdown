@@ -2115,9 +2115,19 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag) {
     }
     if let Some(href) = href {
         if let Some(title) = title {
+            // Mirror Tier-2's `inline/link.rs:482-484`: when the title text
+            // contains a literal `"`, escape it with `\"` so the surrounding
+            // `"…"` delimiters stay unambiguous.
+            let escaped_title;
+            let title_out: &str = if title.contains('"') {
+                escaped_title = title.replace('"', "\\\"");
+                &escaped_title
+            } else {
+                &title
+            };
             // measured: write! is slower on this workload (Stage 5c)
             #[allow(clippy::format_push_string)]
-            dest.push_str(&format!("]({href} \"{title}\")"));
+            dest.push_str(&format!("]({href} \"{title_out}\")"));
         } else {
             // measured: write! is slower on this workload (Stage 5c)
             #[allow(clippy::format_push_string)]
