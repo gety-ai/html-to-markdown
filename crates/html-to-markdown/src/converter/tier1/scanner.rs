@@ -1246,13 +1246,22 @@ fn emit_void(
 
         TagKind::LineBreak => {
             // `<br>` outside any block context emits nothing (Tier-2 behaviour).
-            // Inside a table cell: emit three spaces — Tier-2 walks `<br>` to
-            // `"  \n"` then `cell_text.replace('\n', " ")` turns it into `"   "`
-            // (three spaces).  Matching that exactly is required for byte-equality
-            // on cell-padding-sensitive fixtures (e.g. wikipedia/tables_countries).
-            // Inside a regular block (paragraph, div, etc.) emit `  \n`.
-            if state.in_table_cell() {
-                state.cell_or_output_mut().push_str("   ");
+            // Three context-dependent emissions:
+            //   - Inside a link (anywhere): one space.  Tier-2's
+            //     `normalize_link_label` (utility/content.rs ~145) collapses
+            //     whitespace runs in link labels, so multiple spaces or
+            //     `  \n` would normalize back to one space.
+            //   - Inside a table cell (not in a link): emit a single sentinel
+            //     `\u{0001}`.  `close_table_cell` collapses whitespace runs
+            //     before normalising the sentinel to three spaces — matches
+            //     Tier-2 walking `<br>` to `"  \n"` and `replace('\n', ' ')`
+            //     producing `"   "` (three spaces).
+            //   - Inside a regular block (paragraph, div, etc.): `"  \n"`.
+            let in_link = state.stack.iter().any(|f| matches!(f.spec.kind, TagKind::Link));
+            if in_link {
+                state.cell_or_output_mut().push(' ');
+            } else if state.in_table_cell() {
+                state.cell_or_output_mut().push('\u{0001}');
             } else if state.stack.is_empty() {
                 // bare `<br>` at top level — Tier-2 emits nothing
             } else {
@@ -1692,9 +1701,24 @@ fn close_inline_marker(state: &mut Tier1State, frame: &OpenTag, marker: &str) {
         // Truncate back to the position before the open marker was pushed.
         let open_marker_start = frame.content_start.saturating_sub(marker.len());
         buf.truncate(open_marker_start);
-    } else {
-        buf.push_str(marker);
+        return;
     }
+
+    // Mirror Tier-2's `chomp_inline` (utility/content.rs:31): leading/trailing
+    // whitespace (including Unicode whitespace like NBSP `\u{a0}`) inside the
+    // strong/emphasis markers gets pushed OUTSIDE them so `**\u{a0}X**` becomes
+    // `\u{a0}**X**`.  Required for byte-equality on Wikipedia fixtures with
+    // `<b><span>&nbsp;</span>X</b>` patterns.
+    let content_str = &buf[frame.content_start..];
+    let leading_len = content_str.len() - content_str.trim_start().len();
+    if leading_len > 0 {
+        let leading: String = content_str[..leading_len].to_owned();
+        buf.replace_range(frame.content_start..frame.content_start + leading_len, "");
+        let marker_start = frame.content_start.saturating_sub(marker.len());
+        buf.insert_str(marker_start, &leading);
+    }
+
+    buf.push_str(marker);
 }
 
 // ── Implicit close-tag emission ───────────────────────────────────────────────
@@ -1842,6 +1866,12 @@ fn close_heading(state: &mut Tier1State, frame: &OpenTag, n: u8, is_implicit: bo
 }
 
 fn close_blockquote(state: &mut Tier1State, frame: &OpenTag) {
+    // Phase GG follow-up: inside a table cell `frame.content_start` indexes
+    // into the cell buffer, not `state.output`.  Don't prefix `> ` — Tier-2
+    // also collapses blockquote inside cells to plain inline text.
+    if state.in_table_cell() {
+        return;
+    }
     // The blockquote content needs `> ` prefixed to every line.
     // We inserted nothing on open; now we need to post-process the
     // content from `frame.content_start` to the current output end.
@@ -1859,6 +1889,14 @@ fn close_blockquote(state: &mut Tier1State, frame: &OpenTag) {
 
 fn close_pre(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptions) {
     use crate::options::CodeBlockStyle;
+    // Phase GG follow-up: when `<pre>` opened inside a table cell, its content
+    // was accumulated into `current_cell` (the cell buffer), not `state.output`.
+    // The frame's `content_start` indexes into the cell buffer.  Don't emit a
+    // code fence — Tier-2 also collapses pre inside cells to plain inline text
+    // (the cell's `replace('\n', ' ')` step does the rest).
+    if state.in_table_cell() {
+        return;
+    }
     let raw = state.output[frame.content_start..].to_owned();
     state.output.truncate(frame.content_start);
     match options.code_block_style {
@@ -2173,16 +2211,19 @@ fn close_table(state: &mut Tier1State) -> Result<(), BailReason> {
         let row_count = ts.rows.len();
 
         // Inconsistent column counts → layout table in Tier-2.
+        // Compare colspan-expanded column counts (sum of cell colspans per row)
+        // because Tier-2 computes column counts post-colspan expansion.
+        let expanded_cols = |row: &Vec<(String, u16)>| -> usize { row.iter().map(|(_, c)| usize::from(*c)).sum() };
         let inconsistent_cols = {
             let first = ts.first_row_col_count.unwrap_or(0);
-            ts.rows.iter().any(|r| r.len() != first)
+            ts.rows.iter().any(|r| expanded_cols(r) != first)
         };
 
         // Link-heavy with few rows → layout table in Tier-2.
         let link_heavy = row_count <= 2 && ts.link_count >= 3;
 
         // Blank table → Tier-2 emits nothing (not a bail case).
-        let is_blank = ts.rows.is_empty() || ts.rows.iter().all(|r| r.iter().all(|c| c.trim().is_empty()));
+        let is_blank = ts.rows.is_empty() || ts.rows.iter().all(|r| r.iter().all(|(c, _)| c.trim().is_empty()));
 
         if inconsistent_cols || link_heavy || is_blank {
             // Tier-2 would not emit a GFM table here.
@@ -2243,8 +2284,9 @@ fn close_table_row(state: &mut Tier1State) {
     if ts.current_row.is_empty() {
         return;
     }
-    let col_count = ts.current_row.len();
-    // Track first-row column count for consistency checking.
+    // Track first-row column count for consistency checking — use the
+    // colspan-expanded count so Tier-2's heuristic compares the same numbers.
+    let col_count: usize = ts.current_row.iter().map(|(_, c)| usize::from(*c)).sum();
     if ts.first_row_col_count.is_none() {
         ts.first_row_col_count = Some(col_count);
     }
@@ -2266,15 +2308,21 @@ fn close_table_cell(state: &mut Tier1State, is_implicit: bool) -> Result<(), Bai
     let cell_text_raw = ts.current_cell.trim().to_owned();
     // Replace newlines with spaces — mirrors Tier-2's `cell_text_content`
     // which calls `text.replace('\n', " ")` when `br_in_tables` is false.
-    // Newlines appear when `<p>` or `<div>` tags inside the cell emit block
-    // separators into the cell accumulator; collapsing them to spaces produces
-    // the same single-line cell content that Tier-2 emits.
     let cell_text = if cell_text_raw.contains('\n') {
         cell_text_raw.replace('\n', " ")
     } else {
         cell_text_raw
     };
-    // Trim again after newline replacement (replaces `\n\n` → `  ` at boundaries).
+    // Expand the `<br>` sentinel `\u{0001}` to three literal spaces — Tier-2
+    // emits `<br>` as `"  \n"` and the cell-level `replace('\n', ' ')` yields
+    // `"   "` (three spaces).  Using a sentinel keeps multi-space runs from
+    // inter-tag whitespace distinguishable from `<br>`-derived padding.
+    let cell_text = if cell_text.contains('\u{0001}') {
+        cell_text.replace('\u{0001}', "   ")
+    } else {
+        cell_text
+    };
+    // Trim again after newline replacement (drops stray edge whitespace).
     let cell_text = cell_text.trim().to_owned();
     // Bail if the cell contains a pipe: Tier-2 escapes `|` → `\|`
     // which changes the cell width computation; Tier-1 does not
@@ -2291,13 +2339,11 @@ fn close_table_cell(state: &mut Tier1State, is_implicit: bool) -> Result<(), Bai
     if !is_implicit && !allow_pipes && cell_text.contains('|') {
         return Err(BailReason::TableBlockChildInCell);
     }
-    ts.current_row.push(cell_text);
-    // Expand colspan: add (colspan - 1) empty cells so the row's column
-    // count matches Tier-2's expanded view.  See state.rs for the rationale.
-    let extra = ts.current_cell_colspan.saturating_sub(1);
-    for _ in 0..extra {
-        ts.current_row.push(String::new());
-    }
+    // Phase L-prep: store (text, colspan) so emit_gfm_table can mirror
+    // Tier-2's `for _ in 0..colspan { output.push_str(" |") }` (cell.rs:248)
+    // and the layout-heuristic uses the colspan-expanded column count.
+    let colspan = ts.current_cell_colspan;
+    ts.current_row.push((cell_text, colspan));
     ts.current_cell.clear();
     ts.current_cell_colspan = 1;
     Ok(())
@@ -2458,6 +2504,21 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
         active_empty || active_ends_newline || active_ends_list_marker || active_ends_ordered || at_inline_frame_start;
     let raw_is_whitespace = raw.bytes().all(|b| b == b' ' || b == b'\t' || b == b'\n' || b == b'\r');
     if !in_pre && !state.in_table_cell() && is_block_edge && raw_is_whitespace {
+        return Ok(());
+    }
+    // Tier-2 text_node.rs:100-113 collapses whitespace-only text nodes
+    // between adjacent inline siblings to a single space — including
+    // inside table cells where the surrounding `<a>`/`<span>` siblings are
+    // inline.  Mirror that here so `<a>x</a>\n  <a>y</a>` inside a `<td>`
+    // emits `[x] [y]` (single space) instead of `[x]\n [y]` which the
+    // cell-close `replace('\n', ' ')` would turn into two spaces.  Skip
+    // when at a block edge (cell just opened) so the cell doesn't start
+    // with a stray space.
+    if !in_pre && state.in_table_cell() && raw_is_whitespace && !is_block_edge {
+        let dest = state.cell_or_output_mut();
+        if !dest.is_empty() && !dest.ends_with(' ') && !dest.ends_with('\n') {
+            dest.push(' ');
+        }
         return Ok(());
     }
     // Whitespace-only text outside any inline element (link / strong / em /
@@ -3283,30 +3344,47 @@ fn emit_gfm_table(target: &mut String, ts: crate::converter::tier1::state::Table
 
     // Pre-compute max column widths across ALL rows (mirrors Tier-2's pre-pass).
     // Tier-2: separator dashes = max(col_content_char_count_across_all_rows, 3).
-    let col_count = ts.rows.iter().map(Vec::len).max().unwrap_or(0);
+    // col_count is the colspan-expanded column count (sum of colspans per row).
+    let col_count = ts
+        .rows
+        .iter()
+        .map(|r| r.iter().map(|(_, c)| usize::from(*c)).sum::<usize>())
+        .max()
+        .unwrap_or(0);
     let mut col_widths: Vec<usize> = vec![0; col_count];
     for row in &ts.rows {
-        for (i, cell) in row.iter().enumerate() {
+        let mut col = 0usize;
+        for (cell, span) in row {
             let w = cell.chars().count();
-            if w > col_widths[i] {
-                col_widths[i] = w;
+            // Only the cell's anchor column owns the width — spanned columns
+            // contribute zero (matches Tier-2's per-cell pad calculation).
+            if col < col_widths.len() && w > col_widths[col] {
+                col_widths[col] = w;
             }
+            col += usize::from(*span);
         }
     }
 
     for (row_index, row) in ts.rows.iter().enumerate() {
         // Row: `|` then each cell as ` text |` (padded to col_width like Tier-2).
         target.push('|');
-        for (i, cell) in row.iter().enumerate() {
+        let mut col = 0usize;
+        for (cell, span) in row {
             target.push(' ');
             target.push_str(cell);
             // Pad to column width (mirrors Tier-2 cell.rs padding logic).
             let cell_len = cell.chars().count();
-            let col_w = col_widths.get(i).copied().unwrap_or(0);
+            let col_w = col_widths.get(col).copied().unwrap_or(0);
             for _ in cell_len..col_w {
                 target.push(' ');
             }
-            target.push_str(" |");
+            // Tier-2 (cell.rs:248): `for _ in 0..colspan { output.push_str(" |") }`.
+            // colspan trailing ` |` separators per cell — produces `| Header | | |`
+            // for `<th colspan="3">Header</th>` instead of `| Header |  |  |`.
+            for _ in 0..*span {
+                target.push_str(" |");
+            }
+            col += usize::from(*span);
         }
         target.push('\n');
 

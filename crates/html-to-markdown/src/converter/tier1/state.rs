@@ -19,10 +19,15 @@ const OUTPUT_CAPACITY_DIVISOR: usize = 3;
 /// the completed GFM table is appended to the main output.
 #[derive(Debug, Clone, Default)]
 pub struct TableState {
-    /// Completed rows; each row is a list of finished cell strings.
-    pub rows: Vec<Vec<String>>,
-    /// Row currently being assembled.
-    pub current_row: Vec<String>,
+    /// Completed rows; each cell is `(text, colspan)`.
+    ///
+    /// Tier-2's `convert_table_cell` (block/table/cell.rs:248) emits the cell
+    /// text once then `colspan` trailing ` |` separators.  Storing the colspan
+    /// here lets `emit_gfm_table` mirror that exactly while keeping the
+    /// per-row vector small (no empty filler entries).
+    pub rows: Vec<Vec<(String, u16)>>,
+    /// Row currently being assembled (same `(text, colspan)` shape as `rows`).
+    pub current_row: Vec<(String, u16)>,
     /// Cell text currently accumulating (active while inside a `<td>`/`<th>`).
     pub current_cell: String,
     /// True while the scanner is inside a `<thead>` section.
