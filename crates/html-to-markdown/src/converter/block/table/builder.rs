@@ -219,8 +219,16 @@ pub fn handle_table(
         let col_widths: Vec<usize> = if options.compact_tables {
             Vec::new()
         } else {
+            // Skip visitor-hook Mutex acquisitions during the pre-pass.
+            // The pre-pass only measures cell text widths; it never uses visitor
+            // results. Acquiring Arc<Mutex<>> per tag costs ~25 k lock roundtrips
+            // on a 1000x10 table — pure overhead that regressed in 7f6178f25.
+            let prepass_ctx = super::super::super::Context {
+                skip_visitor_hooks: true,
+                ..ctx.clone()
+            };
             let mut widths: Vec<usize> = Vec::new();
-            let mut prepass_rowspan: Vec<Option<usize>> = Vec::new();
+            let mut prepass_rowspan: Vec<Option<usize>> = vec![None; total_cols];
             let children = tag.children();
             for child_handle in children.top().iter() {
                 if let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) {
@@ -233,7 +241,7 @@ pub fn handle_table(
                                         row_handle,
                                         parser,
                                         options,
-                                        ctx,
+                                        &prepass_ctx,
                                         dom_ctx,
                                         &mut widths,
                                         &mut prepass_rowspan,
@@ -246,7 +254,7 @@ pub fn handle_table(
                                 child_handle,
                                 parser,
                                 options,
-                                ctx,
+                                &prepass_ctx,
                                 dom_ctx,
                                 &mut widths,
                                 &mut prepass_rowspan,

@@ -366,7 +366,9 @@ pub fn walk_node(
             };
 
             #[cfg(feature = "visitor")]
-            let visitor_element_state = if let Some(ref visitor_handle) = ctx.visitor {
+            let visitor_element_state = if ctx.skip_visitor_hooks {
+                None
+            } else if let Some(ref visitor_handle) = ctx.visitor {
                 use crate::converter::visitor_hooks::{VisitAction, handle_visitor_element_start};
 
                 let (action, state) = handle_visitor_element_start(
@@ -392,7 +394,7 @@ pub fn walk_node(
             };
 
             #[cfg(feature = "visitor")]
-            let visitor_is_active = ctx.visitor.is_some();
+            let visitor_is_active = ctx.visitor.is_some() && !ctx.skip_visitor_hooks;
             #[cfg(not(feature = "visitor"))]
             let visitor_is_active = false;
 
