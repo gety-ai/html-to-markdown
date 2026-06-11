@@ -2005,10 +2005,11 @@ fn close_pre(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOption
                 state.output.push_str(&options.code_language);
             }
             state.output.push('\n');
-            // Strip a single trailing newline from raw so the closing
-            // fence doesn't end up after a blank line.  Tier-2 emits
-            // `content\n```\n` (single newline).
-            let raw = raw.strip_suffix('\n').unwrap_or(&raw);
+            // Strip a single leading + trailing newline from raw so neither
+            // fence sits next to a blank line.  Tier-2 emits
+            // `\ncontent\n` (single newlines flanking content).
+            let raw = raw.strip_prefix('\n').unwrap_or(&raw);
+            let raw = raw.strip_suffix('\n').unwrap_or(raw);
             state.output.push_str(raw);
             state.output.push('\n');
             state.output.push_str("```\n");
