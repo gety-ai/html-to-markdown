@@ -81,12 +81,14 @@ fn gate_code_block_style_indented_allows_tier1() {
 }
 
 #[test]
-fn gate_code_block_style_backticks_forces_tier2() {
+fn gate_code_block_style_backticks_allows_tier1() {
+    // Phase Q.4 flipped the backtick router/scanner gates; Tier-1 now
+    // emits backtick-fenced code blocks natively.
     let opts = ConversionOptions {
         code_block_style: CodeBlockStyle::Backticks,
         ..base_opts()
     };
-    assert_eq!(route(&opts), RouterDecision::Tier2);
+    assert_eq!(route(&opts), RouterDecision::Tier1);
 }
 
 #[test]
