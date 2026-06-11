@@ -244,10 +244,14 @@ fn format_code_block(
                 output.push_str(&options.code_language);
             }
             output.push('\n');
-            output.push_str(content);
+            // Strip a single trailing newline so the closing fence sits
+            // directly after the last line of code with no blank line.
+            // A double-newline after the fence separates it from the next
+            // block element (matches what Indented style produces above).
+            output.push_str(content.trim_end_matches('\n'));
             output.push('\n');
             output.push_str(fence);
-            output.push('\n');
+            output.push_str("\n\n");
         }
     }
 }
