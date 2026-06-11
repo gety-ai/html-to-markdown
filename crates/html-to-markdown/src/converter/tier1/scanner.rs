@@ -1904,6 +1904,31 @@ fn close_heading(state: &mut Tier1State, frame: &OpenTag, n: u8, is_implicit: bo
         }
     }
 
+    // Normalize whitespace in the heading body: Tier-2's heading.rs walks
+    // children with `convert_as_inline: true` which routes text through
+    // text-node normalization, folding `\n + indent` runs to a single space.
+    // Mirror that here so `<h3>Mozilla\n   sponsorship</h3>` emits
+    // `### Mozilla sponsorship` rather than `### Mozilla\n  sponsorship`.
+    if state.output[frame.content_start..].contains('\n') {
+        let content = state.output[frame.content_start..].to_owned();
+        let mut normalized = String::with_capacity(content.len());
+        let mut prev_was_space = false;
+        for ch in content.chars() {
+            let is_ws = ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r';
+            if is_ws {
+                if !prev_was_space {
+                    normalized.push(' ');
+                    prev_was_space = true;
+                }
+            } else {
+                normalized.push(ch);
+                prev_was_space = false;
+            }
+        }
+        state.output.truncate(frame.content_start);
+        state.output.push_str(normalized.trim_end());
+    }
+
     let prefix = heading_prefix(n);
     state.output.insert_str(frame.content_start, prefix);
     // Tier-2 leaves a blank line ("\n\n") after a heading. A
