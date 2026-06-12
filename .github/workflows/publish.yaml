@@ -2133,6 +2133,17 @@ jobs:
     if: ${{ needs.prepare.outputs.release_elixir == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && needs.elixir-package.result == 'success' && (needs.check-hex.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     steps:
+      # App token with contents:write so generate-elixir-checksums can
+      # download NIF assets from the draft release via the authenticated
+      # gh release download path. The default github.token (contents:read
+      # at workflow scope) sees only published releases.
+      - uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          owner: kreuzberg-dev
+
       - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.ref }}
@@ -2153,6 +2164,7 @@ jobs:
           nif-versions: "2.16,2.17"
           targets: x86_64-unknown-linux-gnu,aarch64-unknown-linux-gnu,aarch64-apple-darwin,x86_64-apple-darwin
           output-path: packages/elixir/checksum-Elixir.HtmlToMarkdown.Native.exs
+          token: ${{ steps.app-token.outputs.token }}
 
       - uses: kreuzberg-dev/actions/publish-hex@v1
         with:
@@ -2298,6 +2310,11 @@ jobs:
           package-name: html-to-markdown-rs-zig
           update-release-notes: "true"
           dry-run: ${{ needs.prepare.outputs.dry_run }}
+          # Pass the App token explicitly so the action sees the draft
+          # release. The action's step-level env: GH_TOKEN: ${{ inputs.token }}
+          # overrides any job-level GH_TOKEN, so the env: below would
+          # otherwise be ignored.
+          token: ${{ steps.app-token.outputs.token }}
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
 
@@ -2315,6 +2332,7 @@ jobs:
     if: ${{ needs.prepare.outputs.release_homebrew == 'true' && needs.upload-cli-release.result == 'success' && needs.upload-c-ffi-release.result == 'success' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && (needs.check-homebrew.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     steps:
+      # tap-token: scoped to homebrew-tap for the cross-repo checkout + push.
       - uses: actions/create-github-app-token@v2
         id: tap-token
         with:
@@ -2322,6 +2340,16 @@ jobs:
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
           owner: kreuzberg-dev
           repositories: homebrew-tap
+
+      # source-token: org-wide (no `repositories:`) so the homebrew action's
+      # `gh release download` against html-to-markdown can see the draft
+      # release. The tap-token above can't read this repo's releases.
+      - uses: actions/create-github-app-token@v2
+        id: source-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          owner: kreuzberg-dev
 
       - uses: actions/checkout@v6
         with:
@@ -2342,6 +2370,7 @@ jobs:
           version: ${{ needs.prepare.outputs.version }}
           github-repo: ${{ github.repository }}
           dry-run: ${{ needs.prepare.outputs.dry_run }}
+          token: ${{ steps.source-token.outputs.token }}
 
       - name: Commit and push to tap
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
@@ -2488,9 +2517,22 @@ jobs:
     if: ${{ always() && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && !contains(needs.*.result, 'failure') }}
     runs-on: ubuntu-latest
     steps:
+      # App token with contents:write so the action's /releases listing can
+      # see the draft release (release-finalize hasn't published it yet).
+      # The default github.token has contents:read at workflow scope and so
+      # only sees published releases — that's the source of the chronic
+      # "release v3.6.0-rc.* not found after 20 attempts" failure.
+      - uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          owner: kreuzberg-dev
+
       - uses: kreuzberg-dev/actions/verify-release-assets@v1
         with:
           tag: ${{ needs.prepare.outputs.tag }}
+          token: ${{ steps.app-token.outputs.token }}
           expected-assets: |
             # CLI
             cli-*.tar.gz
