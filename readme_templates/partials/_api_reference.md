@@ -95,12 +95,12 @@ List<?>  tables   = result.tables();    // empty unless extractTables(true)
 ```
 
 {% elif language == 'csharp' %}
-**`HtmlToMarkdownConverter.Convert(string html, ConversionOptions? options = null) : ConversionResult`**
+**`{{ csharp_wrapper_class }}.Convert(string html, ConversionOptions? options = null) : ConversionResult`**
 
 Converts HTML to Markdown. Returns a `ConversionResult` record with all results in a single call.
 
 ```csharp
-var result   = HtmlToMarkdownConverter.Convert(html);
+var result   = {{ csharp_wrapper_class }}.Convert(html);
 var markdown = result.Content;    // Converted Markdown string
 var metadata = result.Metadata;   // null unless ExtractMetadata = true
 var tables   = result.Tables;     // empty unless ExtractTables = true

@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.24.11"
+alef_version = "0.24.13"
 languages = [
   "python",
   "node",
@@ -133,6 +133,9 @@ module_name = "_html_to_markdown"
 pip_name = "html-to-markdown"
 reexported_types = [
   "ConversionResult",
+]
+sdist_include = [
+  "crates/html-to-markdown",
 ]
 
 [crates.python.stubs]

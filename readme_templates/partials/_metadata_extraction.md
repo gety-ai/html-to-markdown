@@ -138,7 +138,7 @@ public class Main {
 using HtmlToMarkdown;
 
 var html = "<h1>Article</h1><img src=\"test.jpg\" alt=\"test\">";
-var result = HtmlToMarkdownConverter.Convert(html, new ConversionOptions { ExtractMetadata = true });
+var result = {{ csharp_wrapper_class }}.Convert(html, new ConversionOptions { ExtractMetadata = true });
 
 Console.WriteLine(result.Content);                                    // Converted Markdown
 Console.WriteLine(result.Metadata?.Document?.Title);                  // Document title

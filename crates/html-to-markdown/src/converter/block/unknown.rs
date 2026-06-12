@@ -58,14 +58,14 @@ pub fn handle(
         use crate::converter::utility::serialization::serialize_tag_to_html;
         use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-        let tag_name = tag.name().as_utf8_str().to_string();
+        let tag_name = tag.name().as_utf8_str();
         let raw_html = serialize_tag_to_html(node_handle, parser);
         let node_id = node_handle.get_inner();
         let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
         let node_ctx = NodeContext::with_lazy_attributes(
             NodeType::Custom,
-            Cow::Owned(tag_name.clone()),
+            Cow::Borrowed(tag_name.as_ref()),
             tag,
             depth,
             index_in_parent,

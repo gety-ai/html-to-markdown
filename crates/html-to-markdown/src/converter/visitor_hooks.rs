@@ -15,22 +15,28 @@ use crate::visitor::{NodeContext, NodeType, VisitResult};
 /// matching `handle_visitor_element_end` call does not re-walk the DOM.
 /// Attributes are NOT collected here — they are built lazily inside
 /// `NodeContext` when (and only when) a visitor reads `ctx.attributes()`.
+///
+/// `parent_tag` borrows from the parser's source string to avoid allocating
+/// per element_start call.
 #[derive(Debug)]
-pub struct VisitorElementState {
-    parent_tag: Option<String>,
+pub struct VisitorElementState<'p> {
+    parent_tag: Option<&'p str>,
     index_in_parent: usize,
     is_inline: bool,
 }
 
-impl VisitorElementState {
-    fn build_node_ctx<'a>(&'a self, tag_name: &'a str, tag: &'a tl::HTMLTag<'a>, depth: usize) -> NodeContext<'a> {
+impl<'p> VisitorElementState<'p> {
+    fn build_node_ctx<'a>(&'a self, tag_name: &'a str, tag: &'a tl::HTMLTag<'a>, depth: usize) -> NodeContext<'a>
+    where
+        'p: 'a,
+    {
         NodeContext::with_lazy_attributes(
             NodeType::Element,
             Cow::Borrowed(tag_name),
             tag,
             depth,
             self.index_in_parent,
-            self.parent_tag.as_deref().map(Cow::Borrowed),
+            self.parent_tag.map(Cow::Borrowed),
             self.is_inline,
         )
     }
@@ -42,21 +48,19 @@ impl VisitorElementState {
 /// `handle_visitor_element_end` without recomputing attributes / parent.
 /// When the action is `Skip`, `Custom`, or `Error` the state is `None`
 /// because no matching end callback will fire.
-pub fn handle_visitor_element_start(
+pub fn handle_visitor_element_start<'p>(
     visitor_handle: &crate::visitor::VisitorHandle,
     tag_name: &str,
     node_handle: &tl::NodeHandle,
     tag: &tl::HTMLTag,
-    parser: &tl::Parser<'_>,
+    parser: &'p tl::Parser<'p>,
     output: &mut String,
     _ctx: &crate::converter::Context,
     depth: usize,
-    dom_ctx: &crate::converter::DomContext,
-) -> (VisitAction, Option<VisitorElementState>) {
+    dom_ctx: &'p crate::converter::DomContext,
+) -> (VisitAction, Option<VisitorElementState<'p>>) {
     let state = VisitorElementState {
-        parent_tag: dom_ctx
-            .parent_tag_name(node_handle.get_inner(), parser)
-            .map(str::to_owned),
+        parent_tag: dom_ctx.parent_tag_name(node_handle.get_inner(), parser),
         index_in_parent: dom_ctx.get_sibling_index(node_handle.get_inner()).unwrap_or(0),
         is_inline: !is_block_level_element(tag_name),
     };
@@ -96,7 +100,7 @@ pub fn handle_visitor_element_start(
 pub fn handle_visitor_element_end(
     visitor_handle: &crate::visitor::VisitorHandle,
     tag_name: &str,
-    state: &VisitorElementState,
+    state: &VisitorElementState<'_>,
     tag: &tl::HTMLTag,
     output: &mut String,
     element_output_start: usize,

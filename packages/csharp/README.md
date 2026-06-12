@@ -163,12 +163,12 @@ The dispatcher is invisible to the caller. Output is byte-identical across tiers
 
 ### Core Function
 
-**`HtmlToMarkdownConverter.Convert(string html, ConversionOptions? options = null) : ConversionResult`**
+**`HtmlToMarkdownRs.Convert(string html, ConversionOptions? options = null) : ConversionResult`**
 
 Converts HTML to Markdown. Returns a `ConversionResult` record with all results in a single call.
 
 ```csharp
-var result   = HtmlToMarkdownConverter.Convert(html);
+var result   = HtmlToMarkdownRs.Convert(html);
 var markdown = result.Content;    // Converted Markdown string
 var metadata = result.Metadata;   // null unless ExtractMetadata = true
 var tables   = result.Tables;     // empty unless ExtractTables = true
