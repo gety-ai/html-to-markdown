@@ -72,6 +72,17 @@ if [ ! -f "src/rust/vendor/html-to-markdown-rs/Cargo.toml" ]; then
     cp -R "${VENDOR_SRC}" src/rust/vendor/html-to-markdown-rs
     echo "* vendoring complete."
   fi
+
+  # Wire up the cargo source replacement so the build uses the vendored copy of
+  # html-to-markdown-rs instead of trying to resolve the relative `path = ...`
+  # in src/rust/Cargo.toml. Cargo's path-dep takes precedence over `version` and
+  # source replacement, so we also strip the path clause from the manifest. The
+  # in-tree generated Cargo.toml keeps the path for monorepo dev; this rewrite
+  # only mutates the in-place file inside the R install directory.
+  mkdir -p src/rust/.cargo
+  cp src/rust/vendor-config.toml src/rust/.cargo/config.toml
+  sed -i.bak -E 's/, path = "[^"]*"//' src/rust/Cargo.toml
+  rm -f src/rust/Cargo.toml.bak
 fi
 
 : "${R_HOME=$(R RHOME)}"

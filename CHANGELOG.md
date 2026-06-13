@@ -5,7 +5,29 @@ All notable changes to html-to-markdown will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [3.6.2] - 2026-06-13
+
+### Fixed
+
+- **Python wheel: `HtmlVisitor` trait-bridge runtime-import resolved.** alef's pyo3 trait-marker-class emitter creates `_Trait{Name}Marker` types in the DTO module (`visitor.rs`) to satisfy TypeScript/Ruby/etc. downstream trait surface generation. The PyO3 bridge uses these markers as import-path sentinels, but h2m's `ConversionOptions` visitor field only became public in v3.6.1 after its prior conditional `#[cfg(feature = "visitor")]` gate was removed. Wheels shipped without the marker import working, causing `ImportError: cannot import name '_TraitHtmlVisitorMarker'` at runtime when user code called `convert(..., visitor)`. Fixed in alef v0.21.0 (marker-import path resolved from the actual DTO module).
+
+- **Java JAR: `NativeLib` RID alignment with publish-workflow classifier names.** The publish workflow (`publish.yaml`) uploads native libraries with RID classifiers: `osx-aarch64`, `osx-x86_64`, `linux-x86_64`, `linux-aarch64`, `windows-x64`. The `NativeLib.scala.kt` loader looked for `osx-arm64` and `osx-x86-64` (mismatched case and infix), breaking native library resolution at JAR initialization. Fixed in alef v0.20.5; RID names now match the publish assets exactly.
+
+- **R tarball: GitHub-release install fixed.** The CRAN tarball sources from GitHub release tags when users install from `.tar.gz` source (non-CRAN edge case). The `configure` script ran `cargo` with `CARGO_HOME=...` override to redirect vendor offline access, but `cargo vendor` itself does not honor `CARGO_HOME` (only cargo build does), so the offline build failed with "could not find `html-to-markdown` in the registry". extendr 0.18.1 correctly passes `--registry crates-io --offline` through to `cargo vendor`, restoring offline builds. The configure script also fixed inbound `str_as_str` imports from extendr that the v0.18.0 landing initially broke.
+
+- **Homebrew: `brew trust` prerequisite documented.** Homebrew 6.0+ (released 2026-05) requires `brew trust kreuzberg-dev/tap` before installing from the third-party tap. Updated `docs/installation.md`, `README.md`, and `test_apps/homebrew/run_tests.sh` with the trust step and explanatory note. Smoke test now calls `brew trust "$TAP" || true` before `brew bundle install`, making CI-tested on Homebrew 6.0+ environments.
+
+## [3.6.1] - 2026-06-12
+
+### Fixed
+
+- **Ruby gem: `Rakefile` reverted to v3.5.5 working pattern.** v3.6.0's alef 0.21.0 regen introduced `RbSys::ExtensionTask` with manual `Dir.chdir` nesting that broke nested `file "Cargo.lock"` task declarations. Reverts to the v3.5.5 `Rake::ExtensionTask` pattern for all 5 platforms (macOS arm64/x86_64, Linux x86_64/aarch64, Windows x64). Resolves bundle exec compilation failures.
+
+- **Zig: curl HTTP/2 support.** Zig's vendored curl bindings required `+h2` feature flag for HTTPS URL fetch operations. Updated `packages/zig/build.zig.zon` to enable the feature, restoring GitHub-release downloads on Zig consumers.
+
+- **Homebrew bottle ordering stabilized.** alef v0.20.5 sort order for bottle entries now matches `brew audit` expectations; formulae no longer fail the Homebrew official-tap checklist.
+
+## [3.6.0] - 2026-06-12
 
 ### Added
 
@@ -138,6 +160,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   emission now collapses runs of three or more consecutive newlines into exactly two, so
   the frontmatter→body and list→next-block transitions no longer produce extra blank lines
   that violate markdownlint MD012.
+
 - **autolinks: bare paths and filenames are no longer wrapped as autolinks** (resolves #397).
   Per GFM §6.5, autolinks require an absolute URI with a scheme — but the previous check only
   compared the link text to the `href`, so `<a href="foobar.png">foobar.png</a>` became the
@@ -145,6 +168,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   helper that validates the RFC 3986 scheme grammar (`ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )`
   followed by `:`). Bare paths, fragments, and filenames now render as `[text](href)`. `https://`,
   `mailto:`, `ftp://`, `data:`, and other schemed URLs continue to autolink as before.
+
 - **node binding: visitor callbacks (`visitText`, `visitLink`, `visitHeading`, …) now fire**
   (resolves #395). `JsHtmlVisitorBridge` now stores a persistent `napi::bindgen_prelude::ObjectRef<false>`
   obtained via `Object::create_ref()` and materializes a fresh local `Object` handle per callback
@@ -156,6 +180,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `Drop` impl on the bridge calls `obj_ref.unref(&env)` so the JS object can be GC'd after
   conversion. Verified against the issue repro: `visitText`/`visitLink`/`visitHeading` all fire.
   (alef commit `1ffdaafe4`)
+
 - **code block: `CodeBlockStyle::Backticks` and `Tildes` no longer emit a trailing blank
   line inside the fence and now insert a blank line after the closing fence** (resolves #396).
   The fenced emitter pushed `content` verbatim (which already ends in `\n` for any trailing-newline
@@ -165,36 +190,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   via `.lines().join("\n")` and already emits `\n\n` after. The Backticks/Tildes path now trims
   trailing newlines from inner content (`content.trim_end_matches('\n')`) before re-emitting a
   single `\n`, and pushes `\n\n` after the closing fence to match Indented.
+
 - **php test_app: PIE `install.sh` now installs `kreuzberg-dev/html-to-markdown`** instead of
   the non-existent `kreuzberg-dev/html-to-markdown-rs` (resolves #98 / smoke regression). The
   Packagist project only publishes the un-suffixed name; `alef.toml` was renamed and the regen
   picks it up in both `install.sh` and the inline comment.
+
 - **r binding: `conversion_options()` helper exported in `NAMESPACE`.** alef's R emitter
   generated the `R/options.R` helper for ergonomic ConversionOptions construction but never
   exported it, so `htmltomarkdown::conversion_options(...)` raised `could not find function`
   at runtime — which downstream `convert(..., options=)` callers then surfaced as the
   extendr-api 0.9.0 `options must be a named list` validation error. Resolves #99 / smoke
   regression. (alef commit `160d504f3`)
+
 - **java binding: `NativeLib.<clinit>` no longer throws `NoSuchElementException`** when an
   optional FFI symbol is missing. The error-context handle lookups (`LAST_ERROR_CODE`,
   `LAST_ERROR_CONTEXT`) used `Optional.orElseThrow()` mid-static-init, escalating any partial
   symbol set into a hard `NoClassDefFoundError`; they now fall back to `null` and the rest of
   the loader's null-checks handle the absence gracefully. Resolves #100 / smoke regression.
   (alef commit `d296bfdeb`)
+
 - **c FFI test_app `Makefile` now embeds an `LC_RPATH`** so the smoke binary can find the
   dylib at runtime on macOS without `DYLD_LIBRARY_PATH`. Adds `-Wl,-rpath,$(FFI_LIB_DIR)`
   to the LDFLAGS path. Resolves #101 / smoke regression.
+
 - **csharp binding: trait-bridge catch blocks no longer emit unused `Exception ex` variables.**
   The generated `TraitBridges.cs` had 25+ `catch (Exception ex)` blocks where `ex` was never
   referenced; with `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>` the build failed
   with CS0168, which in turn blocked NuGet publish for 3 releases (root cause of #104). alef
   now emits bare `catch (Exception)` when the exception variable isn't actually used.
   (alef commit `16e81b20d`)
-- **ruby gem: `Rakefile` now uses `Rake::ExtensionTask` with inline `ext_dir`** instead of the
-  alef-0.21.0 `RbSys::ExtensionTask` + manual `Dir.chdir` pattern. rake lost the chdir context
-  when running nested `file "Cargo.lock"` task declarations, breaking `bundle exec rake compile`
-  for ALL 5 platforms (macos-x86_64/arm64, linux/aarch64, windows-x64). Reverts to the v3.5.5
-  working pattern. Resolves #102. (alef commit `c273a5413`)
 
 ### CI/Publish
 
@@ -203,6 +228,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION` for transitively-recent dep pins. The v3.5.5 fix
   only patched the test command; this covers every `pnpm install` call repo-wide. Resolves
   #96.
+
 - **Go subtag publish** (`packages/go/v3.5.x`) is already wired through the
   `kreuzberg-dev/actions` `finalize-release` job (publish.yaml:2418 passes
   `go-module-path: packages/go/v3`); no action needed here. The reason v3.5.2–v3.5.7 didn't
@@ -342,12 +368,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **ci(publish): rename Go FFI tarballs to use `-go-` infix instead of `-ffi-`.** alef 0.19.6's Go packager (`alef publish package --lang go`) emitted `{crate}-ffi-v{version}-{platform}.tar.gz`, colliding with the C FFI packager's prefix. `check-registry` asset-prefix probes and `verify-release-assets` pattern lists could not distinguish Go from C FFI tarballs, so `verify-release-assets` failed on the missing `html-to-markdown-rs-go-*.tar.gz` pattern. Workaround: rename `-ffi-v` → `-go-v` immediately after `alef publish package --lang go` in the workflow. The alef-side fix is already on alef main; the workaround can be dropped once the local alef pin moves to a release that ships it.
 
-- **release: cut v3.5.0.** Promoted from v3.5.0-rc.3 after the dry-run/republish cycle (publish run 26393110006) reached fully green (31 success / 0 failed / 56 skipped). Aligned every workspace manifest on `3.5.0` via `alef sync-versions --set 3.5.0` + full `alef generate` regen.
-
-## [3.5.0-rc.3] - 2026-05-25
-
-### Fixed
-
 - **ci(actions/build-elixir-hex): generate `Cargo.lock` unconditionally after `rewrite-native-deps`.** The fallback `cargo generate-lockfile` only ran on dry-run, but the lockfile is gitignored — real-release runs hit `Missing files: native/html_to_markdown_nif/Cargo.lock` at `mix hex.build`. Now runs in both modes. (kreuzberg-dev/actions v1.6.6, floating `v1` retagged.)
 
 - **ci(publish): split Dart pub.dev publishing into a workflow_dispatch flow so OIDC trusted publishing succeeds.** pub.dev's OIDC verifier rejects tokens minted by `release` events (`Authentication failed!`) and only accepts `push` / `workflow_dispatch`. The publish workflow now assembles the Dart package as an artifact under the `release`-triggered run, then dispatches a separate `publish-pubdev.yaml` workflow (`workflow_dispatch`) that downloads the artifact and runs `dart-lang/publish-pub@v1`. The dispatched job inherits a token GitHub's OIDC provider mints with `event_name == workflow_dispatch`, which pub.dev's audit accepts.
@@ -356,19 +376,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **bindings: regenerated with alef 0.19.5.** Picks up the Kotlin Android trait-bridge codegen fixes that caused the v3.5.0-rc.2 `:compileReleaseKotlin` failure (`Unresolved reference 'HtmlToMarkdownRsBridge'`): `bridge_obj` filename is now used for trait-bridge codegen so the file matches the object name; trait-bridge emission is skipped when the bridge function is excluded via `kotlin_android.exclude_functions`. Also picks up the alef 0.19.5 cumulative sweep: WASM emitter JSON-deserializes structured sub-config fields; swift-bridge restores JSON deserialization step in pre-call AHashMap binding; alef-emitter removes stray `>` after `.collect::<Vec<Vec<String>>>()`; PHP/Ruby/Elixir/Swift/Dart bridges emit pre-call `AHashMap` binding + `ahash = "0.8"` scaffold dep for `Cow<'static, str>` key map params; WASM wraps sanitized `Vec<Vec<String>>` fields with `serde_wasm_bindgen::to_value()`; WASM deduplicates input DTO struct generation across functions sharing the same config type; FFI preserves `AHashMap<Cow<'static, str>, _>` param types across the wrapper boundary; setup-defaults-ruby appends `--add-checksums` to default `bundle install`; scaffold-ffi injects workspace version into every internal workspace dependency so `cargo publish` accepts the FFI crate.
 
-- **ci(e2e): pin `erlef/setup-beam@v1.24.0`** (was `@v1.24` floating minor) to avoid silent action upgrades during the rc cycle.
-
-- **release: cut v3.5.0-rc.3.** Aligned every workspace manifest on `3.5.0-rc.3` via `alef sync-versions --set 3.5.0-rc.3` + full `alef generate` regen against alef 0.19.5.
-
-## [3.5.0-rc.2] - 2026-05-25
-
-### Changed
-
 - **ci(publish): replace inline Homebrew formula updater with `kreuzberg-dev/actions/publish-homebrew-source-formulas@v1`.** The `publish-homebrew-formula` job previously ran a 184-line `scripts/publish/update-homebrew-formula.sh` Bash heredoc that wrote `html-to-markdown.rb` + `libhtml-to-markdown.rb` from scratch (h2m is a dual-formula tap; the shared single-formula `publish-homebrew@v1` doesn't apply). The new shared action does the same job from per-formula `.rb.tmpl` templates + a `scripts/publish/homebrew.json` manifest, downloading release assets via `gh release download` and substituting their SHA256s into `${cli_*_sha}` / `${ffi_*_sha}` placeholders. The script is deleted; the formula generation rules now live in version-controlled Ruby templates rather than a bash heredoc. The job's gate now also passes on `dry_run == 'true'` (was `is_tag == 'true'` only) so dry-run pipelines exercise the bottle pipeline downstream — the new action substitutes a zero-SHA placeholder for missing assets on dry-run.
-
-- **ci(publish): pin `actions/checkout@v5` on the `homebrew-bottles` matrix job.** v6 hits an includeIf credential regression on the `macos-15-intel` runner that this matrix includes (same workaround liter-llm applies on its Homebrew matrix). Other jobs stay on `@v6`.
-
-### Fixed
 
 - **list**: Fix content duplication in Markdown output and the document structure collector when list items contain nested `ul` or `ol` children. `item.rs` previously captured the full rendered output of an `<li>` — including the rendered nested-list Markdown — as the item's text. A `text_end_pos` cursor now advances only past non-list children, so the structure collector records only the item's own text and the Markdown output for outer and mid items is not repeated. Affected: any `ul > li > ul` or `ol > li > ol` (arbitrarily nested) HTML structure. (#385)
 
@@ -376,27 +384,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **ci(publish): replace inline Elixir Hex packaging with `kreuzberg-dev/actions/build-elixir-hex@v1`.** The `elixir-package` job in `.github/workflows/publish.yaml` previously ran `mix deps.get` + `mix hex.build` inline with no path-dep rewrite and no `Cargo.lock` generation. `Cargo.lock` is gitignored, so on a fresh CI checkout `mix hex.build` failed at the `files` list check with `Missing files: native/html_to_markdown_nif/Cargo.lock` — the proximate blocker on v3.5.0-rc.2 dry-run after the Go FFI fix landed. The new shared action wraps `rewrite-native-deps@v1` (default-on, dry-run-guarded) and falls back to `cargo generate-lockfile` on dry-run so the lockfile exists for `mix hex.build` even when the rewrite is skipped. Hex source-package builds now match the python-sdist / ruby-gem pattern (rewrite baked into the shared action; cannot be omitted).
 
-- **release: cut v3.5.0-rc.2.** Aligned every workspace manifest (Cargo + npm + PyPI + Maven + Composer + Gemfile + Hex + pub.dev + Zig + R + Cocoa + NuGet + `Cargo.lock`) on `3.5.0-rc.2` via `alef sync-versions --set 3.5.0-rc.2` and re-generated all bindings, READMEs, docs reference pages, e2e suites, and `test_apps/` registry pins against alef 0.19.2.
-
-- **bindings: regenerated with alef 0.19.2.** Picks up the cumulative v0.19.1 → v0.19.2 sweep: Swift codegen handles `serde_rename_all = "lowercase"` / `"UPPERCASE"` in unit enums and tagged Codable shapes (was silently emitting wrong casing); Swift now emits a custom Codable for serde-untagged data enums (the auto-derive previously used the wrong shape, surfacing as 19 runtime e2e failures); tagged-data enums route through `JSONDecoder` and `Vec<Codable-enum>` closure signatures are fixed. The trait-bridge codegen pipeline is rewired across all 14 language backends (rust/python/ts/node/wasm/ruby/php/go/c#/r/zig/elixir/dart/swift/java/kotlin-android) — super-trait lifecycle methods (`name` / `version` / `initialize` / `shutdown`) are driven by the IR instead of hardcoded literals, and canonical bridge-name helpers in Swift/Kotlin de-duplicate the prior near-misses. JNI no longer special-cases trait impl-name extraction; Kotlin Android accepts a `bridge_class_name` parameter so non-kreuzberg consumers (e.g. liter-llm) can opt out of the hardcoded `KreuzbergBridge` / `kreuzberg::` references. Java's `package_dir` output_paths override now excludes setup/test/lint runs from `.../src/main/java/` so they execute from `packages/java/` as expected; JNI 0.22 compatibility was tightened (`RuntimeMethodSignature` parsing, borrow semantics, unsafe-block scoping, `JString` lifetime binding). Inherited from the v0.19.1 fix landed earlier today: magnus (Ruby) and rustler (Elixir) `NodeContent::MetadataBlock` reverse conversion now reconstructs `Vec<(String, String)>` from the sanitized `Vec<Vec<String>>` binding shape (the prior code didn't type-check and broke every Ruby build).
-
-### Fixed
-
 - **ci(publish): build the Go FFI matrix on dry-runs too.** `.github/workflows/publish.yaml` job `go-ffi-libraries` gated only on `release_go == 'true'` and the registry existence check, so on `workflow_dispatch` dry-runs it skipped entirely. Its downstream sibling `upload-go-release` already gates on `is_tag || dry_run` but waits for `go-ffi-libraries.result == 'success'`, so no Go assets were ever uploaded to the dry-run release, and the terminal `verify-assets` gate failed with `✗ pattern NOT matched: html-to-markdown-rs-go-*.tar.gz` on every recent retry (the immediate blocker on v3.5.0-rc.1 publish). Added the `(is_tag == 'true' || dry_run == 'true')` clause to `go-ffi-libraries`'s `if:`, mirroring the `kotlin-android-natives` pattern (precedent: commit `e00a56e1` "ci(publish): build Kotlin Android natives on dry_run too").
+
+- **ci(e2e): pin `erlef/setup-beam@v1.24.0`** (was `@v1.24` floating minor) to avoid silent action upgrades during the rc cycle.
 
 - **ci(e2e/ruby): drop the explicit `python3 scripts/ci/ruby/vendor-core-crate.py` step from both ruby build jobs in `.github/workflows/ci-e2e.yaml` (committed earlier today as `f23e6d458`); the dead script itself is removed in `f440af4fa`.** The shared `kreuzberg-dev/actions/build-ruby-gem@v1` action now invokes `rewrite-native-deps@v1` internally and vendors the core crate into `packages/ruby/vendor/html-to-markdown/` (no `-rs` suffix). Running the local script first wrote `packages/ruby/vendor/Cargo.toml` with `members = ["html-to-markdown-rs"]` and copied the crate into `vendor/html-to-markdown-rs/`; the subsequent action then created a sibling `vendor/html-to-markdown/` outside that members list, and cargo refused to build it with `error inheriting 'lints' from workspace root manifest's 'workspace.lints'` / `'workspace.lints' was not defined`. The action is now the single source of truth for ruby vendoring.
 
-## [3.5.0-rc.1] - 2026-05-24
-
 ### Changed
+
+- **ci(publish): pin `actions/checkout@v5` on the `homebrew-bottles` matrix job.** v6 hits an includeIf credential regression on the `macos-15-intel` runner that this matrix includes (same workaround liter-llm applies on its Homebrew matrix). Other jobs stay on `@v6`.
+
+- **release: cut v3.5.0.** Promoted from v3.5.0-rc.3 after the dry-run/republish cycle (publish run 26393110006) reached fully green (31 success / 0 failed / 56 skipped). Aligned every workspace manifest on `3.5.0` via `alef sync-versions --set 3.5.0` + full `alef generate` regen.
 
 - **release: cut v3.5.0-rc.1 release candidate.** Aligned every workspace manifest (Cargo + npm + PyPI + Maven + Composer + Gemfile + Hex + pub.dev + Zig + R + Cocoa + nuget + Cargo.lock entries) on `3.5.0-rc.1` via `alef sync-versions --set`. Refreshed every per-language dependency tree to its current upstream pin (`alef update --latest`) and re-generated all bindings, READMEs, docs reference pages, and e2e suites against alef 0.18.1 so the regen artefacts on disk match the version pin baked into every binding manifest.
 
+- **bindings: regenerated with alef 0.19.2.** Picks up the cumulative v0.19.1 → v0.19.2 sweep: Swift codegen handles `serde_rename_all = "lowercase"` / `"UPPERCASE"` in unit enums and tagged Codable shapes (was silently emitting wrong casing); Swift now emits a custom Codable for serde-untagged data enums (the auto-derive previously used the wrong shape, surfacing as 19 runtime e2e failures); tagged-data enums route through `JSONDecoder` and `Vec<Codable-enum>` closure signatures are fixed. The trait-bridge codegen pipeline is rewired across all 14 language backends (rust/python/ts/node/wasm/ruby/php/go/c#/r/zig/elixir/dart/swift/java/kotlin-android) — super-trait lifecycle methods (`name` / `version` / `initialize` / `shutdown`) are driven by the IR instead of hardcoded literals, and canonical bridge-name helpers in Swift/Kotlin de-duplicate the prior near-misses. JNI no longer special-cases trait impl-name extraction; Kotlin Android accepts a `bridge_class_name` parameter so non-kreuzberg consumers (e.g. liter-llm) can opt out of the hardcoded `KreuzbergBridge` / `kreuzberg::` references. Java's `package_dir` output_paths override now excludes setup/test/lint runs from `.../src/main/java/` so they execute from `packages/java/` as expected; JNI 0.22 compatibility was tightened (`RuntimeMethodSignature` parsing, borrow semantics, unsafe-block scoping, `JString` lifetime binding). Inherited from the v0.19.1 fix landed earlier today: magnus (Ruby) and rustler (Elixir) `NodeContent::MetadataBlock` reverse conversion now reconstructs `Vec<(String, String)>` from the sanitized `Vec<Vec<String>>` binding shape (the prior code didn't type-check and broke every Ruby build).
+
 - **bindings: regenerated with alef 0.18.1.** Picks up the v0.18.0 → v0.18.1 sweep: Java Builder `#[serde(default)]` non-optional fields use boxed nullable types so omitted JSON keys survive Jackson round-trip; PHP enum-variant accessor paths skipped before field validation; Python pyproject TOML arrays normalised to canonical `pyproject-fmt` shape; the Windows e2e runner no longer clobbers the inherited `Path` (case-insensitive env-key collision on `std::process::Command::env`); Ruby scaffold emits a `Steepfile` that ignores `lib/<gem>/native.rb` so Steep stops tripping on the Sorbet sigs the magnus backend deliberately emits; `alef readme` markdown normalisation matches `rumdl-fmt` MD012 (one blank max) so cold-regen READMEs no longer diverge from the `alef all` output; rubocop double-quote / `%w[...]` defaults emitted directly; Kotlin Android `.gitkeep` is empty (matches `end-of-file-fixer`); WASM optionalised non-Duration fields preserve core `Default` via the if-let wrapper; `Box<str>` round-trips through binding `String` via the new `CoreWrapper::Box` classifier; bare `str` resolves to `TypeRef::String` instead of falling through `sanitize_type_ref`; Zig test preamble installs `SIG_IGN` on `SIGABRT` so C++ destructor `abort()`s don't break the test-runner IPC; Java sealed-interface tagged-enum field defaults emit `new EnumName.Variant()` (records can't be statically referenced); PHP binding structs with custom core `Default` suppress the auto `#[derive(Default)]` and emit a delegating `impl Default`; doc-test import paths use the published crate name `alef` (post workspace-collapse); kotlin-android snapshot updated for vanniktech 0.36 (`SourcesJar.Sources()`, no-arg `publishToMavenCentral()`); Java e2e resolves per-fixture mock URLs from system properties; Java `Vec<T>`/`Map<K,V>` marshaling uses `MAPPER.writerFor(constructCollectionType(...))` to preserve `@JsonTypeInfo` discriminators; PyO3 `_to_rust_*_config` aliases serde-renamed keys + final pyo3 calls use serde-renamed param names.
 
-- **package READMEs: regenerated with cold `alef readme`.** The 0.18.0 regen sweep used `alef all` whose hot-cache README pass omits the blank lines between consecutive `##` section headers that the standalone `alef readme` pass emits cold. CI's `Validate READMEs` step (cold `alef readme`) caught the divergence; this commits the cold output. Same cosmetic alef bug as the prior `dcd072a58` patch; tracked separately upstream.
+- **bindings: regenerated with alef 0.18.0.** Workspace collapse + 0.17.36 → 0.18.0 cumulative codegen sweep. Notable fixes consumed in this regen: PyO3 `replace_constructor_with_serde_rename` skips the trait-bridge options field (`visitor`) from `sorted_fields` to avoid emitting it twice on `has_default` types with cfg-gated bridge fields (h2m all-features `ConversionOptions::new` previously failed `rustc E0415: identifier 'visitor' is bound more than once`); PHP e2e codegen sources the JSON key rename strategy from the language-effective `serde_rename_all` (camelCase by default) rather than the Rust core type's (which is `None` for h2m's `ConversionOptions`) so `from_json` reads the keys correctly into the binding struct's `#[serde(rename_all = "camelCase")]` — fixes 32 / 7-error PHP e2e failures; `alef all` repopulates `current_gen_paths` from the e2e cache manifest on a cache hit so the orphan-cleanup pass does not delete every previously-generated e2e file (157 deletes observed on first warm run); `[crates.{node,wasm}.crate_dir]` per-language override lets h2m point alef at its actual `crates/html-to-markdown-{node,wasm}` Rust crate dirs (without the `-rs` infix that the default formula assumed).
 
-- **bindings: regenerated with alef 0.18.0.** Workspace collapse + 0.17.36 → 0.18.0 cumulative codegen sweep. Notable fixes consumed in this regen: PyO3 `replace_constructor_with_serde_rename` skips the trait-bridge options field (`visitor`) from `sorted_fields` to avoid emitting it twice on `has_default` types with cfg-gated bridge fields (h2m all-features `ConversionOptions::new` previously failed `rustc E0415: identifier 'visitor' is bound more than once`); PHP e2e codegen sources the JSON key rename strategy from the language-effective `serde_rename_all` (camelCase by default) rather than the Rust core type's (which is `None` for h2m's `ConversionOptions`) so `from_json` reads the keys correctly into the binding struct's `#[serde(rename_all = "camelCase")]` — fixes 32 / 7-error PHP e2e failures; `alef all` repopulates `current_gen_paths` from the e2e cache manifest on a cache hit so the orphan-cleanup pass does not delete every previously-generated e2e file (157 deletes observed on first warm run); `[crates.{node,wasm}.crate_dir]` per-language override lets h2m point alef at its actual `crates/html-to-markdown-{node,wasm}` Rust crate dirs (without the `-rs` infix that the default formula assumed). Plus the inherited 0.17.36 sweep listed below.
+- **package READMEs: regenerated with cold `alef readme`.** The 0.18.0 regen sweep used `alef all` whose hot-cache README pass omits the blank lines between consecutive `##` section headers that the standalone `alef readme` pass emits cold. CI's `Validate READMEs` step (cold `alef readme`) caught the divergence; this commits the cold output. Same cosmetic alef bug as the prior `dcd072a58` patch; tracked separately upstream.
 
 - **bindings: regenerated with alef 0.17.36.** Picks up the v0.17.18→v0.17.36 cumulative codegen sweep, including: Rustler `from_json` NIF shims gated on types with NIF wrappers (fixes Elixir NIF compile errors for `ConversionOptionsUpdate`, `PreprocessingOptionsUpdate`, `NodeContext`); Kotlin Android `= PreprocessingOptions()` synthesized defaults for non-nullable nested struct fields with Rust `Default` (fixes Jackson `MissingKotlinParameterException` on partial-options JSON, 98 → 0 failures); Kotlin sealed-class `@field:JsonSerialize(as = …)`/`contentAs` annotations; Kotlin `@JsonIgnoreProperties(ignoreUnknown = true)` + nullable default for `#[serde(flatten)]` fields; JNI `crate_suffix = "-jni"` build fix; Zig test_apps build.zig references binding `module_name` (not registry `pkg_name`) for `root_source_file`; Zig local-path dependencies in registry-mode test_apps; Dart pubspec single-caret version constraint; wasm `package.json` filenames use underscores (`html_to_markdown_wasm.js`); plus inherited 0.17.18-0.17.23 fixes (Swift visitor `case continue`, C# enum converters + nullable options, PHP `with_visitor` wither for trait-bridge fields, PyO3 streaming wrapper type identity, Go unresolved-Named fallback, Java sealed-interface display helpers, Ruby array literals, Dart positional-vs-named heuristic, R `.alef_format_value` wrapping, WASM camelCase input DTOs). Includes C visitor test suite (208 → 262 tests). The v0.17.25→v0.17.27 increment additionally brings: Rustler opaque-type NIF resource wrappers and enum-variant-field type collection (fixes `cannot find type` errors for types reachable only through enum variants); Kotlin Android `LongMethod` added to the generated `@file:Suppress` list, trait-interface emission skipped (no `IDocumentExtractor`/`IRenderer` redeclaration), `Vec<u8>` return types mapped to `ByteArray`, and integer-like float literals normalized; Java `null` (not `""`) builder default for `Path` fields and streaming adapters skipped; PHP `#[php(name = …)]` on facade static methods; Swift `unwrap_or` instead of `unwrap_or_else` in serde fallbacks (clippy `-D warnings`); WASM stops emitting the broken `*Input` config DTO; and the extractor skips underscore-prefixed `pub fn`s (test-only helpers no longer leak into bindings or docs). The v0.17.28→v0.17.32 increment additionally brings: C FFI struct-field getters for nested struct and `Option<T>` fields now return a cloned, boxed value instead of `null` (`htm_html_metadata_document`, `htm_conversion_result_document`, `htm_conversion_result_metadata`); the Node `index.d.ts`/`index.js` are emitted by NAPI-RS at build time and no longer carry an alef generated-header; plus Swift visitor `VisitResult`, Java sealed-interface, and Ruby scaffold corrections. The v0.17.32→v0.17.34 increment additionally brings: a `LICENSE` file synced into every per-language package directory (pub.dev, RubyGems, and other registries require one); per-language READMEs that render only their own binding section instead of leaking every language's bullet; the PHP e2e harness no longer re-execs PHP with `-n` (PHPUnit keeps shared modules); the Ruby scaffold's `.rubocop.yml` excludes generated `lib/**/*.rb`; PHP streaming facade methods + snake_case adapter names; PyO3 keyword-escaping and signature defaults in serde-rename constructors; Java `clear_fn` `(int, String)` error constructor; and C/Zig/C# e2e codegen compile fixes. The v0.17.34→v0.17.35 increment additionally brings: PyO3 trait-bridge constructor signatures and dict-coercion exclude the synthetic bridge field (e.g. `visitor`) — fixes spurious `visitor=...` kwargs on generated Python constructors and stale dict round-trips; magnus RBS type aliases use lowercase identifiers (`json_value`) — invalid uppercase `JsonValue` was breaking `steep check`; ext-php-rs getters for `Option<NonOpaqueNamed>` explicitly `.map(Into::into)` instead of relying on the blanket `IntoZval` impl that did not unwrap the inner type; Dart e2e fixture codegen emits a default `ConversionOptions()` instance for absent required-positional options; Java `options_type` inherits from sibling language overrides; CLI `--version` syncs `packages/zig/build.zig.zon`; kotlin-android publishing switched to the vanniktech maven-publish plugin for Maven Central Portal. The v0.17.35→v0.17.36 increment additionally brings: the `/* serde(default) */` placeholder marker (used as a `required`-suppression flag for C#) is filtered before emission in `alef-codegen` and `alef-backend-java` — generated Java now contains `List.of()` / `false` / `0` instead of `/* serde(default) */`, and generated magnus Rust uses the type's actual zero value (`vec![]` / `false`); kotlin-android `.editorconfig` disables ktlint's `trailing-comma-on-call-site` and `-on-declaration-site` rules (ktfmt strips them, ktlint demands them — the two were fighting on `build.gradle.kts` after the vanniktech migration); brew unsupported-call `unsupported_in` configuration; csharp variant-struct payload type fix; alef-e2e elixir Rustler NifTaggedEnum tuple emission for tagged-enum array args; publish workflow orders `alef-scaffold` ahead of backends.
 

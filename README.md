@@ -149,7 +149,8 @@ gem install html-to-markdown
 
 # CLI
 cargo install html-to-markdown-cli
-# or
+# or (Homebrew 6.0+ requires explicit trust for third-party taps)
+brew trust kreuzberg-dev/tap
 brew install kreuzberg-dev/tap/html-to-markdown
 ```
 

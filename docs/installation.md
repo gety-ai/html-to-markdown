@@ -388,7 +388,10 @@ cargo install html-to-markdown-cli
 
 Or via Homebrew:
 
+Homebrew 6.0+ requires explicit trust for third-party taps. Trust once, then install:
+
 ```bash
+brew trust kreuzberg-dev/tap
 brew install kreuzberg-dev/tap/html-to-markdown
 ```
 
