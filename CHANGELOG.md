@@ -5,6 +5,22 @@ All notable changes to html-to-markdown will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **alef extension API: `[crates.ffi].visitor_callbacks` is now backed by the new alef per-extension
+  config mechanism.** alef's `parse_config` hook now receives the real `[extensions.<name>]` section
+  from `alef.toml` rather than always `None`. The `visitor_callbacks = true` knob in `[crates.ffi]`
+  remains the correct way to enable the visitor/callback FFI pattern — it is a general alef feature
+  shared with Go, Java, C#, and other FFI consumers, not h2m-specific. A new
+  `transform_emitted_files` hook on the `Extension` trait is also available for downstream post-
+  processing of generated files; h2m does not currently use it but can opt in without alef changes.
+
+### Fixed
+
+- **CI: `upload-go-release` now gates on `release_go == 'true'`.** The job's conditional was missing the explicit `needs.prepare.outputs.release_go == 'true'` check, allowing it to run during partial publishes when Go is intentionally skipped. Without this guard, skipped Go builds would still trigger FFI uploads/finalize-release's go-module-path tagging. Now properly skips when Go release is disabled.
+
 ## [3.6.2] - 2026-06-13
 
 ### Fixed
