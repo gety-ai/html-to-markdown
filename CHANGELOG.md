@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.4] - 2026-06-14
+
+### Fixed
+
+- **CLI: drop `reqwest` `brotli` feature to keep `alloc-no-stdlib` on 2.x.** The transitive `brotli` crate (pulled in via `async-compression`) jumped to 8.x which expects `alloc-no-stdlib` 3.x, but the workspace resolves the sibling at 2.x. The resulting trait drift broke `cargo build` on stable rustc with `the trait bound 'StandardAlloc: alloc::Allocator<...>' is not satisfied`, blocking the ubuntu-latest Python wheel build during the v3.6.3 publish run. The CLI's HTTP client now uses gzip+deflate only.
+
+- **Publish workflow: dispatch `publish-pubdev` with the release tag, not the branch ref.** When `publish.yaml` was triggered by `release: published`, `github.ref_name` resolved to the branch where the release was authored (e.g. `main`). The child workflow's OIDC token then carried `refType=branch`, which pub.dev rejects with `publishing is only allowed from 'tag' refType`. Dispatch now uses `needs.prepare.outputs.tag` so the child runs against the tag and the OIDC token is accepted.
+
+- **Taskfile: `test-apps:test:zig` now grep'd the root `Cargo.toml` for the workspace version.** The previous grep targeted `crates/html-to-markdown/Cargo.toml`, which uses `version.workspace = true` and has no literal version line — `H2M_VERSION` resolved to empty and the zig-fetch URL collapsed to `…/download/v/html-to-markdown-rs-zig-v.tar.gz` (404).
+
+### Changed
+
+- **Track `Cargo.lock` for reproducible builds.** `Cargo.lock` was previously gitignored, defeating `cargo build --locked` everywhere it was used. Every CI runner resolved deps fresh, allowing semver-compatible drift to silently introduce broken transitives (the brotli/alloc-no-stdlib mismatch above). The root workspace lockfile plus the per-package nested lockfiles (R, Ruby, Elixir NIF, e2e/rust, test_apps/rust) are now tracked.
+
+- **Pass `--locked` to `cargo build` in CI, publish, scripts, and `alef.toml` hooks.** Now that the lockfile is tracked, every CI/publish cargo build runs with `--locked` so a dirty index can't silently substitute newer transitive deps. Local-dev tasks (`.task/languages/rust.yml`) intentionally remain without `--locked` so contributors can pick up dep updates.
+
+- **Regenerated cross-language bindings with alef 0.25.1.** Pulls in: csharp e2e codegen using `KreuzbergConverter` facade; swift e2e codegen no longer emits `?` chains on non-Optional `RustString` returns; C e2e codegen panics on missing `fields_c_types` keys instead of silently miscompiling; FFI/NAPI/PyO3/Magnus/Rustler test surface cleanup; `vendor::scrub_or_regenerate_lock` preserves workspace lockfile pins via per-member `cargo update` + `cargo metadata --locked` validation; NAPI strips the `readonly` keyword from emitted `service.cjs`.
+
 ## [3.6.3] - 2026-06-14
 
 ### Changed
