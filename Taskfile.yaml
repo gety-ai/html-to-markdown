@@ -652,7 +652,7 @@ tasks:
     dir: test_apps/zig
     vars:
       H2M_VERSION:
-        sh: cd ../.. && grep -m1 '^version =' crates/html-to-markdown/Cargo.toml | sed -E 's/.*"([^"]+)".*/\1/'
+        sh: cd ../.. && grep -m1 '^version = ' Cargo.toml | sed -E 's/.*"([^"]+)".*/\1/'
     cmds:
       # Resolve the per-tag tarball hash from the GitHub release before build.
       # alef emits a placeholder hash in build.zig.zon because the real value
