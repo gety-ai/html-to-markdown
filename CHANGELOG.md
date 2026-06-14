@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.5] - 2026-06-14
+
+### Fixed
+
+- **Elixir Hex/NIF + Ruby gem publish: bump alef pin to 0.25.4 so `alef publish prepare` produces a valid binding lockfile.** alef 0.25.1's `vendor::scrub_or_regenerate_lock` strict-mode path failed on every v3.6.4 Elixir NIF and macOS/Linux Ruby gem build with `cargo update -p <lockfile> (or final cargo metadata validation) failed (exit code 101) ... cannot update the lock file ... because --locked was passed` — the seed lockfile's workspace-member path entries collided with the registry-source entries the rewrite added, and the final `cargo metadata --locked` validation could not reconcile them. alef 0.25.3 added `strip_workspace_member_entries` to drop the path-source entries from the seed before per-member `cargo update -p` runs, plus a full registry-URL package-id spec (`registry+https://github.com/rust-lang/crates.io-index#NAME@VERSION`) to disambiguate the per-member update. 0.25.4 also escapes Rust reserved keywords in extendr struct fields (relevant to R bindings consuming flat data enums with `serde(tag = "type")`).
+
+- **Python sdist on Alpine/musl: `actions/rewrite-native-deps` v1.8.69 now strips `path = "..."` from `[workspace.dependencies]` entries.** The 3.6.4 sdist's root `Cargo.toml` shipped with `[workspace.dependencies] html-to-markdown-rs = { version = "3.6.4", path = "crates/html-to-markdown" }`, and cargo eagerly validates every workspace-dep entry on `pip install` — bailing with `failed to read .../crates/html-to-markdown/Cargo.toml` because the workspace crate is not bundled in the sdist. v1.8.66 added `[patch.*]` stripping for sdist consumers (resolved #390) but missed `[workspace.dependencies]`. The new step drops `path` from every workspace-dependency entry, leaving the version so the dep resolves from crates.io on consumer install. Resolves #402.
+
 ## [3.6.4] - 2026-06-14
 
 ### Fixed

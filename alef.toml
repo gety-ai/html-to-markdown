@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.25.1"
+alef_version = "0.25.4"
 languages = [
   "python",
   "node",
@@ -322,8 +322,11 @@ precondition = "command -v pnpm >/dev/null 2>&1"
 # (multi-line arrays, 4-space indent), producing a hash-vs-format ping-pong on
 # every commit. Restrict oxfmt to src/ so Cargo.toml is owned solely by the
 # alef template and prek's `cargo sort -w`.
-format = "pnpm exec oxfmt crates/html-to-markdown-wasm/src/"
-check = "pnpm exec oxlint crates/html-to-markdown-wasm/src/"
+# src/ contains only lib.rs (Rust source); oxfmt 0.54+ errors when no JS/TS/JSON/CSS targets
+# match. The dist/ directory holds wasm-bindgen output (.d.ts) but is gitignored. Guard with
+# `|| true` so the alef:format pipeline doesn't bail when this crate has nothing for oxfmt.
+format = "pnpm exec oxfmt crates/html-to-markdown-wasm/src/ 2>/dev/null || true"
+check = "pnpm exec oxlint crates/html-to-markdown-wasm/src/ 2>/dev/null || true"
 
 [crates.lint.kotlin_android]
 precondition = "command -v gradle >/dev/null 2>&1"
@@ -763,85 +766,85 @@ categories = ["smoke", "conversion"]
 
 [crates.e2e.registry.packages.python]
 name = "html-to-markdown"
-version = ">=3.6.4"
+version = ">=3.6.5"
 
 [crates.e2e.registry.packages.node]
 name = "@kreuzberg/html-to-markdown"
-version = "^3.6.4"
+version = "^3.6.5"
 
 [crates.e2e.registry.packages.rust]
 name = "html-to-markdown-rs"
-version = "3.6.4"
+version = "3.6.5"
 
 [crates.e2e.registry.packages.go]
 module = "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
-version = "v3.6.4"
+version = "v3.6.5"
 
 [crates.e2e.registry.packages.java]
 name = "dev.kreuzberg:html-to-markdown"
-version = "3.6.4"
+version = "3.6.5"
 
 [crates.e2e.registry.packages.csharp]
 name = "KreuzbergDev.HtmlToMarkdown"
-version = "3.6.4"
+version = "3.6.5"
 
 [crates.e2e.registry.packages.php]
 name = "kreuzberg-dev/html-to-markdown"
-version = ">=3.6.4"
+version = ">=3.6.5"
 
 [crates.e2e.registry.packages.ruby]
 name = "html-to-markdown"
-version = "~> 3.6.4"
+version = "~> 3.6.5"
 
 [crates.e2e.registry.packages.elixir]
 name = "html_to_markdown"
-version = "~> 3.6.4"
+version = "~> 3.6.5"
 
 [crates.e2e.registry.packages.wasm]
 name = "@kreuzberg/html-to-markdown-wasm"
-version = "^3.6.4"
+version = "^3.6.5"
 
 [crates.e2e.registry.packages.r]
 name = "htmltomarkdown"
-version = "3.6.4"
+version = "3.6.5"
 
 [crates.e2e.registry.packages.c]
 # Matches `publish.yaml`'s `asset-prefix: html-to-markdown-rs-ffi-` for the
 # upload-release-assets step. Drift causes test_apps/c/download_ffi.sh to 404
 # on the GH release tarball.
 name = "html-to-markdown-rs-ffi"
-version = "3.6.4"
+version = "3.6.5"
 
 [crates.e2e.registry.packages.kotlin_android]
 name = "dev.kreuzberg:html-to-markdown-android"
-version = "3.6.4"
+version = "3.6.5"
 
 [crates.e2e.registry.packages.swift]
 name = "HtmlToMarkdown"
-version = "3.6.4"
+version = "3.6.5"
 
 [crates.e2e.registry.packages.dart]
 name = "h2m"
-version = "^3.6.4"
+version = "^3.6.5"
 
 [crates.e2e.registry.packages.zig]
 name = "html_to_markdown"
-version = "3.6.4"
+version = "3.6.5"
 # Placeholder hash with embedded version triggers alef's STALE detection (added
 # in v0.22.1) — the generator emits a STALE comment in build.zig.zon and the
 # zig fetch flow auto-recomputes the real multihash at consume time. Update
 # after publishing the first zig tarball: `zig fetch --save <release-url>`.
-hash = "html-to-markdown-3.6.4-STALE_PLACEHOLDER_TO_BE_RESOLVED_BY_ZIG_FETCH"
+hash = "html-to-markdown-3.6.5-STALE_PLACEHOLDER_TO_BE_RESOLVED_BY_ZIG_FETCH"
 
 [crates.e2e.registry.packages.php_ext]
 name = "kreuzberg-dev/html-to-markdown"
-version = "3.6.4"
+version = "3.6.5"
 
 [crates.e2e.registry.packages.homebrew]
 tap = "kreuzberg-dev/tap"
 cli_formula = "html-to-markdown"
 ffi_formula = "libhtml-to-markdown"
-version = "3.6.4"
+version = "3.6.5"
 
 [crates.e2e.packages.rust]
 path = "../../crates/html-to-markdown"
