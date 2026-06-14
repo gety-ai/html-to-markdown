@@ -245,7 +245,7 @@ jobs:
 
       - name: Build html-to-markdown-ffi (release, Unix)
         if: matrix.runner != 'windows-latest'
-        run: cargo build --release -p html-to-markdown-ffi
+        run: cargo build --release --locked -p html-to-markdown-ffi
         shell: bash
         env:
           CARGO_TERM_COLOR: always
@@ -254,7 +254,7 @@ jobs:
 
       - name: Build html-to-markdown-ffi (debug, Windows)
         if: matrix.runner == 'windows-latest'
-        run: cargo build -p html-to-markdown-ffi
+        run: cargo build --locked -p html-to-markdown-ffi
         shell: bash
         env:
           CARGO_TERM_COLOR: always
@@ -341,7 +341,7 @@ jobs:
         shell: bash
 
       - name: Build CLI binary
-        run: cargo build --release -p html-to-markdown-cli
+        run: cargo build --release --locked -p html-to-markdown-cli
         shell: bash
 
       - name: Cleanup Rust cache
@@ -572,12 +572,12 @@ jobs:
 
       - name: Build FFI library (Unix)
         if: runner.os != 'Windows'
-        run: cargo build --release -p html-to-markdown-ffi
+        run: cargo build --release --locked -p html-to-markdown-ffi
         shell: bash
 
       - name: Build FFI library (Windows)
         if: runner.os == 'Windows'
-        run: cargo build -p html-to-markdown-ffi
+        run: cargo build --locked -p html-to-markdown-ffi
         shell: bash
 
       - name: Restore C# dependencies
@@ -722,7 +722,7 @@ jobs:
         shell: bash
 
       - name: Build CLI binary
-        run: cargo build --release -p html-to-markdown-cli
+        run: cargo build --release --locked -p html-to-markdown-cli
         shell: bash
 
       - name: Install alef
@@ -997,12 +997,12 @@ jobs:
 
       - name: Build FFI library (Unix)
         if: runner.os != 'Windows'
-        run: cargo build --release -p html-to-markdown-ffi
+        run: cargo build --release --locked -p html-to-markdown-ffi
         shell: bash
 
       - name: Build FFI library (Windows)
         if: runner.os == 'Windows'
-        run: cargo build -p html-to-markdown-ffi
+        run: cargo build --locked -p html-to-markdown-ffi
         shell: bash
 
       - name: Restore C# dependencies
@@ -1064,7 +1064,7 @@ jobs:
           check-latest: true
 
       - name: Build FFI library
-        run: cargo build --release -p html-to-markdown-ffi
+        run: cargo build --release --locked -p html-to-markdown-ffi
         shell: bash
 
       - name: Detect Go modules
@@ -1259,7 +1259,7 @@ jobs:
 
       - name: Build html-to-markdown-ffi
         shell: bash
-        run: cargo build --release -p html-to-markdown-ffi
+        run: cargo build --release --locked -p html-to-markdown-ffi
 
       - name: Run C e2e tests
         shell: bash
@@ -1310,7 +1310,7 @@ jobs:
 
       - name: Build html-to-markdown-ffi
         shell: bash
-        run: cargo build -p html-to-markdown-ffi
+        run: cargo build --locked -p html-to-markdown-ffi
 
       - name: Verify header generated
         shell: bash

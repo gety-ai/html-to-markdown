@@ -283,7 +283,7 @@ format = "cd packages/php && vendor/bin/php-cs-fixer fix"
 check = "cd packages/php && vendor/bin/phpstan --configuration=phpstan.neon --memory-limit=512M"
 
 [crates.lint.go]
-before = "cargo build --release -p html-to-markdown-ffi"
+before = "cargo build --release --locked -p html-to-markdown-ffi"
 
 [crates.lint.elixir]
 precondition = "command -v mix >/dev/null 2>&1"
@@ -372,7 +372,7 @@ e2e = "cd e2e/node && pnpm install && pnpm exec vitest run"
 
 [crates.test.go]
 precondition = "command -v go >/dev/null 2>&1"
-before = "cargo build --release -p html-to-markdown-ffi && cd e2e/go && go mod tidy"
+before = "cargo build --release --locked -p html-to-markdown-ffi && cd e2e/go && go mod tidy"
 e2e = "cd e2e/go && go test ./... -count=1"
 
 [crates.test.ruby]
@@ -382,17 +382,17 @@ e2e = "cd e2e/ruby && bundle install && bundle exec rspec"
 
 [crates.test.php]
 precondition = "command -v php >/dev/null 2>&1"
-before = "cargo build --release -p html-to-markdown-php && cd e2e/php && composer install"
+before = "cargo build --release --locked -p html-to-markdown-php && cd e2e/php && composer install"
 e2e = "cd e2e/php && composer test"
 
 [crates.test.java]
 precondition = "command -v mvn >/dev/null 2>&1"
-before = "cargo build --release -p html-to-markdown-ffi && cd packages/java && mvn package -DskipTests -q"
+before = "cargo build --release --locked -p html-to-markdown-ffi && cd packages/java && mvn package -DskipTests -q"
 e2e = "cd e2e/java && mvn test -q"
 
 [crates.test.csharp]
 precondition = "command -v dotnet >/dev/null 2>&1"
-before = "cargo build --release -p html-to-markdown-ffi && scripts/ci/csharp/copy-ffi.sh"
+before = "cargo build --release --locked -p html-to-markdown-ffi && scripts/ci/csharp/copy-ffi.sh"
 e2e = "dotnet test e2e/csharp"
 
 [crates.setup.node]
@@ -447,7 +447,7 @@ e2e = "cd e2e/rust && cargo test"
 
 [crates.test.c]
 precondition = "command -v make >/dev/null 2>&1"
-before = "cargo build --release -p html-to-markdown-ffi"
+before = "cargo build --release --locked -p html-to-markdown-ffi"
 e2e = "cd e2e/c && make clean && make && DYLD_LIBRARY_PATH=../../target/release LD_LIBRARY_PATH=../../target/release ./run_tests"
 
 [crates.test.kotlin_android]
@@ -455,28 +455,28 @@ precondition = "command -v gradle >/dev/null 2>&1"
 # Kotlin/Android is a JNI binding — its host-JVM e2e loads `libhtm_jni`
 # (the `html-to-markdown-rs-jni` crate's `[lib] name = "htm_jni"` cdylib),
 # not the C FFI dylib. Build the JNI crate so it lands in target/release/.
-before = "cargo build --release -p html-to-markdown-rs-jni"
+before = "cargo build --release --locked -p html-to-markdown-rs-jni"
 e2e = "cd e2e/kotlin_android && gradle test --no-daemon"
 
 [crates.test.swift]
 precondition = "command -v swift >/dev/null 2>&1"
-before = "cargo build --release -p html-to-markdown-rs-swift"
+before = "cargo build --release --locked -p html-to-markdown-rs-swift"
 e2e = "cd e2e/swift_e2e && swift test"
 
 [crates.test.dart]
 precondition = "command -v dart >/dev/null 2>&1"
-before = "{ command -v flutter_rust_bridge_codegen >/dev/null 2>&1 || cargo install flutter_rust_bridge_codegen --version 2.12.0; } && cd packages/dart && dart pub get && cd rust && flutter_rust_bridge_codegen generate --config-file flutter_rust_bridge.yaml && cd ../../.. && cargo build --release -p html-to-markdown-rs-dart"
+before = "{ command -v flutter_rust_bridge_codegen >/dev/null 2>&1 || cargo install flutter_rust_bridge_codegen --version 2.12.0; } && cd packages/dart && dart pub get && cd rust && flutter_rust_bridge_codegen generate --config-file flutter_rust_bridge.yaml && cd ../../.. && cargo build --release --locked -p html-to-markdown-rs-dart"
 e2e = "cd e2e/dart && DYLD_FALLBACK_LIBRARY_PATH=$PWD/../../target/release LD_LIBRARY_PATH=$PWD/../../target/release FRB_DART_LOAD_EXTERNAL_LIBRARY_NATIVE_LIB_DIR=$PWD/../../target/release dart pub get && DYLD_FALLBACK_LIBRARY_PATH=$PWD/../../target/release LD_LIBRARY_PATH=$PWD/../../target/release FRB_DART_LOAD_EXTERNAL_LIBRARY_NATIVE_LIB_DIR=$PWD/../../target/release dart test"
 
 [crates.test.zig]
 precondition = "command -v zig >/dev/null 2>&1"
-before = "cargo build --release -p html-to-markdown-ffi"
+before = "cargo build --release --locked -p html-to-markdown-ffi"
 e2e = "cd e2e/zig && zig build test"
 
 [crates.build_commands.ruby]
 precondition = "command -v cargo >/dev/null 2>&1"
-build = "cd packages/ruby/ext/html_to_markdown_rb && cargo build"
-build_release = "cd packages/ruby/ext/html_to_markdown_rb && cargo build --release"
+build = "cd packages/ruby/ext/html_to_markdown_rb && cargo build --locked"
+build_release = "cd packages/ruby/ext/html_to_markdown_rb && cargo build --release --locked"
 
 [crates.publish]
 core_crate = "crates/html-to-markdown"

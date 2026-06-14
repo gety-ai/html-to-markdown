@@ -6,7 +6,7 @@ SWIFT_PKG="$REPO_ROOT/packages/swift"
 SWIFT_E2E="$(cd "$(dirname "$0")" && pwd)"
 
 echo "Building Rust binding..."
-cargo build -p html-to-markdown-rs-swift --release || exit 1
+cargo build --locked -p html-to-markdown-rs-swift --release || exit 1
 
 echo "Copying swift-bridge output to packages/swift..."
 # shellcheck disable=SC2012

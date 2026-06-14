@@ -643,7 +643,7 @@ jobs:
         # The CLI binary is bundled into the sdist so it can be installed via pipx.
         shell: bash
         run: |
-          cargo build --release --package html-to-markdown-cli
+          cargo build --release --locked --package html-to-markdown-cli
           mkdir -p packages/python/html_to_markdown/_cli
           cp target/release/html-to-markdown packages/python/html_to_markdown/_cli/ 2>/dev/null \
             || cp target/release/html-to-markdown.exe packages/python/html_to_markdown/_cli/
@@ -1473,7 +1473,7 @@ jobs:
           VERSION: ${{ needs.prepare.outputs.version }}
         shell: bash
         run: |
-          cargo build --release --target "${TARGET}" \
+          cargo build --release --locked --target "${TARGET}" \
             --manifest-path packages/elixir/native/html_to_markdown_nif/Cargo.toml
           NIF_DIR="packages/elixir/native/html_to_markdown_nif"
           # Source library extension on disk (set by cargo's cdylib output).

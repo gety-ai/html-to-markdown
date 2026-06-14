@@ -14,7 +14,7 @@ def main() -> None:
 
     print("Building html-to-markdown CLI binary...")
     subprocess.run(
-        ["cargo", "build", "--release", "--package", "html-to-markdown-cli"],
+        ["cargo", "build", "--release", "--locked", "--package", "html-to-markdown-cli"],
         check=True,
         cwd=repo_root,
     )
