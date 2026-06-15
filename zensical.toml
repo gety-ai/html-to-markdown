@@ -42,6 +42,10 @@ nav = [
       { "C#" = "reference/api-csharp.md" },
       { "Elixir" = "reference/api-elixir.md" },
       { "R" = "reference/api-r.md" },
+      { "Dart" = "reference/api-dart.md" },
+      { "Kotlin (Android)" = "reference/api-kotlin-android.md" },
+      { "Swift" = "reference/api-swift.md" },
+      { "Zig" = "reference/api-zig.md" },
       { "C" = "reference/api-c.md" },
       { "WebAssembly" = "reference/api-wasm.md" },
     ] },
@@ -53,9 +57,8 @@ nav = [
     { "Migration" = "migration.md" },
     { "Contributing" = "contributing.md" },
     { "Changelog" = "https://github.com/kreuzberg-dev/html-to-markdown/blob/main/CHANGELOG.md" },
+    { "Ecosystem" = "ecosystem.md" },
   ] },
-
-  { "Ecosystem" = "ecosystem.md" },
 ]
 
 [project.theme]

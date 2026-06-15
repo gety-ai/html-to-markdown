@@ -69,6 +69,76 @@ Convert HTML to Markdown, Djot, or plain text. One Rust core, 12 language bindin
 
 ---
 
+## Quick Example
+
+=== "Python"
+
+    ```python title="main.py"
+    from html_to_markdown import convert
+
+    result = convert("<h1>Hello</h1><p>World</p>")
+    print(result.content)
+    print(result.metadata)
+    ```
+
+=== "TypeScript"
+
+    ```typescript title="index.ts"
+    import { convert } from "@kreuzberg/html-to-markdown";
+
+    const result = convert("<h1>Hello</h1><p>World</p>");
+    console.log(result.content);
+    console.log(result.metadata);
+    ```
+
+=== "Rust"
+
+    ```rust title="src/main.rs"
+    use html_to_markdown_rs::convert;
+
+    fn main() -> Result<(), Box<dyn std::error::Error>> {
+        let result = convert("<h1>Hello</h1><p>World</p>", None)?;
+        println!("{}", result.content.unwrap_or_default());
+        Ok(())
+    }
+    ```
+
+---
+
+## Part of Kreuzberg.dev
+
+html-to-markdown ships as a standalone library and as the HTML pipeline inside the [Kreuzberg](https://docs.kreuzberg.dev) document intelligence stack.
+
+<div class="grid cards" markdown>
+
+- :material-file-document-multiple:{ .lg .middle } **[Kreuzberg](https://docs.kreuzberg.dev)**
+
+  Document intelligence core — text, tables, and metadata from 91+ file formats. Uses html-to-markdown for every HTML input.
+
+- :material-cloud:{ .lg .middle } **[Kreuzberg Cloud](https://docs.kreuzberg.cloud)**
+
+  Managed SaaS API for document extraction. Same engine, no infrastructure.
+
+- :material-spider-web:{ .lg .middle } **[kreuzcrawl](https://docs.kreuzcrawl.kreuzberg.dev)**
+
+  Web crawler that pairs with html-to-markdown for crawl-then-convert pipelines.
+
+- :material-robot:{ .lg .middle } **[liter-llm](https://docs.liter-llm.kreuzberg.dev)**
+
+  Universal LLM client — feed it the Markdown out of html-to-markdown.
+
+- :material-code-tags:{ .lg .middle } **[tree-sitter-language-pack](https://docs.tree-sitter-language-pack.kreuzberg.dev)**
+
+  306 Tree-sitter grammars on demand for code intelligence.
+
+- :fontawesome-brands-discord:{ .lg .middle } **[Discord](https://discord.gg/xt9WY3GnKR)**
+
+  Community chat for kreuzberg.dev users and contributors.
+
+</div>
+
+---
+
 ## Explore the Docs
 
 <div class="grid cards" markdown>
@@ -108,40 +178,6 @@ Convert HTML to Markdown, Djot, or plain text. One Rust core, 12 language bindin
   Upgrading from earlier versions.
 
   [:octicons-arrow-right-24: Migration](migration.md)
-
-</div>
-
----
-
-## Part of kreuzberg.dev
-
-html-to-markdown ships as a standalone library and as the HTML pipeline inside the [Kreuzberg](https://docs.kreuzberg.dev) document intelligence stack.
-
-<div class="grid cards" markdown>
-
-- :material-file-document-multiple:{ .lg .middle } **[Kreuzberg](https://docs.kreuzberg.dev)**
-
-  Document intelligence core — text, tables, and metadata from 91+ file formats. Uses html-to-markdown for every HTML input.
-
-- :material-cloud:{ .lg .middle } **[Kreuzberg Cloud](https://docs.kreuzberg.cloud)**
-
-  Managed SaaS API for document extraction. Same engine, no infrastructure.
-
-- :material-spider-web:{ .lg .middle } **[kreuzcrawl](https://docs.kreuzcrawl.kreuzberg.dev)**
-
-  Web crawler that pairs with html-to-markdown for crawl-then-convert pipelines.
-
-- :material-robot:{ .lg .middle } **[liter-llm](https://docs.liter-llm.kreuzberg.dev)**
-
-  Universal LLM client — feed it the Markdown out of html-to-markdown.
-
-- :material-code-tags:{ .lg .middle } **[tree-sitter-language-pack](https://docs.tree-sitter-language-pack.kreuzberg.dev)**
-
-  306 Tree-sitter grammars on demand for code intelligence.
-
-- :fontawesome-brands-discord:{ .lg .middle } **[Discord](https://discord.gg/xt9WY3GnKR)**
-
-  Community chat for kreuzberg.dev users and contributors.
 
 </div>
 

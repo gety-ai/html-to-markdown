@@ -949,6 +949,60 @@ snippets_dir = "docs/snippets"
 discord_url = "https://discord.gg/xt9WY3GnKR"
 banner_url = "https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8"
 
+[crates.readme.targets.root]
+name = "html-to-markdown"
+template = "root.md"
+output_path = "README.md"
+
+[crates.readme.languages.rust]
+name = "Rust"
+template = "rust.md"
+output_path = "crates/html-to-markdown/README.md"
+package_manager = ["cargo"]
+package_name = "html-to-markdown-rs"
+install_command = "cargo add html-to-markdown-rs"
+description = """
+High-performance HTML to Markdown converter built with Rust.
+This crate is the core engine compiled into every binding and CLI, ensuring identical Markdown
+output across every language.
+"""
+migration_version = ""
+
+[crates.readme.languages.rust.features]
+visitor_pattern = true
+metadata_extraction = true
+cli_proxy = false
+
+[crates.readme.languages.rust.performance]
+platform = "Apple M4"
+function = "convert()"
+note = "Real Wikipedia documents"
+
+[[crates.readme.languages.rust.performance.benchmarks]]
+name = "Lists (Timeline)"
+size = "129KB"
+latency = "0.62ms"
+throughput = "208 MB/s"
+
+[[crates.readme.languages.rust.performance.benchmarks]]
+name = "Tables (Countries)"
+size = "360KB"
+latency = "2.02ms"
+throughput = "178 MB/s"
+
+[[crates.readme.languages.rust.performance.benchmarks]]
+name = "Mixed (Python wiki)"
+size = "656KB"
+latency = "4.56ms"
+throughput = "144 MB/s"
+
+[crates.readme.languages.rust.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+metadata_extraction = "metadata/basic_extraction.md"
+visitor_basic = "visitor/basic_visitor.md"
+table_extraction = "table-extraction/basic_extraction.md"
+
 [crates.readme.languages.python]
 name = "Python"
 template = "language_package.md"

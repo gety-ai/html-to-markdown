@@ -41,10 +41,10 @@
 - WebAssembly: `npm install @kreuzberg/html-to-markdown-wasm`.
 - C: shared library + header from GitHub Releases; HTM_H header, `htm_*` symbols.
 
-## Ecosystem
+## Kreuzberg Ecosystem
 
-- [Kreuzberg](https://docs.kreuzberg.dev): Document intelligence core — text, tables, metadata from 91+ file formats. Uses html-to-markdown for every HTML input.
-- [Kreuzberg Cloud](https://docs.kreuzberg.cloud): Managed SaaS API on top of Kreuzberg.
-- [kreuzcrawl](https://docs.kreuzcrawl.kreuzberg.dev): Web crawler for crawl-then-convert pipelines.
-- [liter-llm](https://docs.liter-llm.kreuzberg.dev): Universal LLM client.
-- [tree-sitter-language-pack](https://docs.tree-sitter-language-pack.kreuzberg.dev): 306 Tree-sitter grammars on demand.
+- [Kreuzberg](https://docs.kreuzberg.dev): Document intelligence: text, tables, metadata from 91+ formats with optional OCR
+- [Kreuzberg Cloud](https://docs.kreuzberg.cloud): Managed extraction API with SDKs, dashboards, and observability
+- [kreuzcrawl](https://docs.kreuzcrawl.kreuzberg.dev): Web crawling and scraping with HTML to Markdown and headless-Chrome fallback
+- [liter-llm](https://docs.liter-llm.kreuzberg.dev): Universal LLM API client with native bindings for 14 languages and 143 providers
+- [tree-sitter-language-pack](https://docs.tree-sitter-language-pack.kreuzberg.dev): Tree-sitter grammars and code-intelligence primitives

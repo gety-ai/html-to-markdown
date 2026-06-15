@@ -11,6 +11,7 @@ cargo install html-to-markdown-cli
 Or via Homebrew:
 
 ```bash
+brew trust kreuzberg-dev/tap
 brew install kreuzberg-dev/tap/html-to-markdown
 ```
 
