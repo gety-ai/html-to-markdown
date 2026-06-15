@@ -470,6 +470,8 @@ jobs:
 
       - name: Build Ruby extension
         uses: kreuzberg-dev/actions/build-ruby-gem@v1 # v1
+        with:
+          rewrite-native-deps: "false"
 
       - name: Cleanup Rust cache
         if: always() && steps.checkout.outcome == 'success'
@@ -527,6 +529,7 @@ jobs:
         with:
           crate-name: html-to-markdown-php
           lib-name: html_to_markdown_php
+          rewrite-native-deps: "false"
 
       - name: Upload PHP extension artifact
         uses: actions/upload-artifact@v7
@@ -852,6 +855,8 @@ jobs:
 
       - name: Build Ruby extension
         uses: kreuzberg-dev/actions/build-ruby-gem@v1 # v1
+        with:
+          rewrite-native-deps: "false"
 
       - name: Run Rubocop (Ubuntu/ruby-3.3 only)
         if: runner.os != 'Windows' && matrix.os == 'ubuntu-latest' && matrix.ruby == '3.3'
@@ -940,6 +945,7 @@ jobs:
         with:
           crate-name: html-to-markdown-php
           lib-name: html_to_markdown_php
+          rewrite-native-deps: "false"
 
       - name: Run PHP static analysis
         run: scripts/ci/php/run-phpstan.sh
