@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.9] - 2026-06-15
+
+### Fixed
+
+- **Bump alef to 0.25.17.** Picks up the dart `unreachable_patterns` allow attribute for the crate-root, which was missing from the dart `gen_rust_crate` scaffold. v3.6.8's CI Rust failed with `unreachable pattern` errors at `packages/dart/rust/src/lib.rs:1739` and `:2102`: the dart enum-conversion path emits an `_ => unreachable!("cfg-gated variant ... not active in this build")` catch-all so the match remains exhaustive when a `#[cfg(feature = "X")]`-gated variant is compiled out, but the dart binding's `[features]` table forwards `testkit` unconditionally, so the cfg-gated arm IS compiled in and the catch-all is unreachable — `-D warnings` turned the lint into an error. alef 0.25.17 adds `unreachable_patterns` to the existing `#![allow(unused_variables, unreachable_code)]` crate-root attribute, matching the swift backend's already-correct allow list.
+
 ## [3.6.8] - 2026-06-15
 
 ### Fixed
