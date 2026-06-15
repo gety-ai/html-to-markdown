@@ -8,15 +8,14 @@ title: "Python API Reference"
 
 #### convert()
 
-Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images,
-and warnings.
+Convert HTML to Markdown, Djot, or plain text.
 
-  `impl Into<Option<ConversionOptions>>`, so any of the following call shapes are accepted:
+Returns a `ConversionResult` with converted content plus optional metadata,
+document structure, table data, inline images, and warnings depending on the
+enabled features and conversion options.
 
-- `convert(html, ConversionOptions.default())` — bare options.
-- `convert(html, opts)` — bare options.
-- `convert(html, Some(opts))` — explicit `Option`.
-- `convert(html, None)` — fall back to `ConversionOptions.default`.
+  `ConversionOptions`, `Some(options)`, or `None`; bindings expose the same
+  option fields through language-native constructors or optional parameters.
 
 **Errors:**
 
@@ -117,11 +116,11 @@ metadata, extracted tables, images, and processing warnings.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `content` | `str \| None` | `None` | Converted text output (markdown, djot, or plain text). `None` when `output_format` is set to `OutputFormat.None`, indicating extraction-only mode. |
+| `content` | `str \| None` | `None` | Converted text output in the selected format: Markdown, Djot, or plain text. |
 | `document` | `DocumentStructure \| None` | `None` | Structured document tree with semantic elements. Populated when `ConversionOptions.include_document_structure` is `True`. `None` otherwise (the default), which avoids the overhead of building the tree. When present, the tree mirrors the converted document: headings open `Group` sections, paragraphs and list items carry inline `TextAnnotation`s, and tables reference the same `TableGrid` data exposed in `Self.tables`. Note: this field is independent of the `metadata` feature flag. Document structure collection is always available at runtime; it is gated only by the runtime option, not by a compile-time feature. |
 | `metadata` | `HtmlMetadata` | — | Extracted HTML metadata (title, OG, links, images, structured data). |
 | `tables` | `list[TableData]` | `[]` | Extracted tables with structured cell data and markdown representation. |
-| `images` | `list[str]` | `[]` | Extracted inline images (data URIs and SVGs). Populated when `extract_images` is `True` in options. This field is excluded from binding generation (alef) because `InlineImage` contains binary data (`Vec<u8>`) that cannot be safely represented across language boundaries in a lossless way. Access inline images via the `HtmlExtraction` type returned by the `inline-images` API instead. |
+| `images` | `list[str]` | `[]` | Extracted inline images from data URIs and SVGs. Populated when the `inline-images` feature is enabled and `extract_images` is `True`. Bindings may expose a simplified image representation or omit this Rust-only payload depending on backend support for binary image data. |
 | `warnings` | `list[ProcessingWarning]` | `[]` | Non-fatal processing warnings. |
 
 ---

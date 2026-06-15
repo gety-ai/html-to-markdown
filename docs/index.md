@@ -1,10 +1,10 @@
 ---
-description: "html-to-markdown — Convert HTML to Markdown, Djot, or plain text. Rust core, 12 language bindings, identical output on every runtime."
+description: "html-to-markdown — Convert HTML to Markdown, Djot, or plain text. Rust core plus 15 generated packages, identical output on every runtime."
 ---
 
 # html-to-markdown
 
-Convert HTML to Markdown, Djot, or plain text. One Rust core, 12 language bindings, identical output on every runtime. Part of the [kreuzberg.dev](https://kreuzberg.dev) document intelligence ecosystem.
+Convert HTML to Markdown, Djot, or plain text. One Rust core plus 15 generated packages, identical output on every runtime. Part of the [kreuzberg.dev](https://kreuzberg.dev) document intelligence ecosystem.
 
 <div class="hero-badges" markdown>
 
@@ -25,25 +25,25 @@ Convert HTML to Markdown, Djot, or plain text. One Rust core, 12 language bindin
 
   Single-pass DOM walk written in Rust. The same code path runs from Python, the browser, and the CLI — no per-language conversion logic.
 
-- :material-translate:{ .lg .middle } **12 bindings**
+- :material-translate:{ .lg .middle } **16 language surfaces**
 
-  Rust, Python, TypeScript, Go, Ruby, PHP, Java, C#, Elixir, R, C, and WebAssembly. One option name maps to one option name in every language.
+  Rust plus generated packages for Python, TypeScript, Go, Ruby, PHP, Java, C#, Elixir, R, C, WebAssembly, Swift, Dart, Kotlin Android, and Zig.
 
-- :material-file-document-outline:{ .lg .middle } **Three output formats**
+- :material-file-document-outline:{ .lg .middle } **Three output formats** <span class="version-badge">Available by v3.6</span>
 
   Markdown (CommonMark) by default, plus Djot and plain text via `output_format`. The same options apply to every format.
 
-- :material-tag-multiple:{ .lg .middle } **Metadata extraction**
+- :material-tag-multiple:{ .lg .middle } **Metadata extraction** <span class="version-badge">Available by v3.6</span>
 
   Document title, Open Graph, Twitter Card, JSON-LD, links, and images in one pass. Enabled by default — disable with `extract_metadata: false`.
 
-- :material-table:{ .lg .middle } **Table extraction**
+- :material-table:{ .lg .middle } **Table extraction** <span class="version-badge">Available by v3.6</span>
 
   HTML tables into `result.tables` with structured cells, row/column spans, and header flags, alongside the rendered Markdown.
 
-- :material-puzzle:{ .lg .middle } **Visitor pattern**
+- :material-puzzle:{ .lg .middle } **Visitor pattern** <span class="version-badge">Available by v3.6</span>
 
-  42 element-level callbacks on the `HtmlVisitor` trait to skip, replace, or preserve any node. Zero cost when unused.
+  40 callbacks on the `HtmlVisitor` trait to skip, replace, or preserve nodes. Kotlin Android excludes visitor support. Zero cost when unused.
 
 </div>
 
@@ -65,6 +65,10 @@ Convert HTML to Markdown, Djot, or plain text. One Rust core, 12 language bindin
 | **R**                 | `install.packages("htmltomarkdown")`                              | [Reference](reference/api-r.md)          |
 | **C (FFI)**           | Shared library + header                                           | [Reference](reference/api-c.md)          |
 | **WebAssembly**       | `npm install @kreuzberg/html-to-markdown-wasm`                    | [Reference](reference/api-wasm.md)       |
+| **Swift**             | Swift Package `HtmlToMarkdown`                                    | [Reference](reference/api-swift.md)      |
+| **Dart**              | `dart pub add h2m`                                                | [Reference](reference/api-dart.md)       |
+| **Kotlin Android**    | Maven `dev.kreuzberg:html-to-markdown-android`                    | [Reference](reference/api-kotlin-android.md) |
+| **Zig**               | Zig package `html_to_markdown_rs`                                 | [Reference](reference/api-zig.md)        |
 | **CLI**               | `cargo install html-to-markdown-cli`                              | [CLI Guide](cli.md)                      |
 
 ---

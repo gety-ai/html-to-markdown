@@ -45,7 +45,7 @@ html-to-markdown --url https://example.com > output.md
 | Flag                           | Description                                    |
 | ------------------------------ | ---------------------------------------------- |
 | `-o`, `--output FILE`          | Write output to file (default: stdout).        |
-| `-f`, `--output-format FORMAT` | Output format: `markdown` (default) or `djot`. |
+| `-f`, `--output-format FORMAT` | Output format: `markdown` (default), `djot`, or `plain`. |
 
 ## Heading Options
 
@@ -59,14 +59,14 @@ html-to-markdown --url https://example.com > output.md
 | ------------------------- | --------------- | -------- | ------------------------------------------------------- |
 | `--list-indent-type TYPE` | `spaces`, `tab` | `spaces` | Indentation character for nested lists.                 |
 | `--list-indent-width N`   | 1–8             | `2`      | Spaces per nesting level.                               |
-| `-b`, `--bullets CHARS`   | e.g. `*+-`      | `-`      | Characters to cycle through for unordered list markers. |
+| `-b`, `--bullets CHARS`   | e.g. `-*+`      | `-*+`   | Characters to cycle through for unordered list markers. |
 
 ## Text Formatting
 
 | Flag                      | Values                                 | Default        | Description                                       |
 | ------------------------- | -------------------------------------- | -------------- | ------------------------------------------------- |
 | `--strong-em-symbol CHAR` | `*`, `_`                               | `*`            | Symbol for bold and italic.                       |
-| `--newline-style STYLE`   | `backslash`, `spaces`                  | `backslash`    | How `<br>` tags are rendered.                     |
+| `--newline-style STYLE`   | `backslash`, `spaces`                  | `spaces`       | How `<br>` tags are rendered.                     |
 | `--sub-symbol SYMBOL`     | any string                             | `""`           | Wrapper symbol for `<sub>` text.                  |
 | `--sup-symbol SYMBOL`     | any string                             | `""`           | Wrapper symbol for `<sup>` text.                  |
 | `--highlight-style STYLE` | `double-equal`, `html`, `bold`, `none` | `double-equal` | Rendering of `<mark>` elements.                   |
@@ -79,7 +79,7 @@ html-to-markdown --url https://example.com > output.md
 
 | Flag                         | Values                            | Default    | Description                                  |
 | ---------------------------- | --------------------------------- | ---------- | -------------------------------------------- |
-| `--code-block-style STYLE`   | `indented`, `backticks`, `tildes` | `indented` | Format for multi-line code blocks.           |
+| `--code-block-style STYLE`   | `indented`, `backticks`, `tildes` | `backticks` | Format for multi-line code blocks.          |
 | `-l`, `--code-language LANG` | any string                        | `""`       | Default language tag for fenced code blocks. |
 
 ## Links
@@ -102,6 +102,7 @@ html-to-markdown --url https://example.com > output.md
 | Flag             | Description                                                                     |
 | ---------------- | ------------------------------------------------------------------------------- |
 | `--br-in-tables` | Preserve line breaks in table cells as `<br>` rather than converting to spaces. |
+| `--compact-tables` | Emit compact GFM tables without column-padding alignment.                     |
 
 ## Whitespace
 
@@ -132,7 +133,7 @@ html-to-markdown --url https://example.com > output.md
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `--extract-metadata` | Prepend a metadata comment block (title, description, Open Graph, links, images) to the Markdown output. In `--json` mode, populates the `metadata` field. |
 
-## JSON Output
+## JSON Output <span class="version-badge">Available by v3.6</span>
 
 `--json` swaps the default Markdown output for a full `ConversionResult` object: `content`, `metadata`, `tables`, `document`, `images`, and `warnings` on a single JSON value. The flags in this section control which fields are populated.
 
@@ -201,7 +202,7 @@ Each CLI flag has a corresponding `ConversionOptions` field. Library users can c
 
 | CLI Flag                        | `ConversionOptions` field    | Notes                                                      |
 | ------------------------------- | ---------------------------- | ---------------------------------------------------------- |
-| `--output-format FORMAT`        | `output_format`              | `"markdown"` \| `"djot"` \| `"plain"` \| `"none"`          |
+| `--output-format FORMAT`        | `output_format`              | `"markdown"` \| `"djot"` \| `"plain"`                     |
 | `--heading-style STYLE`         | `heading_style`              | `"atx"` \| `"underlined"` \| `"atx-closed"`                |
 | `--list-indent-type TYPE`       | `list_indent_type`           | `"spaces"` \| `"tab"`                                      |
 | `--list-indent-width N`         | `list_indent_width`          | integer                                                    |
@@ -223,6 +224,7 @@ Each CLI flag has a corresponding `ConversionOptions` field. Library users can c
 | `--keep-inline-images-in ELEMS` | `keep_inline_images_in`      | comma-separated tag list                                   |
 | `--skip-images`                 | `skip_images`                | boolean flag                                               |
 | `--br-in-tables`                | `br_in_tables`               | boolean flag                                               |
+| `--compact-tables`              | `compact_tables`             | boolean flag                                               |
 | `--whitespace-mode MODE`        | `whitespace_mode`            | `"normalized"` \| `"strict"`                               |
 | `--strip-newlines`              | `strip_newlines`             | boolean flag                                               |
 | `-w, --wrap`                    | `wrap`                       | boolean flag                                               |

@@ -5,9 +5,9 @@
 html-to-markdown began as a Python library — a fork of
 [markdownify](https://github.com/matthewwithanm/python-markdownify) —
 focused on converting HTML to Markdown. Over time, the core was
-rewritten in Rust for performance, and native bindings were added for
-12 programming languages: Python, TypeScript, Ruby, Go, PHP, Java,
-C#, Elixir, R, C, and WebAssembly.
+rewritten in Rust for performance, and generated packages were added for
+15 language surfaces: Python, TypeScript, Ruby, Go, PHP, Java, C#,
+Elixir, R, C, WebAssembly, Swift, Dart, Kotlin Android, and Zig.
 
 v3.0.0 rationalises the library's API surface. Instead of multiple
 specialised functions, there is now a single `convert()` function that
@@ -46,7 +46,7 @@ v3 has one function:
 - `metadata` — HTML metadata (title, OG, links, images, structured data)
 - `tables` — extracted tables with cell data
 - `document` — structured document tree (when enabled)
-- `images` — extracted inline images (when enabled)
+- `images` — extracted inline images where the binding exposes them (Rust and WASM when built with inline image support; generated native bindings may omit the Rust-only image payload)
 - `warnings` — non-fatal processing warnings
 
 ### Migration table

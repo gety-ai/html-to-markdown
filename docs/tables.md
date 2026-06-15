@@ -2,7 +2,7 @@
 
 Every call to `convert()` populates `result.tables` with one entry per `<table>` found in the input. Each entry has both a rendered Markdown string and a structured cell grid, so you can embed the Markdown in downstream documents or walk the grid for analysis without re-parsing.
 
-Table extraction runs on every call. There is no opt-in flag. Set `output_format` to `"none"` if you only want the table data and not the rendered content.
+Table extraction runs on every call. There is no opt-in flag. Use JSON output with `--no-content` in the CLI, or ignore `result.content` in library code, when you only want table data.
 
 ## TableData
 
@@ -76,7 +76,7 @@ Table extraction runs on every call. There is no opt-in flag. Set `output_format
 === "Dart"
 --8<-- "snippets/dart/table-extraction/basic_extraction.md"
 
-=== "Kotlin"
+=== "Kotlin Android"
 --8<-- "snippets/kotlin_android/table-extraction/basic_extraction.md"
 
 === "Zig"
@@ -86,7 +86,7 @@ Table extraction runs on every call. There is no opt-in flag. Set `output_format
 
 The Markdown in `TableData.markdown` is the same Markdown that appears inline inside `result.content`. The grid exists for code that needs cell-level access: headers vs body rows, span detection, or programmatic lookup by `(row, col)`.
 
-If the input has no tables, `result.tables` is an empty list. If the output format is `"plain"` or `"none"`, tables are still extracted and their grids are still populated; only the Markdown rendering in `result.content` changes.
+If the input has no tables, `result.tables` is an empty list. If the output format is `"plain"`, tables are still extracted and their grids are still populated; only the rendering in `result.content` changes.
 
 ## Spans
 

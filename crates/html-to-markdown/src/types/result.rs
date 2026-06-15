@@ -24,10 +24,7 @@ use super::warnings::ProcessingWarning;
 #[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct ConversionResult {
-    /// Converted text output (markdown, djot, or plain text).
-    ///
-    /// `None` when `output_format` is set to `OutputFormat::None`,
-    /// indicating extraction-only mode.
+    /// Converted text output in the selected format: Markdown, Djot, or plain text.
     pub content: Option<String>,
 
     /// Structured document tree with semantic elements.
@@ -52,14 +49,12 @@ pub struct ConversionResult {
     /// Extracted tables with structured cell data and markdown representation.
     pub tables: Vec<TableData>,
 
-    /// Extracted inline images (data URIs and SVGs).
+    /// Extracted inline images from data URIs and SVGs.
     ///
-    /// Populated when `extract_images` is `true` in options.
-    ///
-    /// This field is excluded from binding generation (alef) because `InlineImage`
-    /// contains binary data (`Vec<u8>`) that cannot be safely represented across
-    /// language boundaries in a lossless way. Access inline images via the
-    /// `HtmlExtraction` type returned by the `inline-images` API instead.
+    /// Populated when the `inline-images` feature is enabled and
+    /// `extract_images` is `true`. Bindings may expose a simplified image
+    /// representation or omit this Rust-only payload depending on backend
+    /// support for binary image data.
     #[cfg(feature = "inline-images")]
     #[cfg_attr(feature = "serde", serde(skip))]
     #[cfg_attr(alef, alef(skip))]

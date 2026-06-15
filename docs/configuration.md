@@ -22,7 +22,7 @@ All options are passed via `ConversionOptions` (builder pattern in Rust, keyword
 | ------------------- | --------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | `list_indent_type`  | `"spaces"` \| `"tab"` | `"spaces"` | Indentation character for nested lists.                                                                                          |
 | `list_indent_width` | `int` (1–8)           | `2`        | Number of spaces per nesting level (when using spaces).                                                                          |
-| `bullets`           | `string`              | `"-"`      | Characters to cycle through for unordered list markers. For example `"*+-"` uses `*` at level 1, `+` at level 2, `-` at level 3. |
+| `bullets`           | `string`              | `"-*+"`    | Characters to cycle through for unordered list markers. For example `"-*+"` uses `-` at level 1, `*` at level 2, `+` at level 3. |
 
 ### Text Formatting
 
@@ -47,7 +47,7 @@ All options are passed via `ConversionOptions` (builder pattern in Rust, keyword
 
 | Option             | Type                                        | Default      | Description                                                               |
 | ------------------ | ------------------------------------------- | ------------ | ------------------------------------------------------------------------- |
-| `code_block_style` | `"indented"` \| `"backticks"` \| `"tildes"` | `"indented"` | How to format multi-line code blocks.                                     |
+| `code_block_style` | `"indented"` \| `"backticks"` \| `"tildes"` | `"backticks"` | How to format multi-line code blocks.                                     |
 | `code_language`    | `string`                                    | `""`         | Default language tag for fenced code blocks without an explicit language. |
 
 ### Links
@@ -63,7 +63,7 @@ All options are passed via `ConversionOptions` (builder pattern in Rust, keyword
 | Option                  | Type          | Default   | Description                                                                                            |
 | ----------------------- | ------------- | --------- | ------------------------------------------------------------------------------------------------------ |
 | `keep_inline_images_in` | `array`       | `[]`      | Element names where images should be kept as Markdown `![alt](src)` rather than converted to alt text. |
-| `extract_images`        | `bool`        | `false`   | Extract data URIs and embedded SVGs into the `images` field of `ConversionResult`.                     |
+| `extract_images`        | `bool`        | `false`   | Extract data URIs and embedded SVGs. Rust and WASM expose inline images when built with `inline-images`; generated native bindings may omit the Rust-only image payload. |
 | `skip_images`           | `bool`        | `false`   | Drop image elements entirely. No `![alt](src)` output, no alt-text fallback.                           |
 | `max_image_size`        | `int` (bytes) | `5242880` | Maximum byte size for an extracted inline image. Larger images are skipped. 5 MB default.              |
 | `capture_svg`           | `bool`        | `false`   | Include inline `<svg>` elements in `result.images` when `extract_images` is enabled.                   |

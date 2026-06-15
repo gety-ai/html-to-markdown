@@ -2,7 +2,7 @@
 
 The visitor system is the library's main extensibility point. Implement `HtmlVisitor` and you can replace, skip, or augment how any HTML element becomes Markdown. No fork required.
 
-Rust users must opt in with `features = ["visitor"]`. The other bindings expose the visitor through their native idiom (`Visitor` interface in Java, callback object in Python, etc.) and link against a Rust core built with the feature enabled.
+Rust users must opt in with `features = ["visitor"]`. The Rust trait is `HtmlVisitor: Debug + Send`, and the public handle is `Arc<Mutex<dyn HtmlVisitor + Send>>`. Generated bindings expose visitors only where the backend supports trait handles; Kotlin Android excludes visitor support.
 
 ## Execution Order
 
@@ -195,7 +195,7 @@ All 40 methods have default implementations that return `Continue`. Override onl
 === "Dart"
 --8<-- "snippets/dart/visitor/basic_visitor.md"
 
-=== "Kotlin"
+=== "Kotlin Android"
 --8<-- "snippets/kotlin_android/visitor/basic_visitor.md"
 
 === "Zig"

@@ -15,18 +15,18 @@ use crate::validation::{Utf16Encoding, detect_utf16_encoding, validate_input};
 #[cfg(feature = "metadata")]
 use crate::{HtmlMetadata, MetadataConfig};
 
-/// Convert HTML to Markdown, returning a [`ConversionResult`] with content, metadata, images,
-/// and warnings.
+/// Convert HTML to Markdown, Djot, or plain text.
+///
+/// Returns a [`ConversionResult`] with converted content plus optional metadata,
+/// document structure, table data, inline images, and warnings depending on the
+/// enabled features and conversion options.
 ///
 /// # Arguments
 ///
 /// * `html` — the HTML string to convert.
-/// * `options` — conversion options. The parameter bound is
-///   `impl Into<Option<ConversionOptions>>`, so any of the following call shapes are accepted:
-///   - `convert(html, ConversionOptions::default())` — bare options.
-///   - `convert(html, opts)` — bare options.
-///   - `convert(html, Some(opts))` — explicit `Option`.
-///   - `convert(html, None)` — fall back to [`ConversionOptions::default`].
+/// * `options` — conversion options. Rust accepts either bare
+///   [`ConversionOptions`], `Some(options)`, or `None`; bindings expose the same
+///   option fields through language-native constructors or optional parameters.
 ///
 /// # Example
 ///

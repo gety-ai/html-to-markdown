@@ -46,7 +46,7 @@
 === "Dart"
 --8<-- "snippets/dart/getting-started/basic_usage.md"
 
-=== "Kotlin"
+=== "Kotlin Android"
 --8<-- "snippets/kotlin_android/getting-started/basic_usage.md"
 
 === "Zig"
@@ -58,11 +58,11 @@ Every call to `convert()` returns a `ConversionResult` with the following fields
 
 | Field      | Type                          | Description                                                                                                                 |
 | ---------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `content`  | `Optional<String>`            | The converted text (Markdown, Djot, or plain). `None`/`null` when `output_format` is `"none"`.                              |
+| `content`  | `Optional<String>`            | The converted text (Markdown, Djot, or plain). There is no extraction-only `none` output format.                             |
 | `document` | `Optional<DocumentStructure>` | Structured document tree (headings, paragraphs, lists, tables). Only populated when `include_document_structure` is `true`. |
 | `metadata` | `HtmlMetadata`                | Extracted HTML metadata (title, description, Open Graph, Twitter Card, JSON-LD, links, images).                             |
 | `tables`   | `Vec<TableData>`              | Extracted tables with full grid data (headers, rows, colspan/rowspan).                                                      |
-| `images`   | `Vec<ExtractedImage>`         | Extracted inline images (data URIs, embedded SVGs). Only populated when `extract_images` is `true`.                         |
+| `images`   | `Vec<ExtractedImage>`         | Inline image extraction output. Rust and WASM expose it when built with `inline-images`; generated native bindings may omit the Rust-only image payload. |
 | `warnings` | `Vec<ProcessingWarning>`      | Non-fatal warnings raised during conversion.                                                                                |
 
 ## Using Options
@@ -105,7 +105,7 @@ Control output style, metadata extraction, and more via `ConversionOptions`.
 === "Dart"
 --8<-- "snippets/dart/getting-started/with_options.md"
 
-=== "Kotlin"
+=== "Kotlin Android"
 --8<-- "snippets/kotlin_android/getting-started/with_options.md"
 
 === "Zig"
@@ -151,7 +151,7 @@ Enable `extract_metadata` to populate the `metadata` field with structured data 
 === "Dart"
 --8<-- "snippets/dart/metadata/basic_extraction.md"
 
-=== "Kotlin"
+=== "Kotlin Android"
 --8<-- "snippets/kotlin_android/metadata/basic_extraction.md"
 
 === "Zig"

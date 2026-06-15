@@ -4,7 +4,7 @@ description: "html-to-markdown architecture — Rust core, polyglot bindings, si
 
 # Architecture
 
-html-to-markdown has a Rust core with 12 language bindings on top. All bindings call the same `convert()` function — there is no per-language conversion logic.
+html-to-markdown has a Rust core plus 15 generated packages. All language surfaces call the same `convert()` function — there is no per-language conversion logic.
 
 ## Crate layout
 
@@ -18,10 +18,11 @@ crates/
 ├── html-to-markdown-node/     # Node.js / TypeScript binding (NAPI-RS)
 ├── html-to-markdown-py/       # Python binding (PyO3)
 ├── html-to-markdown-php/      # PHP extension (ext-php-rs)
-└── html-to-markdown-wasm/     # WebAssembly binding (wasm-bindgen)
+├── html-to-markdown-wasm/     # WebAssembly binding (wasm-bindgen)
+└── html-to-markdown-rs-jni/   # JNI bridge used by Kotlin Android
 ```
 
-Go, Ruby, Java, C#, Elixir, and R live under `packages/` and call into `libhtml_to_markdown` (the C FFI crate) via their language's native FFI mechanism. The Rust workspace version in the root `Cargo.toml` is the single source of truth — all binding manifests inherit it.
+Go, Ruby, Java, C#, Elixir, R, Swift, Dart, Kotlin Android, and Zig live under `packages/` and call Rust through their generated backend or `libhtml_to_markdown`. The Rust workspace version in the root `Cargo.toml` is the single source of truth — all binding manifests inherit it.
 
 ## Core library
 
@@ -48,6 +49,8 @@ Each language reaches Rust via one of two routes: direct embedding (the Rust cod
 | Elixir               | [Rustler](https://github.com/rusterlium/rustler) NIF                    | `packages/elixir`       |
 | R                    | [extendr](https://extendr.github.io) R extension                        | `packages/r`            |
 | WebAssembly          | [wasm-bindgen](https://rustwasm.github.io/wasm-bindgen/)                | `html-to-markdown-wasm` |
+| Swift                | [swift-bridge](https://github.com/chinedufn/swift-bridge) package       | `packages/swift`        |
+| Dart                 | [flutter_rust_bridge](https://cjycode.com/flutter_rust_bridge/) package | `packages/dart`         |
 
 For these, the conversion function compiles directly into the native extension. The host language never sees the C ABI.
 
@@ -58,6 +61,8 @@ For these, the conversion function compiles directly into the native extension. 
 | Go       | cgo                                      | Bundles `libhtml_to_markdown.a` in the Go module.    |
 | Java     | Foreign Function & Memory API (Java 25+) | Extracts the shared library from the JAR at startup. |
 | C#       | P/Invoke (`DllImport`)                   | Loads `libhtml_to_markdown` via `NativeLibrary`.     |
+| Kotlin Android | JNI bridge                         | Android AAR; JVM Kotlin users consume the Java package. |
+| Zig      | C ABI                                   | Zig package wraps the C FFI symbols.                 |
 | C        | Direct link                              | Header `html_to_markdown.h`, prefix `htm_*`/`HTM*`.  |
 
 The FFI crate exposes a minimal, null-safe C API (`htm_convert`, `htm_conversion_result_*`, `htm_free_string`, …) and catches any Rust panics at the boundary, converting them to `ConversionError::Panic` rather than letting them unwind across the ABI.
@@ -74,7 +79,7 @@ The core library compiles with five Cargo features. Bindings enable the subset t
 | `serde`         | `Serialize`/`Deserialize` on option and result types         |
 | `full`          | All four optional features combined                          |
 
-The WASM build omits `inline-images` (no filesystem, no image decoder in the browser sandbox).
+Rust and WASM expose inline image extraction when built with `inline-images`. Generated native bindings may omit the Rust-only `InlineImage` payload even when they expose metadata for ordinary images.
 
 ## Thread safety and allocation
 

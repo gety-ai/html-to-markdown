@@ -7,12 +7,12 @@ Every binding wraps the same Rust core. The option names and return shapes are i
 **Package:** `html-to-markdown-rs` on [crates.io](https://crates.io/crates/html-to-markdown-rs)
 
 ```toml
-html-to-markdown-rs = "3.4"
+html-to-markdown-rs = "3.6"
 ```
 
 Option structs follow Rust naming conventions (`snake_case`). Use the builder API via `ConversionOptions::builder()` or construct `ConversionOptions` directly.
 
-See [Installation: Feature Flags](installation.md#feature-flags) for the six Cargo features.
+See [Installation: Feature Flags](installation.md#feature-flags) for the five Cargo features.
 
 ## Python
 
@@ -118,7 +118,7 @@ Classes live in the flat `HtmlToMarkdown\` namespace. `HtmlToMarkdown::convert` 
 <dependency>
     <groupId>dev.kreuzberg</groupId>
     <artifactId>html-to-markdown</artifactId>
-    <version>3.6.0</version>
+    <version>3.6.8</version>
 </dependency>
 ```
 
@@ -176,6 +176,7 @@ end
 ## R
 
 **CRAN:** `htmltomarkdown`
+**Requires:** R ≥ 4.2
 
 ```r
 install.packages("htmltomarkdown")
@@ -229,6 +230,38 @@ const result = convert("<h1>Title</h1>", { headingStyle: "atx" });
 console.log(result.content);
 ```
 
-`init()` loads and instantiates the `.wasm` file. Call it once before any conversion. After that, `convert` is synchronous. Options use `camelCase` and have the same shape as the TypeScript binding. The WASM build omits the `inline-images` feature (no file-system access in the browser sandbox).
+`init()` loads and instantiates the `.wasm` file. Call it once before any conversion. After that, `convert` is synchronous. Options use `camelCase` and have the same shape as the TypeScript binding. The WASM build exposes inline image extraction when built with `inline-images`; generated native bindings may omit the Rust-only image payload.
+
+## Swift
+
+**Package:** `HtmlToMarkdown` via SwiftPM
+**Requires:** Swift ≥ 6.0
+
+Add the package from `https://github.com/kreuzberg-dev/html-to-markdown` and import `HtmlToMarkdown`.
+
+## Dart
+
+**Package:** `h2m` on pub.dev
+**Requires:** Dart ≥ 3.11
+
+```bash
+dart pub add h2m
+```
+
+The package is pure Dart from the caller's point of view and uses the generated flutter_rust_bridge runtime.
+
+## Kotlin Android
+
+**Package:** `dev.kreuzberg:html-to-markdown-android`
+**Requires:** Android minSdk 21
+
+Kotlin Android is an AAR with bundled JNI libraries. Kotlin/JVM users should use the Java package (`dev.kreuzberg:html-to-markdown`) directly.
+
+## Zig
+
+**Package:** `html_to_markdown_rs`
+**Requires:** Zig ≥ 0.16
+
+The Zig package wraps the C FFI surface and links to the generated native library.
 
 --8<-- "snippets/feedback.md"

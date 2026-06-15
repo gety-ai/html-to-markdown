@@ -13,11 +13,15 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 | Ruby                 | 3.2               | `html-to-markdown` on RubyGems                             |
 | PHP                  | 8.2               | `kreuzberg-dev/html-to-markdown` on Packagist              |
 | Java                 | 25                | `dev.kreuzberg:html-to-markdown` on Maven Central          |
-| C#                   | .NET Standard 2.0 | `KreuzbergDev.HtmlToMarkdown` on NuGet                     |
+| C#                   | .NET 10           | `KreuzbergDev.HtmlToMarkdown` on NuGet                     |
 | Elixir               | 1.14              | `html_to_markdown` on Hex                                  |
-| R                    | 4.0               | `htmltomarkdown` on CRAN                                   |
+| R                    | 4.2               | `htmltomarkdown` on CRAN                                   |
 | C                    | —                 | `libhtml_to_markdown` (GitHub Releases)                    |
 | WebAssembly          | —                 | `@kreuzberg/html-to-markdown-wasm` on npm                  |
+| Swift                | Swift 6.0         | `HtmlToMarkdown` SwiftPM package                           |
+| Dart                 | 3.11              | `h2m` on pub.dev                                           |
+| Kotlin Android       | Android minSdk 21 | `dev.kreuzberg:html-to-markdown-android` on Maven Central  |
+| Zig                  | 0.16              | `html_to_markdown_rs` Zig package                          |
 
 ---
 
@@ -54,13 +58,13 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 
     By default only the `metadata` feature is enabled. Opt in to additional features as needed:
 
-    | Feature | Enables | Default |
-    |---------|---------|---------|
-    | `metadata` | `HtmlMetadata` extraction and all `extract_*` options | yes |
-    | `visitor` | `HtmlVisitor` trait and `ConversionError::Visitor` | no |
-    | `inline-images` | data-URI decoding and inline SVG extraction | no |
-    | `serde` | `Serialize`/`Deserialize` on all public option and result types | no |
-    | `full` | all of the above | no |
+    | Feature | Enables | Default | Availability |
+    |---------|---------|---------|--------------|
+    | `metadata` | `HtmlMetadata` extraction and all `extract_*` options | yes | <span class="version-badge">Available by v3.6</span> |
+    | `visitor` | `HtmlVisitor` trait and `ConversionError::Visitor` | no | <span class="version-badge">Available by v3.6</span> |
+    | `inline-images` | data-URI decoding and inline SVG extraction | no | <span class="version-badge">Available by v3.6</span> |
+    | `serde` | `Serialize`/`Deserialize` on all public option and result types | no | <span class="version-badge">Available by v3.6</span> |
+    | `full` | all of the above | no | <span class="version-badge">Available by v3.6</span> |
 
     ```toml
     # With visitor support
@@ -194,20 +198,20 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     <dependency>
         <groupId>dev.kreuzberg</groupId>
         <artifactId>html-to-markdown</artifactId>
-        <version>3.6.0</version>
+        <version>3.6.8</version>
     </dependency>
     ```
 
     **Gradle** — add to `build.gradle`:
 
     ```groovy
-    implementation 'dev.kreuzberg:html-to-markdown:3.6.0'
+    implementation 'dev.kreuzberg:html-to-markdown:3.6.8'
     ```
 
     Or Kotlin DSL (`build.gradle.kts`):
 
     ```kotlin
-    implementation("dev.kreuzberg:html-to-markdown:3.6.0")
+    implementation("dev.kreuzberg:html-to-markdown:3.6.8")
     ```
 
     **Verify:**
@@ -244,7 +248,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     // # Hello
     ```
 
-    Targets .NET Standard 2.0 and above (.NET 6+, .NET Framework 4.6.1+). The package bundles native binaries for Linux, macOS, and Windows via `NativeLibrary` P/Invoke.
+    Targets .NET 10. The package bundles native binaries for Linux, macOS, and Windows via `NativeLibrary` P/Invoke.
 
 === "Elixir"
 
@@ -253,7 +257,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     ```elixir
     def deps do
       [
-        {:html_to_markdown, "~> 3.4"}
+        {:html_to_markdown, "~> 3.6"}
       ]
     end
     ```
@@ -289,7 +293,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     # # Hello
     ```
 
-    Requires R 4.0+. Available on CRAN for Linux (x86_64), macOS (arm64, x86_64), and Windows.
+    Requires R 4.2+. Available on CRAN for Linux (x86_64), macOS (arm64, x86_64), and Windows.
 
 === "C"
 
@@ -356,7 +360,66 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     // # Hello
     ```
 
-    `init()` must complete before any `convert()` call. After that, `convert` is synchronous. The WASM build omits the `inline-images` feature (no filesystem access in the browser sandbox). Works in browsers, Cloudflare Workers, Deno, and Bun.
+    `init()` must complete before any `convert()` call. After that, `convert` is synchronous. The WASM build exposes inline image extraction when built with `inline-images`; generated native bindings may omit the Rust-only image payload. Works in browsers, Cloudflare Workers, Deno, and Bun.
+
+=== "Swift"
+
+    Add the package URL in SwiftPM:
+
+    ```text
+    https://github.com/kreuzberg-dev/html-to-markdown
+    ```
+
+    **Verify:**
+
+    ```swift
+    import HtmlToMarkdown
+
+    let result = try convert("<h1>Hello</h1>", nil)
+    print(result.content()?.toString() ?? "")
+    ```
+
+    Requires Swift 6.0+. The package currently targets macOS 13+ and iOS 16+.
+
+=== "Dart"
+
+    ```bash
+    dart pub add h2m
+    ```
+
+    **Verify:**
+
+    ```dart
+    import 'package:h2m/h2m.dart';
+    import 'package:h2m/src/html_to_markdown_rs_bridge_generated/frb_generated.dart'
+        show RustLib;
+
+    await RustLib.init();
+    final result = await H2mBridge.convert('<h1>Hello</h1>');
+    print(result.content);
+    ```
+
+    Requires Dart 3.11+. The generated package is pure Dart from the caller's point of view and uses flutter_rust_bridge under the hood.
+
+=== "Kotlin Android"
+
+    Add the Android artifact:
+
+    ```kotlin
+    implementation("dev.kreuzberg:html-to-markdown-android:3.6.8")
+    ```
+
+    Requires Android minSdk 21. This is an Android AAR with bundled JNI libraries; Kotlin/JVM users should use the Java artifact (`dev.kreuzberg:html-to-markdown`) directly.
+
+=== "Zig"
+
+    Use the Zig package `html_to_markdown_rs` from the release artifacts or the repository package metadata.
+
+    ```zig
+    const html_to_markdown = @import("html_to_markdown");
+    ```
+
+    Requires Zig 0.16+. The package wraps the generated C FFI library.
 
 ---
 
