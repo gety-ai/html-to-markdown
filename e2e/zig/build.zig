@@ -50,6 +50,7 @@ pub fn build(b: *std.Build) void {
     });
     edge_cases_tests.root_module.addRPath(.{ .cwd_relative = ffi_path_abs });
     const edge_cases_run = b.addRunArtifact(edge_cases_tests);
+    edge_cases_run.step.dependOn(&conversion_run_run.step);
     test_step.dependOn(&edge_cases_run.step);
 
     const metadata_module = b.createModule(.{
@@ -66,6 +67,7 @@ pub fn build(b: *std.Build) void {
     });
     metadata_tests.root_module.addRPath(.{ .cwd_relative = ffi_path_abs });
     const metadata_run = b.addRunArtifact(metadata_tests);
+    metadata_run.step.dependOn(&edge_cases_run_run.step);
     test_step.dependOn(&metadata_run.step);
 
     const options_module = b.createModule(.{
@@ -82,6 +84,7 @@ pub fn build(b: *std.Build) void {
     });
     options_tests.root_module.addRPath(.{ .cwd_relative = ffi_path_abs });
     const options_run = b.addRunArtifact(options_tests);
+    options_run.step.dependOn(&metadata_run_run.step);
     test_step.dependOn(&options_run.step);
 
     const real_world_module = b.createModule(.{
@@ -98,6 +101,7 @@ pub fn build(b: *std.Build) void {
     });
     real_world_tests.root_module.addRPath(.{ .cwd_relative = ffi_path_abs });
     const real_world_run = b.addRunArtifact(real_world_tests);
+    real_world_run.step.dependOn(&options_run_run.step);
     test_step.dependOn(&real_world_run.step);
 
     const result_module = b.createModule(.{
@@ -114,6 +118,7 @@ pub fn build(b: *std.Build) void {
     });
     result_tests.root_module.addRPath(.{ .cwd_relative = ffi_path_abs });
     const result_run = b.addRunArtifact(result_tests);
+    result_run.step.dependOn(&real_world_run_run.step);
     test_step.dependOn(&result_run.step);
 
     const smoke_module = b.createModule(.{
@@ -130,6 +135,7 @@ pub fn build(b: *std.Build) void {
     });
     smoke_tests.root_module.addRPath(.{ .cwd_relative = ffi_path_abs });
     const smoke_run = b.addRunArtifact(smoke_tests);
+    smoke_run.step.dependOn(&result_run_run.step);
     test_step.dependOn(&smoke_run.step);
 
     const structure_module = b.createModule(.{
@@ -146,6 +152,7 @@ pub fn build(b: *std.Build) void {
     });
     structure_tests.root_module.addRPath(.{ .cwd_relative = ffi_path_abs });
     const structure_run = b.addRunArtifact(structure_tests);
+    structure_run.step.dependOn(&smoke_run_run.step);
     test_step.dependOn(&structure_run.step);
 
     const visitor_module = b.createModule(.{
@@ -162,6 +169,7 @@ pub fn build(b: *std.Build) void {
     });
     visitor_tests.root_module.addRPath(.{ .cwd_relative = ffi_path_abs });
     const visitor_run = b.addRunArtifact(visitor_tests);
+    visitor_run.step.dependOn(&structure_run_run.step);
     test_step.dependOn(&visitor_run.step);
 
 }

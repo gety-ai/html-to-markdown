@@ -1464,7 +1464,7 @@ HtmNodeContext htm_with_owned_attributes(HtmNodeType node_type, const char* tag_
 **Example:**
 
 ```c
-HtmNodeContext *result = htm_with_owned_attributes(NULL, "value", NULL, 42, 42, "value", true);
+HtmNodeContext *result = htm_with_owned_attributes((HtmNodeType){0}, "value", NULL, 42, 42, "value", true);
 ```
 
 **Parameters:**

@@ -46,6 +46,7 @@ pub fn build(b: *std.Build) void {
         .use_llvm = true,
     });
     const smoke_run = b.addRunArtifact(smoke_tests);
+    smoke_run.step.dependOn(&conversion_run_run.step);
     test_step.dependOn(&smoke_run.step);
 
 }
