@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Table column-width: cap per-cell measurement at 200 characters (issue #406).** Converting Microsoft-style HTML emails with hundreds of nested layout tables produced runaway output (73 MB / 2.2 s for the reporter's 851 KB reproducer) because `collect_row_cell_widths` used the *rendered* width of each cell — including any inner table's separator rows — as the outer column width. The outer table's separator was then emitted with that many dashes, which fed back into the grandparent's measurement, doubling at every nesting level. Capping the per-cell measurement at `MAX_CELL_WIDTH = 200` bounds total output to `O(cells × 200)` and keeps both the Tier-1 fast path and the Tier-2 walker numerically consistent. The reproducer now converts in 0.47 s producing 218 KB of markdown. Bisected by the reporter to alef-driven `Arc<Mutex<>>` visitor migration in 3.4.1 (`7f6178f25`); the v3.6 series already fixed the visitor-mutex hot loop in `4863d1ab6`, but the underlying exponential-width feedback remained. Regression test added: `deeply_nested_layout_tables_do_not_produce_runaway_output`.
+
 ## [3.6.9] - 2026-06-15
 
 ### Fixed

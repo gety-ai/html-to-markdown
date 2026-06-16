@@ -454,4 +454,32 @@ mod tests {
         let content = result.content.unwrap_or_default();
         assert!(content.contains('|'), "should produce pipe table, not list");
     }
+
+    /// Regression test for issue #406: deeply-nested layout tables caused
+    /// exponential output growth because `cell_text_content` recursed into
+    /// nested `<table>` elements (including their separator rows) when
+    /// computing outer column widths.  With 5 levels of nesting the output
+    /// must stay well under 10 KB.
+    #[test]
+    fn deeply_nested_layout_tables_do_not_produce_runaway_output() {
+        // Build a 5-level-deep nested layout table.
+        // Each cell contains another complete table, mirroring the structure
+        // seen in email digests that triggered the regression.
+        let inner = "<table><tr><td>leaf</td></tr></table>";
+        let level1 = format!("<table><tr><td>{inner}</td></tr></table>");
+        let level2 = format!("<table><tr><td>{level1}</td></tr></table>");
+        let level3 = format!("<table><tr><td>{level2}</td></tr></table>");
+        let level4 = format!("<table><tr><td>{level3}</td></tr></table>");
+        let level5 = format!("<table><tr><td>{level4}</td></tr></table>");
+
+        let result = crate::convert(&level5, None).unwrap();
+        let content = result.content.unwrap_or_default();
+
+        const MAX_BYTES: usize = 10_000;
+        assert!(
+            content.len() < MAX_BYTES,
+            "nested layout table output should be < {MAX_BYTES} bytes, got {} bytes (issue #406 regression)",
+            content.len()
+        );
+    }
 }

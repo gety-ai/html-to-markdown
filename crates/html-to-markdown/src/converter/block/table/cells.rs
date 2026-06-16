@@ -127,7 +127,11 @@ pub fn collect_row_cell_widths(
         };
 
         let text = cell_text_content(cell_handle, parser, options, ctx, dom_ctx);
-        let width = text.chars().count();
+        // Cap per-cell width: columns wider than MAX_CELL_WIDTH don't render
+        // legibly anyway, and uncapped widths from nested tables (even with
+        // skip_nested_tables) could still grow unbounded on edge cases (#406).
+        const MAX_CELL_WIDTH: usize = 200;
+        let width = text.chars().count().min(MAX_CELL_WIDTH);
 
         // Grow the widths vec if needed.
         if col >= col_widths.len() {
