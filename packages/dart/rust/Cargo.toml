@@ -1,6 +1,6 @@
 [package]
 name = "html-to-markdown-rs-dart"
-version = "3.6.9"
+version = "3.6.10"
 edition = "2024"
 license = "MIT"
 
@@ -12,10 +12,12 @@ ignored = ["html_to_markdown_rs"]
 [lib]
 crate-type = ["cdylib", "staticlib"]
 [features]
+default = ["inline-images", "metadata", "testkit", "visitor"]
 inline-images = ["html_to_markdown_rs/inline-images"]
 metadata = ["html_to_markdown_rs/metadata"]
 testkit = ["html_to_markdown_rs/testkit"]
 visitor = ["html_to_markdown_rs/visitor"]
+
 [dependencies]
 async-trait = "0.1"
 flutter_rust_bridge = "=2.12.0"

@@ -6,7 +6,7 @@
 
     <groupId>dev.kreuzberg</groupId>
     <artifactId>html-to-markdown</artifactId>
-    <version>3.6.9</version>
+    <version>3.6.10</version>
     <packaging>jar</packaging>
 
     <name>html-to-markdown</name>
@@ -190,8 +190,8 @@
                          with the correct classifier (e.g. osx-aarch64, linux-x64, …).
                          When CI runs `mvn package -Dclassifier=osx-aarch64`, Maven
                          passes the classifier through to this configuration, allowing
-                         the JAR to be published as tree-sitter-language-pack-java-1.9.0-osx-aarch64.jar
-                         instead of tree-sitter-language-pack-java-1.9.0.jar. -->
+                         the JAR to be published as example-language-pack-java-1.9.0-osx-aarch64.jar
+                         instead of example-language-pack-java-1.9.0.jar. -->
                     <classifier>${classifier}</classifier>
                 </configuration>
             </plugin>

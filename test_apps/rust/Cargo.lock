@@ -202,9 +202,9 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-rs"
-version = "3.6.7"
+version = "3.6.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e3328a52c0457f3a65cb0a86a77e118bd6c6a6880170ed01b2733a989934806"
+checksum = "fbcc46ffd2d6cf4427559af7e8cba67eab1ba99ad16780131e8ae814c2e90568"
 dependencies = [
  "ahash",
  "astral-tl",
@@ -235,7 +235,7 @@ dependencies = [
 
 [[package]]
 name = "html_to_markdown_rs-e2e-rust"
-version = "3.6.7"
+version = "3.6.9"
 dependencies = [
  "html-to-markdown-rs",
  "serde_json",

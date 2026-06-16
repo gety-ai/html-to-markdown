@@ -1,6 +1,6 @@
 [package]
 name = "html-to-markdown-node"
-version = "3.6.9"
+version = "3.6.10"
 edition = "2024"
 license = "MIT"
 description = "High-performance HTML to Markdown converter"
@@ -19,9 +19,16 @@ ignored = ["serde_json", "async-trait", "tokio-util"]
 [lib]
 crate-type = ["cdylib"]
 
+[features]
+default = ["inline-images", "metadata", "testkit", "visitor"]
+inline-images = ["html-to-markdown-rs/inline-images"]
+metadata = ["html-to-markdown-rs/metadata"]
+testkit = ["html-to-markdown-rs/testkit"]
+visitor = ["html-to-markdown-rs/visitor"]
+
 [dependencies]
 async-trait = "0.1"
-html-to-markdown-rs = { version = "3.6.9", path = "../html-to-markdown", features = ["serde", "metadata", "visitor", "inline-images", "testkit"] }
+html-to-markdown-rs = { version = "3.6.10", path = "../html-to-markdown", features = ["serde", "metadata", "visitor", "inline-images", "testkit"] }
 napi = { version = "3", features = ["async"] }
 napi-derive = "3"
 serde = { version = "1", features = ["derive"] }
