@@ -2,47 +2,47 @@ name: Smoke test PIE install
 description: Tests PHP extension installation via PIE
 
 inputs:
-  pie-artifacts-dir:
-    description: Directory containing PIE source artifacts
-    required: true
+    pie-artifacts-dir:
+        description: Directory containing PIE source artifacts
+        required: true
 
 runs:
-  using: composite
-  steps:
-    - name: Smoke PIE install
-      shell: bash
-      env:
-        COMPOSER_ALLOW_SUPERUSER: 1
-      run: |
-        set -euo pipefail
-        # Download PIE
-        curl -fsSL https://github.com/php/pie/releases/latest/download/pie.phar -o /tmp/pie.phar
+    using: composite
+    steps:
+        - name: Smoke PIE install
+          shell: bash
+          env:
+              COMPOSER_ALLOW_SUPERUSER: 1
+          run: |
+              set -euo pipefail
+              # Download PIE
+              curl -fsSL https://github.com/php/pie/releases/latest/download/pie.phar -o /tmp/pie.phar
 
-        # Find the PIE source archive
-        pie_archive=$(find "${{ inputs.pie-artifacts-dir }}" -name "php_html_to_markdown-*.tgz" | head -n 1)
-        if [ -z "$pie_archive" ]; then
-          echo "PIE source archive not found" >&2
-          exit 1
-        fi
+              # Find the PIE source archive
+              pie_archive=$(find "${{ inputs.pie-artifacts-dir }}" -name "php_html_to_markdown-*.tgz" | head -n 1)
+              if [ -z "$pie_archive" ]; then
+                echo "PIE source archive not found" >&2
+                exit 1
+              fi
 
-        # Extract to temp dir and install via PIE
-        tmp=$(mktemp -d)
-        tar -xzf "$pie_archive" -C "$tmp"
+              # Extract to temp dir and install via PIE
+              tmp=$(mktemp -d)
+              tar -xzf "$pie_archive" -C "$tmp"
 
-        # Add as local repository and build
-        php /tmp/pie.phar repository:add path "$tmp"
-        CARGO_BIN=$(command -v cargo)
-        php /tmp/pie.phar build kreuzberg-dev/html-to-markdown:*@dev --working-dir "$tmp" --with-cargo-bin="$CARGO_BIN"
+              # Add as local repository and build
+              php /tmp/pie.phar repository:add path "$tmp"
+              CARGO_BIN=$(command -v cargo)
+              php /tmp/pie.phar build kreuzberg-dev/html-to-markdown:*@dev --working-dir "$tmp" --with-cargo-bin="$CARGO_BIN"
 
-        # Find the built extension
-        ext_so=$(find "$tmp" -name "*.so" -path "*/html_to_markdown.so" | head -n 1)
-        if [ -z "$ext_so" ]; then
-          echo "Extension .so file not found after PIE build" >&2
-          exit 1
-        fi
+              # Find the built extension
+              ext_so=$(find "$tmp" -name "*.so" -path "*/html_to_markdown.so" | head -n 1)
+              if [ -z "$ext_so" ]; then
+                echo "Extension .so file not found after PIE build" >&2
+                exit 1
+              fi
 
-        # Test the extension (placeholder for smoke test)
-        # Note: PHP smoke example directory was removed
-        # Consider implementing integration tests via packages/php/tests
+              # Test the extension (placeholder for smoke test)
+              # Note: PHP smoke example directory was removed
+              # Consider implementing integration tests via packages/php/tests
 
-        echo "✓ PIE install smoke test passed"
+              echo "✓ PIE install smoke test passed"

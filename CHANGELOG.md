@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.12] - 2026-06-17
+
+### Fixed
+
+- **test_apps/go: stage cgo FFI library into the binding's module-cache `.lib/<platform>/` so smoke tests link cleanly.** The published Go binding declares `// #cgo LDFLAGS: -L${SRCDIR}/.lib/<platform>/ -lhtml_to_markdown_ffi`, but `${SRCDIR}` resolves to the binding's source directory under `GOMODCACHE`, which is empty after `go mod download`. The package's own `cmd/download_ffi` is `//go:build ignore`-tagged and only invocable via the binding's own `go generate`, which test_apps doesn't run. Fix: `test_apps/go/download_ffi.sh` reads `MODULE_VERSION` from `go.mod`, downloads the matching `html-to-markdown-rs-ffi-v<version>-<rust-triple>.tar.gz` artifact from the GitHub release, caches it under `${XDG_CACHE_HOME:-~/.cache}/html-to-markdown-ffi/`, makes the binding's module-cache subtree writable, and copies the library into `<binding>/.lib/<platform>/`. The smoke task invokes the script before `go test`. Restores Go to the registry-mode smoke matrix.
+- **ci(publish): replace single-success gate on `upload-php-pie-release` with cancelled/skipped guards so partial matrix success still publishes the available PIE archives.** The job was gated on `needs.php-extension.result == 'success'`, which meant a single transient matrix-cell failure (e.g. the `ENOTFOUND` artifact-upload flake observed on the v3.6.11 publish run) cascaded into skipping the entire PIE upload step. With the matrix already declared `fail-fast: false` and the in-job `actions/download-artifact@v4` step configured with `pattern: php-package-*` + `merge-multiple: true`, the upload now proceeds whenever at least one matrix cell produced an artifact. Transient flakes no longer block the entire release surface.
+- **(via alef 0.25.20–0.25.25)** Generated binding suites pick up: NAPI TypeScript `import { A as B }` → CJS `{ A: B }` rename translation (so `oxfmt` no longer aborts on `Expected ',' or '}' but found 'as'`); Go FFI `copyLibraryToBindingPackage` no-op when source aliases destination (avoids 0-byte `libhtml_to_markdown_ffi.dylib` after `go generate`); Swift `Package.swift` `v__ALEF_SWIFT_VERSION__` placeholder substitution at scaffold-write time so SwiftPM consumers don't 404 against the release asset URL; Homebrew `run_tests.sh` formula-installed CLI preflight using the parameterized binary name; alef post-generation formatter pipeline aligned with downstream prek hooks (`ktfmt` for Kotlin format, `gofmt`+`goimports` for Go, `oxfmt` for TS/JSON, `shfmt` for shell scripts, `php-cs-fixer` for PHP, `cargo sort` for emitted Cargo.toml). Resolves CI Lint formatter divergence that had been red on every commit since v3.6.11.
+- **(via alef 0.25.25)** Generated PHP test_apps `install.sh` emits `pie install --version "$VERSION" "<pkg>"` instead of the deprecated `pie install "<pkg>:$VERSION"` form that PIE 1.4.5+ rejects with `Unable to find an installable package <pkg> for version <ver>`. Restores PHP to the registry-mode smoke matrix.
+- **(via alef 0.25.25)** Generated `[crates.dart] excluded_default_features` / `[crates.swift] excluded_default_features` keep optional cargo features out of the wrapper's `default = [...]` array while still declaring them as opt-in forwarding entries, preventing target-conditional cross-compile activation of features whose system deps aren't cross-compile-ready.
+- **(via alef 0.25.25)** Generated publish/vendor flow retries `cargo update` + `cargo metadata` on crates.io registry-index propagation lag (up to 6 attempts × 30 s) so per-language build jobs don't hard-fail in the first few minutes after `Publish Rust crates` completes.
+
+### Changed
+
+- **Bump alef pin to 0.25.25** (was 0.25.19), regenerating all binding outputs, e2e codegen, API reference docs, and test_apps scaffolds.
+
 ## [3.6.11] - 2026-06-16
 
 ### Fixed

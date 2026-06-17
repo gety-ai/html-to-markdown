@@ -7,7 +7,7 @@ set -euo pipefail
 
 # Version override: pass as $1 to test an arbitrary tag; defaults to the
 # alef-pinned version from `[crates.e2e.registry.packages.php].version`.
-VERSION="${1:-3.6.11}"
+VERSION="${1:-3.6.12}"
 
 # PIE >= 1.3.7 supports the array-form `php-ext.download-url-method`
 # our composer.json emits; 1.4.0+ is preferred. Download PIE if we don't
@@ -42,7 +42,7 @@ fi
 # binary cleanly. The php.ini-append guard below prevents duplicate `extension=`
 # lines so the verification step doesn't trip on "Module already loaded".
 EXT_DIR="$(php -r 'echo ini_get("extension_dir");')"
-"$PIE" install "kreuzberg-dev/html-to-markdown:$VERSION" --skip-enable-extension
+"$PIE" install --version "$VERSION" "kreuzberg-dev/html-to-markdown" --skip-enable-extension
 
 # Verify the .so/.dylib/.dll exists after install (or was already present).
 test -f "$EXT_DIR/html_to_markdown.so" || test -f "$EXT_DIR/html_to_markdown.dylib" || test -f "$EXT_DIR/html_to_markdown.dll"
@@ -58,7 +58,7 @@ else
   else
     # Guard against duplicate: check if extension line already exists (uncommented).
     if ! grep -q "^extension=html_to_markdown" "$PHP_INI"; then
-      echo "extension=html_to_markdown" >> "$PHP_INI"
+      echo "extension=html_to_markdown" >>"$PHP_INI"
     fi
   fi
 fi

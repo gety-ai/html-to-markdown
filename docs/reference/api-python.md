@@ -2,7 +2,7 @@
 title: "Python API Reference"
 ---
 
-## Python API Reference <span class="version-badge">v3.6.11</span>
+## Python API Reference <span class="version-badge">v3.6.12</span>
 
 ### Functions
 
@@ -63,7 +63,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `strong_em_symbol` | `str` | `"*"` | Character used for bold/italic emphasis markers (`*` or `_`). |
 | `escape_asterisks` | `bool` | `False` | Escape `*` characters in plain text to avoid unintended bold/italic. |
 | `escape_underscores` | `bool` | `False` | Escape `_` characters in plain text to avoid unintended bold/italic. |
-| `escape_misc` | `bool` | `False` | Escape miscellaneous Markdown metacharacters (`[]()#` etc.) in plain text. |
+| `escape_misc` | `bool` | `False` | Escape miscellaneous Markdown metacharacters (`\[\]()#` etc.) in plain text. |
 | `escape_ascii` | `bool` | `False` | Escape ASCII characters that have special meaning in certain Markdown dialects. |
 | `code_language` | `str` | `""` | Default language annotation for fenced code blocks that have no language hint. |
 | `autolinks` | `bool` | `True` | Automatically convert bare URLs into Markdown autolinks. |
@@ -81,12 +81,12 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `sup_symbol` | `str` | `""` | Markdown notation for superscript text (e.g. `"^"`). |
 | `newline_style` | `NewlineStyle` | `NewlineStyle.SPACES` | How to encode hard line breaks (`<br>`) in Markdown. |
 | `code_block_style` | `CodeBlockStyle` | `CodeBlockStyle.BACKTICKS` | Style used for fenced code blocks (backticks or tilde). |
-| `keep_inline_images_in` | `list[str]` | `[]` | HTML tag names whose `<img>` children are kept inline instead of block. |
+| `keep_inline_images_in` | `list\[str\]` | `\[\]` | HTML tag names whose `<img>` children are kept inline instead of block. |
 | `preprocessing` | `PreprocessingOptions` | — | Options for the HTML pre-processing pass applied before conversion begins. Pre-processing runs before the HTML is handed to the converter and can perform operations such as unwrapping redundant wrapper elements, removing tracking pixels, and normalising vendor-specific markup. See `PreprocessingOptions` for the full set of knobs. Defaults to the standard preprocessing options, which enables the standard cleaning passes. Set individual fields on `PreprocessingOptions` (or construct via `ConversionOptions.builder`) to opt in or out of specific passes. |
 | `encoding` | `str` | `"utf-8"` | Expected character encoding of the input HTML (default `"utf-8"`). |
 | `debug` | `bool` | `False` | Emit debug information during conversion. |
-| `strip_tags` | `list[str]` | `[]` | HTML tag names whose content is stripped from the output entirely. |
-| `preserve_tags` | `list[str]` | `[]` | HTML tag names that are preserved verbatim in the output. |
+| `strip_tags` | `list\[str\]` | `\[\]` | HTML tag names whose content is stripped from the output entirely. |
+| `preserve_tags` | `list\[str\]` | `\[\]` | HTML tag names that are preserved verbatim in the output. |
 | `skip_images` | `bool` | `False` | Skip conversion of `<img>` elements (omit images from output). |
 | `url_escape_style` | `UrlEscapeStyle` | `UrlEscapeStyle.ANGLE` | URL encoding strategy for link and image destinations. Controls how special characters in URL destinations are escaped: - `UrlEscapeStyle.Angle` (default) — wraps the destination in angle brackets when it contains spaces or newlines. Some parsers misinterpret `>` inside such a destination. - `UrlEscapeStyle.Percent` — percent-encodes every character that is not an RFC 3986 unreserved character or `/`, producing a destination that all Markdown parsers handle correctly even when the URL contains `<`, `>`, spaces, or parentheses. |
 | `link_style` | `LinkStyle` | `LinkStyle.INLINE` | Link rendering style (inline or reference). |
@@ -97,7 +97,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `capture_svg` | `bool` | `False` | Capture SVG elements as images. |
 | `infer_dimensions` | `bool` | `True` | Infer image dimensions from data. |
 | `max_depth` | `int \| None` | `None` | Maximum DOM traversal depth. `None` means unlimited. When set, subtrees beyond this depth are silently truncated. |
-| `exclude_selectors` | `list[str]` | `[]` | CSS selectors for elements to exclude entirely (element + all content). Unlike `strip_tags` (which removes the tag wrapper but keeps children), excluded elements and all their descendants are dropped from the output. Supports any CSS selector that `tl` supports: tag names, `.class`, `#id`, `[attribute]`, etc. Invalid selectors are silently skipped at conversion time. Example: `[".cookie-banner", "#ad-container", "[role='complementary']"]` |
+| `exclude_selectors` | `list\[str\]` | `\[\]` | CSS selectors for elements to exclude entirely (element + all content). Unlike `strip_tags` (which removes the tag wrapper but keeps children), excluded elements and all their descendants are dropped from the output. Supports any CSS selector that `tl` supports: tag names, `.class`, `#id`, `\[attribute\]`, etc. Invalid selectors are silently skipped at conversion time. Example: `\[".cookie-banner", "#ad-container", "\[role='complementary'\]"\]` |
 | `tier_strategy` | `TierStrategy` | `TierStrategy.AUTO` | Which conversion tier to use. - `TierStrategy.Auto` (default) — automatically choose the best path. - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only). |
 | `visitor` | `VisitorHandle \| None` | `None` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
@@ -134,8 +134,8 @@ metadata, extracted tables, images, and processing warnings.
 | `content` | `str \| None` | `None` | Converted text output in the selected format: Markdown, Djot, or plain text. |
 | `document` | `DocumentStructure \| None` | `None` | Structured document tree with semantic elements. Populated when the `include_document_structure` option is `True`. `None` otherwise (the default), which avoids the overhead of building the tree. When present, the tree mirrors the converted document: headings open `Group` sections, paragraphs and list items carry inline `TextAnnotation`s, and tables reference the same `TableGrid` data exposed in the result's `tables` field. Note: this field is independent of the `metadata` feature flag. Document structure collection is always available at runtime; it is gated only by the runtime option, not by a compile-time feature. |
 | `metadata` | `HtmlMetadata` | — | Extracted HTML metadata (title, OG, links, images, structured data). |
-| `tables` | `list[TableData]` | `[]` | Extracted tables with structured cell data and markdown representation. |
-| `warnings` | `list[ProcessingWarning]` | `[]` | Non-fatal processing warnings. |
+| `tables` | `list\[TableData\]` | `\[\]` | Extracted tables with structured cell data and markdown representation. |
+| `warnings` | `list\[ProcessingWarning\]` | `\[\]` | Non-fatal processing warnings. |
 
 ---
 
@@ -150,15 +150,15 @@ and browsers for document indexing and presentation.
 |-------|------|---------|-------------|
 | `title` | `str \| None` | `None` | Document title from `<title>` tag |
 | `description` | `str \| None` | `None` | Document description from `<meta name="description">` tag |
-| `keywords` | `list[str]` | `[]` | Document keywords from `<meta name="keywords">` tag, split on commas |
+| `keywords` | `list\[str\]` | `\[\]` | Document keywords from `<meta name="keywords">` tag, split on commas |
 | `author` | `str \| None` | `None` | Document author from `<meta name="author">` tag |
 | `canonical_url` | `str \| None` | `None` | Canonical URL from `<link rel="canonical">` tag |
 | `base_href` | `str \| None` | `None` | Base URL from `<base href="">` tag for resolving relative URLs |
 | `language` | `str \| None` | `None` | Document language from `lang` attribute |
 | `text_direction` | `TextDirection \| None` | `None` | Document text direction from `dir` attribute |
-| `open_graph` | `dict[str, str]` | `{}` | Open Graph metadata (og:* properties) for social media Keys like "title", "description", "image", "url", etc. |
-| `twitter_card` | `dict[str, str]` | `{}` | Twitter Card metadata (twitter:* properties) Keys like "card", "site", "creator", "title", "description", "image", etc. |
-| `meta_tags` | `dict[str, str]` | `{}` | Additional meta tags not covered by specific fields Keys are meta name/property attributes, values are content |
+| `open_graph` | `dict\[str, str\]` | `{}` | Open Graph metadata (og:* properties) for social media Keys like "title", "description", "image", "url", etc. |
+| `twitter_card` | `dict\[str, str\]` | `{}` | Twitter Card metadata (twitter:* properties) Keys like "card", "site", "creator", "title", "description", "image", etc. |
+| `meta_tags` | `dict\[str, str\]` | `{}` | Additional meta tags not covered by specific fields Keys are meta name/property attributes, values are content |
 
 ---
 
@@ -171,9 +171,9 @@ A single node in the document tree.
 | `id` | `str` | — | Deterministic node identifier. |
 | `content` | `NodeContent` | — | The semantic content of this node. |
 | `parent` | `int \| None` | `None` | Index of the parent node (None for root nodes). |
-| `children` | `list[int]` | `/* serde(default) */` | Indices of child nodes in reading order. |
-| `annotations` | `list[TextAnnotation]` | `/* serde(default) */` | Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text. |
-| `attributes` | `dict[str, str] \| None` | `None` | Format-specific attributes preserved from the source HTML element. Keys are lowercased attribute names as they appear in the HTML (e.g. `"class"`, `"id"`, `"data-foo"`). Values are the raw attribute strings, copied verbatim from the source — no HTML entity decoding is applied here. The map is `None` when no attributes are present (omitted entirely in serialized output). Not every HTML attribute is preserved: only attributes that carry semantic or structural significance for the node type are collected. For example, heading nodes capture the `"id"` attribute for anchor linking; other element-level attributes may be silently dropped. |
+| `children` | `list\[int\]` | `/* serde(default) */` | Indices of child nodes in reading order. |
+| `annotations` | `list\[TextAnnotation\]` | `/* serde(default) */` | Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text. |
+| `attributes` | `dict\[str, str\] \| None` | `None` | Format-specific attributes preserved from the source HTML element. Keys are lowercased attribute names as they appear in the HTML (e.g. `"class"`, `"id"`, `"data-foo"`). Values are the raw attribute strings, copied verbatim from the source — no HTML entity decoding is applied here. The map is `None` when no attributes are present (omitted entirely in serialized output). Not every HTML attribute is preserved: only attributes that carry semantic or structural significance for the node type are collected. For example, heading nodes capture the `"id"` attribute for anchor linking; other element-level attributes may be silently dropped. |
 
 ---
 
@@ -185,7 +185,7 @@ Uses a flat node array with index-based parent/child references for efficient tr
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `nodes` | `list[DocumentNode]` | — | All nodes in document reading order. |
+| `nodes` | `list\[DocumentNode\]` | — | All nodes in document reading order. |
 | `source_format` | `str \| None` | `None` | The source format (always "html" for this library). |
 
 ---
@@ -256,10 +256,10 @@ suitable for serialization and transmission across language boundaries.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `document` | `DocumentMetadata` | — | Document-level metadata (title, description, canonical, etc.) |
-| `headers` | `list[HeaderMetadata]` | `[]` | Extracted header elements with hierarchy |
-| `links` | `list[LinkMetadata]` | `[]` | Extracted hyperlinks with type classification |
-| `images` | `list[ImageMetadata]` | `[]` | Extracted images with source and dimensions |
-| `structured_data` | `list[StructuredData]` | `[]` | Extracted structured data blocks |
+| `headers` | `list\[HeaderMetadata\]` | `\[\]` | Extracted header elements with hierarchy |
+| `links` | `list\[LinkMetadata\]` | `\[\]` | Extracted hyperlinks with type classification |
+| `images` | `list\[ImageMetadata\]` | `\[\]` | Extracted images with source and dimensions |
+| `structured_data` | `list\[StructuredData\]` | `\[\]` | Extracted structured data blocks |
 
 ---
 
@@ -286,13 +286,13 @@ plain class (no base class required) and return either a string (`"continue"`,
 `{"error": "..."}`) — the binding converts the return value to the corresponding
 `VisitResult` variant automatically.
 
-### Method Naming Convention
+##### Method Naming Convention
 
 - `visit_*_start`: Called before entering an element (pre-order traversal)
 - `visit_*_end`: Called after exiting an element (post-order traversal)
 - `visit_*`: Called for specific element types (e.g., `visit_link`, `visit_image`)
 
-### Execution Order
+##### Execution Order
 
 For a typical element like `<div><p>text</p></div>`:
 
@@ -302,7 +302,7 @@ For a typical element like `<div><p>text</p></div>`:
 4. `visit_element_end` for `<p>`
 5. `visit_element_end` for `</div>`
 
-### Performance Notes
+##### Performance Notes
 
 - `visit_text` is the most frequently called method (~100+ times per document)
 - Return `Continue` quickly for elements you don't need to customize
@@ -645,7 +645,7 @@ result = instance.visit_table_row(NodeContext(), [], True)
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `ctx` | `NodeContext` | Yes | The node context |
-| `cells` | `list[str]` | Yes | The  cells |
+| `cells` | `list\[str\]` | Yes | The  cells |
 | `is_header` | `bool` | Yes | The  is header |
 
 **Returns:** `VisitResult`
@@ -1358,7 +1358,7 @@ for image analysis and optimization.
 | `title` | `str \| None` | `None` | Title attribute (often shown as tooltip) |
 | `dimensions` | `ImageDimensions \| None` | `None` | Image dimensions in pixels, if available. |
 | `image_type` | `ImageType` | — | Image type classification |
-| `attributes` | `dict[str, str]` | — | Additional HTML attributes |
+| `attributes` | `dict\[str, str\]` | — | Additional HTML attributes |
 
 ---
 
@@ -1374,8 +1374,8 @@ Represents `<a>` elements with parsed href values, text content, and link type c
 | `text` | `str` | — | Link text content (normalized, concatenated if mixed with elements) |
 | `title` | `str \| None` | `None` | Optional title attribute (often shown as tooltip) |
 | `link_type` | `LinkType` | — | Link type classification |
-| `rel` | `list[str]` | — | Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") |
-| `attributes` | `dict[str, str]` | — | Additional HTML attributes |
+| `rel` | `list\[str\]` | — | Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") |
+| `attributes` | `dict\[str, str\]` | — | Additional HTML attributes |
 
 ---
 
@@ -1401,7 +1401,7 @@ Context information passed to all visitor methods.
 Provides comprehensive metadata about the current node being visited,
 including its type, tag name, position in the DOM tree, and parent context.
 
-#### Attributes
+##### Attributes
 
 Access attributes via `NodeContext.attributes`, which returns
 `dict[str, str]`. When the context was built with
@@ -1409,7 +1409,7 @@ lazy attribute extraction (the hot path inside the converter),
 the map is only materialized on the first call — if the visitor never reads
 attributes, the allocation is skipped.
 
-#### Lifetimes
+###### Lifetimes
 
 String fields use `Cow<'_, str>` so the converter can pass slices directly
 out of the parsed DOM without allocating. Visitor implementations that need
@@ -1473,7 +1473,7 @@ result = NodeContext.with_owned_attributes(NodeType(), "value", {}, 42, 42, pare
 |------|------|----------|-------------|
 | `node_type` | `NodeType` | Yes | The node type |
 | `tag_name` | `str` | Yes | The tag name |
-| `attributes` | `dict[str, str]` | Yes | The attributes |
+| `attributes` | `dict\[str, str\]` | Yes | The attributes |
 | `depth` | `int` | Yes | The depth |
 | `index_in_parent` | `int` | Yes | The index in parent |
 | `parent_tag` | `str \| None` | No | The parent tag |
@@ -1592,7 +1592,7 @@ A structured table grid with cell-level data including spans.
 |-------|------|---------|-------------|
 | `rows` | `int` | — | Number of rows. |
 | `cols` | `int` | — | Number of columns. |
-| `cells` | `list[GridCell]` | `[]` | All cells in the table as a flat, sparse list. The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear in the list. Only the top-left "origin" cell of a span is present, with its `row_span` and `col_span` fields set accordingly. To reconstruct the full visual grid, iterate over all cells and mark the rectangular region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any `(row, col)` position that is not the origin of any cell is covered by a span from an earlier cell. The length of this list is `≤ rows * cols`. An empty table (`rows == 0 \|\| cols == 0`) produces an empty list. |
+| `cells` | `list\[GridCell\]` | `\[\]` | All cells in the table as a flat, sparse list. The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear in the list. Only the top-left "origin" cell of a span is present, with its `row_span` and `col_span` fields set accordingly. To reconstruct the full visual grid, iterate over all cells and mark the rectangular region `\[row .. row+row_span, col .. col+col_span\]` as occupied by that cell. Any `(row, col)` position that is not the origin of any cell is covered by a span from an earlier cell. The length of this list is `≤ rows * cols`. An empty table (`rows == 0 \|\| cols == 0`) produces an empty list. |
 
 ---
 
@@ -1810,8 +1810,8 @@ reference-style `[text][1]` syntax with definitions collected at the end.
 
 | Value | Description |
 |-------|-------------|
-| `INLINE` | Inline links: `[text](url)`. Default. |
-| `REFERENCE` | Reference-style links: `[text][1]` with `[1]: url` at end of document. |
+| `INLINE` | Inline links: `\[text\](url)`. Default. |
+| `REFERENCE` | Reference-style links: `\[text\]\[1\]` with `\[1\]: url` at end of document. |
 
 ---
 
@@ -1870,7 +1870,7 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 | `DEFINITION_LIST` | A definition list container. |
 | `DEFINITION_ITEM` | A definition list entry with term and description. — Fields: `term`: `str`, `definition`: `str` |
 | `RAW_BLOCK` | A raw block preserved as-is (e.g. `<script>`, `<style>` content). — Fields: `format`: `str`, `content`: `str` |
-| `METADATA_BLOCK` | A block of key-value metadata pairs (from `<head>` meta tags). — Fields: `entries`: `list[MetadataEntry]` |
+| `METADATA_BLOCK` | A block of key-value metadata pairs (from `<head>` meta tags). — Fields: `entries`: `list\[MetadataEntry\]` |
 | `GROUP` | A section grouping container (auto-generated from heading hierarchy). — Fields: `label`: `str`, `heading_level`: `int`, `heading_text`: `str` |
 
 ---

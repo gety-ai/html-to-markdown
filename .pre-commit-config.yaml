@@ -1,234 +1,235 @@
 default_install_hook_types:
-- pre-commit
-- commit-msg
+    - pre-commit
+    - commit-msg
 exclude: ^docs/snippets/|vendor/|node_modules/|target/|dist/|artifacts/|scripts/ci/|\.cache/|rust-vendor/|\.venv/
 repos:
-- repo: https://github.com/Goldziher/gitfluff
-  rev: v0.8.0
-  hooks:
-  - id: gitfluff-lint
-    args:
-    - --write
-    stages:
-    - commit-msg
-- repo: https://github.com/kreuzberg-dev/pre-commit-hooks
-  # Temporarily pinned to v2.0.0 while v2.1.x strict-hook policy is stabilised
-  # (palantir-java-format / pmd / yard-coverage upstream-JAR issues + h2m
-  # exclude-set churn). Re-bump and tune excludes in a follow-up.
-  rev: v2.1.10
-  hooks:
-    # Alef verification
-    - id: alef-verify
+    - repo: https://github.com/Goldziher/gitfluff
+      rev: v0.8.0
+      hooks:
+          - id: gitfluff-lint
+            args:
+                - --write
+            stages:
+                - commit-msg
+    - repo: https://github.com/kreuzberg-dev/pre-commit-hooks
+      # Temporarily pinned to v2.0.0 while v2.1.x strict-hook policy is stabilised
+      # (palantir-java-format / pmd / yard-coverage upstream-JAR issues + h2m
+      # exclude-set churn). Re-bump and tune excludes in a follow-up.
+      rev: v2.1.10
+      hooks:
+          # Alef verification
+          - id: alef-verify
 
-    # Cargo / Rust
-    - id: cargo-clippy
-      args:
-      - --fix
-      - --allow-dirty
-      - --allow-staged
-      - --workspace
-      - --exclude=html-to-markdown-php
-      - --exclude=html-to-markdown-py
-      - --exclude=html-to-markdown-node
-      - --exclude=html_to_markdown_rs-e2e-rust
-      - --all-features
-      - --all-targets
-      - --
-      - -D
-      - warnings
-    - id: cargo-sort
-      args:
-      - -w
-      exclude: ^(e2e/rust/|test_apps/rust/|packages/dart/rust/)Cargo\.toml$
-    - id: cargo-machete
-      args:
-      - crates/
-      exclude: ^(e2e/|test_apps/)
-    - id: cargo-deny
-      args: ["check"]
-    - id: rustdoc-lint
-      files: ^crates/html-to-markdown/src/.*\.rs$
-      exclude: /tests/
-      args:
-      - -p
-      - html-to-markdown-rs
-    - id: rust-max-lines
-      args: ["--max=1000"]
-      # Alef-generated binding crates routinely exceed 1000 lines (FFI surface
-      # area). The limit is meaningful for core code; exclude the generated
-      # binding crate roots + every per-language bridge crate's lib.rs +
-      # scanner/preprocessing where the size is inherent.
-      exclude: ^(crates/html-to-markdown-(ffi|node|wasm|py|php|cli)/src/.*\.rs|packages/.*/(rust/)?(src|native/.*/src)/(lib|frb_generated)\.rs|crates/html-to-markdown/src/converter/(tier1/scanner|utility/preprocessing)\.rs|(e2e/rust|test_apps/rust)/tests/.*\.rs|crates/html-to-markdown/tests/visitor_integration_test\.rs)$
+          # Cargo / Rust
+          - id: cargo-clippy
+            args:
+                - --fix
+                - --allow-dirty
+                - --allow-staged
+                - --workspace
+                - --exclude=html-to-markdown-php
+                - --exclude=html-to-markdown-py
+                - --exclude=html-to-markdown-node
+                - --exclude=html_to_markdown_rs-e2e-rust
+                - --all-features
+                - --all-targets
+                - --
+                - -D
+                - warnings
+          - id: cargo-sort
+            args:
+                - -w
+            exclude: ^(e2e/rust/|test_apps/rust/|packages/dart/rust/)Cargo\.toml$
+          - id: cargo-machete
+            args:
+                - crates/
+            exclude: ^(e2e/|test_apps/)
+          - id: cargo-deny
+            args: ["check"]
+          - id: rustdoc-lint
+            files: ^crates/html-to-markdown/src/.*\.rs$
+            exclude: /tests/
+            args:
+                - -p
+                - html-to-markdown-rs
+          - id: rust-max-lines
+            args: ["--max=1000"]
+            # Alef-generated binding crates routinely exceed 1000 lines (FFI surface
+            # area). The limit is meaningful for core code; exclude the generated
+            # binding crate roots + every per-language bridge crate's lib.rs +
+            # scanner/preprocessing where the size is inherent.
+            exclude: ^(crates/html-to-markdown-(ffi|node|wasm|py|php|cli)/src/.*\.rs|packages/.*/(rust/)?(src|native/.*/src)/(lib|frb_generated)\.rs|crates/html-to-markdown/src/converter/(tier1/scanner|utility/preprocessing)\.rs|(e2e/rust|test_apps/rust)/tests/.*\.rs|crates/html-to-markdown/tests/visitor_integration_test\.rs)$
 
-    # Linters and checks
-    - id: ai-rulez-generate
+          # Linters and checks
+          - id: ai-rulez-generate
 
-    - id: check-merge-conflict
-    - id: check-added-large-files
-      exclude: "(?x)^(\n  uv\\.lock\n  |crates/html-to-markdown/tests/fixtures/regressions/.*\n)$\n"
-    - id: detect-private-key
-    - id: check-case-conflict
-    - id: check-executables-have-shebangs
-    - id: check-shebang-scripts-are-executable
-      # `#![allow(...)]` Rust crate-level attributes start with `#!` and are
-      # misdetected as shebangs by this hook.
-      exclude: \.rs$
-    - id: typos
-      args: ["--force-exclude"]
-    - id: check-json
-      exclude: tsconfig\.base\.json
-    - id: check-yaml
-      args:
-      - --allow-multiple-documents
-      - --unsafe
-    - id: check-toml
+          - id: check-merge-conflict
+          - id: check-added-large-files
+            exclude: "(?x)^(\n  uv\\.lock\n  |crates/html-to-markdown/tests/fixtures/regressions/.*\n)$\n"
+          - id: detect-private-key
+          - id: check-case-conflict
+          - id: check-executables-have-shebangs
+          - id: check-shebang-scripts-are-executable
+            # `#![allow(...)]` Rust crate-level attributes start with `#!` and are
+            # misdetected as shebangs by this hook.
+            exclude: \.rs$
+          - id: typos
+            args: ["--force-exclude"]
+          - id: check-json
+            exclude: tsconfig\.base\.json
+          - id: check-yaml
+            args:
+                - --allow-multiple-documents
+                - --unsafe
+          - id: check-toml
 
-    - id: actionlint
-    - id: gh-actions-updater
+          - id: actionlint
+          - id: gh-actions-updater
 
-    - id: shellcheck
-      exclude: ^test_apps/kotlin_android/gradlew$
+          - id: shellcheck
+            exclude: ^test_apps/kotlin_android/gradlew$
 
-    - id: textlint
-      files: ^docs/.*\.md$
-      exclude: ^docs/(reference/|api-|snippets/|migration/)
-      args:
-      - --fix
-      - --config
-      - .textlintrc.json
+          - id: textlint
+            files: ^docs/.*\.md$
+            exclude: ^docs/(reference/|api-|snippets/|migration/)
+            args:
+                - --fix
+                - --config
+                - .textlintrc.json
 
-    - id: ruff
-      exclude: ^e2e/
-    - id: mypy
-      exclude: e2e/|tests/|scripts/|^packages/r/
-    - id: pydocstyle
-      files: ^packages/python/.*\.py$
-      exclude: ^packages/python/(tests/|.*_native\.py$)
+          - id: ruff
+            exclude: ^e2e/
+          - id: mypy
+            exclude: e2e/|tests/|scripts/|^packages/r/
+          - id: pydocstyle
+            files: ^packages/python/.*\.py$
+            exclude: ^packages/python/(tests/|.*_native\.py$)
 
-    - id: oxlint
-    - id: golangci-lint
-      exclude: ^(e2e/|test_apps/)
-      env:
-        KREUZBERG_GO_MOD_DIRS: packages/go
-    - id: govulncheck
-      exclude: ^(e2e/|test_apps/)
-      env:
-        KREUZBERG_GO_MOD_DIRS: packages/go
-    - id: godoc-lint
-      files: ^packages/go/.*\.go$
-      exclude: ^(e2e/|test_apps/)
-      env:
-        KREUZBERG_GO_MOD_DIRS: packages/go
+          - id: oxlint
+          - id: golangci-lint
+            exclude: ^(e2e/|test_apps/)
+            env:
+                KREUZBERG_GO_MOD_DIRS: packages/go
+          - id: govulncheck
+            exclude: ^(e2e/|test_apps/)
+            env:
+                KREUZBERG_GO_MOD_DIRS: packages/go
+          - id: godoc-lint
+            files: ^packages/go/.*\.go$
+            exclude: ^(e2e/|test_apps/)
+            env:
+                KREUZBERG_GO_MOD_DIRS: packages/go
 
-    - id: checkstyle
-      args:
-      - -c
-      - packages/java/checkstyle.xml
-      - -p
-      - packages/java/checkstyle.properties
-      exclude: ^(\.mvn/wrapper/|e2e/|test_apps/|packages/java/src/)
-    - id: cpd
-      args:
-      - --minimum-tokens=120
-      exclude: ^(test_apps/|e2e/java/)
-    - id: java-verify
-      files: ^packages/java/
-    - id: javadoc-lint
-      files: ^packages/java/src/main/.*\.java$
+          - id: checkstyle
+            args:
+                - -c
+                - packages/java/checkstyle.xml
+                - -p
+                - packages/java/checkstyle.properties
+            exclude: ^(\.mvn/wrapper/|e2e/|test_apps/|packages/java/src/)
+          - id: cpd
+            args:
+                - --minimum-tokens=120
+            exclude: ^(test_apps/|e2e/java/)
+          - id: java-verify
+            files: ^packages/java/
+          - id: javadoc-lint
+            files: ^packages/java/src/main/.*\.java$
 
-    - id: detekt
-      files: ^packages/kotlin-android/.*\.kts?$
-      args:
-      - --build-upon-default-config
-    - id: ktlint
-      files: ^packages/kotlin-android/.*\.kts?$
-    - id: rubocop-lint
-      files: ^packages/ruby/.*\.(rb|rbs)$
-      exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
-    - id: steep
-      files: ^packages/ruby/.*\.(rb|rbs)$
-      exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
+          - id: detekt
+            files: ^packages/kotlin-android/.*\.kts?$
+            args:
+                - --build-upon-default-config
+          - id: ktlint
+            files: ^packages/kotlin-android/.*\.kts?$
+          - id: rubocop-lint
+            files: ^packages/ruby/.*\.(rb|rbs)$
+            exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
+          - id: steep
+            files: ^packages/ruby/.*\.(rb|rbs)$
+            exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
 
-    - id: dotnet-format-check
-      files: ^packages/csharp/.*\.cs$
-    - id: cs-xmldoc-lint
-      files: ^packages/csharp/HtmlToMarkdown/.*\.cs$
+          - id: dotnet-format-check
+            files: ^packages/csharp/.*\.cs$
+          - id: cs-xmldoc-lint
+            files: ^packages/csharp/HtmlToMarkdown/.*\.cs$
 
-    - id: phpdoc-lint
-      files: ^packages/php/src/.*\.php$
+          - id: phpdoc-lint
+            files: ^packages/php/src/.*\.php$
 
-    - id: mix-credo
-      files: ^packages/elixir/
-      exclude: ^packages/elixir/lib/html_to_markdown/.*\.ex$
+          - id: mix-credo
+            files: ^packages/elixir/
+            exclude: ^packages/elixir/lib/html_to_markdown/.*\.ex$
 
-    - id: roxygen2-check
-      files: ^packages/r/R/.*\.R$
-    - id: swiftlint
-      files: ^packages/swift/.*\.swift$
-    - id: dart-analyze
-      files: ^packages/dart/.*\.dart$
-      exclude: ^(test_apps/|e2e/dart/)
-    - id: dart-doc-lint
-      files: ^packages/dart/lib/.*\.dart$
-      exclude: ^packages/dart/lib/src/rust/
+          - id: roxygen2-check
+            files: ^packages/r/R/.*\.R$
+          - id: swiftlint
+            files: ^packages/swift/.*\.swift$
+          - id: dart-analyze
+            files: ^packages/dart/.*\.dart$
+            exclude: ^(test_apps/|e2e/dart/)
+          - id: dart-doc-lint
+            files: ^packages/dart/lib/.*\.dart$
+            exclude: ^packages/dart/lib/src/rust/
 
-    - id: zig-build-check
-      files: ^packages/zig/.*\.zig$
-    - id: zig-doc-lint
-      files: ^packages/zig/src/.*\.zig$
-      exclude: ^packages/zig/src/html_to_markdown_rs\.zig$
+          - id: zig-build-check
+            files: ^packages/zig/.*\.zig$
+          - id: zig-doc-lint
+            files: ^packages/zig/src/.*\.zig$
+            exclude: ^packages/zig/src/html_to_markdown_rs\.zig$
 
-    - id: clang-tidy
-      files: ^crates/html-to-markdown-ffi/tests/c/
-    - id: cppcheck
-      args:
-      - --suppress=unusedStructMember
+          - id: clang-tidy
+            files: ^crates/html-to-markdown-ffi/tests/c/
+          - id: cppcheck
+            args:
+                - --suppress=unusedStructMember
 
-    - id: alef-docs-fresh
-    - id: alef-snippets-validate
+          - id: alef-docs-fresh
+          - id: alef-snippets-validate
 
-    # Formatters
-    - id: trailing-whitespace
-      exclude: "(?x)^(\n  \\.github/copilot-instructions\\.md\n  |tools/benchmark-harness/snapshots/.*\\.snap\n)$\n"
-    - id: end-of-file-fixer
-      exclude: "(?x)^(\n  \\.github/copilot-instructions\\.md|\n  .*/\\.gitkeep|\n  .*/py\\.typed|\n  packages/java/checkstyle\\\
-        .properties|\n  (e2e/python|e2e/python/tests)/__init__\\.py\n)$\n"
-    - id: mixed-line-ending
-    - id: shfmt
-      args: ["-w", "-i", "2"]
-    - id: rumdl-fmt
-    - id: cargo-fmt
-      args: ["--all"]
-    - id: pyproject-fmt
-      exclude: ^test_apps/python/pyproject\.toml$
-    - id: ruff-format
-      exclude: ^e2e/
-    - id: oxfmt
+          # Formatters
+          - id: trailing-whitespace
+            exclude: "(?x)^(\n  \\.github/copilot-instructions\\.md\n  |tools/benchmark-harness/snapshots/.*\\.snap\n)$\n"
+          - id: end-of-file-fixer
+            exclude:
+                "(?x)^(\n  \\.github/copilot-instructions\\.md|\n  .*/\\.gitkeep|\n  .*/py\\.typed|\n  packages/java/checkstyle\\\
+                .properties|\n  (e2e/python|e2e/python/tests)/__init__\\.py\n)$\n"
+          - id: mixed-line-ending
+          - id: shfmt
+            args: ["-w", "-i", "2"]
+          - id: rumdl-fmt
+          - id: cargo-fmt
+            args: ["--all"]
+          - id: pyproject-fmt
+            exclude: ^test_apps/python/pyproject\.toml$
+          - id: ruff-format
+            exclude: ^e2e/
+          - id: oxfmt
 
-    - id: go-fmt
-      exclude: ^(e2e/|test_apps/)
-    - id: ktfmt
-      files: ^packages/kotlin-android/.*\.kts?$
-      args:
-      - --kotlinlang-style
-    - id: rubocop
-      files: ^packages/ruby/.*\.rb$
-      exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
-    - id: dotnet-format
-      files: ^packages/csharp/.*\.cs$
-    - id: php-cs-fixer
-      files: ^packages/php/.*\.php$
-      exclude: ^packages/php/stubs/
-    - id: mix-format
-      files: ^packages/elixir/
-      exclude: ^packages/elixir/lib/html_to_markdown/.*\.ex$
-    - id: swift-format
-      files: ^packages/swift/.*\.swift$
-    - id: dart-format
-      files: ^packages/dart/.*\.dart$
-    - id: zig-fmt
-      files: ^packages/zig/.*\.zig$
-    - id: clang-format
-      args:
-      - --style=file
-      files: ^crates/html-to-markdown-ffi/tests/c/
+          - id: go-fmt
+            exclude: ^(e2e/|test_apps/)
+          - id: ktfmt
+            files: ^packages/kotlin-android/.*\.kts?$
+            args:
+                - --kotlinlang-style
+          - id: rubocop
+            files: ^packages/ruby/.*\.rb$
+            exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
+          - id: dotnet-format
+            files: ^packages/csharp/.*\.cs$
+          - id: php-cs-fixer
+            files: ^packages/php/.*\.php$
+            exclude: ^packages/php/stubs/
+          - id: mix-format
+            files: ^packages/elixir/
+            exclude: ^packages/elixir/lib/html_to_markdown/.*\.ex$
+          - id: swift-format
+            files: ^packages/swift/.*\.swift$
+          - id: dart-format
+            files: ^packages/dart/.*\.dart$
+          - id: zig-fmt
+            files: ^packages/zig/.*\.zig$
+          - id: clang-format
+            args:
+                - --style=file
+            files: ^crates/html-to-markdown-ffi/tests/c/

@@ -2,187 +2,187 @@ version: "3"
 internal: true
 
 includes:
-  platforms: ../config/platforms.yml
+    platforms: ../config/platforms.yml
 
 vars:
-  RUST_LOG: '{{.RUST_LOG | default "info"}}'
-  BUILD_PROFILE: '{{.BUILD_PROFILE | default "release"}}'
-  RUST_BACKTRACE: '{{.RUST_BACKTRACE | default "1"}}'
-  CARGO_TERM_COLOR: "always"
+    RUST_LOG: '{{.RUST_LOG | default "info"}}'
+    BUILD_PROFILE: '{{.BUILD_PROFILE | default "release"}}'
+    RUST_BACKTRACE: '{{.RUST_BACKTRACE | default "1"}}'
+    CARGO_TERM_COLOR: "always"
 
 tasks:
-  install:
-    desc: "Install Rust toolchain and components (rustup, cargo)"
-    silent: false
-    cmds:
-      - rustup update stable
-      - rustup component add rustfmt clippy
-      - rustup component add llvm-tools-preview
-      - cargo install cargo-llvm-cov --locked
-      - cargo install cargo-upgrades --locked
-      - cargo --version
-      - rustc --version
+    install:
+        desc: "Install Rust toolchain and components (rustup, cargo)"
+        silent: false
+        cmds:
+            - rustup update stable
+            - rustup component add rustfmt clippy
+            - rustup component add llvm-tools-preview
+            - cargo install cargo-llvm-cov --locked
+            - cargo install cargo-upgrades --locked
+            - cargo --version
+            - rustc --version
 
-  build:
-    desc: "Build all Rust crates with {{.BUILD_PROFILE}} profile"
-    silent: false
-    cmds:
-      - cmd: |
-          cargo build --workspace --profile {{.BUILD_PROFILE}} -j {{.NUM_CPUS}}
-        ignore_error: false
+    build:
+        desc: "Build all Rust crates with {{.BUILD_PROFILE}} profile"
+        silent: false
+        cmds:
+            - cmd: |
+                  cargo build --workspace --profile {{.BUILD_PROFILE}} -j {{.NUM_CPUS}}
+              ignore_error: false
 
-  build:dev:
-    desc: "Build all Rust crates in debug mode"
-    silent: false
-    cmds:
-      - cmd: |
-          cargo build --workspace -j {{.NUM_CPUS}}
-        ignore_error: false
+    build:dev:
+        desc: "Build all Rust crates in debug mode"
+        silent: false
+        cmds:
+            - cmd: |
+                  cargo build --workspace -j {{.NUM_CPUS}}
+              ignore_error: false
 
-  build:release:
-    desc: "Build all Rust crates in release mode"
-    silent: false
-    cmds:
-      - cmd: |
-          cargo build --workspace --release -j {{.NUM_CPUS}}
-        ignore_error: false
+    build:release:
+        desc: "Build all Rust crates in release mode"
+        silent: false
+        cmds:
+            - cmd: |
+                  cargo build --workspace --release -j {{.NUM_CPUS}}
+              ignore_error: false
 
-  build:ci:
-    desc: "Build for CI with debug info enabled (no strip)"
-    silent: false
-    cmds:
-      - cmd: |
-          CARGO_PROFILE_RELEASE_DEBUG=2 CARGO_PROFILE_RELEASE_STRIP=none cargo build --workspace --exclude html-to-markdown-php --release -j {{.NUM_CPUS}}
-        ignore_error: false
+    build:ci:
+        desc: "Build for CI with debug info enabled (no strip)"
+        silent: false
+        cmds:
+            - cmd: |
+                  CARGO_PROFILE_RELEASE_DEBUG=2 CARGO_PROFILE_RELEASE_STRIP=none cargo build --workspace --exclude html-to-markdown-php --release -j {{.NUM_CPUS}}
+              ignore_error: false
 
-  test:
-    desc: "Run Rust test suite"
-    silent: false
-    cmds:
-      - cmd: |
-          RUST_LOG={{.RUST_LOG}} RUST_BACKTRACE={{.RUST_BACKTRACE}} cargo test --release --no-default-features --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php -j {{.NUM_CPUS}}
-        ignore_error: false
+    test:
+        desc: "Run Rust test suite"
+        silent: false
+        cmds:
+            - cmd: |
+                  RUST_LOG={{.RUST_LOG}} RUST_BACKTRACE={{.RUST_BACKTRACE}} cargo test --release --no-default-features --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php -j {{.NUM_CPUS}}
+              ignore_error: false
 
-  test:ci:
-    desc: "Run tests with coverage for CI (generates lcov)"
-    silent: false
-    cmds:
-      - cmd: |
-          {{if eq OS "windows"}}
-          RUST_LOG={{.RUST_LOG}} RUST_BACKTRACE={{.RUST_BACKTRACE}} cargo llvm-cov --features metadata,visitor,inline-images --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php --exclude html-to-markdown-rs-swift --exclude html-to-markdown-rs-dart --exclude benchmark-harness --lcov --output-path rust-coverage.lcov -j {{.NUM_CPUS}}
-          {{else}}
-          RUST_LOG={{.RUST_LOG}} RUST_BACKTRACE={{.RUST_BACKTRACE}} cargo llvm-cov --all-features --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php --exclude benchmark-harness --lcov --output-path rust-coverage.lcov -j {{.NUM_CPUS}}
-          {{end}}
-        ignore_error: false
-      - cmd: |
-          {{if eq OS "windows"}}
-          cargo llvm-cov --features metadata,visitor,inline-images --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php --exclude html-to-markdown-rs-swift --exclude html-to-markdown-rs-dart --exclude benchmark-harness --summary-only
-          {{else}}
-          cargo llvm-cov --all-features --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php --exclude benchmark-harness --summary-only
-          {{end}}
-        ignore_error: false
+    test:ci:
+        desc: "Run tests with coverage for CI (generates lcov)"
+        silent: false
+        cmds:
+            - cmd: |
+                  {{if eq OS "windows"}}
+                  RUST_LOG={{.RUST_LOG}} RUST_BACKTRACE={{.RUST_BACKTRACE}} cargo llvm-cov --features metadata,visitor,inline-images --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php --exclude html-to-markdown-rs-swift --exclude html-to-markdown-rs-dart --exclude benchmark-harness --lcov --output-path rust-coverage.lcov -j {{.NUM_CPUS}}
+                  {{else}}
+                  RUST_LOG={{.RUST_LOG}} RUST_BACKTRACE={{.RUST_BACKTRACE}} cargo llvm-cov --all-features --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php --exclude benchmark-harness --lcov --output-path rust-coverage.lcov -j {{.NUM_CPUS}}
+                  {{end}}
+              ignore_error: false
+            - cmd: |
+                  {{if eq OS "windows"}}
+                  cargo llvm-cov --features metadata,visitor,inline-images --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php --exclude html-to-markdown-rs-swift --exclude html-to-markdown-rs-dart --exclude benchmark-harness --summary-only
+                  {{else}}
+                  cargo llvm-cov --all-features --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php --exclude benchmark-harness --summary-only
+                  {{end}}
+              ignore_error: false
 
-  coverage:
-    desc: "Generate code coverage report (lcov format)"
-    silent: false
-    cmds:
-      - cmd: |
-          RUST_LOG={{.RUST_LOG}} cargo llvm-cov --all-features --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php --exclude benchmark-harness --exclude html-to-markdown-wasm-wasmtime-tests --lcov --output-path rust-coverage.lcov -j {{.NUM_CPUS}}
-        ignore_error: false
+    coverage:
+        desc: "Generate code coverage report (lcov format)"
+        silent: false
+        cmds:
+            - cmd: |
+                  RUST_LOG={{.RUST_LOG}} cargo llvm-cov --all-features --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php --exclude benchmark-harness --exclude html-to-markdown-wasm-wasmtime-tests --lcov --output-path rust-coverage.lcov -j {{.NUM_CPUS}}
+              ignore_error: false
 
-  lint:
-    desc: "Lint Rust code WITH auto-fix (cargo fmt + cargo clippy --fix)"
-    silent: false
-    cmds:
-      - cmd: cargo fmt --all
-        ignore_error: false
-      - cmd: |
-          cargo clippy --workspace --fix --allow-dirty --allow-staged -j {{.NUM_CPUS}}
-        ignore_error: false
+    lint:
+        desc: "Lint Rust code WITH auto-fix (cargo fmt + cargo clippy --fix)"
+        silent: false
+        cmds:
+            - cmd: cargo fmt --all
+              ignore_error: false
+            - cmd: |
+                  cargo clippy --workspace --fix --allow-dirty --allow-staged -j {{.NUM_CPUS}}
+              ignore_error: false
 
-  lint:check:
-    desc: "Lint Rust code WITHOUT auto-fix (check-only)"
-    silent: false
-    cmds:
-      - cmd: cargo fmt --all --check
-        ignore_error: false
-      - cmd: |
-          cargo clippy -j {{.NUM_CPUS}} --workspace -- -D warnings
-        ignore_error: false
+    lint:check:
+        desc: "Lint Rust code WITHOUT auto-fix (check-only)"
+        silent: false
+        cmds:
+            - cmd: cargo fmt --all --check
+              ignore_error: false
+            - cmd: |
+                  cargo clippy -j {{.NUM_CPUS}} --workspace -- -D warnings
+              ignore_error: false
 
-  format:
-    desc: "Format Rust code (with modifications)"
-    silent: false
-    cmds:
-      - cmd: cargo fmt --all
-        ignore_error: false
+    format:
+        desc: "Format Rust code (with modifications)"
+        silent: false
+        cmds:
+            - cmd: cargo fmt --all
+              ignore_error: false
 
-  format:check:
-    desc: "Check Rust formatting without modifications"
-    silent: false
-    cmds:
-      - cmd: cargo fmt --all --check
-        ignore_error: false
+    format:check:
+        desc: "Check Rust formatting without modifications"
+        silent: false
+        cmds:
+            - cmd: cargo fmt --all --check
+              ignore_error: false
 
-  update:
-    desc: "Update Rust dependencies within major versions (cargo update)"
-    silent: false
-    cmds:
-      - cmd: cargo update
-        ignore_error: false
-      - cmd: cargo update --manifest-path packages/ruby/ext/html_to_markdown_rb/Cargo.toml
-        ignore_error: false
-      - cmd: cargo update --manifest-path packages/elixir/native/html_to_markdown_nif/Cargo.toml
-        ignore_error: false
-      - cmd: cargo update --manifest-path packages/r/src/rust/Cargo.toml
-        ignore_error: false
+    update:
+        desc: "Update Rust dependencies within major versions (cargo update)"
+        silent: false
+        cmds:
+            - cmd: cargo update
+              ignore_error: false
+            - cmd: cargo update --manifest-path packages/ruby/ext/html_to_markdown_rb/Cargo.toml
+              ignore_error: false
+            - cmd: cargo update --manifest-path packages/elixir/native/html_to_markdown_nif/Cargo.toml
+              ignore_error: false
+            - cmd: cargo update --manifest-path packages/r/src/rust/Cargo.toml
+              ignore_error: false
 
-  upgrade:
-    desc: "Upgrade Rust dependencies to latest including breaking changes (cargo upgrade --incompatible + cargo update)"
-    silent: false
-    cmds:
-      - cmd: cargo upgrade --incompatible
-        ignore_error: false
-      - cmd: cargo update
-        ignore_error: false
-      - cmd: cargo upgrade --incompatible --manifest-path packages/ruby/ext/html_to_markdown_rb/Cargo.toml
-        ignore_error: false
-      - cmd: cargo update --manifest-path packages/ruby/ext/html_to_markdown_rb/Cargo.toml
-        ignore_error: false
-      - cmd: cargo upgrade --incompatible --manifest-path packages/elixir/native/html_to_markdown_nif/Cargo.toml
-        ignore_error: false
-      - cmd: cargo update --manifest-path packages/elixir/native/html_to_markdown_nif/Cargo.toml
-        ignore_error: false
-      - cmd: cargo upgrade --incompatible --manifest-path packages/r/src/rust/Cargo.toml
-        ignore_error: false
-      - cmd: cargo update --manifest-path packages/r/src/rust/Cargo.toml
-        ignore_error: false
+    upgrade:
+        desc: "Upgrade Rust dependencies to latest including breaking changes (cargo upgrade --incompatible + cargo update)"
+        silent: false
+        cmds:
+            - cmd: cargo upgrade --incompatible
+              ignore_error: false
+            - cmd: cargo update
+              ignore_error: false
+            - cmd: cargo upgrade --incompatible --manifest-path packages/ruby/ext/html_to_markdown_rb/Cargo.toml
+              ignore_error: false
+            - cmd: cargo update --manifest-path packages/ruby/ext/html_to_markdown_rb/Cargo.toml
+              ignore_error: false
+            - cmd: cargo upgrade --incompatible --manifest-path packages/elixir/native/html_to_markdown_nif/Cargo.toml
+              ignore_error: false
+            - cmd: cargo update --manifest-path packages/elixir/native/html_to_markdown_nif/Cargo.toml
+              ignore_error: false
+            - cmd: cargo upgrade --incompatible --manifest-path packages/r/src/rust/Cargo.toml
+              ignore_error: false
+            - cmd: cargo update --manifest-path packages/r/src/rust/Cargo.toml
+              ignore_error: false
 
-  clean:
-    desc: "Clean Rust build artifacts"
-    silent: false
-    cmds:
-      - cmd: cargo clean
-        ignore_error: false
+    clean:
+        desc: "Clean Rust build artifacts"
+        silent: false
+        cmds:
+            - cmd: cargo clean
+              ignore_error: false
 
-  doc:
-    desc: "Generate and open Rust documentation"
-    silent: false
-    cmds:
-      - cmd: |
-          cargo doc --workspace --all-features --no-deps --open
-        ignore_error: false
+    doc:
+        desc: "Generate and open Rust documentation"
+        silent: false
+        cmds:
+            - cmd: |
+                  cargo doc --workspace --all-features --no-deps --open
+              ignore_error: false
 
-  e2e:generate:
-    desc: "Generate E2E tests from fixtures using alef"
-    silent: false
-    cmds:
-      - cmd: alef e2e generate --lang rust
-        ignore_error: false
+    e2e:generate:
+        desc: "Generate E2E tests from fixtures using alef"
+        silent: false
+        cmds:
+            - cmd: alef e2e generate --lang rust
+              ignore_error: false
 
-  e2e:test:
-    desc: "Run Rust E2E tests in e2e/rust directory"
-    silent: false
-    cmds:
-      - cmd: cargo test --manifest-path e2e/rust/Cargo.toml
-        ignore_error: false
+    e2e:test:
+        desc: "Run Rust E2E tests in e2e/rust directory"
+        silent: false
+        cmds:
+            - cmd: cargo test --manifest-path e2e/rust/Cargo.toml
+              ignore_error: false

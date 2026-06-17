@@ -2,7 +2,7 @@
 title: "Elixir API Reference"
 ---
 
-## Elixir API Reference <span class="version-badge">v3.6.11</span>
+## Elixir API Reference <span class="version-badge">v3.6.12</span>
 
 ### Functions
 
@@ -64,7 +64,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `strong_em_symbol` | `String.t()` | `"*"` | Character used for bold/italic emphasis markers (`*` or `_`). |
 | `escape_asterisks` | `boolean()` | `false` | Escape `*` characters in plain text to avoid unintended bold/italic. |
 | `escape_underscores` | `boolean()` | `false` | Escape `_` characters in plain text to avoid unintended bold/italic. |
-| `escape_misc` | `boolean()` | `false` | Escape miscellaneous Markdown metacharacters (`[]()#` etc.) in plain text. |
+| `escape_misc` | `boolean()` | `false` | Escape miscellaneous Markdown metacharacters (`\[\]()#` etc.) in plain text. |
 | `escape_ascii` | `boolean()` | `false` | Escape ASCII characters that have special meaning in certain Markdown dialects. |
 | `code_language` | `String.t()` | `""` | Default language annotation for fenced code blocks that have no language hint. |
 | `autolinks` | `boolean()` | `true` | Automatically convert bare URLs into Markdown autolinks. |
@@ -82,12 +82,12 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `sup_symbol` | `String.t()` | `""` | Markdown notation for superscript text (e.g. `"^"`). |
 | `newline_style` | `NewlineStyle` | `:spaces` | How to encode hard line breaks (`<br>`) in Markdown. |
 | `code_block_style` | `CodeBlockStyle` | `:backticks` | Style used for fenced code blocks (backticks or tilde). |
-| `keep_inline_images_in` | `list(String.t())` | `[]` | HTML tag names whose `<img>` children are kept inline instead of block. |
+| `keep_inline_images_in` | `list(String.t())` | `\[\]` | HTML tag names whose `<img>` children are kept inline instead of block. |
 | `preprocessing` | `PreprocessingOptions` | — | Options for the HTML pre-processing pass applied before conversion begins. Pre-processing runs before the HTML is handed to the converter and can perform operations such as unwrapping redundant wrapper elements, removing tracking pixels, and normalising vendor-specific markup. See `PreprocessingOptions` for the full set of knobs. Defaults to the standard preprocessing options, which enables the standard cleaning passes. Set individual fields on `PreprocessingOptions` (or construct via `ConversionOptions.builder`) to opt in or out of specific passes. |
 | `encoding` | `String.t()` | `"utf-8"` | Expected character encoding of the input HTML (default `"utf-8"`). |
 | `debug` | `boolean()` | `false` | Emit debug information during conversion. |
-| `strip_tags` | `list(String.t())` | `[]` | HTML tag names whose content is stripped from the output entirely. |
-| `preserve_tags` | `list(String.t())` | `[]` | HTML tag names that are preserved verbatim in the output. |
+| `strip_tags` | `list(String.t())` | `\[\]` | HTML tag names whose content is stripped from the output entirely. |
+| `preserve_tags` | `list(String.t())` | `\[\]` | HTML tag names that are preserved verbatim in the output. |
 | `skip_images` | `boolean()` | `false` | Skip conversion of `<img>` elements (omit images from output). |
 | `url_escape_style` | `UrlEscapeStyle` | `:angle` | URL encoding strategy for link and image destinations. Controls how special characters in URL destinations are escaped: - `UrlEscapeStyle.Angle` (default) — wraps the destination in angle brackets when it contains spaces or newlines. Some parsers misinterpret `>` inside such a destination. - `UrlEscapeStyle.Percent` — percent-encodes every character that is not an RFC 3986 unreserved character or `/`, producing a destination that all Markdown parsers handle correctly even when the URL contains `<`, `>`, spaces, or parentheses. |
 | `link_style` | `LinkStyle` | `:inline` | Link rendering style (inline or reference). |
@@ -98,7 +98,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `capture_svg` | `boolean()` | `false` | Capture SVG elements as images. |
 | `infer_dimensions` | `boolean()` | `true` | Infer image dimensions from data. |
 | `max_depth` | `integer() \| nil` | `nil` | Maximum DOM traversal depth. `nil` means unlimited. When set, subtrees beyond this depth are silently truncated. |
-| `exclude_selectors` | `list(String.t())` | `[]` | CSS selectors for elements to exclude entirely (element + all content). Unlike `strip_tags` (which removes the tag wrapper but keeps children), excluded elements and all their descendants are dropped from the output. Supports any CSS selector that `tl` supports: tag names, `.class`, `#id`, `[attribute]`, etc. Invalid selectors are silently skipped at conversion time. Example: `[".cookie-banner", "#ad-container", "[role='complementary']"]` |
+| `exclude_selectors` | `list(String.t())` | `\[\]` | CSS selectors for elements to exclude entirely (element + all content). Unlike `strip_tags` (which removes the tag wrapper but keeps children), excluded elements and all their descendants are dropped from the output. Supports any CSS selector that `tl` supports: tag names, `.class`, `#id`, `\[attribute\]`, etc. Invalid selectors are silently skipped at conversion time. Example: `\[".cookie-banner", "#ad-container", "\[role='complementary'\]"\]` |
 | `tier_strategy` | `TierStrategy` | `:auto` | Which conversion tier to use. - `TierStrategy.Auto` (default) — automatically choose the best path. - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only). |
 | `visitor` | `VisitorHandle \| nil` | `nil` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
@@ -134,8 +134,8 @@ metadata, extracted tables, images, and processing warnings.
 | `content` | `String.t() \| nil` | `nil` | Converted text output in the selected format: Markdown, Djot, or plain text. |
 | `document` | `DocumentStructure \| nil` | `nil` | Structured document tree with semantic elements. Populated when the `include_document_structure` option is `true`. `nil` otherwise (the default), which avoids the overhead of building the tree. When present, the tree mirrors the converted document: headings open `Group` sections, paragraphs and list items carry inline `TextAnnotation`s, and tables reference the same `TableGrid` data exposed in the result's `tables` field. Note: this field is independent of the `metadata` feature flag. Document structure collection is always available at runtime; it is gated only by the runtime option, not by a compile-time feature. |
 | `metadata` | `HtmlMetadata` | — | Extracted HTML metadata (title, OG, links, images, structured data). |
-| `tables` | `list(TableData)` | `[]` | Extracted tables with structured cell data and markdown representation. |
-| `warnings` | `list(ProcessingWarning)` | `[]` | Non-fatal processing warnings. |
+| `tables` | `list(TableData)` | `\[\]` | Extracted tables with structured cell data and markdown representation. |
+| `warnings` | `list(ProcessingWarning)` | `\[\]` | Non-fatal processing warnings. |
 
 ---
 
@@ -150,7 +150,7 @@ and browsers for document indexing and presentation.
 |-------|------|---------|-------------|
 | `title` | `String.t() \| nil` | `nil` | Document title from `<title>` tag |
 | `description` | `String.t() \| nil` | `nil` | Document description from `<meta name="description">` tag |
-| `keywords` | `list(String.t())` | `[]` | Document keywords from `<meta name="keywords">` tag, split on commas |
+| `keywords` | `list(String.t())` | `\[\]` | Document keywords from `<meta name="keywords">` tag, split on commas |
 | `author` | `String.t() \| nil` | `nil` | Document author from `<meta name="author">` tag |
 | `canonical_url` | `String.t() \| nil` | `nil` | Canonical URL from `<link rel="canonical">` tag |
 | `base_href` | `String.t() \| nil` | `nil` | Base URL from `<base href="">` tag for resolving relative URLs |
@@ -256,10 +256,10 @@ suitable for serialization and transmission across language boundaries.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `document` | `DocumentMetadata` | — | Document-level metadata (title, description, canonical, etc.) |
-| `headers` | `list(HeaderMetadata)` | `[]` | Extracted header elements with hierarchy |
-| `links` | `list(LinkMetadata)` | `[]` | Extracted hyperlinks with type classification |
-| `images` | `list(ImageMetadata)` | `[]` | Extracted images with source and dimensions |
-| `structured_data` | `list(StructuredData)` | `[]` | Extracted structured data blocks |
+| `headers` | `list(HeaderMetadata)` | `\[\]` | Extracted header elements with hierarchy |
+| `links` | `list(LinkMetadata)` | `\[\]` | Extracted hyperlinks with type classification |
+| `images` | `list(ImageMetadata)` | `\[\]` | Extracted images with source and dimensions |
+| `structured_data` | `list(StructuredData)` | `\[\]` | Extracted structured data blocks |
 
 ---
 
@@ -286,13 +286,13 @@ plain class (no base class required) and return either a string (`"continue"`,
 `{"error": "..."}`) — the binding converts the return value to the corresponding
 `VisitResult` variant automatically.
 
-### Method Naming Convention
+##### Method Naming Convention
 
 - `visit_*_start`: Called before entering an element (pre-order traversal)
 - `visit_*_end`: Called after exiting an element (post-order traversal)
 - `visit_*`: Called for specific element types (e.g., `visit_link`, `visit_image`)
 
-### Execution Order
+##### Execution Order
 
 For a typical element like `<div><p>text</p></div>`:
 
@@ -302,7 +302,7 @@ For a typical element like `<div><p>text</p></div>`:
 4. `visit_element_end` for `<p>`
 5. `visit_element_end` for `</div>`
 
-### Performance Notes
+##### Performance Notes
 
 - `visit_text` is the most frequently called method (~100+ times per document)
 - Return `Continue` quickly for elements you don't need to customize
@@ -1401,7 +1401,7 @@ Context information passed to all visitor methods.
 Provides comprehensive metadata about the current node being visited,
 including its type, tag name, position in the DOM tree, and parent context.
 
-#### Attributes
+##### Attributes
 
 Access attributes via `NodeContext.attributes`, which returns
 `map()`. When the context was built with
@@ -1409,7 +1409,7 @@ lazy attribute extraction (the hot path inside the converter),
 the map is only materialized on the first call — if the visitor never reads
 attributes, the allocation is skipped.
 
-#### Lifetimes
+###### Lifetimes
 
 String fields use `Cow<'_, str>` so the converter can pass slices directly
 out of the parsed DOM without allocating. Visitor implementations that need
@@ -1590,7 +1590,7 @@ A structured table grid with cell-level data including spans.
 |-------|------|---------|-------------|
 | `rows` | `integer()` | — | Number of rows. |
 | `cols` | `integer()` | — | Number of columns. |
-| `cells` | `list(GridCell)` | `[]` | All cells in the table as a flat, sparse list. The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear in the list. Only the top-left "origin" cell of a span is present, with its `row_span` and `col_span` fields set accordingly. To reconstruct the full visual grid, iterate over all cells and mark the rectangular region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any `(row, col)` position that is not the origin of any cell is covered by a span from an earlier cell. The length of this list is `≤ rows * cols`. An empty table (`rows == 0 \|\| cols == 0`) produces an empty list. |
+| `cells` | `list(GridCell)` | `\[\]` | All cells in the table as a flat, sparse list. The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear in the list. Only the top-left "origin" cell of a span is present, with its `row_span` and `col_span` fields set accordingly. To reconstruct the full visual grid, iterate over all cells and mark the rectangular region `\[row .. row+row_span, col .. col+col_span\]` as occupied by that cell. Any `(row, col)` position that is not the origin of any cell is covered by a span from an earlier cell. The length of this list is `≤ rows * cols`. An empty table (`rows == 0 \|\| cols == 0`) produces an empty list. |
 
 ---
 
@@ -1808,8 +1808,8 @@ reference-style `[text][1]` syntax with definitions collected at the end.
 
 | Value | Description |
 |-------|-------------|
-| `inline` | Inline links: `[text](url)`. Default. |
-| `reference` | Reference-style links: `[text][1]` with `[1]: url` at end of document. |
+| `inline` | Inline links: `\[text\](url)`. Default. |
+| `reference` | Reference-style links: `\[text\]\[1\]` with `\[1\]: url` at end of document. |
 
 ---
 

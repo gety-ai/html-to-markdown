@@ -2,7 +2,7 @@
 title: "C API Reference"
 ---
 
-## C API Reference <span class="version-badge">v3.6.11</span>
+## C API Reference <span class="version-badge">v3.6.12</span>
 
 ### Functions
 
@@ -63,7 +63,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `strong_em_symbol` | `const char*` | `"*"` | Character used for bold/italic emphasis markers (`*` or `_`). |
 | `escape_asterisks` | `bool` | `false` | Escape `*` characters in plain text to avoid unintended bold/italic. |
 | `escape_underscores` | `bool` | `false` | Escape `_` characters in plain text to avoid unintended bold/italic. |
-| `escape_misc` | `bool` | `false` | Escape miscellaneous Markdown metacharacters (`[]()#` etc.) in plain text. |
+| `escape_misc` | `bool` | `false` | Escape miscellaneous Markdown metacharacters (`\[\]()#` etc.) in plain text. |
 | `escape_ascii` | `bool` | `false` | Escape ASCII characters that have special meaning in certain Markdown dialects. |
 | `code_language` | `const char*` | `""` | Default language annotation for fenced code blocks that have no language hint. |
 | `autolinks` | `bool` | `true` | Automatically convert bare URLs into Markdown autolinks. |
@@ -97,7 +97,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `capture_svg` | `bool` | `false` | Capture SVG elements as images. |
 | `infer_dimensions` | `bool` | `true` | Infer image dimensions from data. |
 | `max_depth` | `uintptr_t*` | `NULL` | Maximum DOM traversal depth. `NULL` means unlimited. When set, subtrees beyond this depth are silently truncated. |
-| `exclude_selectors` | `const char**` | `NULL` | CSS selectors for elements to exclude entirely (element + all content). Unlike `strip_tags` (which removes the tag wrapper but keeps children), excluded elements and all their descendants are dropped from the output. Supports any CSS selector that `tl` supports: tag names, `.class`, `#id`, `[attribute]`, etc. Invalid selectors are silently skipped at conversion time. Example: `[".cookie-banner", "#ad-container", "[role='complementary']"]` |
+| `exclude_selectors` | `const char**` | `NULL` | CSS selectors for elements to exclude entirely (element + all content). Unlike `strip_tags` (which removes the tag wrapper but keeps children), excluded elements and all their descendants are dropped from the output. Supports any CSS selector that `tl` supports: tag names, `.class`, `#id`, `\[attribute\]`, etc. Invalid selectors are silently skipped at conversion time. Example: `\[".cookie-banner", "#ad-container", "\[role='complementary'\]"\]` |
 | `tier_strategy` | `HtmTierStrategy` | `HTM_HTM_AUTO` | Which conversion tier to use. - `TierStrategy.Auto` (default) — automatically choose the best path. - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only). |
 | `visitor` | `HtmVisitorHandle*` | `NULL` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
@@ -285,13 +285,13 @@ plain class (no base class required) and return either a string (`"continue"`,
 `{"error": "..."}`) — the binding converts the return value to the corresponding
 `VisitResult` variant automatically.
 
-### Method Naming Convention
+##### Method Naming Convention
 
 - `visit_*_start`: Called before entering an element (pre-order traversal)
 - `visit_*_end`: Called after exiting an element (post-order traversal)
 - `visit_*`: Called for specific element types (e.g., `visit_link`, `visit_image`)
 
-### Execution Order
+##### Execution Order
 
 For a typical element like `<div><p>text</p></div>`:
 
@@ -301,7 +301,7 @@ For a typical element like `<div><p>text</p></div>`:
 4. `visit_element_end` for `<p>`
 5. `visit_element_end` for `</div>`
 
-### Performance Notes
+##### Performance Notes
 
 - `visit_text` is the most frequently called method (~100+ times per document)
 - Return `Continue` quickly for elements you don't need to customize
@@ -1400,7 +1400,7 @@ Context information passed to all visitor methods.
 Provides comprehensive metadata about the current node being visited,
 including its type, tag name, position in the DOM tree, and parent context.
 
-#### Attributes
+##### Attributes
 
 Access attributes via `NodeContext.attributes`, which returns
 `void*`. When the context was built with
@@ -1408,7 +1408,7 @@ lazy attribute extraction (the hot path inside the converter),
 the map is only materialized on the first call — if the visitor never reads
 attributes, the allocation is skipped.
 
-#### Lifetimes
+###### Lifetimes
 
 String fields use `Cow<'_, str>` so the converter can pass slices directly
 out of the parsed DOM without allocating. Visitor implementations that need
@@ -1589,7 +1589,7 @@ A structured table grid with cell-level data including spans.
 |-------|------|---------|-------------|
 | `rows` | `uint32_t` | — | Number of rows. |
 | `cols` | `uint32_t` | — | Number of columns. |
-| `cells` | `HtmGridCell*` | `NULL` | All cells in the table as a flat, sparse list. The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear in the list. Only the top-left "origin" cell of a span is present, with its `row_span` and `col_span` fields set accordingly. To reconstruct the full visual grid, iterate over all cells and mark the rectangular region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any `(row, col)` position that is not the origin of any cell is covered by a span from an earlier cell. The length of this list is `≤ rows * cols`. An empty table (`rows == 0 \|\| cols == 0`) produces an empty list. |
+| `cells` | `HtmGridCell*` | `NULL` | All cells in the table as a flat, sparse list. The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear in the list. Only the top-left "origin" cell of a span is present, with its `row_span` and `col_span` fields set accordingly. To reconstruct the full visual grid, iterate over all cells and mark the rectangular region `\[row .. row+row_span, col .. col+col_span\]` as occupied by that cell. Any `(row, col)` position that is not the origin of any cell is covered by a span from an earlier cell. The length of this list is `≤ rows * cols`. An empty table (`rows == 0 \|\| cols == 0`) produces an empty list. |
 
 ---
 
@@ -1807,8 +1807,8 @@ reference-style `[text][1]` syntax with definitions collected at the end.
 
 | Value | Description |
 |-------|-------------|
-| `HTM_INLINE` | Inline links: `[text](url)`. Default. |
-| `HTM_REFERENCE` | Reference-style links: `[text][1]` with `[1]: url` at end of document. |
+| `HTM_INLINE` | Inline links: `\[text\](url)`. Default. |
+| `HTM_REFERENCE` | Reference-style links: `\[text\]\[1\]` with `\[1\]: url` at end of document. |
 
 ---
 

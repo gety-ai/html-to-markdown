@@ -1,20 +1,20 @@
 packages:
-  - crates/html-to-markdown-node
-  - crates/html-to-markdown-wasm
-  - packages/typescript
-  - e2e/node
-  - e2e/wasm
+    - crates/html-to-markdown-node
+    - crates/html-to-markdown-wasm
+    - packages/typescript
+    - e2e/node
+    - e2e/wasm
 
 onlyBuiltDependencies:
-  - esbuild
+    - esbuild
 
 ignoredBuiltDependencies:
-  - wasm-pack
+    - wasm-pack
 
 allowBuilds:
-  esbuild: true
+    esbuild: true
 
 minimumReleaseAgeExclude:
-  - '@kreuzberg/html-to-markdown-node-*'
-  - '@kreuzberg/html-to-markdown-wasm'
-  - '@kreuzberg/html-to-markdown'
+    - "@kreuzberg/html-to-markdown-node-*"
+    - "@kreuzberg/html-to-markdown-wasm"
+    - "@kreuzberg/html-to-markdown"

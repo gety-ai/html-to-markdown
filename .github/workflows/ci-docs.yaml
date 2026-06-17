@@ -1,73 +1,73 @@
 name: CI Docs
 
 on:
-  pull_request:
-    paths:
-      - "docs/**"
-      - "zensical.toml"
-      - "mkdocs.yml"
-      - ".github/workflows/ci-docs.yaml"
-  push:
-    branches: [main]
-    paths:
-      - "docs/**"
-      - "zensical.toml"
-      - "pyproject.toml"
-      - ".github/workflows/ci-docs.yaml"
-  workflow_dispatch:
+    pull_request:
+        paths:
+            - "docs/**"
+            - "zensical.toml"
+            - "mkdocs.yml"
+            - ".github/workflows/ci-docs.yaml"
+    push:
+        branches: [main]
+        paths:
+            - "docs/**"
+            - "zensical.toml"
+            - "pyproject.toml"
+            - ".github/workflows/ci-docs.yaml"
+    workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+    contents: read
+    pages: write
+    id-token: write
 
 concurrency:
-  group: ci-docs-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: false
+    group: ci-docs-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: false
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
+    lint:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
 
-      - name: Lint documentation
-        uses: kreuzberg-dev/actions/lint-docs@main
-        with:
-          working-directory: .
-          strict: "true"
-          validate-snippets: "true"
+            - name: Lint documentation
+              uses: kreuzberg-dev/actions/lint-docs@main
+              with:
+                  working-directory: .
+                  strict: "true"
+                  validate-snippets: "true"
 
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
 
-      - name: Build documentation
-        uses: kreuzberg-dev/actions/build-docs@main
-        with:
-          working-directory: .
-          strict: "true"
+            - name: Build documentation
+              uses: kreuzberg-dev/actions/build-docs@main
+              with:
+                  working-directory: .
+                  strict: "true"
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v5 # v4
-        with:
-          path: site
+            - name: Upload Pages artifact
+              uses: actions/upload-pages-artifact@v5 # v4
+              with:
+                  path: site
 
-  deploy:
-    needs: build
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5 # v4
+    deploy:
+        needs: build
+        permissions:
+            pages: write
+            id-token: write
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v5 # v4

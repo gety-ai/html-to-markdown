@@ -1,29 +1,29 @@
 {
-  "name": "html-to-markdown-monorepo",
-  "version": "3.6.11",
-  "private": true,
-  "description": "HTML to Markdown converter - monorepo root",
-  "scripts": {
-    "build": "pnpm run build:node && pnpm run build:wasm && pnpm run build:ts",
-    "build:node": "pnpm --filter @kreuzberg/html-to-markdown-node run build",
-    "build:wasm": "pnpm --filter @kreuzberg/html-to-markdown-wasm run build:all",
-    "build:ts": "pnpm --filter @kreuzberg/html-to-markdown run build",
-    "test": "pnpm -r test",
-    "test:node": "pnpm --filter @kreuzberg/html-to-markdown-node test",
-    "test:wasm": "pnpm --filter @kreuzberg/html-to-markdown-wasm test",
-    "test:ts": "pnpm --filter @kreuzberg/html-to-markdown test",
-    "clean": "pnpm -r run clean && rm -rf node_modules",
-    "lint": "prek run oxlint --all-files",
-    "format": "prek run oxfmt --all-files"
-  },
-  "devDependencies": {
-    "@types/node": "^25.9.3",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.8"
-  },
-  "engines": {
-    "node": ">=18",
-    "pnpm": ">=11"
-  },
-  "packageManager": "pnpm@11.6.0+sha512.9a36518224080c6fe5165afdcfe79bfa118c29be703f3f462b1e32efe1e98e47e8750b148e08286250aad4113cc7993ca413c4e2cd447752708c2ee5751bc95f"
+	"name": "html-to-markdown-monorepo",
+	"version": "3.6.12",
+	"private": true,
+	"description": "HTML to Markdown converter - monorepo root",
+	"scripts": {
+		"build": "pnpm run build:node && pnpm run build:wasm && pnpm run build:ts",
+		"build:node": "pnpm --filter @kreuzberg/html-to-markdown-node run build",
+		"build:wasm": "pnpm --filter @kreuzberg/html-to-markdown-wasm run build:all",
+		"build:ts": "pnpm --filter @kreuzberg/html-to-markdown run build",
+		"test": "pnpm -r test",
+		"test:node": "pnpm --filter @kreuzberg/html-to-markdown-node test",
+		"test:wasm": "pnpm --filter @kreuzberg/html-to-markdown-wasm test",
+		"test:ts": "pnpm --filter @kreuzberg/html-to-markdown test",
+		"clean": "pnpm -r run clean && rm -rf node_modules",
+		"lint": "prek run oxlint --all-files",
+		"format": "prek run oxfmt --all-files"
+	},
+	"devDependencies": {
+		"@types/node": "^25.9.3",
+		"typescript": "^6.0.3",
+		"vitest": "^4.1.8"
+	},
+	"engines": {
+		"node": ">=18",
+		"pnpm": ">=11"
+	},
+	"packageManager": "pnpm@11.6.0+sha512.9a36518224080c6fe5165afdcfe79bfa118c29be703f3f462b1e32efe1e98e47e8750b148e08286250aad4113cc7993ca413c4e2cd447752708c2ee5751bc95f"
 }
