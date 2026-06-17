@@ -1,6 +1,6 @@
 ```zig
 const std = @import("std");
-const html_to_markdown = @import("html_to_markdown");
+const html_to_markdown = @import("html_to_markdown_rs");
 const c = html_to_markdown.c;
 
 // Visitor callbacks return an int32 status code:

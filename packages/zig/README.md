@@ -102,7 +102,7 @@ Basic conversion:
 
 ```zig
 const std = @import("std");
-const html_to_markdown = @import("html_to_markdown");
+const html_to_markdown = @import("html_to_markdown_rs");
 
 pub fn main() !void {
     const html = "<h1>Hello</h1><p>This is <strong>fast</strong>!</p>";
@@ -119,7 +119,7 @@ With conversion options:
 
 ```zig
 const std = @import("std");
-const html_to_markdown = @import("html_to_markdown");
+const html_to_markdown = @import("html_to_markdown_rs");
 
 pub fn main() !void {
     const html = "<h1>Hello</h1><p>This is <strong>formatted</strong> content.</p>";

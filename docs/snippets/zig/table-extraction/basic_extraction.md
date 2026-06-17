@@ -1,6 +1,6 @@
 ```zig
 const std = @import("std");
-const html_to_markdown = @import("html_to_markdown");
+const html_to_markdown = @import("html_to_markdown_rs");
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};

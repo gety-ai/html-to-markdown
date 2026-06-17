@@ -91,7 +91,12 @@ Ship identical Markdown across every runtime while keeping idiomatic Swift APIs 
 ## Installation
 
 ```bash
-.package(url: "https://github.com/kreuzberg-dev/html-to-markdown.git", from: "3.6.13")
+# SwiftPM URL consumption is not yet available (no published XCFramework).
+# Build from source against the Rust static library:
+git clone https://github.com/kreuzberg-dev/html-to-markdown.git
+cd html-to-markdown
+cargo build -p html-to-markdown-rs-swift --release
+swift build --package-path packages/swift
 ```
 
 ## Performance Snapshot
