@@ -1699,6 +1699,10 @@ jobs:
                   pattern: php-package-*
                   path: dist/php-package
                   merge-multiple: true
+                  # Fail fast if zero PIE archives reach this aggregator — a silently
+                  # empty upload (the old failure mode that orphaned v3.6.11's PIE assets,
+                  # see #333) now hard-errors instead of producing an empty release surface.
+                  if-no-files-found: error
 
             - uses: kreuzberg-dev/actions/upload-release-assets@v1
               with:

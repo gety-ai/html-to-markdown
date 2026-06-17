@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **ci(publish): `upload-php-pie-release` now hard-errors if zero `php-package-*` artifacts reach the aggregator instead of producing an empty PIE upload.** The download step adds `if-no-files-found: error`, so a future regression that drops all PHP build outputs surfaces immediately instead of silently shipping a release with no PIE assets — the failure mode behind v3.6.11's missing-asset reports (see [#333](https://github.com/kreuzberg-dev/html-to-markdown/issues/333)). The matrix-cell tolerance from v3.6.12 (`needs.php-extension.result != 'cancelled' && != 'skipped'`) is unchanged. (`.github/workflows/publish.yaml`)
+
 ## [3.6.13] - 2026-06-17
 
 ### Fixed
