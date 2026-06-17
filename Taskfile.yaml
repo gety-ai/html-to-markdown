@@ -483,6 +483,7 @@ tasks:
     dir: test_apps/go
     cmds:
       - go mod download
+      - bash ./download_ffi.sh
       - go test -v -run Smoke
 
   test-apps:smoke:java:
