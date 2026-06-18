@@ -16,15 +16,17 @@
 //! 4. Visitor hooks do NOT fire during the pre-pass (the whole point of the fix).
 
 fn build_large_table(rows: usize, cols: usize) -> String {
+    use std::fmt::Write as _;
+
     let mut html = String::from("<table><thead><tr>");
     for c in 0..cols {
-        html.push_str(&format!("<th>H{c}</th>"));
+        write!(html, "<th>H{c}</th>").unwrap();
     }
     html.push_str("</tr></thead><tbody>");
     for r in 0..rows {
         html.push_str("<tr>");
         for c in 0..cols {
-            html.push_str(&format!("<td>R{r}C{c}</td>"));
+            write!(html, "<td>R{r}C{c}</td>").unwrap();
         }
         html.push_str("</tr>");
     }
@@ -94,14 +96,19 @@ fn visitor_hooks_fire_during_main_pass_not_suppressed() {
     let visitor = Arc::new(Mutex::new(CountingVisitor::default()));
     let html = "<table><thead><tr><th>Name</th><th>Value</th></tr></thead><tbody><tr><td>foo</td><td>42</td></tr></tbody></table>";
 
-    let mut opts = html_to_markdown_rs::ConversionOptions::default();
-    opts.visitor = Some(visitor.clone());
+    let opts = html_to_markdown_rs::ConversionOptions {
+        visitor: Some(visitor.clone()),
+        ..Default::default()
+    };
 
     html_to_markdown_rs::convert(html, Some(opts)).expect("conversion must not fail");
 
-    let v = visitor.lock().unwrap();
-    assert_eq!(v.table_start_count, 1, "visit_table_start must fire exactly once");
-    assert_eq!(v.table_end_count, 1, "visit_table_end must fire exactly once");
+    let (table_start_count, table_end_count) = {
+        let v = visitor.lock().unwrap();
+        (v.table_start_count, v.table_end_count)
+    };
+    assert_eq!(table_start_count, 1, "visit_table_start must fire exactly once");
+    assert_eq!(table_end_count, 1, "visit_table_end must fire exactly once");
 }
 
 /// With a visitor and a large table, the visitor fires the correct number of times.
@@ -128,15 +135,17 @@ fn visitor_hook_count_matches_table_row_count() {
     let html = build_large_table(ROW_COUNT, 4);
 
     let visitor = Arc::new(Mutex::new(RowCounter::default()));
-    let mut opts = html_to_markdown_rs::ConversionOptions::default();
-    opts.visitor = Some(visitor.clone());
+    let opts = html_to_markdown_rs::ConversionOptions {
+        visitor: Some(visitor.clone()),
+        ..Default::default()
+    };
 
     html_to_markdown_rs::convert(&html, Some(opts)).expect("conversion must not fail");
 
-    let v = visitor.lock().unwrap();
+    let row_count = visitor.lock().unwrap().row_count;
     // 1 header row + ROW_COUNT body rows
     assert_eq!(
-        v.row_count,
+        row_count,
         ROW_COUNT + 1,
         "visit_table_row must fire exactly once per row (header + body), not doubled by pre-pass"
     );

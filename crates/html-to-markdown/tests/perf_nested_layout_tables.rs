@@ -21,13 +21,17 @@
 use std::time::{Duration, Instant};
 
 fn nested_layout_cells(depth: usize, breadth: usize) -> String {
+    use std::fmt::Write as _;
+
     if depth == 0 {
         return "leaf".to_string();
     }
+
     let inner = nested_layout_cells(depth - 1, breadth);
-    let cells: String = (0..breadth)
-        .map(|_| format!("<td><table><tr><td>{inner}</td></tr></table></td>"))
-        .collect();
+    let mut cells = String::new();
+    for _ in 0..breadth {
+        write!(cells, "<td><table><tr><td>{inner}</td></tr></table></td>").unwrap();
+    }
     format!("<table><tr>{cells}</tr></table>")
 }
 
