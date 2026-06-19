@@ -201,8 +201,8 @@ A single cell in a table grid.
 | `Content` | `string` | — | The text content of the cell. |
 | `Row` | `uint32` | — | 0-indexed row position. |
 | `Col` | `uint32` | — | 0-indexed column position. |
-| `RowSpan` | `uint32` | `/* serde(default) */` | Number of rows this cell spans (default 1). |
-| `ColSpan` | `uint32` | `/* serde(default) */` | Number of columns this cell spans (default 1). |
+| `RowSpan` | `uint32` | `serde(default = "default_span")` | Number of rows this cell spans (default 1). |
+| `ColSpan` | `uint32` | `serde(default = "default_span")` | Number of columns this cell spans (default 1). |
 | `IsHeader` | `bool` | `/* serde(default) */` | Whether this is a header cell (`<th>`). |
 
 ---

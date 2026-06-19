@@ -198,8 +198,8 @@ A single cell in a table grid.
 | `content` | `\[:0\]const u8` | — | The text content of the cell. |
 | `row` | `u32` | — | 0-indexed row position. |
 | `col` | `u32` | — | 0-indexed column position. |
-| `rowSpan` | `u32` | `/* serde(default) */` | Number of rows this cell spans (default 1). |
-| `colSpan` | `u32` | `/* serde(default) */` | Number of columns this cell spans (default 1). |
+| `rowSpan` | `u32` | `serde(default = "default_span")` | Number of rows this cell spans (default 1). |
+| `colSpan` | `u32` | `serde(default = "default_span")` | Number of columns this cell spans (default 1). |
 | `isHeader` | `bool` | `/* serde(default) */` | Whether this is a header cell (`<th>`). |
 
 ---

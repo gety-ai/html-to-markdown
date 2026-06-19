@@ -199,8 +199,8 @@ A single cell in a table grid.
 | `content` | `str` | — | The text content of the cell. |
 | `row` | `int` | — | 0-indexed row position. |
 | `col` | `int` | — | 0-indexed column position. |
-| `row_span` | `int` | `/* serde(default) */` | Number of rows this cell spans (default 1). |
-| `col_span` | `int` | `/* serde(default) */` | Number of columns this cell spans (default 1). |
+| `row_span` | `int` | `serde(default = "default_span")` | Number of rows this cell spans (default 1). |
+| `col_span` | `int` | `serde(default = "default_span")` | Number of columns this cell spans (default 1). |
 | `is_header` | `bool` | `/* serde(default) */` | Whether this is a header cell (`<th>`). |
 
 ---

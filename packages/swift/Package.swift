@@ -25,10 +25,12 @@ let package = Package(
     ),
     // RustBridge: Swift wrapper around the Rust static library.
     // Depends on RustBridgeC so the generated Swift files can use the C types.
-    // linkerSettings wire the Rust staticlib (libhtml_to_markdown_rs_swift.a) produced by
-    // `cargo build -p html-to-markdown-rs-swift` so `swift build` / `swift test` can resolve
-    // the `__swift_bridge__$*` C symbols. Both target/release and target/debug are
-    // searched so either cargo profile works.
+    // linkerSettings wire the Rust staticlibs (libhtml_to_markdown_rs_swift.a and libhtml_to_markdown_ffi.a)
+    // produced by `cargo build -p html-to-markdown-rs-swift` and the FFI crate so
+    // `swift build` / `swift test` can resolve the `__swift_bridge__$*` and FFI C symbols.
+    // Both target/release and target/debug are searched so either cargo profile works.
+    // The FFI library is needed because the generated Swift service API code (App.swift)
+    // calls FFI functions directly via @_silgen_name declarations.
     .target(
       name: "RustBridge",
       dependencies: ["RustBridgeC"],
@@ -39,6 +41,7 @@ let package = Package(
           "-L../../target/debug",
         ]),
         .linkedLibrary("html_to_markdown_rs_swift"),
+        .linkedLibrary("html_to_markdown_ffi"),
         .linkedFramework("Security", .when(platforms: [.macOS, .iOS])),
         .linkedFramework("CoreFoundation", .when(platforms: [.macOS, .iOS])),
         .linkedFramework("SystemConfiguration", .when(platforms: [.macOS])),

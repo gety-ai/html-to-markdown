@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **chore(deps): re-pin `alef.toml.alef_version` to 0.25.49 and regenerate every binding, e2e suite, README, and API doc.** Folds in the 0.25.45–0.25.49 generator fixes (incl. kotlin-android AGP 9 toolchain, swift bridge build, content-union accessors). Verified locally: `alef verify` is clean and `task alef:format` succeeds across all languages.
+- **chore(precommit,alef): standardize kotlin-android formatting on ktfmt `--kotlinlang-style`.** Drop the conflicting prek `ktlint` hook (its always-format mode fought `ktfmt` over blank-line-after-brace and rewrote alef's `///` doc comments to `// /`, breaking `alef verify`), switch `alef.toml` kotlin-android format/check from gradle-`ktlintFormat` to `ktfmt` so alef and prek agree, and exclude the vendored Gradle wrapper from shellcheck. detekt remains for static analysis. (`.pre-commit-config.yaml`, `alef.toml`)
+- **chore(alef): close formatter-coverage gaps for generated Go and Zig.** Add a `gofmt -w` format hook for `packages/go`/`e2e/go` (alef's Go emitter output needs canonical re-indentation), and extend the Zig formatter/check to cover `build.zig` in addition to `src`. (`alef.toml`)
+
 ## [3.6.16] - 2026-06-19
 
 ### Fixed
