@@ -7,11 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.16] - 2026-06-19
+
+### Fixed
+
+- **ci(publish): re-exclude `php8.5` + `macos-arm64` from the PHP extension matrix, restoring PHP publishing.** v3.6.15 removed this exclusion to chase the Apple-Silicon PIE asset for [#333](https://github.com/kreuzberg-dev/html-to-markdown/issues/333), but `shivammathur/setup-php` still cannot provision PHP 8.5 on `macos-arm64` — the homebrew tap has no `php@8.5` arm64 formula, so the cell fails at the setup step with "Could not setup PHP 8.5". Because `upload-php-pie-release` does not run when `needs.php-extension.result == 'failure'`, that single failing cell dropped **every** PHP PIE asset from the v3.6.15 release (a regression from v3.6.14's full set). Restoring the exclusion returns the matrix to all-green and republishes the PHP extension for every supported target (PHP 8.2–8.5 on linux/macos-x86_64/windows, plus arm64-darwin for 8.2–8.4). #333 stays open until upstream ships a `php@8.5` arm64 formula. (`.github/workflows/publish.yaml`)
+- **ci(publish): re-publish the Ruby gems missing from v3.6.15.** The v3.6.15 run skipped `publish-rubygems` because the `Build Ruby gem (windows-x64)` cell hung ~3h on `setup-rust` and was cancelled, failing the `needs.ruby-gem.result == 'success'` gate. This is a transient runner fault, not a code defect; cutting v3.6.16 re-runs the publish so the gems ship.
+
 ## [3.6.15] - 2026-06-18
 
 ### Fixed
 
-- **ci(publish): build the PHP 8.5 + macOS arm64 (Apple Silicon) PIE extension.** Removed the build-matrix exclusion that skipped `php8.5` on `macos-latest`; the homebrew tap now ships `php@8.5` for arm64 (8.5.x) and `shivammathur/setup-php` installs it, so the cell builds. Without it, `php_html_to_markdown-v*_php8.5-arm64-darwin-bsdlibc-nts.tgz` was never produced and `pie install kreuzberg-dev/html-to-markdown` failed on Apple Silicon + PHP 8.5 with "Could not find release asset" ([#333](https://github.com/kreuzberg-dev/html-to-markdown/issues/333)). (`.github/workflows/publish.yaml`)
+- **ci(publish): attempted to build the PHP 8.5 + macOS arm64 (Apple Silicon) PIE extension ([#333](https://github.com/kreuzberg-dev/html-to-markdown/issues/333)) — ineffective, reverted in 3.6.16.** Removed the build-matrix exclusion for `php8.5` on `macos-latest`, but `shivammathur/setup-php` cannot install PHP 8.5 on arm64 (no `php@8.5` arm64 homebrew formula), so the cell failed at setup and — because `upload-php-pie-release` skips on a failed matrix — dropped all PHP PIE assets from this release. See the 3.6.16 entry. (`.github/workflows/publish.yaml`)
 - **docs(php): use the native `HtmlToMarkdownApi` class in all PHP examples.** The README quick-start, API reference, and docs snippets used the `HtmlToMarkdown` userland wrapper, which is only autoloaded via Composer's PSR-4 and is absent on the PIE install path (extension-only) — so `HtmlToMarkdown::convert()` raised "Class not found" for users who installed via `pie`. Examples now call `HtmlToMarkdownApi::convert()`, the native class registered by the extension itself, which works on both the PIE and Composer install paths ([#415](https://github.com/kreuzberg-dev/html-to-markdown/issues/415)). (`readme_templates/partials/`, `docs/snippets/php/`, `docs/language-guides.md`)
 
 ### Changed

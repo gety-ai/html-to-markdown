@@ -993,6 +993,12 @@ jobs:
                     - { os: macos-15-intel, label: macos-x86_64, target: x86_64-apple-darwin }
                     - { os: windows-latest, label: windows-x86_64, target: x86_64-pc-windows-msvc }
                     # windows-arm64: deferred until ext-php-rs cross-compile to aarch64-pc-windows-msvc is validated
+                exclude:
+                    # PHP 8.5 on macos-arm64: the homebrew tap lacks a php@8.5 arm64 formula, so
+                    # shivammathur/setup-php fails at the setup step ("Could not setup PHP 8.5").
+                    # Tracked in #333 — re-enable once upstream ships a php@8.5 arm64 formula.
+                    - php: "8.5"
+                      platform: { os: macos-latest, label: macos-arm64, target: aarch64-apple-darwin }
         steps:
             - uses: actions/checkout@v6
               with:
