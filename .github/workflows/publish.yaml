@@ -426,15 +426,92 @@ jobs:
                   package: html_to_markdown
                   version: ${{ needs.prepare.outputs.version }}
 
-    assemble-dart-package:
-        name: Assemble Dart package artifact
+    dart-natives:
+        name: Build Dart native library (${{ matrix.rid }})
         needs: [prepare, check-pub]
         if: ${{ needs.prepare.outputs.release_dart == 'true' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && (needs.check-pub.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+        runs-on: ${{ matrix.os }}
+        timeout-minutes: 180
+        strategy:
+            fail-fast: false
+            matrix:
+                # rid == the lib/src/native/<rid>/ dir the dart loader (_alefHostRid) searches.
+                # Dart uses macos-arm64 / linux-x64 style (NOT x86_64/aarch64).
+                include:
+                    - { os: ubuntu-latest, rid: linux-x64, target: x86_64-unknown-linux-gnu }
+                    - { os: ubuntu-24.04-arm, rid: linux-arm64, target: aarch64-unknown-linux-gnu }
+                    - { os: macos-latest, rid: macos-arm64, target: aarch64-apple-darwin }
+                    - { os: macos-15-intel, rid: macos-x64, target: x86_64-apple-darwin }
+                    - { os: windows-latest, rid: windows-x64, target: x86_64-pc-windows-msvc }
+                    - { os: windows-11-arm, rid: windows-arm64, target: aarch64-pc-windows-msvc }
+        steps:
+            - uses: actions/checkout@v6
+              with:
+                  ref: ${{ needs.prepare.outputs.checkout_ref }}
+                  fetch-depth: 0
+                  submodules: recursive
+
+            - name: Free disk space
+              if: runner.os == 'Linux'
+              uses: kreuzberg-dev/actions/free-disk-space-linux@v1
+
+            - uses: kreuzberg-dev/actions/setup-rust@v1
+              with:
+                  target: ${{ matrix.target }}
+                  cache-key-prefix: publish-dart-${{ matrix.rid }}
+
+            - name: Build and stage Dart native library
+              # The dart binding ships a dedicated flutter_rust_bridge cdylib
+              # (html-to-markdown-rs-dart), not the C FFI lib. Build it natively per
+              # platform and stage under lib/src/native/<rid>/ so the published pub.dev
+              # package can locate it (the loader falls back to a relative path otherwise,
+              # which hardened runtimes reject).
+              shell: bash
+              run: |
+                  cargo build --release --locked -p html-to-markdown-rs-dart --target ${{ matrix.target }}
+                  mkdir -p "dist/dart-natives/${{ matrix.rid }}"
+                  for src in "target/${{ matrix.target }}/release" "target/release"; do
+                    [[ -d "$src" ]] || continue
+                    find "$src" -maxdepth 1 -type f \( -name 'libhtml_to_markdown_rs_dart.so' -o -name 'libhtml_to_markdown_rs_dart.dylib' -o -name 'html_to_markdown_rs_dart.dll' \) -exec cp {} "dist/dart-natives/${{ matrix.rid }}/" \;
+                  done
+                  ls -la "dist/dart-natives/${{ matrix.rid }}/"
+
+            - uses: actions/upload-artifact@v7
+              with:
+                  name: dart-natives-${{ matrix.rid }}
+                  path: dist/dart-natives
+                  if-no-files-found: error
+                  retention-days: 14
+
+    assemble-dart-package:
+        name: Assemble Dart package artifact
+        needs: [prepare, check-pub, dart-natives]
+        if: ${{ needs.prepare.outputs.release_dart == 'true' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.dart-natives.result == 'success' && (needs.check-pub.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v6
               with:
                   ref: ${{ needs.prepare.outputs.ref }}
+
+            - uses: actions/download-artifact@v8
+              with:
+                  pattern: dart-natives-*
+                  path: dart-natives-artifacts
+                  merge-multiple: true
+
+            - name: Stage prebuilt native libraries into Dart package
+              # Populate lib/src/native/<rid>/ with the per-platform cdylibs built by
+              # dart-natives so the published tarball is self-contained. The loader
+              # (_alefResolveExternalLibrary) resolves these via Isolate.resolvePackageUri.
+              shell: bash
+              run: |
+                  for dir in dart-natives-artifacts/*/; do
+                    rid="$(basename "$dir")"
+                    mkdir -p "packages/dart/lib/src/native/${rid}"
+                    cp -r "${dir}." "packages/dart/lib/src/native/${rid}/"
+                    echo "Staged Dart native library for ${rid}:"
+                    ls -la "packages/dart/lib/src/native/${rid}/"
+                  done
 
             - uses: actions/upload-artifact@v7
               with:
