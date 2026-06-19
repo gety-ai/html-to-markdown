@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.17] - 2026-06-19
+
+### Fixed
+
+- **ci(publish): stage Java natives under the `macos-*` RID the loader expects, fixing Java on all macOS.** The `java-natives` matrix labelled the macOS cells `osx-aarch64` / `osx-x86_64`, which became the `natives/<rid>/` directory baked into the jar, but the loader (`NativeLib.resolveNativesRid`, alef `go_java_platform`) expects `macos-arm64` / `macos-x86_64`. The published jar therefore failed with `UnsatisfiedLinkError` on every macOS. Align the labels with the loader. (`.github/workflows/publish.yaml`)
+- **ci(publish): bundle the Dart native libraries into the published package.** `assemble-dart-package` shipped the pub.dev tarball with no native libraries, so the loader fell back to a relative framework path that hardened runtimes reject — the package was unusable for every consumer. Add a `dart-natives` matrix that builds the `html-to-markdown-rs-dart` cdylib per platform and stages it into `lib/src/native/<rid>/` where the loader (`_alefHostRid`) looks. (`.github/workflows/publish.yaml`)
+- **ci(publish): build the PHP 8.5 macOS-arm64 extension on the `macos-14` runner ([#333](https://github.com/kreuzberg-dev/html-to-markdown/issues/333)).** `shivammathur/setup-php` only provisions PHP 8.5 on Apple Silicon via the `macos-14` runner, not `macos-latest` (15/26). The `php-extension` matrix used `macos-latest` and excluded php8.5/macos-arm64, so that PIE asset was never built. Build the macos-arm64 cell on `macos-14` and drop the exclusion so the `php8.5-arm64-darwin` PIE asset ships. (`.github/workflows/publish.yaml`)
+- **fix(task): refresh `go.sum` in the Go smoke test.** `test-apps:smoke:go` failed with "missing go.sum entry" after a version bump because alef edits `go.mod` only. Run the targeted `go mod download <module>` Go suggests — it adds the entry without rewriting `go.mod`'s block form, which `download_ffi.sh` parses for the version. (`Taskfile.yaml`)
+- **test(ci): run the Java e2e step on macOS to cover native RID resolution.** The Java e2e ran the e2e step only on ubuntu, so macOS-specific binding/native regressions (such as the RID mismatch above) were never exercised. Run it on macOS too. (`.github/workflows/ci-e2e.yaml`)
+
 ### Changed
 
 - **chore(deps): re-pin `alef.toml.alef_version` to 0.25.49 and regenerate every binding, e2e suite, README, and API doc.** Folds in the 0.25.45–0.25.49 generator fixes (incl. kotlin-android AGP 9 toolchain, swift bridge build, content-union accessors). Verified locally: `alef verify` is clean and `task alef:format` succeeds across all languages.
