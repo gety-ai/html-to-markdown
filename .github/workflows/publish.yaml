@@ -1136,79 +1136,6 @@ jobs:
                       dist/php-package/php_*.zip.sha256
                   retention-days: 14
 
-    cli-binaries:
-        name: Build CLI binary (${{ matrix.target }})
-        needs: [prepare, check-cli]
-        if: ${{ needs.prepare.outputs.release_cli == 'true' && (needs.check-cli.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
-        runs-on: ${{ matrix.os }}
-        timeout-minutes: 180
-        strategy:
-            fail-fast: false
-            matrix:
-                include:
-                    - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
-                    - { os: ubuntu-latest, target: x86_64-unknown-linux-musl }
-                    - { os: ubuntu-24.04-arm, target: aarch64-unknown-linux-gnu }
-                    - { os: macos-latest, target: aarch64-apple-darwin }
-                    - { os: macos-15-intel, target: x86_64-apple-darwin }
-                    - { os: windows-latest, target: x86_64-pc-windows-msvc }
-                    - { os: windows-11-arm, target: aarch64-pc-windows-msvc }
-        steps:
-            - uses: actions/checkout@v6
-              with:
-                  ref: ${{ needs.prepare.outputs.checkout_ref }}
-                  fetch-depth: 0
-                  submodules: recursive
-
-            - name: Free disk space
-              if: runner.os == 'Linux'
-              uses: kreuzberg-dev/actions/free-disk-space-linux@v1
-
-            - name: Install musl tools
-              if: ${{ matrix.target == 'x86_64-unknown-linux-musl' }}
-              run: sudo apt-get update && sudo apt-get install -y musl-tools
-
-            - uses: kreuzberg-dev/actions/setup-rust@v1
-              with:
-                  target: ${{ matrix.target }}
-                  cache-key-prefix: publish-cli-${{ matrix.target }}
-
-            - uses: kreuzberg-dev/actions/build-rust-cli@v1
-              id: build
-              with:
-                  package-name: html-to-markdown-cli
-                  binary-name: html-to-markdown
-                  target: ${{ matrix.target }}
-
-            - name: Package CLI artifact
-              # Inline: archive layout (.tar.gz on Unix, .zip on Windows) varies per
-              # OS in a way no shared action covers; tiny and self-contained.
-              env:
-                  BINARY_PATH: ${{ steps.build.outputs.binary-path }}
-                  TARGET: ${{ matrix.target }}
-              shell: bash
-              run: |
-                  STAGE="cli-${TARGET}"
-                  mkdir -p "$STAGE"
-                  cp LICENSE "$STAGE/" 2>/dev/null || true
-                  cp README.md "$STAGE/" 2>/dev/null || true
-                  if [[ "$RUNNER_OS" == "Windows" ]]; then
-                    cp "$BINARY_PATH" "$STAGE/html-to-markdown.exe"
-                    7z a "${STAGE}.zip" "$STAGE" >/dev/null
-                  else
-                    cp "$BINARY_PATH" "$STAGE/html-to-markdown"
-                    tar -czf "${STAGE}.tar.gz" "$STAGE"
-                  fi
-
-            - uses: actions/upload-artifact@v7
-              with:
-                  name: cli-${{ matrix.target }}
-                  path: |
-                      cli-${{ matrix.target }}.tar.gz
-                      cli-${{ matrix.target }}.zip
-                  if-no-files-found: ignore
-                  retention-days: 14
-
     go-ffi-libraries:
         name: Build Go FFI library (${{ matrix.platform }})
         needs: [prepare, check-go]
@@ -1655,28 +1582,26 @@ jobs:
 
     # ─── GitHub Release asset uploads ─────────────────────────────────────
 
+    # Builds the CLI across the reliable cross-platform matrix and attaches the
+    # archives to the release via the centralized reusable workflow. Job name is
+    # kept as `upload-cli-release` because downstream jobs (homebrew, finalize)
+    # gate on `needs.upload-cli-release.result`.
     upload-cli-release:
-        name: Upload CLI binaries to GitHub Release
-        needs: [prepare, cli-binaries]
-        if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.cli-binaries.result == 'success' }}
-        runs-on: ubuntu-latest
+        name: Build & upload CLI binaries
+        needs: [prepare, check-cli]
+        if: ${{ needs.prepare.outputs.release_cli == 'true' && (needs.check-cli.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') }}
         permissions:
             contents: write
-        steps:
-            - uses: actions/download-artifact@v8
-              with:
-                  pattern: cli-*
-                  path: dist/cli
-                  merge-multiple: true
-
-            - uses: kreuzberg-dev/actions/upload-release-assets@v1
-              with:
-                  tag: ${{ needs.prepare.outputs.tag }}
-                  working-directory: dist/cli
-                  dry-run: ${{ needs.prepare.outputs.dry_run }}
-                  assets: |
-                      cli-*.tar.gz
-                      cli-*.zip
+        uses: kreuzberg-dev/actions/.github/workflows/reusable-cli-release.yml@v1
+        with:
+            package-name: html-to-markdown-cli
+            binary-name: html-to-markdown
+            tag: ${{ needs.prepare.outputs.tag }}
+            asset-prefix: cli-
+            checkout-ref: ${{ needs.prepare.outputs.checkout_ref }}
+            dry-run: ${{ needs.prepare.outputs.dry_run }}
+            build-musl: true
+            checksums: true
 
     upload-go-release:
         name: Upload Go FFI archives to GitHub Release
