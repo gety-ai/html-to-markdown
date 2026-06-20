@@ -106,6 +106,7 @@ repos:
             exclude: ^packages/python/(tests/|.*_native\.py$)
 
           - id: oxlint
+            exclude: ^(e2e/|test_apps/)
           - id: golangci-lint
             exclude: ^(e2e/|test_apps/)
             env:
@@ -207,6 +208,13 @@ repos:
           - id: ruff-format
             exclude: ^e2e/
           - id: oxfmt
+            # alef has no e2e/test_apps JS/TS formatter (see alef.toml
+            # [crates.e2e.format] — go/python/rust/c only), so oxfmt was the lone
+            # tool reformatting generated test JS, producing churn on every regen.
+            # Match the e2e/test_apps exclusion every other language tool already
+            # uses (go-fmt, ruff-format, golangci-lint); generated test JS ships as
+            # alef emits it, like e2e/ruby, e2e/php, etc.
+            exclude: ^(e2e/|test_apps/)
 
           - id: go-fmt
             exclude: ^(e2e/|test_apps/)
