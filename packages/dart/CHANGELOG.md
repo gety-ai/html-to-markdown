@@ -2,6 +2,6 @@
 
 All notable changes to this package will be documented in this file.
 
-## 3.6.18
+## 3.6.19
 
 - Initial release.

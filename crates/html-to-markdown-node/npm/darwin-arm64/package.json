@@ -1,15 +1,25 @@
 {
-  "name": "@kreuzberg/html-to-markdown-node-darwin-arm64",
-  "version": "3.6.18",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kreuzberg-dev/html-to-markdown.git"
-  },
-  "main": "html-to-markdown-node.darwin-arm64.node",
-  "files": ["html-to-markdown-node.darwin-arm64.node"],
-  "os": ["darwin"],
-  "cpu": ["arm64"],
-  "engines": { "node": ">= 18" },
-  "publishConfig": { "access": "public" }
+	"name": "@kreuzberg/html-to-markdown-node-darwin-arm64",
+	"version": "3.6.19",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kreuzberg-dev/html-to-markdown.git"
+	},
+	"files": [
+		"html-to-markdown-node.darwin-arm64.node"
+	],
+	"os": [
+		"darwin"
+	],
+	"cpu": [
+		"arm64"
+	],
+	"main": "html-to-markdown-node.darwin-arm64.node",
+	"publishConfig": {
+		"access": "public"
+	},
+	"engines": {
+		"node": ">= 18"
+	}
 }

@@ -3146,7 +3146,7 @@ HTMNodeContext *htm_node_context_into_owned(HTMNodeContext *this_);
 int32_t htm_text_direction_from_i32(int32_t value);
 
 /**
- * Convert a `TextDirection` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `TextDirection` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -3161,7 +3161,7 @@ int32_t htm_text_direction_from_str(const char *name);
 int32_t htm_link_type_from_i32(int32_t value);
 
 /**
- * Convert a `LinkType` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `LinkType` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -3176,7 +3176,7 @@ int32_t htm_link_type_from_str(const char *name);
 int32_t htm_image_type_from_i32(int32_t value);
 
 /**
- * Convert a `ImageType` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `ImageType` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -3191,7 +3191,7 @@ int32_t htm_image_type_from_str(const char *name);
 int32_t htm_structured_data_type_from_i32(int32_t value);
 
 /**
- * Convert a `StructuredDataType` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `StructuredDataType` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -3206,7 +3206,7 @@ int32_t htm_structured_data_type_from_str(const char *name);
 int32_t htm_tier_strategy_from_i32(int32_t value);
 
 /**
- * Convert a `TierStrategy` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `TierStrategy` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -3221,7 +3221,7 @@ int32_t htm_tier_strategy_from_str(const char *name);
 int32_t htm_preprocessing_preset_from_i32(int32_t value);
 
 /**
- * Convert a `PreprocessingPreset` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `PreprocessingPreset` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -3236,7 +3236,7 @@ int32_t htm_preprocessing_preset_from_str(const char *name);
 int32_t htm_heading_style_from_i32(int32_t value);
 
 /**
- * Convert a `HeadingStyle` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `HeadingStyle` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -3251,7 +3251,7 @@ int32_t htm_heading_style_from_str(const char *name);
 int32_t htm_list_indent_type_from_i32(int32_t value);
 
 /**
- * Convert a `ListIndentType` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `ListIndentType` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -3266,7 +3266,7 @@ int32_t htm_list_indent_type_from_str(const char *name);
 int32_t htm_whitespace_mode_from_i32(int32_t value);
 
 /**
- * Convert a `WhitespaceMode` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `WhitespaceMode` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -3281,7 +3281,7 @@ int32_t htm_whitespace_mode_from_str(const char *name);
 int32_t htm_newline_style_from_i32(int32_t value);
 
 /**
- * Convert a `NewlineStyle` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `NewlineStyle` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -3296,7 +3296,7 @@ int32_t htm_newline_style_from_str(const char *name);
 int32_t htm_code_block_style_from_i32(int32_t value);
 
 /**
- * Convert a `CodeBlockStyle` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `CodeBlockStyle` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -3311,7 +3311,7 @@ int32_t htm_code_block_style_from_str(const char *name);
 int32_t htm_highlight_style_from_i32(int32_t value);
 
 /**
- * Convert a `HighlightStyle` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `HighlightStyle` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -3326,7 +3326,7 @@ int32_t htm_highlight_style_from_str(const char *name);
 int32_t htm_link_style_from_i32(int32_t value);
 
 /**
- * Convert a `LinkStyle` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `LinkStyle` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -3341,7 +3341,7 @@ int32_t htm_link_style_from_str(const char *name);
 int32_t htm_url_escape_style_from_i32(int32_t value);
 
 /**
- * Convert a `UrlEscapeStyle` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `UrlEscapeStyle` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -3356,7 +3356,7 @@ int32_t htm_url_escape_style_from_str(const char *name);
 int32_t htm_output_format_from_i32(int32_t value);
 
 /**
- * Convert a `OutputFormat` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `OutputFormat` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -3371,7 +3371,7 @@ int32_t htm_output_format_from_str(const char *name);
 int32_t htm_node_content_from_i32(int32_t value);
 
 /**
- * Convert a `NodeContent` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `NodeContent` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -3386,7 +3386,7 @@ int32_t htm_node_content_from_str(const char *name);
 int32_t htm_annotation_kind_from_i32(int32_t value);
 
 /**
- * Convert a `AnnotationKind` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `AnnotationKind` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -3401,7 +3401,7 @@ int32_t htm_annotation_kind_from_str(const char *name);
 int32_t htm_warning_kind_from_i32(int32_t value);
 
 /**
- * Convert a `WarningKind` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `WarningKind` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -3416,7 +3416,7 @@ int32_t htm_warning_kind_from_str(const char *name);
 int32_t htm_node_type_from_i32(int32_t value);
 
 /**
- * Convert a `NodeType` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `NodeType` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -3431,7 +3431,7 @@ int32_t htm_node_type_from_str(const char *name);
 int32_t htm_visit_result_from_i32(int32_t value);
 
 /**
- * Convert a `VisitResult` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `VisitResult` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */

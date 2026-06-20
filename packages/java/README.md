@@ -94,7 +94,7 @@ Uses Foreign Function & Memory API for zero-dependency, thread-safe conversion w
 <dependency>
     <groupId>dev.kreuzberg</groupId>
     <artifactId>html-to-markdown</artifactId>
-    <version>3.6.18</version>
+    <version>3.6.19</version>
 </dependency>
 ```
 
@@ -106,14 +106,14 @@ Requires Java 25+ with Panama FFI support.
 <dependency>
     <groupId>dev.kreuzberg</groupId>
     <artifactId>html-to-markdown</artifactId>
-    <version>3.6.18</version>
+    <version>3.6.19</version>
 </dependency>
 ```
 
 **Gradle (Kotlin DSL):**
 
 ```kotlin
-implementation("dev.kreuzberg:html-to-markdown:3.6.18")
+implementation("dev.kreuzberg:html-to-markdown:3.6.19")
 ```
 
 ## Performance Snapshot

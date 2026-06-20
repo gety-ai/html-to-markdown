@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.19] - 2026-06-20
+
+### Fixed
+
+- **test_apps(php): install the PHP extension via PIE's `pkg:version` syntax.** Both generated PHP test_app installers (`test_apps/php/install.sh`, `test_apps/php_ext/run_tests.sh`) ran `pie install --version "$VERSION" <pkg>`, but PIE parses `--version`/`-V` as "print PIE's own version" and exits **without installing** — the pinned extension version was never fetched, so the registry-mode PHP smoke validated whatever stale build happened to be present (or nothing). Use `pie install "<pkg>:$VERSION"` so the targeted release is actually installed. (alef 0.25.54)
+
+### Changed
+
+- **chore(deps): re-pin `alef.toml.alef_version` to 0.25.54 and regenerate every binding, e2e suite, README, and API doc.** Folds in the 0.25.51–0.25.54 generator fixes: the PHP PIE `pkg:version` install fix above; **Go** — unit/newtype-tuple enum constants emit serde wire values, a parameter named `result` no longer collides with the codegen variable, and `Option<&[u8]>` returns generate correctly; **R/extendr** — cfg-variant dedup, registration entries drop the stray `#[cfg(...)]`, and opaque-method/`Option`/`Vec`/error returns convert properly; **C#** — corrected host-capsule native method name; **Swift** — `Package.swift` dependency argument order and e2e `harness_extras` product override; **test_apps runner** — declared `[crates.e2e.env]` vars are exported to the run command. Verified locally: both PIE fixes are present in the regenerated test_apps and the 3.6.19 bump is synced across all manifests.
+- **chore(precommit): scope `oxfmt`/`oxlint` away from generated `e2e/`+`test_apps/`.** alef has no e2e/test_apps JS/TS formatter (`alef.toml [crates.e2e.format]` covers go/python/rust/c only), so `oxfmt` was the lone tool reformatting generated test JS, producing churn on every regenerate. Add the `^(e2e/|test_apps/)` exclude that `go-fmt`, `ruff-format`, and `golangci-lint` already carry; generated test JS now ships as alef emits it, matching `e2e/ruby`, `e2e/php`, etc. (`.pre-commit-config.yaml`)
+
 ## [3.6.18] - 2026-06-20
 
 ### Fixed
