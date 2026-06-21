@@ -52,6 +52,7 @@ dist-web/
 *.node
 
 # Ruby
+.yardoc/
 !packages/ruby/lib/
 !packages/ruby/lib/**/*.rb
 packages/ruby/lib/bin/

@@ -88,7 +88,7 @@ repos:
             exclude: ^(test_apps/kotlin_android|packages/kotlin-android)/gradlew$
 
           - id: markdownlint-rumdl-strict
-            exclude: ^(docs/reference/.*|packages/.*/README\.md|crates/.*/README\.md|readme_templates/.*|README\.md|CHANGELOG\.md)$
+            exclude: ^(docs/.*|\.ai-rulez/.*|\.task/.*|packages/.*/README\.md|crates/.*/README\.md|readme_templates/.*|README\.md|CHANGELOG\.md|CONTRIBUTING\.md|\.github/PULL_REQUEST_TEMPLATE\.md|test_documents/.*|test_apps/.*)$
           - id: textlint
             files: ^docs/.*\.md$
             exclude: ^docs/(reference/|api-|snippets/|migration/)
@@ -135,7 +135,8 @@ repos:
             # Java subprocess runner deliberately catches Error/Throwable to emit a
             # clean failure record before exiting, which trips PMD's
             # AvoidCatchingGenericException — not a concern for a benchmark driver.
-            exclude: ^tools/benchmark-harness/scripts/
+            # Generated e2e code and Maven infrastructure are not shipped code.
+            exclude: ^(tools/benchmark-harness/scripts/|e2e/|test_apps/|\.mvn/)
           - id: cpd
             args:
                 - --minimum-tokens=120
@@ -162,6 +163,11 @@ repos:
             files: ^packages/ruby/.*\.(rb|rbs)$
             exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
           - id: yard-coverage
+            # All Ruby under packages/ruby is alef-generated (native.rb holds
+            # inherently undocumentable Sorbet-sig RBI defs). Generated code
+            # ships as alef emits it; match the generated-tree exclusion every
+            # other doc/lint/format hook already uses.
+            exclude: ^(packages/ruby/|e2e/|test_apps/)
 
           - id: dotnet-format-check
             files: ^packages/csharp/.*\.cs$
@@ -169,7 +175,8 @@ repos:
             files: ^packages/csharp/HtmlToMarkdown/.*\.cs$
 
           - id: phpstan
-            files: ^packages/php/.*\.php$
+            files: ^packages/php/src/.*\.php$
+            exclude: ^packages/php/stubs/
           - id: phpdoc-lint
             files: ^packages/php/src/.*\.php$
 
@@ -180,8 +187,13 @@ repos:
 
           - id: air-check
             files: ^packages/r/.*\.[Rr]$
+            # packages/r is alef-generated (extendr) and formatted by alef's R
+            # toolchain (styler), not air; it ships as emitted. All repo R lives
+            # under generated trees, so air has nothing to check here.
+            exclude: ^(e2e/|test_apps/|packages/)
           - id: lintr
             files: ^packages/r/.*\.[Rr]$
+            exclude: ^(e2e/|test_apps/)
           - id: roxygen2-check
             files: ^packages/r/R/.*\.R$
           - id: swiftlint
@@ -233,11 +245,18 @@ repos:
             # Match the e2e/test_apps exclusion every other language tool already
             # uses (go-fmt, ruff-format, golangci-lint); generated test JS ships as
             # alef emits it, like e2e/ruby, e2e/php, etc.
-            exclude: ^(e2e/|test_apps/)
+            # packages/ is alef-generated, so skip it too. crates/html-to-markdown-{node,wasm}
+            # contain generated binding code. .ai-rulez/ contains governance metadata.
+            exclude: ^(\.ai-rulez/|e2e/|test_apps/|packages/|crates/html-to-markdown-(node|wasm)/)
 
           - id: go-fmt
             exclude: ^(e2e/|test_apps/)
           - id: palantir-java-format
+            # All Java is alef-generated (packages/java, kotlin-android stubs)
+            # or generated test code (e2e/, test_apps/); .mvn is vendored Maven
+            # wrapper infra. Generated code ships as alef emits it — match the
+            # generated-tree exclusion used by every other formatter.
+            exclude: ^(e2e/|test_apps/|packages/|\.mvn/)
           - id: ktfmt
             files: ^packages/kotlin-android/.*\.kts?$
             args:
@@ -255,6 +274,10 @@ repos:
             exclude: ^packages/elixir/lib/html_to_markdown/.*\.ex$
           - id: air-format
             files: ^packages/r/.*\.[Rr]$
+            # packages/r is alef-generated (extendr) and formatted by alef's R
+            # toolchain (styler), not air; it ships as emitted. All repo R lives
+            # under generated trees, so air has nothing to format here.
+            exclude: ^(e2e/|test_apps/|packages/)
           - id: swift-format
             files: ^packages/swift/.*\.swift$
           - id: dart-format

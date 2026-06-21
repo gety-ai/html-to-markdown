@@ -1,6 +1,6 @@
 # php-ext test_app
 
-Exercises the configured PHP native extension (`kreuzberg-dev/html-to-markdown` v`3.6.19`)
+Exercises the configured PHP native extension (`kreuzberg-dev/html-to-markdown` v`3.6.20`)
 installed via [PIE](https://github.com/php/pie).
 
 ## Running
