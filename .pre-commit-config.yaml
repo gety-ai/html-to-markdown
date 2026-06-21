@@ -36,7 +36,7 @@ repos:
           - id: cargo-sort
             args:
                 - -w
-            exclude: ^(e2e/rust/|test_apps/rust/|packages/dart/rust/)Cargo\.toml$
+            exclude: ^(e2e/rust/|test_apps/rust/|packages/dart/rust/|packages/r/src/rust/|packages/elixir/native/[^/]+/)Cargo\.toml$
           - id: cargo-machete
             args:
                 - crates/
@@ -98,7 +98,11 @@ repos:
                 - .textlintrc.json
 
           - id: ruff
-            exclude: ^e2e/
+            # packages/ and test_apps/ are alef-generated and ship as alef emits
+            # them. Under alef 0.25.58's output-sensitive verify, ruff reformatting
+            # generated Python (e.g. line-wrapping packages/python/.../api.py) breaks
+            # alef-docs-fresh. Match the generated-tree exclusion other tools use.
+            exclude: ^(e2e/|test_apps/|packages/)
           - id: mypy
             exclude: e2e/|tests/|scripts/|^packages/r/
           - id: pydocstyle
@@ -227,17 +231,24 @@ repos:
           - id: end-of-file-fixer
             exclude:
                 "(?x)^(\n  \\.github/copilot-instructions\\.md|\n  .*/\\.gitkeep|\n  .*/py\\.typed|\n  packages/java/checkstyle\\\
-                .properties|\n  (e2e/python|e2e/python/tests)/__init__\\.py\n)$\n"
+                .properties|\n  (e2e/python|e2e/python/tests|test_apps/python/tests)/__init__\\.py|\n  .*frb_generated\\.dart\n)$\n"
           - id: mixed-line-ending
           - id: shfmt
             args: ["-w", "-i", "2"]
+            # Generated shell scripts (download_ffi.sh, install.sh, gradlew) ship
+            # as alef emits them; shfmt rewriting them breaks alef verify under
+            # 0.25.58. Hand-written scripts live outside these generated trees.
+            exclude: ^(e2e/|test_apps/|packages/)
           - id: rumdl-fmt
           - id: cargo-fmt
             args: ["--all"]
           - id: pyproject-fmt
-            exclude: ^test_apps/python/pyproject\.toml$
+            # alef runs no pyproject-fmt pass, so generated pyproject.toml (e2e/,
+            # test_apps/, packages/) ship as alef emits them; the hook's pinned
+            # pyproject-fmt reorders them and breaks alef verify under 0.25.58.
+            exclude: ^(e2e/|test_apps/|packages/)
           - id: ruff-format
-            exclude: ^e2e/
+            exclude: ^(e2e/|test_apps/|packages/)
           - id: oxfmt
             # alef has no e2e/test_apps JS/TS formatter (see alef.toml
             # [crates.e2e.format] — go/python/rust/c only), so oxfmt was the lone
@@ -247,7 +258,11 @@ repos:
             # alef emits it, like e2e/ruby, e2e/php, etc.
             # packages/ is alef-generated, so skip it too. crates/html-to-markdown-{node,wasm}
             # contain generated binding code. .ai-rulez/ contains governance metadata.
-            exclude: ^(\.ai-rulez/|e2e/|test_apps/|packages/|crates/html-to-markdown-(node|wasm)/)
+            # composer.json (root + crates/html-to-markdown-php/) is alef-generated
+            # and formatted by alef's npm oxfmt; the hook's oxc oxfmt binary uses a
+            # different style (tabs vs spaces), so letting it touch them breaks alef
+            # verify under 0.25.58.
+            exclude: ^(\.ai-rulez/|e2e/|test_apps/|packages/|crates/html-to-markdown-(node|wasm|php)/|composer\.json$)
 
           - id: go-fmt
             exclude: ^(e2e/|test_apps/)
