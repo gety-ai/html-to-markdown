@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.21] - 2026-06-22
+
+### Changed
+
+- **chore(deps): re-pin `alef.toml.alef_version` to 0.25.60 and regenerate every binding, e2e suite, README, and API doc.** Folds in the 0.25.59–0.25.60 generator fixes: the R/extendr by-reference DTO rework now emits a non-optional Named param following an optional param as `&T` (passed by reference via an owned `name_core` binding) instead of the non-compiling `Nullable<&T>::into_option()` path; Kotlin/Kotlin-Android content-union `text()` accessors reference the actual data-class payload property (`value`) instead of the non-existent `field0`; generated binding rustdoc de-links core intra-doc references (e.g. ``[`Error::LanguageNotFound`]``) to plain code spans so `rustdoc -D rustdoc::broken-intra-doc-links` passes; and `sync-versions` now runs the same `format_generated` pass as `alef all`, so version-bumped manifests (`package.json`, `composer.json`, `Package.swift`) are byte-identical to the generate path and no longer trip freshness gates. (alef 0.25.60)
+
 ## [3.6.20] - 2026-06-21
 
 ### Fixed
