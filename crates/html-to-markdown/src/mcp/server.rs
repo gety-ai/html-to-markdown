@@ -2,11 +2,15 @@
 
 use crate::options::ConversionOptions;
 use rmcp::{
-    ServerHandler, ServiceExt,
+    ErrorData as McpError, RoleServer, ServerHandler, ServiceExt,
     handler::server::{router::tool::ToolRouter, wrapper::Parameters},
     model::{
-        CallToolResult, Content, Implementation, InitializeResult, ServerCapabilities, ServerInfo, ToolsCapability,
+        CallToolResult, CompleteRequestParams, CompleteResult, Content, GetPromptRequestParams, GetPromptResult,
+        Implementation, InitializeResult, JsonObject, ListPromptsResult, ListResourcesResult, PaginatedRequestParams,
+        PromptsCapability, ReadResourceRequestParams, ReadResourceResult, ResourcesCapability, ServerCapabilities,
+        ServerInfo, ToolsCapability,
     },
+    service::RequestContext,
     tool, tool_handler, tool_router,
     transport::stdio,
 };
@@ -127,6 +131,9 @@ impl ServerHandler for HtmlToMarkdownMcp {
     fn get_info(&self) -> ServerInfo {
         let mut capabilities = ServerCapabilities::default();
         capabilities.tools = Some(ToolsCapability::default());
+        capabilities.prompts = Some(PromptsCapability::default());
+        capabilities.resources = Some(ResourcesCapability::default());
+        capabilities.completions = Some(JsonObject::default());
 
         let server_info = Implementation::new("html-to-markdown-mcp", env!("CARGO_PKG_VERSION"))
             .with_title("HTML-to-Markdown MCP Server")
@@ -146,8 +153,50 @@ impl ServerHandler for HtmlToMarkdownMcp {
                  and pass config for typed options (heading_style, escape_asterisks, \
                  preprocessing, extract_images, …) — every option is described in the tool's \
                  input schema. extract_metadata returns only the structured metadata \
-                 (title, Open Graph, Twitter Card, JSON-LD, headers, links, images) as JSON.",
+                 (title, Open Graph, Twitter Card, JSON-LD, headers, links, images) as JSON. \
+                 Prompts (convert_to_markdown, extract_main_content, inspect_metadata) provide \
+                 ready-made workflows, and the htmltomarkdown:// resources document every option.",
             )
+    }
+
+    async fn list_prompts(
+        &self,
+        _request: Option<PaginatedRequestParams>,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<ListPromptsResult, McpError> {
+        Ok(super::catalog::list_prompts())
+    }
+
+    async fn get_prompt(
+        &self,
+        request: GetPromptRequestParams,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<GetPromptResult, McpError> {
+        super::catalog::get_prompt(&request.name, request.arguments.as_ref())
+    }
+
+    async fn list_resources(
+        &self,
+        _request: Option<PaginatedRequestParams>,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<ListResourcesResult, McpError> {
+        Ok(super::catalog::list_resources())
+    }
+
+    async fn read_resource(
+        &self,
+        request: ReadResourceRequestParams,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<ReadResourceResult, McpError> {
+        super::catalog::read_resource(&request.uri)
+    }
+
+    async fn complete(
+        &self,
+        request: CompleteRequestParams,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<CompleteResult, McpError> {
+        Ok(super::catalog::complete(&request.r#ref, &request.argument))
     }
 }
 
@@ -288,7 +337,10 @@ mod tests {
 
         assert_eq!(info.server_info.name, "html-to-markdown-mcp");
         assert_eq!(info.server_info.version, env!("CARGO_PKG_VERSION"));
-        assert!(info.capabilities.tools.is_some());
+        assert!(info.capabilities.tools.is_some(), "tools capability");
+        assert!(info.capabilities.prompts.is_some(), "prompts capability");
+        assert!(info.capabilities.resources.is_some(), "resources capability");
+        assert!(info.capabilities.completions.is_some(), "completions capability");
         assert!(info.instructions.is_some());
     }
 
