@@ -954,4 +954,5 @@ void* __swift_bridge__$__alef_phantom_vec_structured_data_type(void);
 void* __swift_bridge__$__alef_phantom_vec_node_type(void);
 
 
+
 #endif /* RUST_BRIDGE_C_H */

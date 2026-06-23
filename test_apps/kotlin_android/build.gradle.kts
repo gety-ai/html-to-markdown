@@ -47,7 +47,7 @@ kotlin {
 
 dependencies {
     // Published Android AAR from Maven Central (verifies artifact resolution)
-    implementation("dev.kreuzberg:html-to-markdown-android:3.7.0")
+    implementation("dev.kreuzberg:html-to-markdown-android:3.7.1")
     // Jackson for JSON assertion helpers
     testImplementation("com.fasterxml.jackson.core:jackson-annotations:2.18.2")
     testImplementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
@@ -67,7 +67,7 @@ dependencies {
     // JUnit 5 API and engine
     testImplementation("org.junit.jupiter:junit-jupiter-api:6.1.0")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:6.1.0")
-
+    testImplementation("org.junit.platform:junit-platform-launcher:6.1.0")
 
     // Kotlin stdlib test helpers
     testImplementation(kotlin("test"))
@@ -80,7 +80,7 @@ dependencies {
 tasks.register("verifyAarPublished") {
     description = "Verify the published Android AAR contains jni and classes.jar"
     doLast {
-        val aarCoord = "dev.kreuzberg:html-to-markdown-android:3.7.0"
+        val aarCoord = "dev.kreuzberg:html-to-markdown-android:3.7.1"
         val (groupId, artifactId, version) = run {
             val parts = aarCoord.split(':')
             Triple(parts[0], parts[1], parts[2])

@@ -87,7 +87,7 @@ Note: The package was previously published as `goldziher/html-to-markdown`, whic
 ## Installation
 
 ```bash
-composer require kreuzberg-dev/html-to-markdown
+pie install kreuzberg-dev/html-to-markdown
 ```
 
 Requires PHP 8.2+. Install the native extension via PIE:

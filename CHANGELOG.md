@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.7.1] - 2026-06-23
+
+### Fixed
+
+- **ci(homebrew): drop the Intel-macOS `sonoma` bottle from the publish matrix.** The formula intentionally has no `x86_64-apple-darwin` url (Apple-Silicon only), but the bottle matrix still built a `sonoma` (Intel) bottle, which failed with `formula requires at least a URL`. Because `release-finalize` gates on `publish-homebrew-bottles` with `if: !contains(needs.*.result, 'failure')`, that one chronic failure silently **skipped release-finalize for three releases** (v3.6.20, v3.6.21, v3.7.0) — and with it the `packages/go/vX.Y.Z` Go module tag, leaving `go get …/packages/go/v3@vX.Y.Z` unresolvable. Removing the Intel bottle restores release-finalize (and the Go tag) for every future release. (`.github/workflows/publish.yaml`)
+- **ci(e2e, C# on Windows): keep `cargo` on PATH in the test before-hook.** The "Run E2E tests (Windows)" step overrode `PATH` via `env:` with `${{ env.PATH }}`, which omits cargo's `$GITHUB_PATH` additions under Git Bash, so the `cargo build … html-to-markdown-ffi` before-hook failed with `cargo: command not found`. Prepend the target dirs to the live `$PATH` at runtime instead. (`.github/workflows/ci-e2e.yaml`)
+- **ci(e2e/docs, Elixir): force the NIF to build from source.** Under `MIX_ENV=test` the `force_build: … or Mix.env() in [:dev]` clause does not apply, so `mix test` tried to download a precompiled NIF for the current (unreleased) version and failed with `the precompiled NIF file does not exist in the checksum file`. Set `RUSTLER_PRECOMPILED_FORCE_BUILD_ALL=1` so the test/doc compile builds the NIF locally. (`scripts/ci/elixir/run-tests.sh`)
+- **ci(e2e, Swift): build the FFI crate the generated `Package.swift` links.** The swift e2e before-hook built only `html-to-markdown-rs-swift`, but the generated manifest links `html_to_markdown_ffi`, so `swift test` failed with `library 'html_to_markdown_ffi' not found`. Build `html-to-markdown-ffi` in the before-hook too (matching Go/C#/C). (`alef.toml`)
+- **ci(e2e, PHP): drop `--locked` from the PHP test before-hook.** The PHP e2e job's extension build rewrites the native package deps to the published registry version and runs `cargo update`, mutating the workspace `Cargo.lock`; the subsequent `cargo build --locked -p html-to-markdown-php` then failed with `cannot update the lock file … --locked`. (`alef.toml`)
+- **ci(node/wasm): use `--no-frozen-lockfile` for the NAPI binding install.** `build-node-napi` ran a frozen `pnpm install`, but the napi platform packages in `optionalDependencies` are pinned to the unpublished release version and can never be in `pnpm-lock.yaml`, so the install failed with `ERR_PNPM_OUTDATED_LOCKFILE` across every Node build/e2e. (shared `kreuzberg-dev/actions/build-node-napi`, `alef.toml`)
+- **docs(php): recommend `pie install` over `composer require`.** The PHP package is a native `ext-php-rs` extension that `composer require` cannot load (the cause of #420); every PHP install snippet now leads with `pie install kreuzberg-dev/html-to-markdown`. (`docs/`, `readme_templates/`)
+
+### Changed
+
+- **ci(publish): require all 16 PHP PIE cells by explicit per-cell pattern in `verify-release-assets`.** A dropped cell now fails the release instead of silently shipping a partial PIE matrix (#333). (`.github/workflows/publish.yaml`)
+- **chore(deps): re-pin `alef.toml.alef_version` to 0.26.5 and regenerate every binding, e2e suite, README, and API doc.** (alef 0.26.5)
+
 ## [3.7.0] - 2026-06-22
 
 ### Added

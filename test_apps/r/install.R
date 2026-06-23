@@ -6,7 +6,7 @@
 # arbitrary tag; defaults to the alef-pinned version from
 # [crates.e2e.registry.packages.r].version.
 args <- commandArgs(trailingOnly = TRUE)
-VERSION <- if (length(args) > 0) args[1] else "3.7.0"
+VERSION <- if (length(args) > 0) args[1] else "3.7.1"
 
 # Construct the GitHub release tarball URL.
 url <- sprintf(
@@ -16,11 +16,23 @@ url <- sprintf(
 )
 
 # Install from the release tarball without requiring devtools or remotes.
-tryCatch({
-  install.packages(url, repos = NULL, type = "source", quiet = TRUE)
-  message(paste("Successfully installed htmltomarkdown", VERSION))
-}, error = function(e) {
-  message(paste("Error installing htmltomarkdown from", url))
-  message(conditionMessage(e))
+tryCatch(
+  withCallingHandlers(
+    install.packages(url, repos = NULL, type = "source", quiet = TRUE),
+    warning = function(w) stop(conditionMessage(w), call. = FALSE)
+  ),
+  error = function(e) {
+    message(paste("Error installing htmltomarkdown from", url))
+    message(conditionMessage(e))
+    quit(status = 1)
+  }
+)
+
+# Verify the package is installed and loadable; install.packages does
+# not guarantee this even when no condition was raised.
+if (!requireNamespace("htmltomarkdown", quietly = TRUE)) {
+  message(paste("Error: htmltomarkdown not available after install from", url))
   quit(status = 1)
-})
+}
+
+message(paste("Successfully installed htmltomarkdown", VERSION))

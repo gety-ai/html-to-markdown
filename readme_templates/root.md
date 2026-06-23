@@ -115,8 +115,10 @@ See [Ruby README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/pa
 <details>
 <summary><strong>PHP</strong></summary>
 
+This is a native PHP extension (Rust `ext-php-rs`), so install it with [PIE](https://github.com/php/pie) — not `composer require`:
+
 ```sh
-composer require kreuzberg-dev/html-to-markdown
+pie install kreuzberg-dev/html-to-markdown
 ```
 
 See [PHP README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/php) for full documentation.
