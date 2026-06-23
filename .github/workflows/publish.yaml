@@ -2451,7 +2451,10 @@ jobs:
             matrix:
                 include:
                     - { os: macos-latest, bottle_tag: arm64_sonoma, install_brew: false }
-                    - { os: macos-15-intel, bottle_tag: sonoma, install_brew: false }
+                    # No Intel macOS (sonoma) bottle: the formula intentionally dropped
+                    # the Intel-mac build (no on_intel block / x86_64-apple-darwin url),
+                    # so `brew install --build-bottle` fails with "formula requires at
+                    # least a URL" on an Intel runner. (Chronic pre-v3.7.0 failure.)
                     - { os: ubuntu-latest, bottle_tag: x86_64_linux, install_brew: true }
                     - { os: ubuntu-24.04-arm, bottle_tag: arm64_linux, install_brew: true }
         steps:
@@ -2592,6 +2595,26 @@ jobs:
                       html-to-markdown-rs-ffi-*.tar.gz
                       # Elixir NIF
                       libhtml_to_markdown_nif-*.tar.gz
+                      # PHP PIE — explicit per-cell patterns so a single dropped
+                      # matrix cell (the recurring #333 failure) fails the release
+                      # instead of shipping a partial asset set. 4 PHP versions ×
+                      # {arm64-darwin, arm64-linux, x86_64-linux} unix + windows x86_64.
+                      php_html_to_markdown-*_php8.2-arm64-darwin-bsdlibc-nts.tgz
+                      php_html_to_markdown-*_php8.2-arm64-linux-glibc-nts.tgz
+                      php_html_to_markdown-*_php8.2-x86_64-linux-glibc-nts.tgz
+                      php_html_to_markdown-*_php8.3-arm64-darwin-bsdlibc-nts.tgz
+                      php_html_to_markdown-*_php8.3-arm64-linux-glibc-nts.tgz
+                      php_html_to_markdown-*_php8.3-x86_64-linux-glibc-nts.tgz
+                      php_html_to_markdown-*_php8.4-arm64-darwin-bsdlibc-nts.tgz
+                      php_html_to_markdown-*_php8.4-arm64-linux-glibc-nts.tgz
+                      php_html_to_markdown-*_php8.4-x86_64-linux-glibc-nts.tgz
+                      php_html_to_markdown-*_php8.5-arm64-darwin-bsdlibc-nts.tgz
+                      php_html_to_markdown-*_php8.5-arm64-linux-glibc-nts.tgz
+                      php_html_to_markdown-*_php8.5-x86_64-linux-glibc-nts.tgz
+                      php_html_to_markdown-*-8.2-nts-vs*-x86_64.zip
+                      php_html_to_markdown-*-8.3-nts-vs*-x86_64.zip
+                      php_html_to_markdown-*-8.4-nts-vs*-x86_64.zip
+                      php_html_to_markdown-*-8.5-nts-vs*-x86_64.zip
 
     update-swift-package-manifest:
         name: Update Swift Package.swift manifest with artifact URL and checksum

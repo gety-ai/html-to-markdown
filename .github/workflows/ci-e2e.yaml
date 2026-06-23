@@ -1030,10 +1030,14 @@ jobs:
 
             - name: Run E2E tests (Windows)
               if: runner.os == 'Windows'
-              run: alef test --e2e --lang csharp
+              # Prepend the target dirs to PATH at runtime (for FFI .dll resolution)
+              # using the live $PATH rather than the `env:` `${{ env.PATH }}`
+              # expression, which does not include cargo's $GITHUB_PATH additions on
+              # Windows Git Bash and broke the before-hook with `cargo: command not found`.
+              run: |
+                  export PATH="${{ github.workspace }}/target/release:${{ github.workspace }}/target/debug:$PATH"
+                  alef test --e2e --lang csharp
               shell: bash
-              env:
-                  PATH: ${{ github.workspace }}/target/release;${{ github.workspace }}/target/debug;${{ env.PATH }}
 
             - name: Cleanup Rust cache
               if: always()
