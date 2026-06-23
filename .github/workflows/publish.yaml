@@ -2003,7 +2003,10 @@ jobs:
         steps:
             - uses: kreuzberg-dev/actions/publish-packagist@v1
               with:
-                  packagist-username: kreuzberg-dev
+                  # Packagist account login that owns the API token (the package
+                  # maintainer), NOT the vendor namespace. Using the vendor here
+                  # makes the update-package API return 403 "invalid username".
+                  packagist-username: Goldziher
                   package-name: kreuzberg-dev/html-to-markdown
                   version: ${{ needs.prepare.outputs.version }}
                   repository-url: https://github.com/kreuzberg-dev/html-to-markdown
