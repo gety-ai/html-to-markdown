@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **test(test_apps/go): extract the module version with `$NF` instead of `$2`.** The smoke harness'
+  `download_ffi.sh` read the version from `$2`, which only holds in the block `require (…)` go.mod form;
+  the inline `require <path> <version>` form (emitted by the v3.7.2 regen) shifts the version to `$NF`,
+  so the script built a malformed module-cache path and failed with "Binding directory not found". This
+  is test-harness only — the published Go package is unaffected.
+
 ## [3.7.2] - 2026-06-23
 
 ### Fixed
