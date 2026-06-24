@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Swift publish now creates the `release/swift/<version>` branch carrying the substituted
+  XCFramework checksum.** The alef-generated Swift e2e/test-app pins
+  `.package(url: …, branch: "release/swift/<version>")`, but the publish workflow only force-moved
+  the `v<version>` tag and never created that branch, so SwiftPM could not resolve the package. The
+  checksummed commit is now also pushed to `refs/heads/release/swift/<version>`.
+  (`.github/workflows/publish.yaml`)
 - **test(test_apps/go): extract the module version with `$NF` instead of `$2`.** The smoke harness'
   `download_ffi.sh` read the version from `$2`, which only holds in the block `require (…)` go.mod form;
   the inline `require <path> <version>` form (emitted by the v3.7.2 regen) shifts the version to `$NF`,

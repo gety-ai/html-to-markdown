@@ -2686,6 +2686,21 @@ jobs:
                     sleep 5
                   done
 
+                  # Also publish the checksummed commit to a release/swift/<version> branch. The
+                  # alef-generated Swift e2e/test-app pins `branch: "release/swift/<version>"`, so
+                  # this ref must exist for SwiftPM to resolve the package with the real checksum.
+                  for attempt in 1 2 3; do
+                    if git push origin "HEAD:refs/heads/release/swift/${VERSION}" --force; then
+                      break
+                    fi
+                    if [ "$attempt" = 3 ]; then
+                      echo "::error::Failed to push release/swift/${VERSION} branch after 3 attempts"
+                      exit 1
+                    fi
+                    echo "Branch push attempt ${attempt} failed, retrying in 5s..."
+                    sleep 5
+                  done
+
             - name: Update release notes with artifact URL
               if: ${{ needs.prepare.outputs.dry_run != 'true' }}
               env:
