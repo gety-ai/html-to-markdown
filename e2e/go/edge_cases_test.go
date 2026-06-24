@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	htmd "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
+	htmd "github.com/xberg-io/html-to-markdown/packages/go/v3"
 )
 
 type testVisitorVisitorCustomElementWithNesting struct {

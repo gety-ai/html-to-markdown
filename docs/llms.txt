@@ -13,7 +13,7 @@
 - [Visitor pattern](https://docs.html-to-markdown.kreuzberg.dev/visitor/): Intercept the DOM walk with `HtmlVisitor` to skip, replace, or preserve any element.
 - [Table extraction](https://docs.html-to-markdown.kreuzberg.dev/tables/): Structured `result.tables` with cells, spans, and header flags alongside the rendered Markdown.
 - [Error handling](https://docs.html-to-markdown.kreuzberg.dev/errors/): The `ConversionError` variants and how each binding surfaces them.
-- [AI Coding Assistants](https://docs.html-to-markdown.kreuzberg.dev/agent-skills/): Install the html-to-markdown plugin from the kreuzberg-dev/plugins marketplace for Claude Code, Codex, Cursor, Gemini, Factory Droid, Copilot, and opencode.
+- [AI Coding Assistants](https://docs.html-to-markdown.kreuzberg.dev/agent-skills/): Install the html-to-markdown plugin from the xberg-io/plugins marketplace for Claude Code, Codex, Cursor, Gemini, Factory Droid, Copilot, and opencode.
 
 ## Concepts
 
@@ -32,9 +32,9 @@
 - Rust: `html-to-markdown-rs = "3.6"` in Cargo.toml (Rust ≥ 1.85).
 - Python: `pip install html-to-markdown` (Python ≥ 3.10).
 - TypeScript: `npm install @kreuzberg/html-to-markdown` (Node ≥ 18).
-- Go: `go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3` (Go ≥ 1.26).
+- Go: `go get github.com/xberg-io/html-to-markdown/packages/go/v3` (Go ≥ 1.26).
 - Ruby: `gem 'html-to-markdown', '~> 3.6'` (Ruby ≥ 3.2).
-- PHP: `pie install kreuzberg-dev/html-to-markdown` (native ext-php-rs extension; PHP ≥ 8.2).
+- PHP: `pie install xberg-io/html-to-markdown` (native ext-php-rs extension; PHP ≥ 8.2).
 - Java: Maven artifact `dev.kreuzberg:html-to-markdown:3.6.8` (Java ≥ 25).
 - C#: `dotnet add package KreuzbergDev.HtmlToMarkdown` (.NET 10).
 - Elixir: `{:html_to_markdown, "~> 3.6"}` in mix.exs (Elixir ≥ 1.14).

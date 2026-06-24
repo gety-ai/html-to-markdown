@@ -3,7 +3,7 @@ import (
     "fmt"
     "log"
 
-    htmltomarkdown "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
+    htmltomarkdown "github.com/xberg-io/html-to-markdown/packages/go/v3"
 )
 
 html := `

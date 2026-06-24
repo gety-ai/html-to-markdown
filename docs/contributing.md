@@ -4,21 +4,21 @@ Thanks for considering a contribution to html-to-markdown. Every fix, feature, a
 
 ## Ways to contribute
 
-- **Report a bug** — [open an issue](https://github.com/kreuzberg-dev/html-to-markdown/issues/new?labels=bug) with a minimal reproduction
-- **Fix a bug** — look for issues tagged [`good first issue`](https://github.com/kreuzberg-dev/html-to-markdown/issues?q=label%3A%22good+first+issue%22) or [`help wanted`](https://github.com/kreuzberg-dev/html-to-markdown/issues?q=label%3A%22help+wanted%22)
+- **Report a bug** — [open an issue](https://github.com/xberg-io/html-to-markdown/issues/new?labels=bug) with a minimal reproduction
+- **Fix a bug** — look for issues tagged [`good first issue`](https://github.com/xberg-io/html-to-markdown/issues?q=label%3A%22good+first+issue%22) or [`help wanted`](https://github.com/xberg-io/html-to-markdown/issues?q=label%3A%22help+wanted%22)
 - **Improve the docs** — edit any page directly on GitHub using the pencil icon, or clone and run the site locally
 - **Add a feature** — open an issue first to discuss scope before writing code; large changes without prior discussion may not be accepted
 
 ## Getting started
 
 ```bash
-git clone https://github.com/kreuzberg-dev/html-to-markdown.git
+git clone https://github.com/xberg-io/html-to-markdown.git
 cd html-to-markdown
 task setup          # installs deps, builds Rust extension, wires commit hooks
 task test           # should pass before you make any changes
 ```
 
-Full prerequisites and per-language build instructions are in [`CONTRIBUTING.md`](https://github.com/kreuzberg-dev/html-to-markdown/blob/main/CONTRIBUTING.md) at the repo root.
+Full prerequisites and per-language build instructions are in [`CONTRIBUTING.md`](https://github.com/xberg-io/html-to-markdown/blob/main/CONTRIBUTING.md) at the repo root.
 
 ## Workflow
 
@@ -42,8 +42,8 @@ New pages go in `docs/`, must be added to `nav:` in `mkdocs.yaml`, and should fo
 
 ## Getting help
 
-- **Have Any Questions** — [Join the GitHub Discussions](https://github.com/kreuzberg-dev/html-to-markdown/discussions)
+- **Have Any Questions** — [Join the GitHub Discussions](https://github.com/xberg-io/html-to-markdown/discussions)
 - **Join Our community** — [Discord](https://discord.gg/xt9WY3GnKR)
-- **Report a Bugs** — [GitHub Issues](https://github.com/kreuzberg-dev/html-to-markdown/issues)
+- **Report a Bugs** — [GitHub Issues](https://github.com/xberg-io/html-to-markdown/issues)
 
 --8<-- "snippets/feedback.md"

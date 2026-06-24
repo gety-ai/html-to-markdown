@@ -1,6 +1,6 @@
 # html-to-markdown-rs
 
-[![Built with alef](https://img.shields.io/badge/built%20with-alef%20%D7%90-007ec6)](https://github.com/kreuzberg-dev/alef)
+[![Built with alef](https://img.shields.io/badge/built%20with-alef%20%D7%90-007ec6)](https://github.com/xberg-io/alef)
 
 High-performance HTML to Markdown converter built with Rust.
 
@@ -10,9 +10,9 @@ This crate is the core engine compiled into the Python wheels, Ruby gem, Node.js
 [![npm version](https://img.shields.io/npm/v/@kreuzberg/html-to-markdown.svg?logo=npm&color=007ec6)](https://www.npmjs.com/package/@kreuzberg/html-to-markdown-node)
 [![PyPI version](https://img.shields.io/pypi/v/html-to-markdown.svg?logo=pypi&color=007ec6)](https://pypi.org/project/html-to-markdown/)
 [![Gem Version](https://img.shields.io/gem/v/html-to-markdown.svg?color=007ec6)](https://rubygems.org/gems/html-to-markdown)
-[![Packagist](https://img.shields.io/packagist/v/kreuzberg-dev/html-to-markdown.svg?color=007ec6)](https://packagist.org/packages/kreuzberg-dev/html-to-markdown)
+[![Packagist](https://img.shields.io/packagist/v/xberg-io/html-to-markdown.svg?color=007ec6)](https://packagist.org/packages/xberg-io/html-to-markdown)
 [![docs.rs](https://img.shields.io/badge/docs.rs-html--to--markdown--rs-007ec6)](https://docs.rs/html-to-markdown-rs)
-[![License: MIT](https://img.shields.io/badge/License-MIT-007ec6)](https://github.com/kreuzberg-dev/html-to-markdown/blob/main/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-007ec6)](https://github.com/xberg-io/html-to-markdown/blob/main/LICENSE)
 
 Fast, reliable HTML to Markdown conversion with full CommonMark compliance. Built with `html5ever` for correctness and a DOM-based filter for safe preprocessing.
 
@@ -258,18 +258,18 @@ println!("{}", result.content.unwrap_or_default());
 
 This is the core Rust library. For other languages:
 
-- **JavaScript/TypeScript**: [html-to-markdown-node](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/crates/html-to-markdown-node) (NAPI-RS) or [html-to-markdown-wasm](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/crates/html-to-markdown-wasm) (WebAssembly)
-- **Python**: [html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/crates/html-to-markdown-py) (PyO3)
-- **PHP**: [html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/php) (PIE + Composer helpers)
-- **Ruby**: [html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/ruby) (Magnus + rb-sys)
-- **CLI**: [html-to-markdown-cli](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/crates/html-to-markdown-cli)
+- **JavaScript/TypeScript**: [html-to-markdown-node](https://github.com/xberg-io/html-to-markdown/tree/main/crates/html-to-markdown-node) (NAPI-RS) or [html-to-markdown-wasm](https://github.com/xberg-io/html-to-markdown/tree/main/crates/html-to-markdown-wasm) (WebAssembly)
+- **Python**: [html-to-markdown](https://github.com/xberg-io/html-to-markdown/tree/main/crates/html-to-markdown-py) (PyO3)
+- **PHP**: [html-to-markdown](https://github.com/xberg-io/html-to-markdown/tree/main/packages/php) (PIE + Composer helpers)
+- **Ruby**: [html-to-markdown](https://github.com/xberg-io/html-to-markdown/tree/main/packages/ruby) (Magnus + rb-sys)
+- **CLI**: [html-to-markdown-cli](https://github.com/xberg-io/html-to-markdown/tree/main/crates/html-to-markdown-cli)
 
 ## Documentation
 
 - [Full Documentation](https://docs.html-to-markdown.kreuzberg.dev)
 - [API Reference](https://docs.rs/html-to-markdown-rs)
 - [Documentation](https://docs.html-to-markdown.kreuzberg.dev/)
-- [Contributing Guide](https://github.com/kreuzberg-dev/html-to-markdown/blob/main/CONTRIBUTING.md)
+- [Contributing Guide](https://github.com/xberg-io/html-to-markdown/blob/main/CONTRIBUTING.md)
 
 ## Performance
 

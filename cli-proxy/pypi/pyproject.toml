@@ -22,9 +22,9 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
 ]
-urls.Homepage = "https://github.com/kreuzberg-dev/html-to-markdown"
-urls.Issues = "https://github.com/kreuzberg-dev/html-to-markdown/issues"
-urls.Repository = "https://github.com/kreuzberg-dev/html-to-markdown.git"
+urls.Homepage = "https://github.com/xberg-io/html-to-markdown"
+urls.Issues = "https://github.com/xberg-io/html-to-markdown/issues"
+urls.Repository = "https://github.com/xberg-io/html-to-markdown.git"
 scripts.html-to-markdown = "html_to_markdown_cli.cli:main"
 
 [tool.hatch]

@@ -3,7 +3,7 @@
 
 class HtmlToMarkdown < Formula
   desc "High-performance HTML to Markdown converter powered by Rust"
-  homepage "https://github.com/kreuzberg-dev/html-to-markdown"
+  homepage "https://github.com/xberg-io/html-to-markdown"
   version "${version}"
   license "MIT"
 
@@ -11,19 +11,19 @@ class HtmlToMarkdown < Formula
   # build (Intel mac dropped), so there is no on_intel block here.
   on_macos do
     on_arm do
-      url "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v#{version}/cli-aarch64-apple-darwin.tar.gz"
+      url "https://github.com/xberg-io/html-to-markdown/releases/download/v#{version}/cli-aarch64-apple-darwin.tar.gz"
       sha256 "${cli_macos_arm_sha}"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v#{version}/cli-aarch64-unknown-linux-gnu.tar.gz"
+      url "https://github.com/xberg-io/html-to-markdown/releases/download/v#{version}/cli-aarch64-unknown-linux-gnu.tar.gz"
       sha256 "${cli_linux_arm_sha}"
     end
 
     on_intel do
-      url "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v#{version}/cli-x86_64-unknown-linux-gnu.tar.gz"
+      url "https://github.com/xberg-io/html-to-markdown/releases/download/v#{version}/cli-x86_64-unknown-linux-gnu.tar.gz"
       sha256 "${cli_linux_intel_sha}"
     end
   end

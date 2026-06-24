@@ -32,7 +32,7 @@ runs:
               # Add as local repository and build
               php /tmp/pie.phar repository:add path "$tmp"
               CARGO_BIN=$(command -v cargo)
-              php /tmp/pie.phar build kreuzberg-dev/html-to-markdown:*@dev --working-dir "$tmp" --with-cargo-bin="$CARGO_BIN"
+              php /tmp/pie.phar build xberg-io/html-to-markdown:*@dev --working-dir "$tmp" --with-cargo-bin="$CARGO_BIN"
 
               # Find the built extension
               ext_so=$(find "$tmp" -name "*.so" -path "*/html_to_markdown.so" | head -n 1)

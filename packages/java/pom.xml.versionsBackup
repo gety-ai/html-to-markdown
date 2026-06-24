@@ -11,7 +11,7 @@
 
     <name>html-to-markdown</name>
     <description>High-performance HTML to Markdown converter</description>
-    <url>https://github.com/kreuzberg-dev/html-to-markdown</url>
+    <url>https://github.com/xberg-io/html-to-markdown</url>
 
     <licenses>
         <license>
@@ -28,9 +28,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/kreuzberg-dev/html-to-markdown.git</connection>
-        <developerConnection>scm:git:ssh://github.com:kreuzberg-dev/html-to-markdown.git</developerConnection>
-        <url>https://github.com/kreuzberg-dev/html-to-markdown</url>
+        <connection>scm:git:git://github.com/xberg-io/html-to-markdown.git</connection>
+        <developerConnection>scm:git:ssh://github.com:xberg-io/html-to-markdown.git</developerConnection>
+        <url>https://github.com/xberg-io/html-to-markdown</url>
     </scm>
 
     <properties>

@@ -7,7 +7,7 @@ use reqwest::header::{CONTENT_TYPE, USER_AGENT};
 use std::time::Duration;
 
 pub const DEFAULT_USER_AGENT: &str =
-    "Mozilla/5.0 (compatible; html-to-markdown-cli/2.10; +https://github.com/kreuzberg-dev/html-to-markdown)";
+    "Mozilla/5.0 (compatible; html-to-markdown-cli/2.10; +https://github.com/xberg-io/html-to-markdown)";
 
 pub fn decode_bytes(bytes: &[u8], encoding_name: &str) -> Result<String, String> {
     let lowercase = encoding_name.to_lowercase();

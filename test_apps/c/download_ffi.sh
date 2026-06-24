@@ -5,7 +5,7 @@
 # To verify freshness: alef verify --exit-code
 set -euo pipefail
 
-REPO_URL="https://github.com/kreuzberg-dev/html-to-markdown"
+REPO_URL="https://github.com/xberg-io/html-to-markdown"
 VERSION="3.7.2"
 FFI_PKG_NAME="html-to-markdown-rs-ffi"
 FFI_DIR="ffi"

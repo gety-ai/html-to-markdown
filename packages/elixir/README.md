@@ -1,7 +1,7 @@
 # html-to-markdown
 
 <div align="center" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 20px 0;">
-  <a href="https://github.com/kreuzberg-dev/alef">
+  <a href="https://github.com/xberg-io/alef">
     <img src="https://img.shields.io/badge/built%20with-alef%20%D7%90-007ec6" alt="Built with alef">
   </a>
   <!-- Language Bindings -->
@@ -20,14 +20,14 @@
   <a href="https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown">
     <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown?label=Java&color=007ec6" alt="Java">
   </a>
-  <a href="https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3">
-    <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/html-to-markdown?label=Go&color=007ec6&filter=v3*" alt="Go">
+  <a href="https://pkg.go.dev/github.com/xberg-io/html-to-markdown/packages/go/v3">
+    <img src="https://img.shields.io/github/v/tag/xberg-io/html-to-markdown?label=Go&color=007ec6&filter=v3*" alt="Go">
   </a>
   <a href="https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/">
     <img src="https://img.shields.io/nuget/v/KreuzbergDev.HtmlToMarkdown?label=C%23&color=007ec6" alt="C#">
   </a>
-  <a href="https://packagist.org/packages/kreuzberg-dev/html-to-markdown">
-    <img src="https://img.shields.io/packagist/v/kreuzberg-dev/html-to-markdown?label=PHP&color=007ec6" alt="PHP">
+  <a href="https://packagist.org/packages/xberg-io/html-to-markdown">
+    <img src="https://img.shields.io/packagist/v/xberg-io/html-to-markdown?label=PHP&color=007ec6" alt="PHP">
   </a>
   <a href="https://rubygems.org/gems/html-to-markdown">
     <img src="https://img.shields.io/gem/v/html-to-markdown?label=Ruby&color=007ec6" alt="Ruby">
@@ -35,7 +35,7 @@
   <a href="https://hex.pm/packages/html_to_markdown">
     <img src="https://img.shields.io/hexpm/v/html_to_markdown?label=Elixir&color=007ec6" alt="Elixir">
   </a>
-  <a href="https://kreuzberg-dev.r-universe.dev/htmltomarkdown">
+  <a href="https://xberg-io.r-universe.dev/htmltomarkdown">
     <img src="https://img.shields.io/badge/R-htmltomarkdown-007ec6" alt="R">
   </a>
   <a href="https://pub.dev/packages/h2m">
@@ -44,18 +44,18 @@
   <a href="https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown-android">
     <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown-android?label=Kotlin&color=007ec6" alt="Kotlin">
   </a>
-  <a href="https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/swift">
+  <a href="https://github.com/xberg-io/html-to-markdown/tree/main/packages/swift">
     <img src="https://img.shields.io/badge/Swift-SPM-007ec6" alt="Swift">
   </a>
-  <a href="https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/zig">
+  <a href="https://github.com/xberg-io/html-to-markdown/tree/main/packages/zig">
     <img src="https://img.shields.io/badge/Zig-package-007ec6" alt="Zig">
   </a>
-  <a href="https://github.com/kreuzberg-dev/html-to-markdown/releases">
+  <a href="https://github.com/xberg-io/html-to-markdown/releases">
     <img src="https://img.shields.io/badge/C-FFI-007ec6" alt="C FFI">
   </a>
 
   <!-- Project Info -->
-  <a href="https://github.com/kreuzberg-dev/html-to-markdown/blob/main/LICENSE">
+  <a href="https://github.com/xberg-io/html-to-markdown/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-007ec6" alt="License">
   </a>
   <a href="https://docs.html-to-markdown.kreuzberg.dev">
@@ -302,23 +302,23 @@ result.content
 
 ## Links
 
-- **GitHub:** [github.com/kreuzberg-dev/html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown)
+- **GitHub:** [github.com/xberg-io/html-to-markdown](https://github.com/xberg-io/html-to-markdown)
 - **Hex.pm:** [hex.pm/packages/html_to_markdown](https://hex.pm/packages/html_to_markdown)
 - **Discord:** [discord.gg/xt9WY3GnKR](https://discord.gg/xt9WY3GnKR)
 
 ## Part of Kreuzberg.dev
 
-- [Kreuzberg](https://github.com/kreuzberg-dev/kreuzberg) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
-- [Kreuzberg Cloud](https://github.com/kreuzberg-dev/kreuzberg-cloud) — managed extraction API with SDKs, dashboards, and observability.
-- [kreuzcrawl](https://github.com/kreuzberg-dev/kreuzcrawl) — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
-- [html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown) — fast, lossless HTML→Markdown engine.
-- [liter-llm](https://github.com/kreuzberg-dev/liter-llm) — universal LLM API client with native bindings for 14 languages and 143 providers.
-- [tree-sitter-language-pack](https://github.com/kreuzberg-dev/tree-sitter-language-pack) — tree-sitter grammars and code-intelligence primitives.
-- [alef](https://github.com/kreuzberg-dev/alef) — the polyglot binding generator that produces every per-language binding across the 5 polyglot repos.
+- [Kreuzberg](https://github.com/xberg-io/kreuzberg) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
+- [Kreuzberg Cloud](https://github.com/xberg-io/kreuzberg-cloud) — managed extraction API with SDKs, dashboards, and observability.
+- [kreuzcrawl](https://github.com/xberg-io/kreuzcrawl) — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
+- [html-to-markdown](https://github.com/xberg-io/html-to-markdown) — fast, lossless HTML→Markdown engine.
+- [liter-llm](https://github.com/xberg-io/liter-llm) — universal LLM API client with native bindings for 14 languages and 143 providers.
+- [tree-sitter-language-pack](https://github.com/xberg-io/tree-sitter-language-pack) — tree-sitter grammars and code-intelligence primitives.
+- [alef](https://github.com/xberg-io/alef) — the polyglot binding generator that produces every per-language binding across the 5 polyglot repos.
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guide](https://github.com/kreuzberg-dev/html-to-markdown/blob/main/CONTRIBUTING.md) for details on:
+We welcome contributions! Please see our [Contributing Guide](https://github.com/xberg-io/html-to-markdown/blob/main/CONTRIBUTING.md) for details on:
 
 - Setting up the development environment
 - Running tests locally
@@ -333,7 +333,7 @@ All contributions must follow our code quality standards (enforced via pre-commi
 
 ## License
 
-MIT License – see [LICENSE](https://github.com/kreuzberg-dev/html-to-markdown/blob/main/LICENSE). Copyright © Kreuzberg, Inc.
+MIT License – see [LICENSE](https://github.com/xberg-io/html-to-markdown/blob/main/LICENSE). Copyright © Kreuzberg, Inc.
 
 ## Support
 
@@ -341,5 +341,5 @@ If you find this library useful, consider [sponsoring the project](https://githu
 
 Have questions or run into issues? We're here to help:
 
-- **GitHub Issues:** [github.com/kreuzberg-dev/html-to-markdown/issues](https://github.com/kreuzberg-dev/html-to-markdown/issues)
+- **GitHub Issues:** [github.com/xberg-io/html-to-markdown/issues](https://github.com/xberg-io/html-to-markdown/issues)
 - **Discord Community:** [discord.gg/xt9WY3GnKR](https://discord.gg/xt9WY3GnKR)

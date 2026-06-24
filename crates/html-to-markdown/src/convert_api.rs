@@ -50,7 +50,7 @@ use crate::{HtmlMetadata, MetadataConfig};
 pub fn convert(html: &str, options: impl Into<Option<ConversionOptions>>) -> Result<ConversionResult> {
     // Thin generic wrapper. Delegates to the non-generic `convert_inner` so the
     // ~250-line body monomorphises exactly once instead of once per `Into` impl
-    // the caller picks. See kreuzberg-dev/html-to-markdown#398.
+    // the caller picks. See xberg-io/html-to-markdown#398.
     convert_inner(html, options.into().unwrap_or_default())
 }
 

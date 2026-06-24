@@ -7,7 +7,7 @@ fn convert(
     html_to_markdown_rs::convert(html, opts).map(|r| r.content.unwrap_or_default())
 }
 
-/// Regression test for <https://github.com/kreuzberg-dev/html-to-markdown/issues/212>
+/// Regression test for <https://github.com/xberg-io/html-to-markdown/issues/212>
 ///
 /// When `\n` precedes an `<a>` tag inside a `<p>`, the whitespace was
 /// inconsistently handled between the first and subsequent paragraphs.

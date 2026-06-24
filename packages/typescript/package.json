@@ -8,10 +8,10 @@
 		"markdown"
 	],
 	"homepage": "https://kreuzberg.dev",
-	"bugs": "https://github.com/kreuzberg-dev/html-to-markdown/issues",
+	"bugs": "https://github.com/xberg-io/html-to-markdown/issues",
 	"license": "MIT",
 	"author": "Kreuzberg Team",
-	"repository": "https://github.com/kreuzberg-dev/html-to-markdown",
+	"repository": "https://github.com/xberg-io/html-to-markdown",
 	"files": [
 		"dist",
 		"README.md"

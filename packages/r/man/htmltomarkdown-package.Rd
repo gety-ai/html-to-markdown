@@ -11,8 +11,8 @@ High-performance HTML to Markdown converter Rust bindings generated with extendr
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/kreuzberg-dev/html-to-markdown}
-  \item Report bugs at \url{https://github.com/kreuzberg-dev/html-to-markdown/issues}
+  \item \url{https://github.com/xberg-io/html-to-markdown}
+  \item Report bugs at \url{https://github.com/xberg-io/html-to-markdown/issues}
 }
 
 }

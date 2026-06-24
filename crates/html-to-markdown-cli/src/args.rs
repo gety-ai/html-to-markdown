@@ -75,7 +75,7 @@ pub enum Commands {
         --bullets '*' \\
         --list-indent-width 2
 
-For more information: https://github.com/kreuzberg-dev/html-to-markdown
+For more information: https://github.com/xberg-io/html-to-markdown
 ")]
 pub struct Cli {
     /// Input HTML file (use \"-\" or omit for stdin)

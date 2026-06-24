@@ -1,6 +1,6 @@
 # AI Coding Assistants
 
-Install the html-to-markdown plugin from the [`kreuzberg-dev/plugins`](https://github.com/kreuzberg-dev/plugins) marketplace. It ships the html-to-markdown agent skills and works with every major coding agent — expand your harness below.
+Install the html-to-markdown plugin from the [`xberg-io/plugins`](https://github.com/xberg-io/plugins) marketplace. It ships the html-to-markdown agent skills and works with every major coding agent — expand your harness below.
 
 ## Installing
 
@@ -8,7 +8,7 @@ Install the html-to-markdown plugin from the [`kreuzberg-dev/plugins`](https://g
 <summary><strong>Claude Code</strong></summary>
 
 ```text
-/plugin marketplace add kreuzberg-dev/plugins
+/plugin marketplace add xberg-io/plugins
 /plugin install html-to-markdown@kreuzberg
 ```
 
@@ -18,7 +18,7 @@ Install the html-to-markdown plugin from the [`kreuzberg-dev/plugins`](https://g
 <summary><strong>Codex CLI</strong></summary>
 
 ```text
-/plugins add https://github.com/kreuzberg-dev/plugins
+/plugins add https://github.com/xberg-io/plugins
 ```
 
 Then search for `html-to-markdown` and select **Install Plugin**.
@@ -27,14 +27,14 @@ Then search for `html-to-markdown` and select **Install Plugin**.
 <details>
 <summary><strong>Cursor</strong></summary>
 
-Settings → Plugins → Add from URL → `https://github.com/kreuzberg-dev/plugins`, then select **html-to-markdown**.
+Settings → Plugins → Add from URL → `https://github.com/xberg-io/plugins`, then select **html-to-markdown**.
 </details>
 
 <details>
 <summary><strong>Gemini CLI</strong></summary>
 
 ```text
-gemini extensions install https://github.com/kreuzberg-dev/plugins
+gemini extensions install https://github.com/xberg-io/plugins
 ```
 
 </details>
@@ -43,7 +43,7 @@ gemini extensions install https://github.com/kreuzberg-dev/plugins
 <summary><strong>Factory Droid</strong></summary>
 
 ```text
-droid plugin marketplace add https://github.com/kreuzberg-dev/plugins
+droid plugin marketplace add https://github.com/xberg-io/plugins
 droid plugin install html-to-markdown@kreuzberg
 ```
 
@@ -53,7 +53,7 @@ droid plugin install html-to-markdown@kreuzberg
 <summary><strong>GitHub Copilot CLI</strong></summary>
 
 ```text
-copilot plugin marketplace add https://github.com/kreuzberg-dev/plugins
+copilot plugin marketplace add https://github.com/xberg-io/plugins
 copilot plugin install html-to-markdown@kreuzberg
 ```
 

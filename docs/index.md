@@ -10,7 +10,7 @@ Convert HTML to Markdown, Djot, or plain text. One Rust core plus 15 generated p
 
 [:material-rocket-launch: Get Started](installation.md){ .md-button .md-button--primary }
 [:material-package-variant: Installation](installation.md){ .md-button }
-[:material-github: GitHub](https://github.com/kreuzberg-dev/html-to-markdown){ .md-button }
+[:material-github: GitHub](https://github.com/xberg-io/html-to-markdown){ .md-button }
 [:fontawesome-brands-discord: Discord](https://discord.gg/xt9WY3GnKR){ .md-button }
 
 </div>
@@ -56,9 +56,9 @@ Convert HTML to Markdown, Djot, or plain text. One Rust core plus 15 generated p
 | **Rust**              | `cargo add html-to-markdown-rs`                                   | [Reference](reference/api-rust.md)       |
 | **Python**            | `pip install html-to-markdown`                                    | [Reference](reference/api-python.md)     |
 | **TypeScript / Node** | `npm install @kreuzberg/html-to-markdown`                         | [Reference](reference/api-typescript.md) |
-| **Go**                | `go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3` | [Reference](reference/api-go.md)         |
+| **Go**                | `go get github.com/xberg-io/html-to-markdown/packages/go/v3` | [Reference](reference/api-go.md)         |
 | **Ruby**              | `gem install html-to-markdown`                                    | [Reference](reference/api-ruby.md)       |
-| **PHP**               | `pie install kreuzberg-dev/html-to-markdown`                      | [Reference](reference/api-php.md)        |
+| **PHP**               | `pie install xberg-io/html-to-markdown`                      | [Reference](reference/api-php.md)        |
 | **Java**              | Maven `dev.kreuzberg:html-to-markdown`                            | [Reference](reference/api-java.md)       |
 | **C#**                | `dotnet add package KreuzbergDev.HtmlToMarkdown`                  | [Reference](reference/api-csharp.md)     |
 | **Elixir**            | `{:html_to_markdown, "~> 3.4"}`                                   | [Reference](reference/api-elixir.md)     |
@@ -189,6 +189,6 @@ html-to-markdown ships as a standalone library and as the HTML pipeline inside t
 
 ## Getting Help
 
-- **Bugs and feature requests** — [Open an issue on GitHub](https://github.com/kreuzberg-dev/html-to-markdown/issues)
+- **Bugs and feature requests** — [Open an issue on GitHub](https://github.com/xberg-io/html-to-markdown/issues)
 - **Community chat** — [Join the Discord](https://discord.gg/xt9WY3GnKR)
 - **Contributing** — [Read the contributor guide](contributing.md)

@@ -8,7 +8,7 @@ import crypto from "node:crypto";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { spawnSync, execFileSync } from "node:child_process";
 
-const REPO = "kreuzberg-dev/html-to-markdown";
+const REPO = "xberg-io/html-to-markdown";
 const BIN_NAME = "html-to-markdown";
 const PKG_NAME = "html-to-markdown-cli";
 const VERSION_ENV = "HTML_TO_MARKDOWN_CLI_VERSION";

@@ -10,12 +10,12 @@
 		"rust"
 	],
 	"homepage": "https://kreuzberg.dev",
-	"bugs": "https://github.com/kreuzberg-dev/html-to-markdown/issues",
+	"bugs": "https://github.com/xberg-io/html-to-markdown/issues",
 	"license": "MIT",
 	"author": "Na'aman Hirschfeld <naaman@kreuzberg.dev>",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/kreuzberg-dev/html-to-markdown.git"
+		"url": "git+https://github.com/xberg-io/html-to-markdown.git"
 	},
 	"files": [
 		"html-to-markdown-node.linux-arm-gnueabihf.node"

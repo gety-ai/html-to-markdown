@@ -196,7 +196,7 @@ mavenPublishing {
     pom {
         name.set("html-to-markdown-android")
         description.set("High-performance HTML to Markdown converter")
-        url.set("https://github.com/kreuzberg-dev/html-to-markdown")
+        url.set("https://github.com/xberg-io/html-to-markdown")
         licenses {
             license {
                 name.set("MIT")
@@ -211,10 +211,10 @@ mavenPublishing {
         }
 
         scm {
-            url.set("https://github.com/kreuzberg-dev/html-to-markdown")
-            connection.set("scm:git:git://github.com/kreuzberg-dev/html-to-markdown.git")
+            url.set("https://github.com/xberg-io/html-to-markdown")
+            connection.set("scm:git:git://github.com/xberg-io/html-to-markdown.git")
             developerConnection.set(
-                "scm:git:ssh://git@github.com:kreuzberg-dev/html-to-markdown.git"
+                "scm:git:ssh://git@github.com:xberg-io/html-to-markdown.git"
             )
         }
     }

@@ -9,9 +9,9 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 | Rust                 | 1.85              | `html-to-markdown-rs` on crates.io                         |
 | Python               | 3.10              | `html-to-markdown` on PyPI                                 |
 | TypeScript / Node.js | Node.js 18        | `@kreuzberg/html-to-markdown` on npm                       |
-| Go                   | 1.26              | `github.com/kreuzberg-dev/html-to-markdown/packages/go/v3` |
+| Go                   | 1.26              | `github.com/xberg-io/html-to-markdown/packages/go/v3` |
 | Ruby                 | 3.2               | `html-to-markdown` on RubyGems                             |
-| PHP                  | 8.2               | `kreuzberg-dev/html-to-markdown` on Packagist              |
+| PHP                  | 8.2               | `xberg-io/html-to-markdown` on Packagist              |
 | Java                 | 25                | `dev.kreuzberg:html-to-markdown` on Maven Central          |
 | C#                   | .NET 10           | `KreuzbergDev.HtmlToMarkdown` on NuGet                     |
 | Elixir               | 1.14              | `html_to_markdown` on Hex                                  |
@@ -123,7 +123,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 === "Go"
 
     ```bash
-    go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3
+    go get github.com/xberg-io/html-to-markdown/packages/go/v3
     ```
 
     **Verify:**
@@ -133,7 +133,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 
     import (
         "fmt"
-        htmltomarkdown "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
+        htmltomarkdown "github.com/xberg-io/html-to-markdown/packages/go/v3"
     )
 
     func main() {
@@ -174,7 +174,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     This is a native PHP extension (Rust `ext-php-rs`), installed with [PIE](https://github.com/php/pie) — not `composer require` (Composer cannot load a native extension):
 
     ```bash
-    pie install kreuzberg-dev/html-to-markdown
+    pie install xberg-io/html-to-markdown
     ```
 
     **Verify:**
@@ -299,7 +299,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 
 === "C"
 
-    Download a prebuilt release archive for your platform from the [GitHub Releases page](https://github.com/kreuzberg-dev/html-to-markdown/releases). Each archive contains:
+    Download a prebuilt release archive for your platform from the [GitHub Releases page](https://github.com/xberg-io/html-to-markdown/releases). Each archive contains:
 
     - `libhtml_to_markdown.so` / `.dylib` / `.dll` — shared library
     - `libhtml_to_markdown.a` — static library
@@ -308,7 +308,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     **Build from source** (requires Rust toolchain):
 
     ```bash
-    git clone https://github.com/kreuzberg-dev/html-to-markdown.git
+    git clone https://github.com/xberg-io/html-to-markdown.git
     cd html-to-markdown
     cargo build --release -p html-to-markdown-ffi
     # output: target/release/libhtml_to_markdown.{so,dylib,dll}
@@ -369,7 +369,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     Add the package URL in SwiftPM:
 
     ```text
-    https://github.com/kreuzberg-dev/html-to-markdown
+    https://github.com/xberg-io/html-to-markdown
     ```
 
     **Verify:**
@@ -456,8 +456,8 @@ Or via Homebrew:
 Homebrew 6.0+ requires explicit trust for third-party taps. Trust once, then install:
 
 ```bash
-brew trust kreuzberg-dev/tap
-brew install kreuzberg-dev/tap/html-to-markdown
+brew trust xberg-io/tap
+brew install xberg-io/tap/html-to-markdown
 ```
 
 **Verify:**

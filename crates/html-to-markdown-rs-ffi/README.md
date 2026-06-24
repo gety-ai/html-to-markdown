@@ -14,15 +14,15 @@ See the build instructions in the main repository.
 #include "html_to_markdown.h"
 
 int main(void) {
-    // See https://github.com/kreuzberg-dev/html-to-markdown for usage examples.
+    // See https://github.com/xberg-io/html-to-markdown for usage examples.
     return 0;
 }
 ```
 
 ## Documentation
 
-For full documentation, see the [html-to-markdown-rs repository](https://github.com/kreuzberg-dev/html-to-markdown).
+For full documentation, see the [html-to-markdown-rs repository](https://github.com/xberg-io/html-to-markdown).
 
 ## License
 
-See the [LICENSE](https://github.com/kreuzberg-dev/html-to-markdown/blob/main/LICENSE) file in the root repository.
+See the [LICENSE](https://github.com/xberg-io/html-to-markdown/blob/main/LICENSE) file in the root repository.

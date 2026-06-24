@@ -5,7 +5,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kreuzberg-dev/html-to-markdown.git"
+    "url": "git+https://github.com/xberg-io/html-to-markdown.git"
   },
   "main": "index.js",
   "types": "index.d.ts",

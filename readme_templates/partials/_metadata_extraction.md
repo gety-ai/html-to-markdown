@@ -90,7 +90,7 @@ import (
     "fmt"
     "log"
 
-    "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
+    "github.com/xberg-io/html-to-markdown/packages/go/v3"
 )
 
 func main() {

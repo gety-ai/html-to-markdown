@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Na'aman Hirschfeld <naaman@kreuzberg.dev>"]
   spec.summary       = "High-performance HTML to Markdown converter"
   spec.description   = "High-performance HTML to Markdown converter"
-  spec.homepage      = "https://github.com/kreuzberg-dev/html-to-markdown"
+  spec.homepage      = "https://github.com/xberg-io/html-to-markdown"
 
   spec.license       = "MIT"
 

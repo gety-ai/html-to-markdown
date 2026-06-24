@@ -3,8 +3,8 @@ site_name = "html-to-markdown"
 site_description = "High-performance HTML to Markdown conversion powered by Rust"
 site_url = "https://docs.html-to-markdown.kreuzberg.dev"
 site_author = "kreuzberg.dev"
-repo_name = "kreuzberg-dev/html-to-markdown"
-repo_url = "https://github.com/kreuzberg-dev/html-to-markdown"
+repo_name = "xberg-io/html-to-markdown"
+repo_url = "https://github.com/xberg-io/html-to-markdown"
 edit_uri = "edit/main/docs/"
 copyright = "Copyright &copy; 2023-2026 Kreuzberg.dev"
 
@@ -57,7 +57,7 @@ nav = [
   { "More" = [
     { "Migration" = "migration.md" },
     { "Contributing" = "contributing.md" },
-    { "Changelog" = "https://github.com/kreuzberg-dev/html-to-markdown/blob/main/CHANGELOG.md" },
+    { "Changelog" = "https://github.com/xberg-io/html-to-markdown/blob/main/CHANGELOG.md" },
     { "Ecosystem" = "ecosystem.md" },
   ] },
 ]
@@ -194,7 +194,7 @@ forks = true
 
 [[project.extra.social]]
 icon = "fontawesome/brands/github"
-link = "https://github.com/kreuzberg-dev/html-to-markdown"
+link = "https://github.com/xberg-io/html-to-markdown"
 name = "View on GitHub"
 
 [[project.extra.social]]

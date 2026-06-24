@@ -5,7 +5,7 @@
 **Do not open a public issue for security reports.**
 
 Preferred channel: open a private advisory at
-<https://github.com/kreuzberg-dev/html-to-markdown/security/advisories/new>.
+<https://github.com/xberg-io/html-to-markdown/security/advisories/new>.
 
 Alternative: email **<security@kreuzberg.dev>**.
 

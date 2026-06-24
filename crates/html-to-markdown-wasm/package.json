@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kreuzberg-dev/html-to-markdown",
+    "url": "https://github.com/xberg-io/html-to-markdown",
     "directory": "crates/html-to-markdown-wasm"
   },
   "publishConfig": {

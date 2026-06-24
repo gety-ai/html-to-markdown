@@ -7,7 +7,7 @@
 set -euo pipefail
 
 VERSION="3.7.2"
-PKG="kreuzberg-dev/html-to-markdown"
+PKG="xberg-io/html-to-markdown"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 

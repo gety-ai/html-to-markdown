@@ -142,7 +142,7 @@ impl ServerHandler for HtmlToMarkdownMcp {
                  Supports optional ConversionOptions for heading style, list formatting, \
                  escaping, metadata extraction, and more.",
             )
-            .with_website_url("https://github.com/kreuzberg-dev/html-to-markdown");
+            .with_website_url("https://github.com/xberg-io/html-to-markdown");
 
         InitializeResult::new(capabilities)
             .with_server_info(server_info)

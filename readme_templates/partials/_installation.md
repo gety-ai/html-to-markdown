@@ -48,13 +48,13 @@ Requires Ruby 3.2+ with Magnus native extension bindings. Published for Linux, m
 Requires PHP 8.2+. Install the native extension via PIE:
 
 ```bash
-pie install kreuzberg-dev/html-to-markdown
+pie install xberg-io/html-to-markdown
 ```
 
 Or use Composer (requires ext-html_to_markdown):
 
 ```bash
-composer require kreuzberg-dev/html-to-markdown
+composer require xberg-io/html-to-markdown
 ```
 
 {% elif language == 'go' %}
@@ -113,13 +113,13 @@ end
 Requires R 4.3+ and a Rust toolchain (cargo, rustc).
 
 ```r
-install.packages("htmltomarkdown", repos = "https://kreuzberg-dev.r-universe.dev")
+install.packages("htmltomarkdown", repos = "https://xberg-io.r-universe.dev")
 ```
 
 Or install the development version from GitHub:
 
 ```r
-devtools::install_github("kreuzberg-dev/html-to-markdown", subdir = "packages/r")
+devtools::install_github("xberg-io/html-to-markdown", subdir = "packages/r")
 ```
 
 {% endif %}

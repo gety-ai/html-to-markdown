@@ -483,7 +483,7 @@ fn ensure_newline(buf: &mut String) {
 /// number of space-only lines between paragraphs collapses to a single blank line.
 ///
 /// Algorithm contributed by @xitep in
-/// <https://github.com/kreuzberg-dev/html-to-markdown/issues/362>: 2–7× faster than the
+/// <https://github.com/xberg-io/html-to-markdown/issues/362>: 2–7× faster than the
 /// previous char-by-char rewrite while preserving identical semantics.
 fn normalize_plain_output(buf: &mut String) {
     let input = std::mem::take(buf);

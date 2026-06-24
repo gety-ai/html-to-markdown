@@ -1,6 +1,6 @@
 # html-to-markdown-cli
 
-CLI proxy for [`html-to-markdown`](https://github.com/kreuzberg-dev/html-to-markdown). Installing
+CLI proxy for [`html-to-markdown`](https://github.com/xberg-io/html-to-markdown). Installing
 this package provides a `html-to-markdown` command that downloads the matching native
 binary from GitHub releases and runs it.
 

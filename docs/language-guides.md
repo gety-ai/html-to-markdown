@@ -52,15 +52,15 @@ Option keys are `camelCase` (`headingStyle`, `linkStyle`, `outputFormat`). The p
 
 ## Go
 
-**Module:** `github.com/kreuzberg-dev/html-to-markdown/packages/go/v3`
+**Module:** `github.com/xberg-io/html-to-markdown/packages/go/v3`
 **Requires:** Go ≥ 1.26
 
 ```bash
-go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3
+go get github.com/xberg-io/html-to-markdown/packages/go/v3
 ```
 
 ```go
-import htmltomarkdown "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
+import htmltomarkdown "github.com/xberg-io/html-to-markdown/packages/go/v3"
 
 result, err := htmltomarkdown.Convert("<h1>Title</h1>", nil)
 if err != nil {
@@ -91,13 +91,13 @@ Options are keyword arguments with `snake_case` symbols. `result` is a hash. Err
 
 ## PHP
 
-**Package:** `kreuzberg-dev/html-to-markdown` (native `ext-php-rs` extension)
+**Package:** `xberg-io/html-to-markdown` (native `ext-php-rs` extension)
 **Requires:** PHP ≥ 8.2
 
 Install with [PIE](https://github.com/php/pie) — not `composer require`, which cannot load a native extension:
 
 ```bash
-pie install kreuzberg-dev/html-to-markdown
+pie install xberg-io/html-to-markdown
 ```
 
 ```php
@@ -198,7 +198,7 @@ Options are named function arguments. The returned list matches the `ConversionR
 **Link against:** `libhtml_to_markdown`
 **Header:** `html_to_markdown.h` (HTM*H, all symbols prefixed `htm*_`/`HTM_`)
 
-Download a pre-built release archive for your platform from the [GitHub releases page](https://github.com/kreuzberg-dev/html-to-markdown/releases), or build from source with `cargo build --release -p html-to-markdown-ffi`.
+Download a pre-built release archive for your platform from the [GitHub releases page](https://github.com/xberg-io/html-to-markdown/releases), or build from source with `cargo build --release -p html-to-markdown-ffi`.
 
 ```c
 #include "html_to_markdown.h"
@@ -239,7 +239,7 @@ console.log(result.content);
 **Package:** `HtmlToMarkdown` via SwiftPM
 **Requires:** Swift ≥ 6.0
 
-Add the package from `https://github.com/kreuzberg-dev/html-to-markdown` and import `HtmlToMarkdown`.
+Add the package from `https://github.com/xberg-io/html-to-markdown` and import `HtmlToMarkdown`.
 
 ## Dart
 

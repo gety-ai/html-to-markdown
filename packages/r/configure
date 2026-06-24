@@ -24,7 +24,7 @@ if [ ! -f "src/rust/vendor/html-to-markdown-rs/Cargo.toml" ]; then
   else
     # Strategy 2: download source from GitHub
     VERSION="$(grep '^Version:' DESCRIPTION | sed 's/Version:[[:space:]]*//')"
-    GITHUB_URL="https://github.com/kreuzberg-dev/html-to-markdown/archive/refs/tags/v${VERSION}.tar.gz"
+    GITHUB_URL="https://github.com/xberg-io/html-to-markdown/archive/refs/tags/v${VERSION}.tar.gz"
 
     echo "* monorepo not detected — downloading html-to-markdown v${VERSION} source..."
 

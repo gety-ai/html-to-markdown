@@ -1,7 +1,7 @@
 # html-to-markdown
 
 <div align="center" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 20px 0;">
-  <a href="https://github.com/kreuzberg-dev/alef">
+  <a href="https://github.com/xberg-io/alef">
     <img src="https://img.shields.io/badge/built%20with-alef%20%D7%90-007ec6" alt="Built with alef">
   </a>
   <!-- Language Bindings -->
@@ -20,14 +20,14 @@
   <a href="https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown">
     <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown?label=Java&color=007ec6" alt="Java">
   </a>
-  <a href="https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3">
-    <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/html-to-markdown?label=Go&color=007ec6&filter=v3*" alt="Go">
+  <a href="https://pkg.go.dev/github.com/xberg-io/html-to-markdown/packages/go/v3">
+    <img src="https://img.shields.io/github/v/tag/xberg-io/html-to-markdown?label=Go&color=007ec6&filter=v3*" alt="Go">
   </a>
   <a href="https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/">
     <img src="https://img.shields.io/nuget/v/KreuzbergDev.HtmlToMarkdown?label=C%23&color=007ec6" alt="C#">
   </a>
-  <a href="https://packagist.org/packages/kreuzberg-dev/html-to-markdown">
-    <img src="https://img.shields.io/packagist/v/kreuzberg-dev/html-to-markdown?label=PHP&color=007ec6" alt="PHP">
+  <a href="https://packagist.org/packages/xberg-io/html-to-markdown">
+    <img src="https://img.shields.io/packagist/v/xberg-io/html-to-markdown?label=PHP&color=007ec6" alt="PHP">
   </a>
   <a href="https://rubygems.org/gems/html-to-markdown">
     <img src="https://img.shields.io/gem/v/html-to-markdown?label=Ruby&color=007ec6" alt="Ruby">
@@ -35,7 +35,7 @@
   <a href="https://hex.pm/packages/html_to_markdown">
     <img src="https://img.shields.io/hexpm/v/html_to_markdown?label=Elixir&color=007ec6" alt="Elixir">
   </a>
-  <a href="https://kreuzberg-dev.r-universe.dev/htmltomarkdown">
+  <a href="https://xberg-io.r-universe.dev/htmltomarkdown">
     <img src="https://img.shields.io/badge/R-htmltomarkdown-007ec6" alt="R">
   </a>
   <a href="https://pub.dev/packages/h2m">
@@ -44,18 +44,18 @@
   <a href="https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown-android">
     <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown-android?label=Kotlin&color=007ec6" alt="Kotlin">
   </a>
-  <a href="https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/swift">
+  <a href="https://github.com/xberg-io/html-to-markdown/tree/main/packages/swift">
     <img src="https://img.shields.io/badge/Swift-SPM-007ec6" alt="Swift">
   </a>
-  <a href="https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/zig">
+  <a href="https://github.com/xberg-io/html-to-markdown/tree/main/packages/zig">
     <img src="https://img.shields.io/badge/Zig-package-007ec6" alt="Zig">
   </a>
-  <a href="https://github.com/kreuzberg-dev/html-to-markdown/releases">
+  <a href="https://github.com/xberg-io/html-to-markdown/releases">
     <img src="https://img.shields.io/badge/C-FFI-007ec6" alt="C FFI">
   </a>
 
   <!-- Project Info -->
-  <a href="https://github.com/kreuzberg-dev/html-to-markdown/blob/main/LICENSE">
+  <a href="https://github.com/xberg-io/html-to-markdown/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-007ec6" alt="License">
   </a>
   <a href="https://docs.html-to-markdown.kreuzberg.dev">
@@ -96,7 +96,7 @@ It routes each input through three tiers: a single-pass byte scanner for clean H
 | **Fast** | 19–116 MB/s on the Wikipedia/mdream corpus; per-group regression thresholds enforced on every PR |
 
 <div align="center">
-  <a href="https://github.com/kreuzberg-dev/html-to-markdown/stargazers">
+  <a href="https://github.com/xberg-io/html-to-markdown/stargazers">
     <img src="docs/assets/star.gif" alt="Star html-to-markdown on GitHub" width="640">
   </a>
 </div>
@@ -116,7 +116,7 @@ It routes each input through three tiers: a single-pass byte scanner for clean H
 cargo add html-to-markdown-rs
 ```
 
-See [Rust README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/crates/html-to-markdown) for full documentation.
+See [Rust README](https://github.com/xberg-io/html-to-markdown/tree/main/crates/html-to-markdown) for full documentation.
 
 </details>
 
@@ -127,7 +127,7 @@ See [Rust README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/cr
 pip install html-to-markdown
 ```
 
-See [Python README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/python) for full documentation.
+See [Python README](https://github.com/xberg-io/html-to-markdown/tree/main/packages/python) for full documentation.
 
 </details>
 
@@ -138,7 +138,7 @@ See [Python README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/
 npm install @kreuzberg/html-to-markdown
 ```
 
-See [Node.js README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/crates/html-to-markdown-node) for full documentation.
+See [Node.js README](https://github.com/xberg-io/html-to-markdown/tree/main/crates/html-to-markdown-node) for full documentation.
 
 </details>
 
@@ -146,17 +146,17 @@ See [Node.js README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main
 <summary><strong>Go</strong></summary>
 
 ```sh
-go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3
+go get github.com/xberg-io/html-to-markdown/packages/go/v3
 ```
 
-See [Go README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/go) for full documentation.
+See [Go README](https://github.com/xberg-io/html-to-markdown/tree/main/packages/go) for full documentation.
 
 </details>
 
 <details>
 <summary><strong>Java</strong></summary>
 
-Available on Maven Central as `dev.kreuzberg:html-to-markdown`. See [Java README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/java) for the dependency snippet and current version.
+Available on Maven Central as `dev.kreuzberg:html-to-markdown`. See [Java README](https://github.com/xberg-io/html-to-markdown/tree/main/packages/java) for the dependency snippet and current version.
 
 </details>
 
@@ -167,7 +167,7 @@ Available on Maven Central as `dev.kreuzberg:html-to-markdown`. See [Java README
 dotnet add package KreuzbergDev.HtmlToMarkdown
 ```
 
-See [C# README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/csharp) for full documentation.
+See [C# README](https://github.com/xberg-io/html-to-markdown/tree/main/packages/csharp) for full documentation.
 
 </details>
 
@@ -178,7 +178,7 @@ See [C# README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/pack
 gem install html-to-markdown
 ```
 
-See [Ruby README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/ruby) for full documentation.
+See [Ruby README](https://github.com/xberg-io/html-to-markdown/tree/main/packages/ruby) for full documentation.
 
 </details>
 
@@ -188,17 +188,17 @@ See [Ruby README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/pa
 This is a native PHP extension (Rust `ext-php-rs`), so install it with [PIE](https://github.com/php/pie) — not `composer require`:
 
 ```sh
-pie install kreuzberg-dev/html-to-markdown
+pie install xberg-io/html-to-markdown
 ```
 
-See [PHP README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/php) for full documentation.
+See [PHP README](https://github.com/xberg-io/html-to-markdown/tree/main/packages/php) for full documentation.
 
 </details>
 
 <details>
 <summary><strong>Elixir</strong></summary>
 
-Add `{:html_to_markdown, "~> 3.6"}` to your `mix.exs` dependencies. See [Elixir README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/elixir) for full documentation.
+Add `{:html_to_markdown, "~> 3.6"}` to your `mix.exs` dependencies. See [Elixir README](https://github.com/xberg-io/html-to-markdown/tree/main/packages/elixir) for full documentation.
 
 </details>
 
@@ -206,10 +206,10 @@ Add `{:html_to_markdown, "~> 3.6"}` to your `mix.exs` dependencies. See [Elixir 
 <summary><strong>R</strong></summary>
 
 ```r
-install.packages("htmltomarkdown", repos = "https://kreuzberg-dev.r-universe.dev")
+install.packages("htmltomarkdown", repos = "https://xberg-io.r-universe.dev")
 ```
 
-See [R README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/r) for full documentation.
+See [R README](https://github.com/xberg-io/html-to-markdown/tree/main/packages/r) for full documentation.
 
 </details>
 
@@ -220,28 +220,28 @@ See [R README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packa
 dart pub add h2m
 ```
 
-See [Dart README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/dart) for full documentation.
+See [Dart README](https://github.com/xberg-io/html-to-markdown/tree/main/packages/dart) for full documentation.
 
 </details>
 
 <details>
 <summary><strong>Kotlin (Android)</strong></summary>
 
-Available on Maven Central as `dev.kreuzberg:html-to-markdown-android`. See [Kotlin README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/kotlin-android) for the dependency snippet and current version.
+Available on Maven Central as `dev.kreuzberg:html-to-markdown-android`. See [Kotlin README](https://github.com/xberg-io/html-to-markdown/tree/main/packages/kotlin-android) for the dependency snippet and current version.
 
 </details>
 
 <details>
 <summary><strong>Swift</strong></summary>
 
-Add via Swift Package Manager. See [Swift README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/swift) for full documentation.
+Add via Swift Package Manager. See [Swift README](https://github.com/xberg-io/html-to-markdown/tree/main/packages/swift) for full documentation.
 
 </details>
 
 <details>
 <summary><strong>Zig</strong></summary>
 
-See [Zig README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/packages/zig) for installation and usage.
+See [Zig README](https://github.com/xberg-io/html-to-markdown/tree/main/packages/zig) for installation and usage.
 
 </details>
 
@@ -252,14 +252,14 @@ See [Zig README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/pac
 npm install @kreuzberg/html-to-markdown-wasm
 ```
 
-See [WebAssembly README](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/crates/html-to-markdown-wasm) for full documentation.
+See [WebAssembly README](https://github.com/xberg-io/html-to-markdown/tree/main/crates/html-to-markdown-wasm) for full documentation.
 
 </details>
 
 <details>
 <summary><strong>C/C++ (FFI)</strong></summary>
 
-Pre-built `.so` / `.dll` / `.dylib` from [GitHub Releases](https://github.com/kreuzberg-dev/html-to-markdown/releases). See [FFI crate](https://github.com/kreuzberg-dev/html-to-markdown/tree/main/crates/html-to-markdown-ffi) for full documentation.
+Pre-built `.so` / `.dll` / `.dylib` from [GitHub Releases](https://github.com/xberg-io/html-to-markdown/releases). See [FFI crate](https://github.com/xberg-io/html-to-markdown/tree/main/crates/html-to-markdown-ffi) for full documentation.
 
 </details>
 
@@ -271,7 +271,7 @@ cargo install html-to-markdown-cli
 ```
 
 ```sh
-brew install kreuzberg-dev/tap/html-to-markdown
+brew install xberg-io/tap/html-to-markdown
 ```
 
 See [CLI usage](https://docs.html-to-markdown.kreuzberg.dev) for full documentation.
@@ -280,13 +280,13 @@ See [CLI usage](https://docs.html-to-markdown.kreuzberg.dev) for full documentat
 
 ### AI Coding Assistants
 
-Install the html-to-markdown plugin from the [`kreuzberg-dev/plugins`](https://github.com/kreuzberg-dev/plugins) marketplace. It ships the html-to-markdown agent skills and works with every major coding agent — expand your harness below.
+Install the html-to-markdown plugin from the [`xberg-io/plugins`](https://github.com/xberg-io/plugins) marketplace. It ships the html-to-markdown agent skills and works with every major coding agent — expand your harness below.
 
 <details open>
 <summary><strong>Claude Code</strong></summary>
 
 ```text
-/plugin marketplace add kreuzberg-dev/plugins
+/plugin marketplace add xberg-io/plugins
 /plugin install html-to-markdown@kreuzberg
 ```
 
@@ -296,7 +296,7 @@ Install the html-to-markdown plugin from the [`kreuzberg-dev/plugins`](https://g
 <summary><strong>Codex CLI</strong></summary>
 
 ```text
-/plugins add https://github.com/kreuzberg-dev/plugins
+/plugins add https://github.com/xberg-io/plugins
 ```
 
 Then search for `html-to-markdown` and select **Install Plugin**.
@@ -306,7 +306,7 @@ Then search for `html-to-markdown` and select **Install Plugin**.
 <details>
 <summary><strong>Cursor</strong></summary>
 
-Settings → Plugins → Add from URL → `https://github.com/kreuzberg-dev/plugins`, then select **html-to-markdown**.
+Settings → Plugins → Add from URL → `https://github.com/xberg-io/plugins`, then select **html-to-markdown**.
 
 </details>
 
@@ -314,7 +314,7 @@ Settings → Plugins → Add from URL → `https://github.com/kreuzberg-dev/plug
 <summary><strong>Gemini CLI</strong></summary>
 
 ```text
-gemini extensions install https://github.com/kreuzberg-dev/plugins
+gemini extensions install https://github.com/xberg-io/plugins
 ```
 
 </details>
@@ -323,7 +323,7 @@ gemini extensions install https://github.com/kreuzberg-dev/plugins
 <summary><strong>Factory Droid</strong></summary>
 
 ```text
-droid plugin marketplace add https://github.com/kreuzberg-dev/plugins
+droid plugin marketplace add https://github.com/xberg-io/plugins
 droid plugin install html-to-markdown@kreuzberg
 ```
 
@@ -333,7 +333,7 @@ droid plugin install html-to-markdown@kreuzberg
 <summary><strong>GitHub Copilot CLI</strong></summary>
 
 ```text
-copilot plugin marketplace add https://github.com/kreuzberg-dev/plugins
+copilot plugin marketplace add https://github.com/xberg-io/plugins
 copilot plugin install html-to-markdown@kreuzberg
 ```
 
@@ -359,13 +359,13 @@ Full guides, the `convert()` API for every binding, tier architecture, the metad
 
 ## Part of Kreuzberg.dev
 
-- [Kreuzberg](https://github.com/kreuzberg-dev/kreuzberg) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
-- [Kreuzberg Cloud](https://github.com/kreuzberg-dev/kreuzberg-cloud) — managed extraction API with SDKs, dashboards, and observability.
-- [kreuzcrawl](https://github.com/kreuzberg-dev/kreuzcrawl) — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
-- [html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown) — fast, lossless HTML→Markdown engine.
-- [liter-llm](https://github.com/kreuzberg-dev/liter-llm) — universal LLM API client with native bindings for 14 languages and 143 providers.
-- [tree-sitter-language-pack](https://github.com/kreuzberg-dev/tree-sitter-language-pack) — tree-sitter grammars and code-intelligence primitives.
-- [alef](https://github.com/kreuzberg-dev/alef) — the polyglot binding generator that produces every per-language binding across the 5 polyglot repos.
+- [Kreuzberg](https://github.com/xberg-io/kreuzberg) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
+- [Kreuzberg Cloud](https://github.com/xberg-io/kreuzberg-cloud) — managed extraction API with SDKs, dashboards, and observability.
+- [kreuzcrawl](https://github.com/xberg-io/kreuzcrawl) — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
+- [html-to-markdown](https://github.com/xberg-io/html-to-markdown) — fast, lossless HTML→Markdown engine.
+- [liter-llm](https://github.com/xberg-io/liter-llm) — universal LLM API client with native bindings for 14 languages and 143 providers.
+- [tree-sitter-language-pack](https://github.com/xberg-io/tree-sitter-language-pack) — tree-sitter grammars and code-intelligence primitives.
+- [alef](https://github.com/xberg-io/alef) — the polyglot binding generator that produces every per-language binding across the 5 polyglot repos.
 
 ## Contributing
 

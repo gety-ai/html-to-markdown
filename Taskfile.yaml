@@ -18,7 +18,7 @@ version: "3"
 
 # Preconditions for task setup:
 # - Rust toolchain (rustup) — install via https://rustup.rs
-# - alef CLI — install via cargo install --git https://github.com/kreuzberg-dev/alef
+# - alef CLI — install via cargo install --git https://github.com/xberg-io/alef
 # - prek — install via cargo install prek
 # - Per-language tools auto-skipped via alef preconditions; install as needed:
 #   - Python: uv, Node: pnpm (corepack enable), Ruby: bundle, PHP: composer
@@ -470,7 +470,7 @@ tasks:
     desc: "Smoke test PHP package from Packagist"
     dir: test_apps/php
     cmds:
-      # Packagist publishes `kreuzberg-dev/html-to-markdown` as `type: php-ext`,
+      # Packagist publishes `xberg-io/html-to-markdown` as `type: php-ext`,
       # so composer alone will not install it — PIE must place the native
       # extension first. install.sh fetches the matching alef-pinned release
       # via PIE before composer install can satisfy `ext-html_to_markdown: "*"`.
@@ -486,7 +486,7 @@ tasks:
       # go.sum lacks the new hash → "missing go.sum entry"). Use the targeted
       # `go mod download <module>` Go itself suggests: it adds the entry without
       # rewriting go.mod's block form (download_ffi.sh parses the version from it).
-      - go mod download github.com/kreuzberg-dev/html-to-markdown/packages/go/v3
+      - go mod download github.com/xberg-io/html-to-markdown/packages/go/v3
       - bash ./download_ffi.sh
       - go test -v -run Smoke
 
@@ -662,7 +662,7 @@ tasks:
       # Resolve the per-tag tarball hash from the GitHub release before build.
       # alef emits a placeholder hash in build.zig.zon because the real value
       # is only known after the publish-zig job uploads the tarball.
-      - zig fetch --save=html_to_markdown "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v{{.H2M_VERSION}}/html-to-markdown-rs-zig-v{{.H2M_VERSION}}.tar.gz"
+      - zig fetch --save=html_to_markdown "https://github.com/xberg-io/html-to-markdown/releases/download/v{{.H2M_VERSION}}/html-to-markdown-rs-zig-v{{.H2M_VERSION}}.tar.gz"
       - zig build test
 
   test-apps:test:kotlin-android:

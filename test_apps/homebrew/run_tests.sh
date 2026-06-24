@@ -7,7 +7,7 @@
 set -euo pipefail
 
 VERSION="3.7.2"
-TAP="kreuzberg-dev/tap"
+TAP="xberg-io/tap"
 CLI_FORMULA="html-to-markdown"
 FFI_FORMULA="libhtml-to-markdown"
 FFI_FORMULA_QUALIFIED="$TAP/$FFI_FORMULA"

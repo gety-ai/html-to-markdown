@@ -356,7 +356,7 @@ version = "2.18.0"
 # - tests/test_apps/go/go.mod               → (version in module path)
 # - tests/test_apps/java/pom.xml            → <version>2.18.0</version>
 # - tests/test_apps/csharp/TestApp.csproj   → <Version>2.18.0</Version>
-# - tests/test_apps/php/composer.json       → "kreuzberg-dev/html-to-markdown": ">=2.18.0"
+# - tests/test_apps/php/composer.json       → "xberg-io/html-to-markdown": ">=2.18.0"
 # - tests/test_apps/elixir/mix.exs          → {:html_to_markdown, "~> 2.18.0"}
 ```
 
@@ -381,7 +381,7 @@ All test_apps use **minimum version constraints** to ensure compatibility:
 gem 'html-to-markdown', '>= 2.18.0'
 
 // PHP (composer.json)
-"kreuzberg-dev/html-to-markdown": ">=2.18.0"
+"xberg-io/html-to-markdown": ">=2.18.0"
 ```
 
 ## Adding a New Test Case

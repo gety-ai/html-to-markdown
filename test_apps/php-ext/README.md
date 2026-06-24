@@ -2,7 +2,7 @@
 
 Comprehensive test suite validating the native `html_to_markdown` PHP extension built with ext-php-rs.
 
-This test app exercises the **raw extension functions** directly (e.g. `html_to_markdown_convert()`), without the Composer wrapper package. For tests of the Composer package (`kreuzberg-dev/html-to-markdown`), see `tests/test_apps/php/`.
+This test app exercises the **raw extension functions** directly (e.g. `html_to_markdown_convert()`), without the Composer wrapper package. For tests of the Composer package (`xberg-io/html-to-markdown`), see `tests/test_apps/php/`.
 
 ## What This Test Suite Covers
 
@@ -103,7 +103,7 @@ $options = [
 
 | Aspect         | `php/` (Composer package)                     | `php-ext/` (Native extension)        |
 | -------------- | --------------------------------------------- | ------------------------------------ |
-| Dependency     | `kreuzberg-dev/html-to-markdown` via Composer | Raw `.so`/`.dylib` extension         |
+| Dependency     | `xberg-io/html-to-markdown` via Composer | Raw `.so`/`.dylib` extension         |
 | Functions      | Namespaced: `HtmlToMarkdown\convert()`        | Global: `html_to_markdown_convert()` |
 | Test framework | PHPUnit                                       | Self-contained test runner           |
 | Types          | Typed objects (ConversionOptions, etc.)       | Associative arrays                   |

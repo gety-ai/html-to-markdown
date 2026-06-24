@@ -20,7 +20,7 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/kreuzberg-dev/html-to-markdown.git
+git clone https://github.com/xberg-io/html-to-markdown.git
 cd html-to-markdown
 
 # Setup environment (installs deps, builds Rust, installs hooks)
@@ -378,13 +378,13 @@ Verify all distributions are published:
 - **Python**: <https://pypi.org/project/html-to-markdown/>
 - **npm (main)**: <https://www.npmjs.com/package/@kreuzberg/html-to-markdown>
 - **npm (wasm)**: <https://www.npmjs.com/package/@kreuzberg/html-to-markdown-wasm>
-- **Homebrew**: <https://github.com/kreuzberg-dev/homebrew-tap>
-- **GitHub**: <https://github.com/kreuzberg-dev/html-to-markdown/releases>
+- **Homebrew**: <https://github.com/xberg-io/homebrew-tap>
+- **GitHub**: <https://github.com/xberg-io/html-to-markdown/releases>
 
 ### Getting Help
 
-- **Issues**: [GitHub Issues](https://github.com/kreuzberg-dev/html-to-markdown/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/kreuzberg-dev/html-to-markdown/discussions)
+- **Issues**: [GitHub Issues](https://github.com/xberg-io/html-to-markdown/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/xberg-io/html-to-markdown/discussions)
 - **Discord**: [Kreuzberg Community](https://discord.gg/xt9WY3GnKR)
 
 ### License

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Populates the cgo FFI library inside the module cache for the
-# kreuzberg-dev/html-to-markdown/packages/go/v3 binding, downloading the
+# xberg-io/html-to-markdown/packages/go/v3 binding, downloading the
 # matching pre-built artifact from the GitHub release.
 #
 # The binding's binding.go declares `#cgo LDFLAGS: -L${SRCDIR}/.lib/<platform>/`
@@ -62,11 +62,11 @@ Linux)
 esac
 
 GOMODCACHE="$(go env GOMODCACHE)"
-BINDING_DIR="$GOMODCACHE/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3@v${MODULE_VERSION}"
+BINDING_DIR="$GOMODCACHE/github.com/xberg-io/html-to-markdown/packages/go/v3@v${MODULE_VERSION}"
 
 if [ ! -d "$BINDING_DIR" ]; then
   cd "$SCRIPT_DIR"
-  go mod download github.com/kreuzberg-dev/html-to-markdown/packages/go/v3
+  go mod download github.com/xberg-io/html-to-markdown/packages/go/v3
 fi
 
 if [ ! -d "$BINDING_DIR" ]; then
@@ -91,7 +91,7 @@ CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/html-to-markdown-ffi/v${MODULE_VERSIO
 mkdir -p "$CACHE_DIR"
 
 if [ ! -f "$CACHE_DIR/libhtml_to_markdown_ffi.a" ]; then
-  URL="https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v${MODULE_VERSION}/html-to-markdown-rs-ffi-v${MODULE_VERSION}-${PLATFORM_RUST}.tar.gz"
+  URL="https://github.com/xberg-io/html-to-markdown/releases/download/v${MODULE_VERSION}/html-to-markdown-rs-ffi-v${MODULE_VERSION}-${PLATFORM_RUST}.tar.gz"
   echo "Downloading FFI library from: $URL"
 
   TMPDIR="$(mktemp -d)"

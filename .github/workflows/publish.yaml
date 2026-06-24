@@ -8,7 +8,7 @@ name: Publish Release
 #
 # Mirrors kreuzberg's publish.yaml composition: every registry interaction,
 # every multi-platform build, and every release-asset upload routes through
-# a shared kreuzberg-dev/actions composite. Inline bash is reserved for
+# a shared xberg-io/actions composite. Inline bash is reserved for
 # repo-quirky orchestration only (homebrew bottle assembly, Node platform
 # package staging, NIF artifact packaging, multi-formula brew flow).
 
@@ -115,18 +115,18 @@ jobs:
 
             - name: Retag for republish
               if: ${{ inputs.republish == true || github.event.client_payload.republish == true }}
-              uses: kreuzberg-dev/actions/retag-for-republish@v1
+              uses: xberg-io/actions/retag-for-republish@v1
               with:
                   tag: ${{ inputs.tag || github.event.client_payload.tag }}
                   token: ${{ steps.app-token.outputs.token }}
 
             - name: Resolve release metadata
               id: meta
-              uses: kreuzberg-dev/actions/prepare-release-metadata@v1
+              uses: xberg-io/actions/prepare-release-metadata@v1
 
             - name: Ensure GitHub Release exists for tag
               if: ${{ steps.meta.outputs.is_tag == 'true' && steps.meta.outputs.dry_run != 'true' }}
-              uses: kreuzberg-dev/actions/publish-github-release@v1
+              uses: xberg-io/actions/publish-github-release@v1
               with:
                   tag: ${{ steps.meta.outputs.tag }}
                   target: ${{ steps.meta.outputs.target_sha }}
@@ -149,7 +149,7 @@ jobs:
                   submodules: recursive
 
             - name: Validate versions
-              uses: kreuzberg-dev/actions/validate-versions@v1
+              uses: xberg-io/actions/validate-versions@v1
               with:
                   version: ${{ needs.prepare.outputs.version }}
 
@@ -164,7 +164,7 @@ jobs:
             exists: ${{ steps.check.outputs.exists }}
         steps:
             - id: check
-              uses: kreuzberg-dev/actions/check-registry@v1
+              uses: xberg-io/actions/check-registry@v1
               with:
                   registry: pypi
                   package: html-to-markdown
@@ -180,7 +180,7 @@ jobs:
             ts_exists: ${{ steps.check.outputs.ts_exists }}
         steps:
             - id: check
-              uses: kreuzberg-dev/actions/check-registry@v1
+              uses: xberg-io/actions/check-registry@v1
               with:
                   registry: npm
                   package: "@kreuzberg/html-to-markdown-node"
@@ -197,7 +197,7 @@ jobs:
             exists: ${{ steps.check.outputs.exists }}
         steps:
             - id: check
-              uses: kreuzberg-dev/actions/check-registry@v1
+              uses: xberg-io/actions/check-registry@v1
               with:
                   registry: npm
                   package: "@kreuzberg/html-to-markdown-wasm"
@@ -212,7 +212,7 @@ jobs:
             exists: ${{ steps.check.outputs.exists }}
         steps:
             - id: check
-              uses: kreuzberg-dev/actions/check-registry@v1
+              uses: xberg-io/actions/check-registry@v1
               with:
                   registry: rubygems
                   package: html-to-markdown
@@ -227,7 +227,7 @@ jobs:
             exists: ${{ steps.check.outputs.exists }}
         steps:
             - id: check
-              uses: kreuzberg-dev/actions/check-registry@v1
+              uses: xberg-io/actions/check-registry@v1
               with:
                   registry: maven
                   package: "dev.kreuzberg:html-to-markdown"
@@ -242,7 +242,7 @@ jobs:
             exists: ${{ steps.check.outputs.exists }}
         steps:
             - id: check
-              uses: kreuzberg-dev/actions/check-registry@v1
+              uses: xberg-io/actions/check-registry@v1
               with:
                   registry: nuget
                   package: KreuzbergDev.HtmlToMarkdown
@@ -257,10 +257,10 @@ jobs:
             exists: ${{ steps.check.outputs.exists }}
         steps:
             - id: check
-              uses: kreuzberg-dev/actions/check-registry@v1
+              uses: xberg-io/actions/check-registry@v1
               with:
                   registry: packagist
-                  package: kreuzberg-dev/html-to-markdown
+                  package: xberg-io/html-to-markdown
                   version: ${{ needs.prepare.outputs.version }}
 
     check-cratesio:
@@ -274,7 +274,7 @@ jobs:
             all_exist: ${{ steps.derive.outputs.all_exist }}
         steps:
             - id: check
-              uses: kreuzberg-dev/actions/check-registry@v1
+              uses: xberg-io/actions/check-registry@v1
               with:
                   registry: cratesio
                   package: html-to-markdown-rs
@@ -301,7 +301,7 @@ jobs:
             exists: ${{ steps.check.outputs.exists }}
         steps:
             - id: check
-              uses: kreuzberg-dev/actions/check-registry@v1
+              uses: xberg-io/actions/check-registry@v1
               with:
                   registry: hex
                   package: html_to_markdown
@@ -317,12 +317,12 @@ jobs:
             exists: ${{ steps.check.outputs.exists }}
         steps:
             - id: check
-              uses: kreuzberg-dev/actions/check-registry@v1
+              uses: xberg-io/actions/check-registry@v1
               with:
                   registry: homebrew
                   package: html-to-markdown
                   version: ${{ needs.prepare.outputs.version }}
-                  tap-repo: kreuzberg-dev/homebrew-tap
+                  tap-repo: xberg-io/homebrew-tap
 
     check-cli:
         name: Check GitHub Release for CLI assets
@@ -333,7 +333,7 @@ jobs:
             exists: ${{ steps.check.outputs.exists }}
         steps:
             - id: check
-              uses: kreuzberg-dev/actions/check-registry@v1
+              uses: xberg-io/actions/check-registry@v1
               with:
                   registry: github-release
                   package: html-to-markdown
@@ -351,7 +351,7 @@ jobs:
             exists: ${{ steps.check.outputs.exists }}
         steps:
             - id: check
-              uses: kreuzberg-dev/actions/check-registry@v1
+              uses: xberg-io/actions/check-registry@v1
               with:
                   registry: github-release
                   package: html-to-markdown
@@ -369,7 +369,7 @@ jobs:
             exists: ${{ steps.check.outputs.exists }}
         steps:
             - id: check
-              uses: kreuzberg-dev/actions/check-registry@v1
+              uses: xberg-io/actions/check-registry@v1
               with:
                   registry: github-release
                   package: html-to-markdown
@@ -387,7 +387,7 @@ jobs:
             exists: ${{ steps.check.outputs.exists }}
         steps:
             - id: check
-              uses: kreuzberg-dev/actions/check-registry@v1
+              uses: xberg-io/actions/check-registry@v1
               with:
                   registry: github-release
                   package: html-to-markdown
@@ -405,7 +405,7 @@ jobs:
             exists: ${{ steps.check.outputs.exists }}
         steps:
             - id: check
-              uses: kreuzberg-dev/actions/check-registry@v1
+              uses: xberg-io/actions/check-registry@v1
               with:
                   registry: maven
                   package: "dev.kreuzberg:html-to-markdown-kotlin"
@@ -420,7 +420,7 @@ jobs:
             exists: ${{ steps.check.outputs.exists }}
         steps:
             - id: check
-              uses: kreuzberg-dev/actions/check-registry@v1
+              uses: xberg-io/actions/check-registry@v1
               with:
                   registry: pub
                   package: html_to_markdown
@@ -453,9 +453,9 @@ jobs:
 
             - name: Free disk space
               if: runner.os == 'Linux'
-              uses: kreuzberg-dev/actions/free-disk-space-linux@v1
+              uses: xberg-io/actions/free-disk-space-linux@v1
 
-            - uses: kreuzberg-dev/actions/setup-rust@v1
+            - uses: xberg-io/actions/setup-rust@v1
               with:
                   target: ${{ matrix.target }}
                   cache-key-prefix: publish-dart-${{ matrix.rid }}
@@ -618,7 +618,7 @@ jobs:
               # always true, so it short-circuits `publish-zig` to skipped (regression:
               # v3.5.1 shipped without the zig tarball asset because of this). Verify
               # the actual asset is present instead.
-              uses: kreuzberg-dev/actions/check-registry@v1
+              uses: xberg-io/actions/check-registry@v1
               with:
                   registry: github-release
                   package: html-to-markdown-rs-zig-v${{ needs.prepare.outputs.version }}.tar.gz
@@ -653,7 +653,7 @@ jobs:
 
             - name: Free disk space
               if: runner.os == 'Linux'
-              uses: kreuzberg-dev/actions/free-disk-space-linux@v1
+              uses: xberg-io/actions/free-disk-space-linux@v1
 
             - name: Setup Rust on host (macOS, Windows)
               # cibuildwheel's before-build runs `cargo build` which auto-installs
@@ -664,12 +664,12 @@ jobs:
               # by the time cibuildwheel runs cargo. No-op for Linux (cibw runs in
               # a manylinux container — host rust is invisible there).
               if: runner.os != 'Linux'
-              uses: kreuzberg-dev/actions/setup-rust@v1
+              uses: xberg-io/actions/setup-rust@v1
               with:
                   use-sccache: "false"
 
             - name: Build wheels
-              uses: kreuzberg-dev/actions/build-python-wheels@v1
+              uses: xberg-io/actions/build-python-wheels@v1
               with:
                   python-version: "3.13"
                   package-dir: packages/python
@@ -711,7 +711,7 @@ jobs:
                   fetch-depth: 0
                   submodules: recursive
 
-            - uses: kreuzberg-dev/actions/setup-rust@v1
+            - uses: xberg-io/actions/setup-rust@v1
             - uses: actions/setup-python@v6.2.0
               with:
                   python-version: "3.13"
@@ -725,7 +725,7 @@ jobs:
                   cp target/release/html-to-markdown packages/python/html_to_markdown/_cli/ 2>/dev/null \
                     || cp target/release/html-to-markdown.exe packages/python/html_to_markdown/_cli/
 
-            - uses: kreuzberg-dev/actions/build-python-sdist@v1
+            - uses: xberg-io/actions/build-python-sdist@v1
               with:
                   package-dir: packages/python
                   output-dir: dist
@@ -748,8 +748,8 @@ jobs:
                   fetch-depth: 0
                   submodules: recursive
 
-            - uses: kreuzberg-dev/actions/setup-rust@v1
-            - uses: kreuzberg-dev/actions/setup-node-workspace@v1
+            - uses: xberg-io/actions/setup-rust@v1
+            - uses: xberg-io/actions/setup-node-workspace@v1
               with:
                   node-version: "24"
 
@@ -810,19 +810,19 @@ jobs:
 
             - name: Free disk space
               if: runner.os == 'Linux'
-              uses: kreuzberg-dev/actions/free-disk-space-linux@v1
+              uses: xberg-io/actions/free-disk-space-linux@v1
 
-            - uses: kreuzberg-dev/actions/setup-rust@v1
+            - uses: xberg-io/actions/setup-rust@v1
               with:
                   target: ${{ matrix.rust_target || matrix.target }}
                   cache-key-prefix: publish-node-${{ matrix.target }}
 
-            - uses: kreuzberg-dev/actions/setup-node-workspace@v1
+            - uses: xberg-io/actions/setup-node-workspace@v1
               with:
                   node-version: "24"
 
             - name: Build native module
-              uses: kreuzberg-dev/actions/build-node-napi@v1
+              uses: xberg-io/actions/build-node-napi@v1
               with:
                   crate-dir: crates/html-to-markdown-node
                   target: ${{ matrix.target }}
@@ -855,16 +855,16 @@ jobs:
                   fetch-depth: 0
                   submodules: recursive
 
-            - uses: kreuzberg-dev/actions/setup-rust@v1
+            - uses: xberg-io/actions/setup-rust@v1
               with:
                   target: wasm32-unknown-unknown
                   cache-key-prefix: publish-wasm
 
-            - uses: kreuzberg-dev/actions/setup-node-workspace@v1
+            - uses: xberg-io/actions/setup-node-workspace@v1
               with:
                   node-version: "24"
 
-            - uses: kreuzberg-dev/actions/build-wasm-package@v1
+            - uses: xberg-io/actions/build-wasm-package@v1
               with:
                   crate-dir: crates/html-to-markdown-wasm
                   pack-tarball: "false"
@@ -907,7 +907,7 @@ jobs:
 
             - name: Free disk space
               if: runner.os == 'Linux'
-              uses: kreuzberg-dev/actions/free-disk-space-linux@v1
+              uses: xberg-io/actions/free-disk-space-linux@v1
 
             - name: Drop cached CLI binaries
               # Inline: stale CLI artifacts under packages/ruby/exe/ confuse rake
@@ -948,7 +948,7 @@ jobs:
                   echo "BINDGEN_EXTRA_CLANG_ARGS=--sysroot=${UCRT} -I${UCRT}/include" >>"$GITHUB_ENV"
                   echo "LIBCLANG_PATH=${UCRT}/bin" >>"$GITHUB_ENV"
 
-            - uses: kreuzberg-dev/actions/setup-rust@v1
+            - uses: xberg-io/actions/setup-rust@v1
               if: runner.os != 'Windows'
               with:
                   cache-key-prefix: publish-ruby-${{ matrix.label }}
@@ -969,7 +969,7 @@ jobs:
                   bundle config set --local path 'vendor/bundle'
                   bundle install --jobs 4 --retry 3
 
-            - uses: kreuzberg-dev/actions/build-ruby-gem@v1
+            - uses: xberg-io/actions/build-ruby-gem@v1
               if: matrix.dock_platform == ''
               with:
                   package-dir: packages/ruby
@@ -1088,17 +1088,17 @@ jobs:
                   fetch-depth: 0
                   submodules: recursive
 
-            - uses: kreuzberg-dev/actions/setup-php@v1
+            - uses: xberg-io/actions/setup-php@v1
               with:
                   php-version: ${{ matrix.php }}
 
-            - uses: kreuzberg-dev/actions/setup-rust@v1
+            - uses: xberg-io/actions/setup-rust@v1
               with:
                   cache-key-prefix: publish-php-${{ matrix.platform.label }}-php${{ matrix.php }}
 
-            - uses: kreuzberg-dev/actions/install-alef@v1
+            - uses: xberg-io/actions/install-alef@v1
 
-            - uses: kreuzberg-dev/actions/build-php-extension@v1
+            - uses: xberg-io/actions/build-php-extension@v1
               with:
                   crate-name: html-to-markdown-php
                   lib-name: html_to_markdown_php
@@ -1119,7 +1119,7 @@ jobs:
                   }
                   "compiler=$compiler" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
-            - uses: kreuzberg-dev/actions/package-php-pie@v1
+            - uses: xberg-io/actions/package-php-pie@v1
               with:
                   php-version: ${{ matrix.php }}
                   php-ts: nts
@@ -1163,14 +1163,14 @@ jobs:
 
             - name: Free disk space
               if: runner.os == 'Linux'
-              uses: kreuzberg-dev/actions/free-disk-space-linux@v1
+              uses: xberg-io/actions/free-disk-space-linux@v1
 
-            - uses: kreuzberg-dev/actions/setup-rust@v1
+            - uses: xberg-io/actions/setup-rust@v1
               with:
                   target: ${{ matrix.target }}
                   cache-key-prefix: publish-go-${{ matrix.platform }}
 
-            - uses: kreuzberg-dev/actions/install-alef@v1
+            - uses: xberg-io/actions/install-alef@v1
 
             - name: Build and package Go FFI library
               # Inline: html-to-markdown's FFI build is driven by `alef publish` rather
@@ -1227,14 +1227,14 @@ jobs:
 
             - name: Free disk space
               if: runner.os == 'Linux'
-              uses: kreuzberg-dev/actions/free-disk-space-linux@v1
+              uses: xberg-io/actions/free-disk-space-linux@v1
 
-            - uses: kreuzberg-dev/actions/setup-rust@v1
+            - uses: xberg-io/actions/setup-rust@v1
               with:
                   target: ${{ matrix.target }}
                   cache-key-prefix: publish-c-ffi-${{ matrix.platform }}
 
-            - uses: kreuzberg-dev/actions/install-alef@v1
+            - uses: xberg-io/actions/install-alef@v1
 
             - name: Build and package C FFI distribution
               # Inline: alef-driven FFI packaging emits the pkgconfig + cmake metadata
@@ -1264,11 +1264,11 @@ jobs:
                   fetch-depth: 0
                   submodules: recursive
 
-            - uses: kreuzberg-dev/actions/setup-rust@v1
+            - uses: xberg-io/actions/setup-rust@v1
               with:
                   cache-key-prefix: publish-swift-artifactbundle
 
-            - uses: kreuzberg-dev/actions/build-swift-artifactbundle@v1
+            - uses: xberg-io/actions/build-swift-artifactbundle@v1
               id: build
               with:
                   crate-name: html-to-markdown-rs-swift
@@ -1329,14 +1329,14 @@ jobs:
 
             - name: Free disk space
               if: runner.os == 'Linux'
-              uses: kreuzberg-dev/actions/free-disk-space-linux@v1
+              uses: xberg-io/actions/free-disk-space-linux@v1
 
-            - uses: kreuzberg-dev/actions/setup-rust@v1
+            - uses: xberg-io/actions/setup-rust@v1
               with:
                   target: ${{ matrix.target }}
                   cache-key-prefix: publish-java-${{ matrix.platform }}
 
-            - uses: kreuzberg-dev/actions/install-alef@v1
+            - uses: xberg-io/actions/install-alef@v1
 
             - name: Build and stage FFI library
               # Inline: html-to-markdown reuses the C FFI library for Java (Panama),
@@ -1386,14 +1386,14 @@ jobs:
 
             - name: Free disk space
               if: runner.os == 'Linux'
-              uses: kreuzberg-dev/actions/free-disk-space-linux@v1
+              uses: xberg-io/actions/free-disk-space-linux@v1
 
-            - uses: kreuzberg-dev/actions/setup-rust@v1
+            - uses: xberg-io/actions/setup-rust@v1
               with:
                   target: ${{ matrix.target }}
                   cache-key-prefix: publish-csharp-${{ matrix.rid }}
 
-            - uses: kreuzberg-dev/actions/install-alef@v1
+            - uses: xberg-io/actions/install-alef@v1
 
             - name: Build and stage FFI library
               # Inline: html-to-markdown reuses the C FFI library for C# (P/Invoke),
@@ -1441,9 +1441,9 @@ jobs:
 
             - name: Free disk space
               if: runner.os == 'Linux'
-              uses: kreuzberg-dev/actions/free-disk-space-linux@v1
+              uses: xberg-io/actions/free-disk-space-linux@v1
 
-            - uses: kreuzberg-dev/actions/setup-rust@v1
+            - uses: xberg-io/actions/setup-rust@v1
               with:
                   target: ${{ matrix.target }}
                   cache-key-prefix: publish-elixir-${{ matrix.label }}
@@ -1451,7 +1451,7 @@ jobs:
             # Inline build: rewrite the NIF crate's workspace path-deps to registry
             # version-deps so the hex source-fallback resolves on a consumer.
             - name: Rewrite native dependencies to registry versions
-              uses: kreuzberg-dev/actions/rewrite-native-deps@v1
+              uses: xberg-io/actions/rewrite-native-deps@v1
               with:
                   lang: elixir
 
@@ -1528,9 +1528,9 @@ jobs:
                   elixir-version: "1.19"
                   otp-version: "28.1"
 
-            - uses: kreuzberg-dev/actions/setup-rust@v1
+            - uses: xberg-io/actions/setup-rust@v1
 
-            - uses: kreuzberg-dev/actions/build-elixir-hex@v1
+            - uses: xberg-io/actions/build-elixir-hex@v1
               with:
                   package-dir: packages/elixir
                   nif-crate-path: packages/elixir/native/html_to_markdown_nif
@@ -1554,7 +1554,7 @@ jobs:
                   fetch-depth: 0
                   submodules: recursive
 
-            - uses: kreuzberg-dev/actions/setup-rust@v1
+            - uses: xberg-io/actions/setup-rust@v1
 
             - name: Package crates
               # Inline: cargo package both crates into crate-artifacts/. The CLI
@@ -1594,7 +1594,7 @@ jobs:
         if: ${{ needs.prepare.outputs.release_cli == 'true' && (needs.check-cli.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') }}
         permissions:
             contents: write
-        uses: kreuzberg-dev/actions/.github/workflows/reusable-cli-release.yml@v1
+        uses: xberg-io/actions/.github/workflows/reusable-cli-release.yml@v1
         with:
             package-name: html-to-markdown-cli
             binary-name: html-to-markdown
@@ -1619,7 +1619,7 @@ jobs:
                   path: dist/go-ffi
                   merge-multiple: true
 
-            - uses: kreuzberg-dev/actions/upload-release-assets@v1
+            - uses: xberg-io/actions/upload-release-assets@v1
               with:
                   tag: ${{ needs.prepare.outputs.tag }}
                   working-directory: dist/go-ffi
@@ -1642,7 +1642,7 @@ jobs:
                   path: dist/c-ffi
                   merge-multiple: true
 
-            - uses: kreuzberg-dev/actions/upload-release-assets@v1
+            - uses: xberg-io/actions/upload-release-assets@v1
               with:
                   tag: ${{ needs.prepare.outputs.tag }}
                   working-directory: dist/c-ffi
@@ -1665,7 +1665,7 @@ jobs:
                   path: dist/swift
                   merge-multiple: true
 
-            - uses: kreuzberg-dev/actions/upload-release-assets@v1
+            - uses: xberg-io/actions/upload-release-assets@v1
               with:
                   tag: ${{ needs.prepare.outputs.tag }}
                   working-directory: dist/swift
@@ -1688,7 +1688,7 @@ jobs:
                   path: dist/elixir
                   merge-multiple: true
 
-            - uses: kreuzberg-dev/actions/upload-release-assets@v1
+            - uses: xberg-io/actions/upload-release-assets@v1
               with:
                   tag: ${{ needs.prepare.outputs.tag }}
                   working-directory: dist/elixir
@@ -1719,7 +1719,7 @@ jobs:
                   # see #333) now hard-errors instead of producing an empty release surface.
                   if-no-files-found: error
 
-            - uses: kreuzberg-dev/actions/upload-release-assets@v1
+            - uses: xberg-io/actions/upload-release-assets@v1
               with:
                   tag: ${{ needs.prepare.outputs.tag }}
                   working-directory: dist/php-package
@@ -1746,11 +1746,11 @@ jobs:
                   ref: ${{ needs.prepare.outputs.ref }}
                   submodules: recursive
 
-            - uses: kreuzberg-dev/actions/setup-rust@v1
+            - uses: xberg-io/actions/setup-rust@v1
               with:
                   cache-key-prefix: publish-crates
 
-            - uses: kreuzberg-dev/actions/publish-crates@v1
+            - uses: xberg-io/actions/publish-crates@v1
               with:
                   # Order matters: html-to-markdown-rs is depended on by html-to-markdown-cli.
                   crates: html-to-markdown-rs html-to-markdown-cli
@@ -1777,7 +1777,7 @@ jobs:
                   name: python-sdist
                   path: dist
 
-            - uses: kreuzberg-dev/actions/publish-pypi@v1
+            - uses: xberg-io/actions/publish-pypi@v1
               with:
                   packages-dir: dist
                   dry-run: ${{ needs.prepare.outputs.dry_run }}
@@ -1808,7 +1808,7 @@ jobs:
 
             - uses: rubygems/configure-rubygems-credentials@v2.0.0
 
-            - uses: kreuzberg-dev/actions/publish-rubygems@v1
+            - uses: xberg-io/actions/publish-rubygems@v1
               with:
                   gems-dir: dist
                   dry-run: ${{ needs.prepare.outputs.dry_run }}
@@ -1838,7 +1838,7 @@ jobs:
                   name: node-typescript-defs
                   path: typescript-defs
 
-            - uses: kreuzberg-dev/actions/setup-node-workspace@v1
+            - uses: xberg-io/actions/setup-node-workspace@v1
               with:
                   node-version: "24"
                   registry-url: "https://registry.npmjs.org/"
@@ -1881,7 +1881,7 @@ jobs:
                   mv "$tmp_pkg_json" crates/html-to-markdown-node/package.json
 
             - name: Publish platform sub-packages
-              uses: kreuzberg-dev/actions/publish-npm@v1
+              uses: xberg-io/actions/publish-npm@v1
               with:
                   packages-dir: crates/html-to-markdown-node/npm
                   npm-tag: ${{ needs.prepare.outputs.npm_tag }}
@@ -1889,7 +1889,7 @@ jobs:
 
             - name: Wait for npm indexing (linux-x64-gnu)
               if: ${{ needs.prepare.outputs.dry_run != 'true' }}
-              uses: kreuzberg-dev/actions/wait-for-package@v1
+              uses: xberg-io/actions/wait-for-package@v1
               with:
                   registry: npm
                   package: "@kreuzberg/html-to-markdown-node-linux-x64-gnu"
@@ -1898,7 +1898,7 @@ jobs:
 
             - name: Wait for npm indexing (linux-arm64-gnu)
               if: ${{ needs.prepare.outputs.dry_run != 'true' }}
-              uses: kreuzberg-dev/actions/wait-for-package@v1
+              uses: xberg-io/actions/wait-for-package@v1
               with:
                   registry: npm
                   package: "@kreuzberg/html-to-markdown-node-linux-arm64-gnu"
@@ -1906,7 +1906,7 @@ jobs:
                   max-attempts: "60"
 
             - name: Publish main @kreuzberg/html-to-markdown-node package
-              uses: kreuzberg-dev/actions/publish-npm@v1
+              uses: xberg-io/actions/publish-npm@v1
               with:
                   package-dir: crates/html-to-markdown-node
                   npm-tag: ${{ needs.prepare.outputs.npm_tag }}
@@ -1914,7 +1914,7 @@ jobs:
 
             - name: Wait for main Node package indexing
               if: ${{ needs.prepare.outputs.dry_run != 'true' && needs.check-npm.outputs.ts_exists != 'true' }}
-              uses: kreuzberg-dev/actions/wait-for-package@v1
+              uses: xberg-io/actions/wait-for-package@v1
               with:
                   registry: npm
                   package: "@kreuzberg/html-to-markdown-node"
@@ -1949,7 +1949,7 @@ jobs:
 
             - name: Publish TypeScript wrapper package
               if: ${{ needs.check-npm.outputs.ts_exists != 'true' }}
-              uses: kreuzberg-dev/actions/publish-npm@v1
+              uses: xberg-io/actions/publish-npm@v1
               with:
                   package-dir: packages/typescript
                   npm-tag: ${{ needs.prepare.outputs.npm_tag }}
@@ -1983,12 +1983,12 @@ jobs:
                   rm -f crates/html-to-markdown-wasm/dist-node/.gitignore
                   rm -f crates/html-to-markdown-wasm/dist-web/.gitignore
 
-            - uses: kreuzberg-dev/actions/setup-node-workspace@v1
+            - uses: xberg-io/actions/setup-node-workspace@v1
               with:
                   node-version: "24"
                   registry-url: "https://registry.npmjs.org/"
 
-            - uses: kreuzberg-dev/actions/publish-npm@v1
+            - uses: xberg-io/actions/publish-npm@v1
               with:
                   package-dir: crates/html-to-markdown-wasm
                   npm-tag: ${{ needs.prepare.outputs.npm_tag }}
@@ -2001,15 +2001,15 @@ jobs:
         if: ${{ needs.prepare.outputs.release_php == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-packagist.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
         runs-on: ubuntu-latest
         steps:
-            - uses: kreuzberg-dev/actions/publish-packagist@v1
+            - uses: xberg-io/actions/publish-packagist@v1
               with:
                   # Packagist account login that owns the API token (the package
                   # maintainer), NOT the vendor namespace. Using the vendor here
                   # makes the update-package API return 403 "invalid username".
                   packagist-username: Goldziher
-                  package-name: kreuzberg-dev/html-to-markdown
+                  package-name: xberg-io/html-to-markdown
                   version: ${{ needs.prepare.outputs.version }}
-                  repository-url: https://github.com/kreuzberg-dev/html-to-markdown
+                  repository-url: https://github.com/xberg-io/html-to-markdown
                   dry-run: ${{ needs.prepare.outputs.dry_run }}
               env:
                   PACKAGIST_API_TOKEN: ${{ secrets.PACKAGIST_API_TOKEN }}
@@ -2056,13 +2056,13 @@ jobs:
                   gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
                   gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
-            - uses: kreuzberg-dev/actions/setup-maven@v1
+            - uses: xberg-io/actions/setup-maven@v1
 
-            - uses: kreuzberg-dev/actions/configure-maven-gpg@v1
+            - uses: xberg-io/actions/configure-maven-gpg@v1
               with:
                   pom-file: packages/java/pom.xml
 
-            - uses: kreuzberg-dev/actions/publish-maven@v1
+            - uses: xberg-io/actions/publish-maven@v1
               with:
                   pom-file: packages/java/pom.xml
                   maven-profile: publish
@@ -2119,7 +2119,7 @@ jobs:
                     -p:Version=${{ needs.prepare.outputs.version }} \
                     -o dist/nuget
 
-            - uses: kreuzberg-dev/actions/publish-nuget@v1
+            - uses: xberg-io/actions/publish-nuget@v1
               with:
                   packages-dir: dist/nuget
                   dry-run: ${{ needs.prepare.outputs.dry_run }}
@@ -2157,7 +2157,7 @@ jobs:
                   otp-version: "28.1"
 
             - name: Generate NIF checksum file
-              uses: kreuzberg-dev/actions/generate-elixir-checksums@v1
+              uses: xberg-io/actions/generate-elixir-checksums@v1
               with:
                   github-repo: ${{ github.repository }}
                   tag: ${{ needs.prepare.outputs.tag }}
@@ -2168,7 +2168,7 @@ jobs:
                   output-path: packages/elixir/checksum-Elixir.HtmlToMarkdown.Native.exs
                   token: ${{ steps.app-token.outputs.token }}
 
-            - uses: kreuzberg-dev/actions/publish-hex@v1
+            - uses: xberg-io/actions/publish-hex@v1
               with:
                   package-dir: packages/elixir
                   dry-run: ${{ needs.prepare.outputs.dry_run }}
@@ -2190,13 +2190,13 @@ jobs:
                   ref: ${{ needs.prepare.outputs.ref }}
                   submodules: recursive
 
-            - uses: kreuzberg-dev/actions/setup-rust@v1
+            - uses: xberg-io/actions/setup-rust@v1
               with:
                   targets: aarch64-linux-android,x86_64-linux-android
 
             - uses: android-actions/setup-android@v4.0.1
 
-            - uses: kreuzberg-dev/actions/build-android-natives@v1
+            - uses: xberg-io/actions/build-android-natives@v1
               with:
                   crate-name: html-to-markdown-ffi
                   lib-name: html_to_markdown_ffi
@@ -2237,7 +2237,7 @@ jobs:
                     fi
                   done
 
-            - uses: kreuzberg-dev/actions/publish-maven-gradle@v1
+            - uses: xberg-io/actions/publish-maven-gradle@v1
               with:
                   working-directory: packages/kotlin-android
                   gradle-task: publishAndReleaseToMavenCentral
@@ -2304,7 +2304,7 @@ jobs:
                   name: zig-package-assembled
                   path: .
 
-            - uses: kreuzberg-dev/actions/publish-zig@v1
+            - uses: xberg-io/actions/publish-zig@v1
               with:
                   working-directory: packages/zig
                   tag: ${{ needs.prepare.outputs.tag }}
@@ -2405,12 +2405,12 @@ jobs:
 
             - uses: actions/checkout@v6
               with:
-                  repository: kreuzberg-dev/homebrew-tap
+                  repository: xberg-io/homebrew-tap
                   token: ${{ steps.tap-token.outputs.token }}
                   path: homebrew-tap
                   persist-credentials: true
 
-            - uses: kreuzberg-dev/actions/publish-homebrew-source-formulas@v1
+            - uses: xberg-io/actions/publish-homebrew-source-formulas@v1
               with:
                   tap-dir: ${{ github.workspace }}/homebrew-tap
                   config-file: scripts/publish/homebrew.json
@@ -2477,19 +2477,19 @@ jobs:
 
             - name: Install Homebrew (Linux)
               if: ${{ matrix.install_brew }}
-              uses: kreuzberg-dev/actions/install-homebrew-linux@v1
+              uses: xberg-io/actions/install-homebrew-linux@v1
 
             - name: Build bottles
-              uses: kreuzberg-dev/actions/homebrew-build-bottles@v1
+              uses: xberg-io/actions/homebrew-build-bottles@v1
               with:
                   tag: ${{ needs.prepare.outputs.tag }}
                   version: ${{ needs.prepare.outputs.version }}
-                  tap: kreuzberg-dev/tap
+                  tap: xberg-io/tap
                   formulas: |
                       html-to-markdown
                       libhtml-to-markdown
                   out-dir: ${{ github.workspace }}/bottle-json
-                  github-repo: kreuzberg-dev/html-to-markdown
+                  github-repo: xberg-io/html-to-markdown
                   token: ${{ steps.app-token.outputs.token }}
 
             - uses: actions/upload-artifact@v7
@@ -2519,7 +2519,7 @@ jobs:
 
             - uses: actions/checkout@v6
               with:
-                  repository: kreuzberg-dev/homebrew-tap
+                  repository: xberg-io/homebrew-tap
                   token: ${{ steps.tap-token.outputs.token }}
                   path: homebrew-tap
                   persist-credentials: true
@@ -2530,7 +2530,7 @@ jobs:
                   pattern: homebrew-bottle-json-*
                   merge-multiple: true
 
-            - uses: kreuzberg-dev/actions/homebrew-merge-bottles@v1
+            - uses: xberg-io/actions/homebrew-merge-bottles@v1
               with:
                   tag: ${{ needs.prepare.outputs.tag }}
                   version: ${{ needs.prepare.outputs.version }}
@@ -2539,7 +2539,7 @@ jobs:
                   formulas: |
                       html-to-markdown
                       libhtml-to-markdown
-                  github-repo: kreuzberg-dev/html-to-markdown
+                  github-repo: xberg-io/html-to-markdown
 
             - name: Commit and push bottle DSL
               if: ${{ needs.prepare.outputs.dry_run != 'true' }}
@@ -2584,7 +2584,7 @@ jobs:
                   private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
                   owner: kreuzberg-dev
 
-            - uses: kreuzberg-dev/actions/verify-release-assets@v1
+            - uses: xberg-io/actions/verify-release-assets@v1
               with:
                   tag: ${{ needs.prepare.outputs.tag }}
                   token: ${{ steps.app-token.outputs.token }}
@@ -2708,7 +2708,7 @@ jobs:
                   VERSION: ${{ needs.prepare.outputs.version }}
               run: |
                   CHECKSUM=$(cat swift-checksums/*.checksum | tr -d '[:space:]')
-                  ASSET_URL="https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v${VERSION}/HtmlToMarkdown-rs.artifactbundle.zip"
+                  ASSET_URL="https://github.com/xberg-io/html-to-markdown/releases/download/v${VERSION}/HtmlToMarkdown-rs.artifactbundle.zip"
 
                   cat > /tmp/swift-notes.md << EOF
                   ## Swift Package Manager
@@ -2716,7 +2716,7 @@ jobs:
                   Add to your \`Package.swift\`:
 
                   \`\`\`swift
-                  .package(url: "https://github.com/kreuzberg-dev/html-to-markdown", from: "${VERSION}")
+                  .package(url: "https://github.com/xberg-io/html-to-markdown", from: "${VERSION}")
                   \`\`\`
 
                   The Swift binding is distributed as a pre-built artifact bundle. No Rust toolchain required.
@@ -2778,7 +2778,7 @@ jobs:
                   name: r-source-tarball
                   path: dist/r
 
-            - uses: kreuzberg-dev/actions/upload-release-assets@v1
+            - uses: xberg-io/actions/upload-release-assets@v1
               with:
                   tag: ${{ needs.prepare.outputs.tag }}
                   working-directory: dist/r
@@ -2825,7 +2825,7 @@ jobs:
                   private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
                   owner: kreuzberg-dev
 
-            - uses: kreuzberg-dev/actions/finalize-release@v1
+            - uses: xberg-io/actions/finalize-release@v1
               with:
                   tag: ${{ needs.prepare.outputs.tag }}
                   is-prerelease: ${{ needs.prepare.outputs.is_prerelease == 'true' && 'true' || 'false' }}
@@ -2872,7 +2872,7 @@ jobs:
                   private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
                   owner: kreuzberg-dev
 
-            - uses: kreuzberg-dev/actions/announce-release-discord@v1
+            - uses: xberg-io/actions/announce-release-discord@v1
               with:
                   tag: ${{ needs.prepare.outputs.tag }}
                   webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
@@ -2893,7 +2893,7 @@ jobs:
             contents: read
         steps:
             - uses: actions/checkout@v6
-            - uses: kreuzberg-dev/actions/publish-npm@v1
+            - uses: xberg-io/actions/publish-npm@v1
               with:
                   package-dir: cli-proxy/npm
                   access: public

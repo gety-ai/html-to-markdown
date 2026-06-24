@@ -27,7 +27,7 @@ defmodule HtmlToMarkdown.MixProject do
   defp package do
     [
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/kreuzberg-dev/html-to-markdown"},
+      links: %{"GitHub" => "https://github.com/xberg-io/html-to-markdown"},
       files:
         ~w(lib .formatter.exs mix.exs README* checksum-*.exs native/html_to_markdown_nif/Cargo.toml native/html_to_markdown_nif/Cargo.lock native/html_to_markdown_nif/src)
     ]

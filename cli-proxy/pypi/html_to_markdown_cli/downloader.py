@@ -27,7 +27,7 @@ from urllib.request import HTTPRedirectHandler, Request, build_opener
 if TYPE_CHECKING:
     from http.client import HTTPMessage
 
-REPO = "kreuzberg-dev/html-to-markdown"
+REPO = "xberg-io/html-to-markdown"
 BIN_NAME = "html-to-markdown"
 PKG_NAME = "html-to-markdown-cli"
 VERSION_ENV = "HTML_TO_MARKDOWN_CLI_VERSION"

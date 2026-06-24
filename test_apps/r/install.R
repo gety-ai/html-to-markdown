@@ -10,7 +10,7 @@ VERSION <- if (length(args) > 0) args[1] else "3.7.2"
 
 # Construct the GitHub release tarball URL.
 url <- sprintf(
-  "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v%s/htmltomarkdown_%s.tar.gz",
+  "https://github.com/xberg-io/html-to-markdown/releases/download/v%s/htmltomarkdown_%s.tar.gz",
   VERSION,
   VERSION
 )

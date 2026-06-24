@@ -9,7 +9,7 @@
     <InformationalVersion>3.7.2</InformationalVersion>
     <Description>High-performance HTML to Markdown converter</Description>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <RepositoryUrl>https://github.com/kreuzberg-dev/html-to-markdown</RepositoryUrl>
+    <RepositoryUrl>https://github.com/xberg-io/html-to-markdown</RepositoryUrl>
     <Authors>Na&apos;aman Hirschfeld &lt;naaman@kreuzberg.dev&gt;</Authors>
     <Company>Alef Team</Company>
     <Product>HtmlToMarkdown</Product>
