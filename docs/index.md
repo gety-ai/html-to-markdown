@@ -123,7 +123,7 @@ html-to-markdown ships as a standalone library and as the HTML pipeline inside t
 
   Managed SaaS API for document extraction. Same engine, no infrastructure.
 
-- :material-spider-web:{ .lg .middle } **[kreuzcrawl](https://docs.kreuzcrawl.xberg.io)**
+- :material-spider-web:{ .lg .middle } **[crawlberg](https://docs.crawlberg.xberg.io)**
 
   Web crawler that pairs with html-to-markdown for crawl-then-convert pipelines.
 

@@ -961,7 +961,7 @@ jobs:
 
             - name: Install Ruby dependencies
               # Inline: bundle config + install in the package dir; trivially small
-              # and identical across kreuzcrawl/kreuzberg/html-to-markdown.
+              # and identical across crawlberg/kreuzberg/html-to-markdown.
               shell: bash
               working-directory: packages/ruby
               run: |
