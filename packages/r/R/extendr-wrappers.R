@@ -640,12 +640,10 @@ NodeContent$heading <- function(level, text) .Call("wrap__NodeContent___factory_
 NodeContent$paragraph <- function(text) .Call("wrap__NodeContent___factory_paragraph", text, PACKAGE = "htmltomarkdown")
 NodeContent$list <- function(ordered) .Call("wrap__NodeContent___factory_list", ordered, PACKAGE = "htmltomarkdown")
 NodeContent$list_item <- function(text) .Call("wrap__NodeContent___factory_list_item", text, PACKAGE = "htmltomarkdown")
-NodeContent$table <- function(grid) .Call("wrap__NodeContent___factory_table", grid, PACKAGE = "htmltomarkdown")
 NodeContent$image <- function(description, src, image_index) .Call("wrap__NodeContent___factory_image", description, src, image_index, PACKAGE = "htmltomarkdown")
 NodeContent$code <- function(text, language) .Call("wrap__NodeContent___factory_code", text, language, PACKAGE = "htmltomarkdown")
 NodeContent$definition_item <- function(term, definition) .Call("wrap__NodeContent___factory_definition_item", term, definition, PACKAGE = "htmltomarkdown")
 NodeContent$raw_block <- function(format, content) .Call("wrap__NodeContent___factory_raw_block", format, content, PACKAGE = "htmltomarkdown")
-NodeContent$metadata_block <- function(entries) .Call("wrap__NodeContent___factory_metadata_block", entries, PACKAGE = "htmltomarkdown")
 NodeContent$group <- function(label, heading_level, heading_text) .Call("wrap__NodeContent___factory_group", label, heading_level, heading_text, PACKAGE = "htmltomarkdown")
 #' @export
 `$.NodeContent` <- function(self, name) {
