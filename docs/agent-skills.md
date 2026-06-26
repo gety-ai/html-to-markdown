@@ -9,7 +9,7 @@ Install the html-to-markdown plugin from the [`xberg-io/plugins`](https://github
 
 ```text
 /plugin marketplace add xberg-io/plugins
-/plugin install html-to-markdown@kreuzberg
+/plugin install html-to-markdown@xberg-io
 ```
 
 </details>
@@ -44,7 +44,7 @@ gemini extensions install https://github.com/xberg-io/plugins
 
 ```text
 droid plugin marketplace add https://github.com/xberg-io/plugins
-droid plugin install html-to-markdown@kreuzberg
+droid plugin install html-to-markdown@xberg-io
 ```
 
 </details>
@@ -54,7 +54,7 @@ droid plugin install html-to-markdown@kreuzberg
 
 ```text
 copilot plugin marketplace add https://github.com/xberg-io/plugins
-copilot plugin install html-to-markdown@kreuzberg
+copilot plugin install html-to-markdown@xberg-io
 ```
 
 </details>
@@ -67,7 +67,7 @@ Add the package to `opencode.json`:
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": ["@kreuzberg/opencode-html-to-markdown"]
+  "plugin": ["@xberg-io/opencode-html-to-markdown"]
 }
 ```
 

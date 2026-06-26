@@ -34,15 +34,15 @@ Option keys match the Rust field names (`snake_case`). `ConversionOptions` accep
 
 ## TypeScript
 
-**Package:** `@kreuzberg/html-to-markdown` on npm
+**Package:** `@xberg-io/html-to-markdown` on npm
 **Requires:** Node.js ≥ 18
 
 ```bash
-npm install @kreuzberg/html-to-markdown
+npm install @xberg-io/html-to-markdown
 ```
 
 ```typescript
-import { convert } from "@kreuzberg/html-to-markdown";
+import { convert } from "@xberg-io/html-to-markdown";
 
 const result = convert("<h1>Title</h1>", { headingStyle: "atx" });
 console.log(result.content);
@@ -113,21 +113,21 @@ Classes live in the flat `HtmlToMarkdown\` namespace. `HtmlToMarkdownApi::conver
 
 ## Java
 
-**Maven:** `dev.kreuzberg:html-to-markdown`
+**Maven:** `io.xberg:html-to-markdown`
 **Requires:** Java ≥ 25
 
 ```xml
 <dependency>
-    <groupId>dev.kreuzberg</groupId>
+    <groupId>io.xberg</groupId>
     <artifactId>html-to-markdown</artifactId>
     <version>3.6.8</version>
 </dependency>
 ```
 
 ```java
-import dev.kreuzberg.htmltomarkdown.HtmlToMarkdown;
-import dev.kreuzberg.htmltomarkdown.ConversionOptions;
-import dev.kreuzberg.htmltomarkdown.ConversionResult;
+import io.xberg.htmltomarkdown.HtmlToMarkdown;
+import io.xberg.htmltomarkdown.ConversionOptions;
+import io.xberg.htmltomarkdown.ConversionResult;
 
 ConversionOptions options = ConversionOptions.builder()
     .headingStyle("atx")
@@ -136,15 +136,15 @@ ConversionResult result = HtmlToMarkdown.convert("<h1>Title</h1>", options);
 System.out.println(result.getContent());
 ```
 
-Uses a builder for options. Conversion failures throw `dev.kreuzberg.htmltomarkdown.HtmlToMarkdownRsException` and its subtypes (`ParseErrorException`, `ConfigErrorException`, `InvalidInputException`, `PanicException`, `OtherException`). Native binaries ship in the JAR for Linux x86_64, macOS arm64/x86_64, and Windows x86_64.
+Uses a builder for options. Conversion failures throw `io.xberg.htmltomarkdown.HtmlToMarkdownRsException` and its subtypes (`ParseErrorException`, `ConfigErrorException`, `InvalidInputException`, `PanicException`, `OtherException`). Native binaries ship in the JAR for Linux x86_64, macOS arm64/x86_64, and Windows x86_64.
 
 ## C# (.NET)
 
-**NuGet:** `KreuzbergDev.HtmlToMarkdown`
+**NuGet:** `XbergIo.HtmlToMarkdown`
 **Requires:** .NET 10
 
 ```bash
-dotnet add package KreuzbergDev.HtmlToMarkdown
+dotnet add package XbergIo.HtmlToMarkdown
 ```
 
 ```csharp
@@ -155,7 +155,7 @@ var result = HtmlToMarkdownConverter.Convert("<h1>Title</h1>", options);
 Console.WriteLine(result.Content);
 ```
 
-Classes live in the `HtmlToMarkdown` namespace (the `KreuzbergDev.HtmlToMarkdown` prefix is only the NuGet package id). Properties are `PascalCase`. Errors throw `HtmlToMarkdownRsException` and subtypes.
+Classes live in the `HtmlToMarkdown` namespace (the `XbergIo.HtmlToMarkdown` prefix is only the NuGet package id). Properties are `PascalCase`. Errors throw `HtmlToMarkdownRsException` and subtypes.
 
 ## Elixir
 
@@ -218,14 +218,14 @@ Every heap-allocated string must be released with `htm_free_string` and every ha
 
 ## WASM
 
-**npm:** `@kreuzberg/html-to-markdown-wasm`
+**npm:** `@xberg-io/html-to-markdown-wasm`
 
 ```bash
-npm install @kreuzberg/html-to-markdown-wasm
+npm install @xberg-io/html-to-markdown-wasm
 ```
 
 ```javascript
-import init, { convert } from "@kreuzberg/html-to-markdown-wasm";
+import init, { convert } from "@xberg-io/html-to-markdown-wasm";
 
 await init();
 const result = convert("<h1>Title</h1>", { headingStyle: "atx" });
@@ -254,10 +254,10 @@ The package is pure Dart from the caller's point of view and uses the generated 
 
 ## Kotlin Android
 
-**Package:** `dev.kreuzberg:html-to-markdown-android`
+**Package:** `io.xberg:html-to-markdown-android`
 **Requires:** Android minSdk 21
 
-Kotlin Android is an AAR with bundled JNI libraries. Kotlin/JVM users should use the Java package (`dev.kreuzberg:html-to-markdown`) directly.
+Kotlin Android is an AAR with bundled JNI libraries. Kotlin/JVM users should use the Java package (`io.xberg:html-to-markdown`) directly.
 
 ## Zig
 

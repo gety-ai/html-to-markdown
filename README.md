@@ -18,20 +18,20 @@
   <a href="https://pypi.org/project/html-to-markdown/">
     <img src="https://img.shields.io/pypi/v/html-to-markdown?label=Python&color=007ec6" alt="Python">
   </a>
-  <a href="https://www.npmjs.com/package/@kreuzberg/html-to-markdown-node">
-    <img src="https://img.shields.io/npm/v/@kreuzberg/html-to-markdown-node?label=Node.js&color=007ec6" alt="Node.js">
+  <a href="https://www.npmjs.com/package/@xberg-io/html-to-markdown">
+    <img src="https://img.shields.io/npm/v/@xberg-io/html-to-markdown?label=Node.js&color=007ec6" alt="Node.js">
   </a>
-  <a href="https://www.npmjs.com/package/@kreuzberg/html-to-markdown-wasm">
-    <img src="https://img.shields.io/npm/v/@kreuzberg/html-to-markdown-wasm?label=WASM&color=007ec6" alt="WASM">
+  <a href="https://www.npmjs.com/package/@xberg-io/html-to-markdown-wasm">
+    <img src="https://img.shields.io/npm/v/@xberg-io/html-to-markdown-wasm?label=WASM&color=007ec6" alt="WASM">
   </a>
-  <a href="https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown">
-    <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown?label=Java&color=007ec6" alt="Java">
+  <a href="https://central.sonatype.com/artifact/io.xberg/html-to-markdown">
+    <img src="https://img.shields.io/maven-central/v/io.xberg/html-to-markdown?label=Java&color=007ec6" alt="Java">
   </a>
   <a href="https://pkg.go.dev/github.com/xberg-io/html-to-markdown/packages/go/v3">
     <img src="https://img.shields.io/github/v/tag/xberg-io/html-to-markdown?label=Go&color=007ec6&filter=v3*" alt="Go">
   </a>
-  <a href="https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/">
-    <img src="https://img.shields.io/nuget/v/KreuzbergDev.HtmlToMarkdown?label=C%23&color=007ec6" alt="C#">
+  <a href="https://www.nuget.org/packages/XbergIo.HtmlToMarkdown/">
+    <img src="https://img.shields.io/nuget/v/XbergIo.HtmlToMarkdown?label=C%23&color=007ec6" alt="C#">
   </a>
   <a href="https://packagist.org/packages/xberg-io/html-to-markdown">
     <img src="https://img.shields.io/packagist/v/xberg-io/html-to-markdown?label=PHP&color=007ec6" alt="PHP">
@@ -48,8 +48,8 @@
   <a href="https://pub.dev/packages/h2m">
     <img src="https://img.shields.io/pub/v/h2m?label=Dart&color=007ec6" alt="Dart">
   </a>
-  <a href="https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown-android">
-    <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown-android?label=Kotlin&color=007ec6" alt="Kotlin">
+  <a href="https://central.sonatype.com/artifact/io.xberg/html-to-markdown-android">
+    <img src="https://img.shields.io/maven-central/v/io.xberg/html-to-markdown-android?label=Kotlin&color=007ec6" alt="Kotlin">
   </a>
   <a href="https://github.com/xberg-io/html-to-markdown/tree/main/packages/swift">
     <img src="https://img.shields.io/badge/Swift-SPM-007ec6" alt="Swift">
@@ -142,7 +142,7 @@ See [Python README](https://github.com/xberg-io/html-to-markdown/tree/main/packa
 <summary><strong>Node.js</strong></summary>
 
 ```sh
-npm install @kreuzberg/html-to-markdown
+npm install @xberg-io/html-to-markdown
 ```
 
 See [Node.js README](https://github.com/xberg-io/html-to-markdown/tree/main/crates/html-to-markdown-node) for full documentation.
@@ -163,7 +163,7 @@ See [Go README](https://github.com/xberg-io/html-to-markdown/tree/main/packages/
 <details>
 <summary><strong>Java</strong></summary>
 
-Available on Maven Central as `dev.kreuzberg:html-to-markdown`. See [Java README](https://github.com/xberg-io/html-to-markdown/tree/main/packages/java) for the dependency snippet and current version.
+Available on Maven Central as `io.xberg:html-to-markdown`. See [Java README](https://github.com/xberg-io/html-to-markdown/tree/main/packages/java) for the dependency snippet and current version.
 
 </details>
 
@@ -171,7 +171,7 @@ Available on Maven Central as `dev.kreuzberg:html-to-markdown`. See [Java README
 <summary><strong>C#</strong></summary>
 
 ```sh
-dotnet add package KreuzbergDev.HtmlToMarkdown
+dotnet add package XbergIo.HtmlToMarkdown
 ```
 
 See [C# README](https://github.com/xberg-io/html-to-markdown/tree/main/packages/csharp) for full documentation.
@@ -234,7 +234,7 @@ See [Dart README](https://github.com/xberg-io/html-to-markdown/tree/main/package
 <details>
 <summary><strong>Kotlin (Android)</strong></summary>
 
-Available on Maven Central as `dev.kreuzberg:html-to-markdown-android`. See [Kotlin README](https://github.com/xberg-io/html-to-markdown/tree/main/packages/kotlin-android) for the dependency snippet and current version.
+Available on Maven Central as `io.xberg:html-to-markdown-android`. See [Kotlin README](https://github.com/xberg-io/html-to-markdown/tree/main/packages/kotlin-android) for the dependency snippet and current version.
 
 </details>
 
@@ -256,7 +256,7 @@ See [Zig README](https://github.com/xberg-io/html-to-markdown/tree/main/packages
 <summary><strong>WebAssembly</strong></summary>
 
 ```sh
-npm install @kreuzberg/html-to-markdown-wasm
+npm install @xberg-io/html-to-markdown-wasm
 ```
 
 See [WebAssembly README](https://github.com/xberg-io/html-to-markdown/tree/main/crates/html-to-markdown-wasm) for full documentation.
@@ -294,7 +294,7 @@ Install the html-to-markdown plugin from the [`xberg-io/plugins`](https://github
 
 ```text
 /plugin marketplace add xberg-io/plugins
-/plugin install html-to-markdown@kreuzberg
+/plugin install html-to-markdown@xberg-io
 ```
 
 </details>
@@ -331,7 +331,7 @@ gemini extensions install https://github.com/xberg-io/plugins
 
 ```text
 droid plugin marketplace add https://github.com/xberg-io/plugins
-droid plugin install html-to-markdown@kreuzberg
+droid plugin install html-to-markdown@xberg-io
 ```
 
 </details>
@@ -341,7 +341,7 @@ droid plugin install html-to-markdown@kreuzberg
 
 ```text
 copilot plugin marketplace add https://github.com/xberg-io/plugins
-copilot plugin install html-to-markdown@kreuzberg
+copilot plugin install html-to-markdown@xberg-io
 ```
 
 </details>
@@ -354,7 +354,7 @@ Add the package to `opencode.json`:
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": ["@kreuzberg/opencode-html-to-markdown"]
+  "plugin": ["@xberg-io/opencode-html-to-markdown"]
 }
 ```
 
@@ -364,9 +364,9 @@ Add the package to `opencode.json`:
 
 Full guides, the `convert()` API for every binding, tier architecture, the metadata and visitor APIs, and performance benchmarks live at **[docs.html-to-markdown.xberg.io](https://docs.html-to-markdown.xberg.io)**.
 
-## Part of Kreuzberg.dev
+## Part of Xberg
 
-- [Kreuzberg](https://github.com/xberg-io/kreuzberg) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
+- [Xberg](https://github.com/xberg-io/xberg) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
 - [Xberg Enterprise](https://github.com/xberg-io/xberg-enterprise) — managed extraction API with SDKs, dashboards, and observability.
 - [crawlberg](https://github.com/xberg-io/crawlberg) — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
 - [html-to-markdown](https://github.com/xberg-io/html-to-markdown) — fast, lossless HTML→Markdown engine.

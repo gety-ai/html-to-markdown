@@ -1,6 +1,6 @@
 {
-  "name": "@kreuzberg/html-to-markdown-node-win32-x64-msvc",
-  "version": "3.7.2",
+  "name": "@xberg-io/html-to-markdown-win32-x64-msvc",
+  "version": "3.8.0-rc.1",
   "license": "MIT",
   "repository": {
     "type": "git",

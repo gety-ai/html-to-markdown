@@ -17,7 +17,7 @@ plain = result.content
 {% elif language == 'typescript' %}
 
 ```typescript
-import { convert, OutputFormat } from "@kreuzberg/html-to-markdown";
+import { convert, OutputFormat } from "@xberg-io/html-to-markdown";
 
 const html = "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.</p>";
 
@@ -60,9 +60,9 @@ plain := *result.Content
 {% elif language == 'java' %}
 
 ```java
-import dev.kreuzberg.htmltomarkdown.HtmlToMarkdown;
-import dev.kreuzberg.htmltomarkdown.ConversionOptions;
-import dev.kreuzberg.htmltomarkdown.OutputFormat;
+import io.xberg.htmltomarkdown.HtmlToMarkdown;
+import io.xberg.htmltomarkdown.ConversionOptions;
+import io.xberg.htmltomarkdown.OutputFormat;
 
 String html = "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.</p>";
 

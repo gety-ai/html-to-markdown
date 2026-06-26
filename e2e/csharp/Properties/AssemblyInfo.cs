@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("HtmlToMarkdown.E2eTests")]
-[assembly: AssemblyCompany("Kreuzberg Team")]
+[assembly: AssemblyCompany("Xberg")]
 [assembly: AssemblyProduct("HtmlToMarkdown.E2eTests")]
 [assembly: AssemblyDescription("E2E tests for HTML to Markdown converter")]
 [assembly: AssemblyVersion("3.4.0")]

@@ -4,8 +4,8 @@
   {% if language == 'python' %}
 - **PyPI:** [pypi.org/project/html-to-markdown](https://pypi.org/project/html-to-markdown/)
   {% elif language == 'typescript' or language == 'node' %}
-- **npm:** [npmjs.com/@kreuzberg/html-to-markdown](https://www.npmjs.com/package/@kreuzberg/html-to-markdown-node)
-- **WASM:** [npmjs.com/@kreuzberg/html-to-markdown-wasm](https://www.npmjs.com/package/@kreuzberg/html-to-markdown-wasm)
+- **npm:** [npmjs.com/@xberg-io/html-to-markdown](https://www.npmjs.com/package/@xberg-io/html-to-markdown)
+- **WASM:** [npmjs.com/@xberg-io/html-to-markdown-wasm](https://www.npmjs.com/package/@xberg-io/html-to-markdown-wasm)
   {% elif language == 'ruby' %}
 - **RubyGems:** [rubygems.org/gems/html-to-markdown](https://rubygems.org/gems/html-to-markdown)
   {% elif language == 'php' %}
@@ -13,17 +13,17 @@
   {% elif language == 'go' %}
 - **Go Packages:** [pkg.go.dev/github.com/xberg-io/html-to-markdown/packages/go/v3](https://pkg.go.dev/github.com/xberg-io/html-to-markdown/packages/go/v3)
   {% elif language == 'java' %}
-- **Maven Central:** [central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown](https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown)
+- **Maven Central:** [central.sonatype.com/artifact/io.xberg/html-to-markdown](https://central.sonatype.com/artifact/io.xberg/html-to-markdown)
   {% elif language == 'csharp' %}
-- **NuGet:** [nuget.org/packages/KreuzbergDev.HtmlToMarkdown](https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/)
+- **NuGet:** [nuget.org/packages/XbergIo.HtmlToMarkdown](https://www.nuget.org/packages/XbergIo.HtmlToMarkdown/)
   {% elif language == 'elixir' %}
 - **Hex.pm:** [hex.pm/packages/html_to_markdown](https://hex.pm/packages/html_to_markdown)
   {% endif %}
 - **Discord:** [discord.gg/xt9WY3GnKR](https://discord.gg/xt9WY3GnKR)
 
-## Part of Kreuzberg.dev
+## Part of Xberg
 
-- [Kreuzberg](https://github.com/xberg-io/kreuzberg) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
+- [Xberg](https://github.com/xberg-io/xberg) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
 - [Xberg Enterprise](https://github.com/xberg-io/xberg-enterprise) — managed extraction API with SDKs, dashboards, and observability.
 - [crawlberg](https://github.com/xberg-io/crawlberg) — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
 - [html-to-markdown](https://github.com/xberg-io/html-to-markdown) — fast, lossless HTML→Markdown engine.
@@ -52,7 +52,7 @@ MIT License – see [LICENSE](https://github.com/xberg-io/html-to-markdown/blob/
 
 ## Support
 
-If you find this library useful, consider [sponsoring the project](https://github.com/sponsors/kreuzberg-dev).
+If you find this library useful, consider [sponsoring the project](https://github.com/sponsors/xberg-io).
 
 Have questions or run into issues? We're here to help:
 

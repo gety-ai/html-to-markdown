@@ -24,7 +24,7 @@ bun test
 ## Requirements
 
 - Bun 1.2+
-- @kreuzberg/html-to-markdown package
+- @xberg-io/html-to-markdown package
 
 ## Notes
 

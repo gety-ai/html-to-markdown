@@ -1,4 +1,4 @@
-//! Structured document tree types aligned with kreuzberg's `DocumentStructure`.
+//! Structured document tree types aligned with Xberg's `DocumentStructure`.
 
 use std::collections::HashMap;
 

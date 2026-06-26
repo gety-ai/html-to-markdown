@@ -8,19 +8,19 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 | -------------------- | ----------------- | ---------------------------------------------------------- |
 | Rust                 | 1.85              | `html-to-markdown-rs` on crates.io                         |
 | Python               | 3.10              | `html-to-markdown` on PyPI                                 |
-| TypeScript / Node.js | Node.js 18        | `@kreuzberg/html-to-markdown` on npm                       |
+| TypeScript / Node.js | Node.js 18        | `@xberg-io/html-to-markdown` on npm                       |
 | Go                   | 1.26              | `github.com/xberg-io/html-to-markdown/packages/go/v3` |
 | Ruby                 | 3.2               | `html-to-markdown` on RubyGems                             |
 | PHP                  | 8.2               | `xberg-io/html-to-markdown` on Packagist              |
-| Java                 | 25                | `dev.kreuzberg:html-to-markdown` on Maven Central          |
-| C#                   | .NET 10           | `KreuzbergDev.HtmlToMarkdown` on NuGet                     |
+| Java                 | 25                | `io.xberg:html-to-markdown` on Maven Central          |
+| C#                   | .NET 10           | `XbergIo.HtmlToMarkdown` on NuGet                     |
 | Elixir               | 1.14              | `html_to_markdown` on Hex                                  |
 | R                    | 4.2               | `htmltomarkdown` on CRAN                                   |
 | C                    | —                 | `libhtml_to_markdown` (GitHub Releases)                    |
-| WebAssembly          | —                 | `@kreuzberg/html-to-markdown-wasm` on npm                  |
+| WebAssembly          | —                 | `@xberg-io/html-to-markdown-wasm` on npm                  |
 | Swift                | Swift 6.0         | `HtmlToMarkdown` SwiftPM package                           |
 | Dart                 | 3.11              | `h2m` on pub.dev                                           |
-| Kotlin Android       | Android minSdk 21 | `dev.kreuzberg:html-to-markdown-android` on Maven Central  |
+| Kotlin Android       | Android minSdk 21 | `io.xberg:html-to-markdown-android` on Maven Central  |
 | Zig                  | 0.16              | `html_to_markdown_rs` Zig package                          |
 
 ---
@@ -98,20 +98,20 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 === "TypeScript"
 
     ```bash
-    npm install @kreuzberg/html-to-markdown
+    npm install @xberg-io/html-to-markdown
     ```
 
     Using `pnpm` or `yarn`:
 
     ```bash
-    pnpm add @kreuzberg/html-to-markdown
-    yarn add @kreuzberg/html-to-markdown
+    pnpm add @xberg-io/html-to-markdown
+    yarn add @xberg-io/html-to-markdown
     ```
 
     **Verify:**
 
     ```typescript
-    import { convert } from '@kreuzberg/html-to-markdown';
+    import { convert } from '@xberg-io/html-to-markdown';
 
     const result = convert('<h1>Hello</h1>');
     console.log(result.content);
@@ -198,7 +198,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 
     ```xml
     <dependency>
-        <groupId>dev.kreuzberg</groupId>
+        <groupId>io.xberg</groupId>
         <artifactId>html-to-markdown</artifactId>
         <version>3.6.8</version>
     </dependency>
@@ -207,19 +207,19 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     **Gradle** — add to `build.gradle`:
 
     ```groovy
-    implementation 'dev.kreuzberg:html-to-markdown:3.6.8'
+    implementation 'io.xberg:html-to-markdown:3.6.8'
     ```
 
     Or Kotlin DSL (`build.gradle.kts`):
 
     ```kotlin
-    implementation("dev.kreuzberg:html-to-markdown:3.6.8")
+    implementation("io.xberg:html-to-markdown:3.6.8")
     ```
 
     **Verify:**
 
     ```java
-    import dev.kreuzberg.htmltomarkdown.HtmlToMarkdown;
+    import io.xberg.htmltomarkdown.HtmlToMarkdown;
 
     public class Main {
         public static void main(String[] args) {
@@ -235,10 +235,10 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 === "C#"
 
     ```bash
-    dotnet add package KreuzbergDev.HtmlToMarkdown
+    dotnet add package XbergIo.HtmlToMarkdown
     ```
 
-    Or via the NuGet Package Manager in Visual Studio — search for `KreuzbergDev.HtmlToMarkdown`.
+    Or via the NuGet Package Manager in Visual Studio — search for `XbergIo.HtmlToMarkdown`.
 
     **Verify:**
 
@@ -347,13 +347,13 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 === "WASM"
 
     ```bash
-    npm install @kreuzberg/html-to-markdown-wasm
+    npm install @xberg-io/html-to-markdown-wasm
     ```
 
     **Verify:**
 
     ```javascript
-    import init, { convert } from '@kreuzberg/html-to-markdown-wasm';
+    import init, { convert } from '@xberg-io/html-to-markdown-wasm';
 
     await init();  // load and instantiate the .wasm file — call once
 
@@ -408,10 +408,10 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     Add the Android artifact:
 
     ```kotlin
-    implementation("dev.kreuzberg:html-to-markdown-android:3.6.8")
+    implementation("io.xberg:html-to-markdown-android:3.6.8")
     ```
 
-    Requires Android minSdk 21. This is an Android AAR with bundled JNI libraries; Kotlin/JVM users should use the Java artifact (`dev.kreuzberg:html-to-markdown`) directly.
+    Requires Android minSdk 21. This is an Android AAR with bundled JNI libraries; Kotlin/JVM users should use the Java artifact (`io.xberg:html-to-markdown`) directly.
 
 === "Zig"
 

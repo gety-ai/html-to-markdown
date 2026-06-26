@@ -1,6 +1,6 @@
 <!-- Outer csproj retained as IDE convenience for opening the whole tree as a project,
      but it is NOT used for packing. The inner `HtmlToMarkdown/HtmlToMarkdown.csproj`
-     owns `<PackageId>KreuzbergDev.HtmlToMarkdown</PackageId>` and is the direct
+     owns `<PackageId>XbergIo.HtmlToMarkdown</PackageId>` and is the direct
      `dotnet pack` target (see scripts/publish/csharp/pack.sh). -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>

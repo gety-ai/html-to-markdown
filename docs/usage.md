@@ -248,7 +248,7 @@ from html_to_markdown import ConversionOptions, convert
 
 === "TypeScript"
 ```typescript
-import { convert, ConversionOptions } from '@kreuzberg/html-to-markdown';
+import { convert, ConversionOptions } from '@xberg-io/html-to-markdown';
 
     const options: ConversionOptions = { includeDocumentStructure: true };
     const result = convert('<h1>Title</h1><p>Paragraph</p>', options);

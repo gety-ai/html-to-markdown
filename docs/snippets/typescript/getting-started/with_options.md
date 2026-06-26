@@ -1,5 +1,5 @@
 ```typescript
-import { convert, ConversionOptions } from "@kreuzberg/html-to-markdown";
+import { convert, ConversionOptions } from "@xberg-io/html-to-markdown";
 
 const options: ConversionOptions = {
   headingStyle: "atx",

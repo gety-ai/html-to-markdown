@@ -23,7 +23,7 @@ warnings = result.warnings          # Any conversion warnings
 Converts HTML to Markdown. Returns a `ConversionResult` object with all results in a single call.
 
 ```typescript
-import { convert, ConversionOptions } from "@kreuzberg/html-to-markdown";
+import { convert, ConversionOptions } from "@xberg-io/html-to-markdown";
 
 const result = convert(html);
 const markdown = result.content; // Converted Markdown string

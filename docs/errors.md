@@ -52,7 +52,7 @@ from html_to_markdown import convert, ConversionError
 
 === "TypeScript"
 ```typescript
-import { convert, ConversionError } from '@kreuzberg/html-to-markdown';
+import { convert, ConversionError } from '@xberg-io/html-to-markdown';
 
     try {
       const result = convert(html);

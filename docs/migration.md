@@ -14,11 +14,11 @@ specialised functions, there is now a single `convert()` function that
 returns a structured `ConversionResult`. This simplifies the API while
 making all extraction capabilities available through one call.
 
-### hOCR support moved to Kreuzberg
+### hOCR support moved to Xberg
 
 hOCR (OCR-generated HTML) processing was removed from html-to-markdown
-and moved into [Kreuzberg](https://github.com/xberg-io/kreuzberg),
-the document extraction library in the Kreuzberg.dev ecosystem. hOCR is
+and moved into [Xberg](https://github.com/xberg-io/xberg),
+the document extraction library in the Xberg ecosystem. hOCR is
 a document-level concern — it belongs in the extraction pipeline, not
 in an html-to-markdown converter.
 
@@ -59,7 +59,7 @@ v3 has one function:
 | `convert_with_tables(html, opts)`             | `convert(html, opts).tables`                                |
 | `convert_with_visitor(html, opts, v)`         | `convert(html, opts, v).content`                            |
 | `convert_to_string(html)`                     | `convert(html).content`                                     |
-| `hocr_spatial_tables: true`                   | Use [Kreuzberg](https://github.com/xberg-io/kreuzberg) |
+| `hocr_spatial_tables: true`                   | Use [Xberg](https://github.com/xberg-io/xberg) |
 | `ExtendedMetadata`                            | `HtmlMetadata`                                              |
 | `start_profiling()`                           | Removed                                                     |
 | `markdownify(html)` (Python)                  | `convert(html).content`                                     |

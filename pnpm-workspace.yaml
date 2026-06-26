@@ -1,7 +1,6 @@
 packages:
     - crates/html-to-markdown-node
     - crates/html-to-markdown-wasm
-    - packages/typescript
     - e2e/node
     - e2e/wasm
 
@@ -15,6 +14,6 @@ allowBuilds:
     esbuild: true
 
 minimumReleaseAgeExclude:
-    - "@kreuzberg/html-to-markdown-node-*"
-    - "@kreuzberg/html-to-markdown-wasm"
-    - "@kreuzberg/html-to-markdown"
+    - "@xberg-io/html-to-markdown-*"
+    - "@xberg-io/html-to-markdown-wasm"
+    - "@xberg-io/html-to-markdown"

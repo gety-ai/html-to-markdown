@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.29.0"
+alef_version = "0.29.1"
 languages = [
   "python",
   "node",
@@ -48,18 +48,18 @@ orcid = "https://orcid.org/0009-0000-2247-5072"
 # test_apps version sync — use text_replacements to avoid clobbering unrelated semver strings
 [[workspace.sync.text_replacements]]
 path = "test_apps/node/package.json"
-search = '"@kreuzberg/html-to-markdown": "[^"]*"'
-replace = '"@kreuzberg/html-to-markdown": "^{version}"'
+search = '"@xberg-io/html-to-markdown": "[^"]*"'
+replace = '"@xberg-io/html-to-markdown": "^{version}"'
 
 [[workspace.sync.text_replacements]]
 path = "test_apps/bun/package.json"
-search = '"@kreuzberg/html-to-markdown": "[^"]*"'
-replace = '"@kreuzberg/html-to-markdown": "^{version}"'
+search = '"@xberg-io/html-to-markdown": "[^"]*"'
+replace = '"@xberg-io/html-to-markdown": "^{version}"'
 
 [[workspace.sync.text_replacements]]
 path = "test_apps/wasm/package.json"
-search = '"@kreuzberg/html-to-markdown-wasm": "[^"]*"'
-replace = '"@kreuzberg/html-to-markdown-wasm": "^{version}"'
+search = '"@xberg-io/html-to-markdown-wasm": "[^"]*"'
+replace = '"@xberg-io/html-to-markdown-wasm": "^{version}"'
 
 # Anchor on artifactId so we don't accidentally rewrite junit/jackson <version> tags.
 # Use double-quoted (basic) strings so the \n in the replacement is a real newline.
@@ -69,9 +69,9 @@ search = "<artifactId>html-to-markdown</artifactId>\\s*<version>[^<]*</version>"
 replace = "<artifactId>html-to-markdown</artifactId>\n            <version>{version}</version>"
 
 [[workspace.sync.text_replacements]]
-path = "test_apps/csharp/KreuzbergDev.HtmlToMarkdown.E2eTests.csproj"
-search = 'Include="KreuzbergDev.HtmlToMarkdown" Version="[^"]*"'
-replace = 'Include="KreuzbergDev.HtmlToMarkdown" Version="{version}"'
+path = "test_apps/csharp/XbergIo.HtmlToMarkdown.E2eTests.csproj"
+search = 'Include="XbergIo.HtmlToMarkdown" Version="[^"]*"'
+replace = 'Include="XbergIo.HtmlToMarkdown" Version="{version}"'
 
 [[workspace.sync.text_replacements]]
 path = "test_apps/php/composer.json"
@@ -142,7 +142,7 @@ sdist_include = [
 output = "packages/python/html_to_markdown/"
 
 [crates.node]
-package_name = "@kreuzberg/html-to-markdown-node"
+package_name = "@xberg-io/html-to-markdown"
 crate_dir = "crates/html-to-markdown-node"
 
 [crates.ruby]
@@ -172,17 +172,17 @@ module = "github.com/xberg-io/html-to-markdown/packages/go/v3"
 package_name = "htmltomarkdown"
 
 [crates.java]
-package = "dev.kreuzberg.htmltomarkdown"
-group_id = "dev.kreuzberg"
+package = "io.xberg.htmltomarkdown"
+group_id = "io.xberg"
 artifact_id = "html-to-markdown"
 
 [crates.csharp]
 namespace = "HtmlToMarkdown"
 # Plain `HtmlToMarkdown` is owned by another publisher on NuGet; the org-owned
-# package is `KreuzbergDev.HtmlToMarkdown` (8K+ downloads). Without this
+# package is `XbergIo.HtmlToMarkdown` (8K+ downloads). Without this
 # override, alef defaults the csproj <PackageId> to `namespace` and the
 # publish gets rejected with HTTP 403.
-package_id = "KreuzbergDev.HtmlToMarkdown"
+package_id = "XbergIo.HtmlToMarkdown"
 
 [crates.r]
 package_name = "htmltomarkdown"
@@ -192,10 +192,10 @@ package_name = "htmltomarkdown"
 # package directly. Panama FFM is unavailable on Android (max JDK 17), which
 # is why Android needs its own JNI-based package with bundled .so files.
 # Emitted by alef-backend-kotlin-android (alef >= 0.16.6).
-package = "dev.kreuzberg.android"
-namespace = "dev.kreuzberg.android"
+package = "io.xberg.android"
+namespace = "io.xberg.android"
 artifact_id = "html-to-markdown-android"
-group_id = "dev.kreuzberg"
+group_id = "io.xberg"
 abis = ["arm64-v8a", "x86_64"]
 # `serde` enables the Serialize/Deserialize derives on options/result types so
 # the JNI shim can JSON-marshal them across the host boundary. `metadata`
@@ -240,7 +240,7 @@ java = "packages/java/src/main/java/"
 elixir = "packages/elixir/native/html_to_markdown_nif/src/"
 wasm = "crates/html-to-markdown-wasm/src/"
 r = "packages/r/src/rust/src/"
-kotlin_android = "packages/kotlin-android/src/main/kotlin/dev/kreuzberg/android/"
+kotlin_android = "packages/kotlin-android/src/main/kotlin/io/xberg/android/"
 swift = "packages/swift/Sources/HtmlToMarkdown/"
 dart = "packages/dart/lib/src/"
 zig = "packages/zig/src/"
@@ -268,8 +268,8 @@ typecheck = "cd packages/python && uv run --no-sync mypy ."
 
 [crates.lint.node]
 precondition = "command -v pnpm >/dev/null 2>&1"
-format = "pnpm dlx oxfmt packages/typescript/src/"
-check = "pnpm dlx oxlint packages/typescript/"
+format = "pnpm dlx oxfmt crates/html-to-markdown-node/index.js crates/html-to-markdown-node/index.d.ts"
+check = "pnpm dlx oxlint crates/html-to-markdown-node/index.js crates/html-to-markdown-node/index.d.ts"
 
 [crates.lint.ruby]
 precondition = "command -v bundle >/dev/null 2>&1"
@@ -372,7 +372,7 @@ precondition = "command -v pnpm >/dev/null 2>&1"
 # Invoke the napi build via `pnpm run build` (the crate package.json's `build`
 # script) so the `@napi-rs/cli` binary resolves from node_modules/.bin — a bare
 # `napi` is not on PATH in CI. `pnpm install` first guarantees node_modules.
-before = "cd crates/html-to-markdown-node && pnpm install && pnpm run build && cd ../../packages/typescript && pnpm install && pnpm run build"
+before = "cd crates/html-to-markdown-node && pnpm install && pnpm run build"
 e2e = "cd e2e/node && pnpm install && pnpm exec vitest run"
 
 [crates.test.go]
@@ -419,18 +419,18 @@ precondition = "command -v pnpm >/dev/null 2>&1 && [ -f crates/html-to-markdown-
 # ERR_PNPM_OUTDATED_LOCKFILE; this is exactly the case pnpm documents
 # --no-frozen-lockfile for. The lockfile is left unchanged (optional deps that
 # cannot resolve are skipped).
-install = "pnpm --filter @kreuzberg/html-to-markdown-node install --no-frozen-lockfile"
+install = "pnpm --filter @xberg-io/html-to-markdown install --no-frozen-lockfile"
 timeout_seconds = 600
 
 [crates.setup.wasm]
 # Same shape as [crates.setup.node]: alef's default `cd packages/wasm && pnpm
 # install` points at a directory that no longer exists. The real wasm crate
-# lives at crates/html-to-markdown-wasm/ (npm @kreuzberg/html-to-markdown-wasm),
+# lives at crates/html-to-markdown-wasm/ (npm @xberg-io/html-to-markdown-wasm),
 # and is in pnpm-workspace.yaml.
 precondition = "command -v pnpm >/dev/null 2>&1 && [ -f crates/html-to-markdown-wasm/package.json ]"
 # See the node setup note above: --no-frozen-lockfile for the same napi
 # optional-platform-deps reason (shared pnpm workspace / pnpm-lock.yaml).
-install = "pnpm --filter @kreuzberg/html-to-markdown-wasm install --no-frozen-lockfile"
+install = "pnpm --filter @xberg-io/html-to-markdown-wasm install --no-frozen-lockfile"
 timeout_seconds = 600
 
 [crates.setup.csharp]
@@ -600,7 +600,7 @@ outputFormat = "OutputFormat"
 urlEscapeStyle = "UrlEscapeStyle"
 
 [crates.e2e.call.overrides.node]
-module = "@kreuzberg/html-to-markdown"
+module = "@xberg-io/html-to-markdown"
 function = "convert"
 options_type = "ConversionOptions"
 enum_module = "html_to_markdown._html_to_markdown"
@@ -625,7 +625,7 @@ returns_result = true
 options_ptr = true
 
 [crates.e2e.call.overrides.java]
-class = "dev.kreuzberg.htmltomarkdown.HtmlToMarkdownRs"
+class = "io.xberg.htmltomarkdown.HtmlToMarkdownRs"
 function = "convert"
 options_type = "ConversionOptions"
 enum_module = "html_to_markdown._html_to_markdown"
@@ -746,7 +746,7 @@ prefix = "htm"
 result_type = "ConversionResult"
 
 [crates.e2e.call.overrides.kotlin_android]
-class = "dev.kreuzberg.android.HtmlToMarkdownRs"
+class = "io.xberg.android.HtmlToMarkdownRs"
 function = "convert"
 options_type = "ConversionOptions"
 
@@ -784,85 +784,85 @@ categories = ["smoke", "conversion"]
 
 [crates.e2e.registry.packages.python]
 name = "html-to-markdown"
-version = ">=3.7.2"
+version = ">=3.8.0rc1"
 
 [crates.e2e.registry.packages.node]
-name = "@kreuzberg/html-to-markdown"
-version = "^3.7.2"
+name = "@xberg-io/html-to-markdown"
+version = "^3.8.0-rc.1"
 
 [crates.e2e.registry.packages.rust]
 name = "html-to-markdown-rs"
-version = "3.7.2"
+version = "3.8.0-rc.1"
 
 [crates.e2e.registry.packages.go]
 module = "github.com/xberg-io/html-to-markdown/packages/go/v3"
-version = "v3.7.2"
+version = "v3.8.0-rc.1"
 
 [crates.e2e.registry.packages.java]
-name = "dev.kreuzberg:html-to-markdown"
-version = "3.7.2"
+name = "io.xberg:html-to-markdown"
+version = "3.8.0-rc.1"
 
 [crates.e2e.registry.packages.csharp]
-name = "KreuzbergDev.HtmlToMarkdown"
-version = "3.7.2"
+name = "XbergIo.HtmlToMarkdown"
+version = "3.8.0-rc.1"
 
 [crates.e2e.registry.packages.php]
 name = "xberg-io/html-to-markdown"
-version = ">=3.7.2"
+version = ">=3.8.0-rc.1"
 
 [crates.e2e.registry.packages.ruby]
 name = "html-to-markdown"
-version = "~> 3.7.2"
+version = "~> 3.8.0.pre.rc.1"
 
 [crates.e2e.registry.packages.elixir]
 name = "html_to_markdown"
-version = "~> 3.7.2"
+version = "~> 3.8.0-rc.1"
 
 [crates.e2e.registry.packages.wasm]
-name = "@kreuzberg/html-to-markdown-wasm"
-version = "^3.7.2"
+name = "@xberg-io/html-to-markdown-wasm"
+version = "^3.8.0-rc.1"
 
 [crates.e2e.registry.packages.r]
 name = "htmltomarkdown"
-version = "3.7.2"
+version = "3.8.0.9001"
 
 [crates.e2e.registry.packages.c]
 # Matches `publish.yaml`'s `asset-prefix: html-to-markdown-rs-ffi-` for the
 # upload-release-assets step. Drift causes test_apps/c/download_ffi.sh to 404
 # on the GH release tarball.
 name = "html-to-markdown-rs-ffi"
-version = "3.7.2"
+version = "3.8.0-rc.1"
 
 [crates.e2e.registry.packages.kotlin_android]
-name = "dev.kreuzberg:html-to-markdown-android"
-version = "3.7.2"
+name = "io.xberg:html-to-markdown-android"
+version = "3.8.0-rc.1"
 
 [crates.e2e.registry.packages.swift]
 name = "HtmlToMarkdown"
-version = "3.7.2"
+version = "3.8.0-rc.1"
 
 [crates.e2e.registry.packages.dart]
 name = "h2m"
-version = "^3.7.2"
+version = "^3.8.0-rc.1"
 
 [crates.e2e.registry.packages.zig]
 name = "html_to_markdown"
-version = "3.7.2"
+version = "3.8.0-rc.1"
 # Placeholder hash with embedded version triggers alef's STALE detection (added
 # in v0.22.1) — the generator emits a STALE comment in build.zig.zon and the
 # zig fetch flow auto-recomputes the real multihash at consume time. Update
 # after publishing the first zig tarball: `zig fetch --save <release-url>`.
-hash = "html-to-markdown-3.7.2-STALE_PLACEHOLDER_TO_BE_RESOLVED_BY_ZIG_FETCH"
+hash = "html-to-markdown-3.8.0-rc.1-STALE_PLACEHOLDER_TO_BE_RESOLVED_BY_ZIG_FETCH"
 
 [crates.e2e.registry.packages.php_ext]
 name = "xberg-io/html-to-markdown"
-version = "3.7.2"
+version = "3.8.0-rc.1"
 
 [crates.e2e.registry.packages.homebrew]
 tap = "xberg-io/tap"
 cli_formula = "html-to-markdown"
 ffi_formula = "libhtml-to-markdown"
-version = "3.7.2"
+version = "3.8.0-rc.1"
 
 [crates.e2e.packages.rust]
 path = "../../crates/html-to-markdown"
@@ -872,7 +872,7 @@ name = "html-to-markdown"
 path = "../../packages/python"
 
 [crates.e2e.packages.node]
-name = "@kreuzberg/html-to-markdown"
+name = "@xberg-io/html-to-markdown"
 path = "../../crates/html-to-markdown-node"
 
 [crates.e2e.packages.go]
@@ -885,7 +885,7 @@ name = "xberg-io/html-to-markdown"
 path = "../../packages/php"
 
 [crates.e2e.packages.java]
-name = "dev.kreuzberg:html-to-markdown"
+name = "io.xberg:html-to-markdown"
 path = "../../packages/java"
 
 [crates.e2e.packages.csharp]
@@ -901,7 +901,7 @@ name = "html_to_markdown"
 path = "../../packages/elixir"
 
 [crates.e2e.packages.wasm]
-name = "@kreuzberg/html-to-markdown-wasm"
+name = "@xberg-io/html-to-markdown-wasm"
 path = "../../crates/html-to-markdown-wasm"
 
 [crates.e2e.packages.r]
@@ -913,7 +913,7 @@ name = "html_to_markdown_ffi"
 path = "../../crates/html-to-markdown-ffi"
 
 [crates.e2e.packages.kotlin_android]
-module = "dev.kreuzberg.android"
+module = "io.xberg.android"
 path = "../../packages/kotlin-android"
 
 [crates.e2e.packages.swift]
@@ -1072,13 +1072,13 @@ table_extraction = "table-extraction/basic_extraction.md"
 [crates.readme.languages.typescript]
 name = "TypeScript (Node.js)"
 template = "language_package.md"
-output_path = "packages/typescript/README.md"
+output_path = "crates/html-to-markdown-node/README.md"
 package_manager = ["npm", "pnpm", "yarn", "bun"]
-package_name = "@kreuzberg/html-to-markdown"
-install_command = "pnpm add @kreuzberg/html-to-markdown"
+package_name = "@xberg-io/html-to-markdown"
+install_command = "pnpm add @xberg-io/html-to-markdown"
 description = """
 High-performance HTML to Markdown converter for Node.js and Bun with full TypeScript support.
-This package wraps native `@kreuzberg/html-to-markdown` bindings and provides a type-safe API.
+Native NAPI-RS bindings to the Rust core with a type-safe API.
 """
 migration_version = "3.1.0"
 
@@ -1265,10 +1265,10 @@ name = "Java"
 template = "language_package.md"
 output_path = "packages/java/README.md"
 package_manager = ["maven", "gradle"]
-package_name = "dev.kreuzberg:html-to-markdown"
+package_name = "io.xberg:html-to-markdown"
 install_command = """
 <dependency>
-    <groupId>dev.kreuzberg</groupId>
+    <groupId>io.xberg</groupId>
     <artifactId>html-to-markdown</artifactId>
     <version>{{ version }}</version>
 </dependency>"""
@@ -1316,8 +1316,8 @@ name = "C# / .NET"
 template = "language_package.md"
 output_path = "packages/csharp/README.md"
 package_manager = ["nuget"]
-package_name = "KreuzbergDev.HtmlToMarkdown"
-install_command = "dotnet add package KreuzbergDev.HtmlToMarkdown"
+package_name = "XbergIo.HtmlToMarkdown"
+install_command = "dotnet add package XbergIo.HtmlToMarkdown"
 description = """
 High-performance HTML to Markdown converter with C#/.NET bindings using P/Invoke to the Rust core.
 Provides type-safe record-based APIs for metadata extraction, visitor patterns, and thread-safe concurrent conversion.
@@ -1470,12 +1470,12 @@ name = "Kotlin (Android)"
 template = "language_package.md"
 output_path = "packages/kotlin-android/README.md"
 package_manager = ["gradle", "maven"]
-package_name = "dev.kreuzberg:html-to-markdown-android"
+package_name = "io.xberg:html-to-markdown-android"
 install_command = """
-implementation("dev.kreuzberg:html-to-markdown-android:{{ version }}")"""
+implementation("io.xberg:html-to-markdown-android:{{ version }}")"""
 description = """
 High-performance HTML to Markdown converter for Android, packaged as an AAR with bundled JNI libraries for `arm64-v8a` and `x86_64`.
-Server-side Kotlin/JVM consumers should use the `dev.kreuzberg:html-to-markdown` Java package directly — Kotlin/JVM treats Java classes as native, and Panama FFM is unavailable on Android, which is why Android ships as its own artifact.
+Server-side Kotlin/JVM consumers should use the `io.xberg:html-to-markdown` Java package directly — Kotlin/JVM treats Java classes as native, and Panama FFM is unavailable on Android, which is why Android ships as its own artifact.
 """
 migration_version = ""
 
@@ -1588,8 +1588,8 @@ name = "WebAssembly"
 template = "language_package.md"
 output_path = "crates/html-to-markdown-wasm/README.md"
 package_manager = ["npm", "pnpm", "yarn", "bun"]
-package_name = "@kreuzberg/html-to-markdown-wasm"
-install_command = "pnpm add @kreuzberg/html-to-markdown-wasm"
+package_name = "@xberg-io/html-to-markdown-wasm"
+install_command = "pnpm add @xberg-io/html-to-markdown-wasm"
 description = """
 Pure WebAssembly build of html-to-markdown for browsers, Deno, Cloudflare Workers, and other JS
 runtimes without a Node.js native-addon ABI. Single `.wasm` artifact loaded via `wasm-bindgen`,

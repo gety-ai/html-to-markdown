@@ -1,5 +1,5 @@
 ```typescript
-import { convert } from "@kreuzberg/html-to-markdown";
+import { convert } from "@xberg-io/html-to-markdown";
 
 const html = `
 <table>

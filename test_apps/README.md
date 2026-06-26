@@ -126,7 +126,7 @@ tests/test_apps/
 ├── java/                             # Java test app (Maven Central)
 │   ├── pom.xml                       # Depends on html-to-markdown from Maven
 │   ├── src/test/java/
-│   │   └── dev/kreuzberg/htmltomarkdown/
+│   │   └── io/xberg/htmltomarkdown/
 │   │       ├── SmokeTest.java        # Fast smoke tests
 │   │       └── ComprehensiveTest.java # Fixture-driven tests
 │   └── README.md                     # Java-specific notes
@@ -428,7 +428,7 @@ Let's add **Kotlin** as an example:
 ### Step 1: Create Directory Structure
 
 ```bash
-mkdir -p tests/test_apps/kotlin/src/test/kotlin/dev/kreuzberg/htmltomarkdown
+mkdir -p tests/test_apps/kotlin/src/test/kotlin/io/xberg/htmltomarkdown
 ```
 
 ### Step 2: Create Package Manifest
@@ -446,7 +446,7 @@ repositories {
 }
 
 dependencies {
-    implementation("dev.kreuzberg:html-to-markdown:3.4.0")
+    implementation("io.xberg:html-to-markdown:3.4.0")
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.1")
 }
@@ -461,7 +461,7 @@ tasks.test {
 **File**: `src/test/kotlin/.../SmokeTest.kt`
 
 ```kotlin
-package dev.kreuzberg.htmltomarkdown
+package io.xberg.htmltomarkdown
 
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
@@ -489,7 +489,7 @@ class SmokeTest {
 **File**: `src/test/kotlin/.../ComprehensiveTest.kt`
 
 ```kotlin
-package dev.kreuzberg.htmltomarkdown
+package io.xberg.htmltomarkdown
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json

@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>dev.kreuzberg</groupId>
+    <groupId>io.xberg</groupId>
     <artifactId>html-to-markdown-e2e-java</artifactId>
     <version>0.1.0</version>
 
@@ -29,9 +29,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>dev.kreuzberg</groupId>
+            <groupId>io.xberg</groupId>
             <artifactId>html-to-markdown</artifactId>
-            <version>3.7.2</version>
+            <version>3.8.0-rc.1</version>
         </dependency>
 
         <dependency>

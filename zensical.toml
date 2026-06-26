@@ -6,7 +6,7 @@ site_author = "xberg.io"
 repo_name = "xberg-io/html-to-markdown"
 repo_url = "https://github.com/xberg-io/html-to-markdown"
 edit_uri = "edit/main/docs/"
-copyright = "Copyright &copy; 2023-2026 Kreuzberg.dev"
+copyright = "Copyright &copy; 2023-2026 Kreuzberg, Inc."
 
 extra_css = ["css/extra.css"]
 
@@ -204,7 +204,7 @@ name = "View on PyPI"
 
 [[project.extra.social]]
 icon = "fontawesome/brands/npm"
-link = "https://www.npmjs.com/package/@kreuzberg/html-to-markdown"
+link = "https://www.npmjs.com/package/@xberg-io/html-to-markdown"
 name = "View on npm"
 
 [[project.extra.social]]

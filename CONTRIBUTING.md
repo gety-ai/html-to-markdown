@@ -231,7 +231,7 @@ cargo build --release --package html-to-markdown-cli
 
 ### CI Workflows
 
-- **ci-\*.yaml**: Kreuzberg-style, path-filtered workflows (rust, python, node, wasm, ruby, php, go, java, elixir, validate)
+- **ci-\*.yaml**: Xberg-style, path-filtered workflows (rust, python, node, wasm, ruby, php, go, java, elixir, validate)
 - **test-wheels.yaml**: Builds and tests wheels (manual or on Rust/config changes)
 - All workflows must pass before merging
 
@@ -376,8 +376,8 @@ Verify all distributions are published:
 
 - **Rust**: <https://crates.io/crates/html-to-markdown-rs>
 - **Python**: <https://pypi.org/project/html-to-markdown/>
-- **npm (main)**: <https://www.npmjs.com/package/@kreuzberg/html-to-markdown>
-- **npm (wasm)**: <https://www.npmjs.com/package/@kreuzberg/html-to-markdown-wasm>
+- **npm (main)**: <https://www.npmjs.com/package/@xberg-io/html-to-markdown>
+- **npm (wasm)**: <https://www.npmjs.com/package/@xberg-io/html-to-markdown-wasm>
 - **Homebrew**: <https://github.com/xberg-io/homebrew-tap>
 - **GitHub**: <https://github.com/xberg-io/html-to-markdown/releases>
 
@@ -385,7 +385,7 @@ Verify all distributions are published:
 
 - **Issues**: [GitHub Issues](https://github.com/xberg-io/html-to-markdown/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/xberg-io/html-to-markdown/discussions)
-- **Discord**: [Kreuzberg Community](https://discord.gg/xt9WY3GnKR)
+- **Discord**: [Xberg Community](https://discord.gg/xt9WY3GnKR)
 
 ### License
 

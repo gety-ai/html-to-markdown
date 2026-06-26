@@ -18,20 +18,20 @@
   <a href="https://pypi.org/project/html-to-markdown/">
     <img src="https://img.shields.io/pypi/v/html-to-markdown?label=Python&color=007ec6" alt="Python">
   </a>
-  <a href="https://www.npmjs.com/package/@kreuzberg/html-to-markdown-node">
-    <img src="https://img.shields.io/npm/v/@kreuzberg/html-to-markdown-node?label=Node.js&color=007ec6" alt="Node.js">
+  <a href="https://www.npmjs.com/package/@xberg-io/html-to-markdown">
+    <img src="https://img.shields.io/npm/v/@xberg-io/html-to-markdown?label=Node.js&color=007ec6" alt="Node.js">
   </a>
-  <a href="https://www.npmjs.com/package/@kreuzberg/html-to-markdown-wasm">
-    <img src="https://img.shields.io/npm/v/@kreuzberg/html-to-markdown-wasm?label=WASM&color=007ec6" alt="WASM">
+  <a href="https://www.npmjs.com/package/@xberg-io/html-to-markdown-wasm">
+    <img src="https://img.shields.io/npm/v/@xberg-io/html-to-markdown-wasm?label=WASM&color=007ec6" alt="WASM">
   </a>
-  <a href="https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown">
-    <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown?label=Java&color=007ec6" alt="Java">
+  <a href="https://central.sonatype.com/artifact/io.xberg/html-to-markdown">
+    <img src="https://img.shields.io/maven-central/v/io.xberg/html-to-markdown?label=Java&color=007ec6" alt="Java">
   </a>
   <a href="https://pkg.go.dev/github.com/xberg-io/html-to-markdown/packages/go/v3">
     <img src="https://img.shields.io/github/v/tag/xberg-io/html-to-markdown?label=Go&color=007ec6&filter=v3*" alt="Go">
   </a>
-  <a href="https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/">
-    <img src="https://img.shields.io/nuget/v/KreuzbergDev.HtmlToMarkdown?label=C%23&color=007ec6" alt="C#">
+  <a href="https://www.nuget.org/packages/XbergIo.HtmlToMarkdown/">
+    <img src="https://img.shields.io/nuget/v/XbergIo.HtmlToMarkdown?label=C%23&color=007ec6" alt="C#">
   </a>
   <a href="https://packagist.org/packages/xberg-io/html-to-markdown">
     <img src="https://img.shields.io/packagist/v/xberg-io/html-to-markdown?label=PHP&color=007ec6" alt="PHP">
@@ -48,8 +48,8 @@
   <a href="https://pub.dev/packages/h2m">
     <img src="https://img.shields.io/pub/v/h2m?label=Dart&color=007ec6" alt="Dart">
   </a>
-  <a href="https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown-android">
-    <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown-android?label=Kotlin&color=007ec6" alt="Kotlin">
+  <a href="https://central.sonatype.com/artifact/io.xberg/html-to-markdown-android">
+    <img src="https://img.shields.io/maven-central/v/io.xberg/html-to-markdown-android?label=Kotlin&color=007ec6" alt="Kotlin">
   </a>
   <a href="https://github.com/xberg-io/html-to-markdown/tree/main/packages/swift">
     <img src="https://img.shields.io/badge/Swift-SPM-007ec6" alt="Swift">
@@ -92,7 +92,7 @@ shipped with TypeScript types and dist targets for nodejs, web, bundler, and den
 ## Installation
 
 ```bash
-pnpm add @kreuzberg/html-to-markdown-wasm
+pnpm add @xberg-io/html-to-markdown-wasm
 ```
 
 ## Performance Snapshot
@@ -102,7 +102,7 @@ pnpm add @kreuzberg/html-to-markdown-wasm
 Basic conversion:
 
 ```javascript
-import init, { convert } from "@kreuzberg/html-to-markdown-wasm";
+import init, { convert } from "@xberg-io/html-to-markdown-wasm";
 
 await init();
 
@@ -115,7 +115,7 @@ console.log(markdown);
 With conversion options:
 
 ```javascript
-import init, { convert } from "@kreuzberg/html-to-markdown-wasm";
+import init, { convert } from "@xberg-io/html-to-markdown-wasm";
 
 await init();
 
@@ -212,9 +212,9 @@ The metadata extraction feature enables comprehensive document analysis during c
 - **GitHub:** [github.com/xberg-io/html-to-markdown](https://github.com/xberg-io/html-to-markdown)
 - **Discord:** [discord.gg/xt9WY3GnKR](https://discord.gg/xt9WY3GnKR)
 
-## Part of Kreuzberg.dev
+## Part of Xberg
 
-- [Kreuzberg](https://github.com/xberg-io/kreuzberg) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
+- [Xberg](https://github.com/xberg-io/xberg) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
 - [Xberg Enterprise](https://github.com/xberg-io/xberg-enterprise) — managed extraction API with SDKs, dashboards, and observability.
 - [crawlberg](https://github.com/xberg-io/crawlberg) — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
 - [html-to-markdown](https://github.com/xberg-io/html-to-markdown) — fast, lossless HTML→Markdown engine.
@@ -243,7 +243,7 @@ MIT License – see [LICENSE](https://github.com/xberg-io/html-to-markdown/blob/
 
 ## Support
 
-If you find this library useful, consider [sponsoring the project](https://github.com/sponsors/kreuzberg-dev).
+If you find this library useful, consider [sponsoring the project](https://github.com/sponsors/xberg-io).
 
 Have questions or run into issues? We're here to help:
 

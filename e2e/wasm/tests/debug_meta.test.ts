@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { convert } from "@kreuzberg/html-to-markdown-wasm";
+import { convert } from "@xberg-io/html-to-markdown-wasm";
 
 it("debug_og", () => {
 	const result = convert(

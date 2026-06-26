@@ -1,5 +1,5 @@
-# `@kreuzberg/html-to-markdown-node-linux-x64-musl`
+# `@xberg-io/html-to-markdown-node-linux-x64-musl`
 
 [![Built with alef](https://img.shields.io/badge/built%20with-alef%20%D7%90-007ec6)](https://github.com/xberg-io/alef)
 
-This is the **x86_64-unknown-linux-musl** binary for `@kreuzberg/html-to-markdown-node`
+This is the **x86_64-unknown-linux-musl** binary for `@xberg-io/html-to-markdown-node`

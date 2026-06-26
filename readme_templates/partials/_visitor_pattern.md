@@ -43,7 +43,7 @@ import {
   type Visitor,
   type NodeContext,
   type VisitResult,
-} from "@kreuzberg/html-to-markdown";
+} from "@xberg-io/html-to-markdown";
 
 const visitor: Visitor = {
   visitLink(ctx: NodeContext, href: string, text: string, title?: string): VisitResult {

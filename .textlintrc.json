@@ -15,7 +15,7 @@
 		},
 		"terminology": {
 			"defaultTerms": false,
-			"terms": ["Kreuzberg", "html-to-markdown"]
+			"terms": ["Xberg", "html-to-markdown"]
 		},
 		"no-zero-width-spaces": true,
 		"@textlint-rule/no-invalid-control-character": true,

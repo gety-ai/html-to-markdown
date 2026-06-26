@@ -2,8 +2,8 @@
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import dev.kreuzberg.android.ConversionOptions
-import dev.kreuzberg.android.HtmlToMarkdownRs
+import io.xberg.android.ConversionOptions
+import io.xberg.android.HtmlToMarkdownRs
 
 val mapper = ObjectMapper()
     .registerKotlinModule()

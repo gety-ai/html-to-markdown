@@ -293,10 +293,7 @@ fn custom_element_returns_none() {
 
 #[test]
 fn completely_made_up_tag_returns_none() {
-    assert!(
-        lookup(b"kreuzberg-element").is_none(),
-        "kreuzberg-element must return None"
-    );
+    assert!(lookup(b"xberg-element").is_none(), "xberg-element must return None");
 }
 
 // ── Case-sensitivity contract ─────────────────────────────────────────────────

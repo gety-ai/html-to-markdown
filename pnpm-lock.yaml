@@ -23,43 +23,24 @@ importers:
       '@napi-rs/cli':
         specifier: ^3.6.2
         version: 3.7.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@26.0.1)
-    optionalDependencies:
-      '@kreuzberg/html-to-markdown-node-darwin-arm64':
-        specifier: 3.7.2
-        version: 3.7.2
-      '@kreuzberg/html-to-markdown-node-darwin-x64':
-        specifier: 3.7.2
-        version: 3.7.2
-      '@kreuzberg/html-to-markdown-node-linux-arm64-gnu':
-        specifier: 3.7.2
-        version: 3.7.2
-      '@kreuzberg/html-to-markdown-node-linux-x64-gnu':
-        specifier: 3.7.2
-        version: 3.7.2
-      '@kreuzberg/html-to-markdown-node-win32-arm64-msvc':
-        specifier: 3.7.2
-        version: 3.7.2
-      '@kreuzberg/html-to-markdown-node-win32-x64-msvc':
-        specifier: 3.7.2
-        version: 3.7.2
 
   crates/html-to-markdown-wasm: {}
 
   e2e/node:
     devDependencies:
-      '@kreuzberg/html-to-markdown':
-        specifier: workspace:*
-        version: link:../../packages/typescript
       '@types/node':
         specifier: ^22.10.2
         version: 22.19.21
+      '@xberg-io/html-to-markdown':
+        specifier: workspace:*
+        version: link:../../crates/html-to-markdown-node
       vitest:
         specifier: ^4.1.5
         version: 4.1.8(@types/node@22.19.21)(vite@8.0.10(@types/node@22.19.21))
 
   e2e/wasm:
     devDependencies:
-      '@kreuzberg/html-to-markdown-wasm':
+      '@xberg-io/html-to-markdown-wasm':
         specifier: file:../../crates/html-to-markdown-wasm
         version: link:../../crates/html-to-markdown-wasm
       rollup:
@@ -68,16 +49,6 @@ importers:
       vitest:
         specifier: ^4.1.5
         version: 4.1.8(@types/node@26.0.1)(vite@8.0.10(@types/node@26.0.1))
-
-  packages/typescript:
-    dependencies:
-      '@kreuzberg/html-to-markdown-node':
-        specifier: workspace:*
-        version: link:../../crates/html-to-markdown-node
-    devDependencies:
-      typescript:
-        specifier: ^6.0.3
-        version: 6.0.3
 
 packages:
 
@@ -226,44 +197,6 @@ packages:
 
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
-
-  '@kreuzberg/html-to-markdown-node-darwin-arm64@3.7.2':
-    resolution: {integrity: sha512-gROpDkp8hoQEO9vSJ/onYWHuBivB6awPgg/ZgggtX5gcW9k2b2hIs5xvvHsbwxA2xnglZx6/5yoxVdjgjtJwyA==}
-    engines: {node: '>= 18'}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@kreuzberg/html-to-markdown-node-darwin-x64@3.7.2':
-    resolution: {integrity: sha512-UmCubXdsCKpTgeAixvRnIlyowZTKEyMfubpLlyUbCvXhaMGZhlJNOcRjIGxbJ++U5urXIBW9UEFnJlarBDPDOw==}
-    engines: {node: '>= 18'}
-    cpu: [x64]
-    os: [darwin]
-
-  '@kreuzberg/html-to-markdown-node-linux-arm64-gnu@3.7.2':
-    resolution: {integrity: sha512-5iBze12RzkiViU5abI3tUwhSnHV8S/dFUPc4XzOcfaoq3HfBT/rwJG8MOLHhELL+CY9OX+pSa5IC8NtKtaogEQ==}
-    engines: {node: '>= 18'}
-    cpu: [arm64]
-    os: [linux]
-    libc: [glibc]
-
-  '@kreuzberg/html-to-markdown-node-linux-x64-gnu@3.7.2':
-    resolution: {integrity: sha512-AdnNwz6/MDUz+9g8kRV6LQHtA+um8B6P0Y4QRY6buRIDSLjLf/OcRNV06GcTCqAU00yWN/5hA6RvKgqYcJTKrA==}
-    engines: {node: '>= 18'}
-    cpu: [x64]
-    os: [linux]
-    libc: [glibc]
-
-  '@kreuzberg/html-to-markdown-node-win32-arm64-msvc@3.7.2':
-    resolution: {integrity: sha512-IxeeP189ZbvFOXONiEyYUg/8Vuje1c2xXSq0UIv1nRMu0F4st0yD5vU5d9EjVtipgUe93snM6JakMKRRNAptSA==}
-    engines: {node: '>= 18'}
-    cpu: [arm64]
-    os: [win32]
-
-  '@kreuzberg/html-to-markdown-node-win32-x64-msvc@3.7.2':
-    resolution: {integrity: sha512-xzy/3ZWno3BOdcRjI8+sdUuU7ss82P8bW4UDnpUhVBpwkcQ802I5yqZKJIlaSrlFDSK3pd6xsH5UzJnI/3Q1rQ==}
-    engines: {node: '>= 18'}
-    cpu: [x64]
-    os: [win32]
 
   '@napi-rs/cli@3.7.1':
     resolution: {integrity: sha512-7FkcxJ70SqpsYnyjaYwLVpkP3Xoyd8YkT5g7DevuEvSY7mzpLSva8oSQNENHiQ1T0GMLnae1X46KmiNIu5OXDw==}
@@ -1550,24 +1483,6 @@ snapshots:
       '@types/node': 26.0.1
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
-
-  '@kreuzberg/html-to-markdown-node-darwin-arm64@3.7.2':
-    optional: true
-
-  '@kreuzberg/html-to-markdown-node-darwin-x64@3.7.2':
-    optional: true
-
-  '@kreuzberg/html-to-markdown-node-linux-arm64-gnu@3.7.2':
-    optional: true
-
-  '@kreuzberg/html-to-markdown-node-linux-x64-gnu@3.7.2':
-    optional: true
-
-  '@kreuzberg/html-to-markdown-node-win32-arm64-msvc@3.7.2':
-    optional: true
-
-  '@kreuzberg/html-to-markdown-node-win32-x64-msvc@3.7.2':
-    optional: true
 
   '@napi-rs/cli@3.7.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@26.0.1)':
     dependencies:

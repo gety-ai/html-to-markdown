@@ -31,7 +31,7 @@ print(result.metadata.structured_data)         # JSON-LD, Microdata, RDFa
 {% elif language == 'typescript' %}
 
 ```typescript
-import { convert } from "@kreuzberg/html-to-markdown";
+import { convert } from "@xberg-io/html-to-markdown";
 
 const html = '<h1>Article</h1><img src="test.jpg" alt="test">';
 const result = convert(html, { extractMetadata: true });
@@ -111,9 +111,9 @@ func main() {
 {% elif language == 'java' %}
 
 ```java
-import dev.kreuzberg.htmltomarkdown.HtmlToMarkdown;
-import dev.kreuzberg.htmltomarkdown.ConversionOptions;
-import dev.kreuzberg.htmltomarkdown.ConversionResult;
+import io.xberg.htmltomarkdown.HtmlToMarkdown;
+import io.xberg.htmltomarkdown.ConversionOptions;
+import io.xberg.htmltomarkdown.ConversionResult;
 
 public class Main {
     public static void main(String[] args) {

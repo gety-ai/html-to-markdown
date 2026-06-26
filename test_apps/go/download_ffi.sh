@@ -16,7 +16,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # $NF is the version field in both go.mod forms: block `<path> <version>` (NF=2)
 # and inline `require <path> <version>` (NF=3). The regex anchors the match on
 # the binding path followed by a `v<digit>` version, so $NF is always the version.
-MODULE_VERSION="$(awk '/github.com\/kreuzberg-dev\/html-to-markdown\/packages\/go\/v3[[:space:]]+v[0-9]/ {gsub(/^v/, "", $NF); print $NF; exit}' "$SCRIPT_DIR/go.mod")"
+MODULE_VERSION="$(awk '/github.com\/xberg-io\/html-to-markdown\/packages\/go\/v3[[:space:]]+v[0-9]/ {gsub(/^v/, "", $NF); print $NF; exit}' "$SCRIPT_DIR/go.mod")"
 if [ -z "${MODULE_VERSION:-}" ]; then
   echo "Could not determine MODULE_VERSION from go.mod" >&2
   exit 1

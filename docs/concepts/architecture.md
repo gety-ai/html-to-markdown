@@ -89,6 +89,6 @@ Bindings that cross the C FFI boundary use opaque handles returned by `htm_*` co
 
 ## Ecosystem fit
 
-html-to-markdown is consumed by [Kreuzberg](https://docs.xberg.io) (as the HTML extractor in the document intelligence pipeline) and [crawlberg](https://docs.crawlberg.xberg.io) (as the conversion stage after page fetch). The output `ConversionResult` is intentionally close in shape to Kreuzberg's `ExtractionResult` so the two compose without translation.
+html-to-markdown is consumed by [Xberg](https://docs.xberg.io) (as the HTML extractor in the document intelligence pipeline) and [crawlberg](https://docs.crawlberg.xberg.io) (as the conversion stage after page fetch). The output `ConversionResult` is intentionally close in shape to Xberg's `ExtractionResult` so the two compose without translation.
 
 --8<-- "snippets/feedback.md"

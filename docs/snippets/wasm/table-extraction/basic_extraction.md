@@ -1,5 +1,5 @@
 ```javascript
-import init, { convert } from "@kreuzberg/html-to-markdown-wasm";
+import init, { convert } from "@xberg-io/html-to-markdown-wasm";
 
 await init();
 

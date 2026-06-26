@@ -1,6 +1,6 @@
 ```typescript
-import { convert, ConversionOptions } from "@kreuzberg/html-to-markdown";
-import { Visitor, NodeContext, VisitResult } from "@kreuzberg/html-to-markdown";
+import { convert, ConversionOptions } from "@xberg-io/html-to-markdown";
+import { Visitor, NodeContext, VisitResult } from "@xberg-io/html-to-markdown";
 
 const visitor: Visitor = {
   visitLink(ctx: NodeContext, href: string, text: string): VisitResult {

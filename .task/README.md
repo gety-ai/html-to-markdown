@@ -1,6 +1,6 @@
 # .task/ Directory - Modular Task Organization
 
-This directory contains the modular Task configuration for the html-to-markdown project, following the **Kreuzberg pattern** for maintainable, scalable build automation.
+This directory contains the modular Task configuration for the html-to-markdown project, following the **Xberg pattern** for maintainable, scalable build automation.
 
 ## Purpose
 
@@ -665,7 +665,7 @@ cmds:
 ## References
 
 - **Task Documentation**: <https://taskfile.dev>
-- **Kreuzberg Pattern**: ../kreuzberg/ (sibling project)
+- **Xberg Pattern**: ../xberg/ (sibling project)
 - **Root Taskfile**: ../Taskfile.yml
 - **Platform Config**: config/platforms.yml
 - **Global Variables**: config/vars.yml

@@ -18,20 +18,20 @@
   <a href="https://pypi.org/project/html-to-markdown/">
     <img src="https://img.shields.io/pypi/v/html-to-markdown?label=Python&color=007ec6" alt="Python">
   </a>
-  <a href="https://www.npmjs.com/package/@kreuzberg/html-to-markdown-node">
-    <img src="https://img.shields.io/npm/v/@kreuzberg/html-to-markdown-node?label=Node.js&color=007ec6" alt="Node.js">
+  <a href="https://www.npmjs.com/package/@xberg-io/html-to-markdown">
+    <img src="https://img.shields.io/npm/v/@xberg-io/html-to-markdown?label=Node.js&color=007ec6" alt="Node.js">
   </a>
-  <a href="https://www.npmjs.com/package/@kreuzberg/html-to-markdown-wasm">
-    <img src="https://img.shields.io/npm/v/@kreuzberg/html-to-markdown-wasm?label=WASM&color=007ec6" alt="WASM">
+  <a href="https://www.npmjs.com/package/@xberg-io/html-to-markdown-wasm">
+    <img src="https://img.shields.io/npm/v/@xberg-io/html-to-markdown-wasm?label=WASM&color=007ec6" alt="WASM">
   </a>
-  <a href="https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown">
-    <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown?label=Java&color=007ec6" alt="Java">
+  <a href="https://central.sonatype.com/artifact/io.xberg/html-to-markdown">
+    <img src="https://img.shields.io/maven-central/v/io.xberg/html-to-markdown?label=Java&color=007ec6" alt="Java">
   </a>
   <a href="https://pkg.go.dev/github.com/xberg-io/html-to-markdown/packages/go/v3">
     <img src="https://img.shields.io/github/v/tag/xberg-io/html-to-markdown?label=Go&color=007ec6&filter=v3*" alt="Go">
   </a>
-  <a href="https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/">
-    <img src="https://img.shields.io/nuget/v/KreuzbergDev.HtmlToMarkdown?label=C%23&color=007ec6" alt="C#">
+  <a href="https://www.nuget.org/packages/XbergIo.HtmlToMarkdown/">
+    <img src="https://img.shields.io/nuget/v/XbergIo.HtmlToMarkdown?label=C%23&color=007ec6" alt="C#">
   </a>
   <a href="https://packagist.org/packages/xberg-io/html-to-markdown">
     <img src="https://img.shields.io/packagist/v/xberg-io/html-to-markdown?label=PHP&color=007ec6" alt="PHP">
@@ -48,8 +48,8 @@
   <a href="https://pub.dev/packages/h2m">
     <img src="https://img.shields.io/pub/v/h2m?label=Dart&color=007ec6" alt="Dart">
   </a>
-  <a href="https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown-android">
-    <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown-android?label=Kotlin&color=007ec6" alt="Kotlin">
+  <a href="https://central.sonatype.com/artifact/io.xberg/html-to-markdown-android">
+    <img src="https://img.shields.io/maven-central/v/io.xberg/html-to-markdown-android?label=Kotlin&color=007ec6" alt="Kotlin">
   </a>
   <a href="https://github.com/xberg-io/html-to-markdown/tree/main/packages/swift">
     <img src="https://img.shields.io/badge/Swift-SPM-007ec6" alt="Swift">
@@ -93,9 +93,9 @@ Uses Foreign Function & Memory API for zero-dependency, thread-safe conversion w
 
 ```bash
 <dependency>
-    <groupId>dev.kreuzberg</groupId>
+    <groupId>io.xberg</groupId>
     <artifactId>html-to-markdown</artifactId>
-    <version>3.7.2</version>
+    <version>3.8.0-rc.1</version>
 </dependency>
 ```
 
@@ -105,16 +105,16 @@ Requires Java 25+ with Panama FFI support.
 
 ```xml
 <dependency>
-    <groupId>dev.kreuzberg</groupId>
+    <groupId>io.xberg</groupId>
     <artifactId>html-to-markdown</artifactId>
-    <version>3.7.2</version>
+    <version>3.8.0-rc.1</version>
 </dependency>
 ```
 
 **Gradle (Kotlin DSL):**
 
 ```kotlin
-implementation("dev.kreuzberg:html-to-markdown:3.7.2")
+implementation("io.xberg:html-to-markdown:3.8.0-rc.1")
 ```
 
 ## Performance Snapshot
@@ -132,8 +132,8 @@ implementation("dev.kreuzberg:html-to-markdown:3.7.2")
 Basic conversion:
 
 ```java
-import dev.kreuzberg.htmltomarkdown.HtmlToMarkdown;
-import dev.kreuzberg.htmltomarkdown.ConversionResult;
+import io.xberg.htmltomarkdown.HtmlToMarkdown;
+import io.xberg.htmltomarkdown.ConversionResult;
 
 public class Example {
     public static void main(String[] args) {
@@ -147,9 +147,9 @@ public class Example {
 With conversion options:
 
 ```java
-import dev.kreuzberg.htmltomarkdown.HtmlToMarkdown;
-import dev.kreuzberg.htmltomarkdown.ConversionOptions;
-import dev.kreuzberg.htmltomarkdown.ConversionResult;
+import io.xberg.htmltomarkdown.HtmlToMarkdown;
+import io.xberg.htmltomarkdown.ConversionOptions;
+import io.xberg.htmltomarkdown.ConversionResult;
 
 public class MetadataExample {
     public static void main(String[] args) {
@@ -236,9 +236,9 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 ### Example Usage
 
 ```java
-import dev.kreuzberg.htmltomarkdown.HtmlToMarkdown;
-import dev.kreuzberg.htmltomarkdown.ConversionOptions;
-import dev.kreuzberg.htmltomarkdown.OutputFormat;
+import io.xberg.htmltomarkdown.HtmlToMarkdown;
+import io.xberg.htmltomarkdown.ConversionOptions;
+import io.xberg.htmltomarkdown.OutputFormat;
 
 String html = "<p>This is <strong>bold</strong> and <em>italic</em> text.</p>";
 
@@ -262,9 +262,9 @@ Djot's extended syntax allows you to express more semantic meaning in lightweigh
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
 
 ```java
-import dev.kreuzberg.htmltomarkdown.HtmlToMarkdown;
-import dev.kreuzberg.htmltomarkdown.ConversionOptions;
-import dev.kreuzberg.htmltomarkdown.OutputFormat;
+import io.xberg.htmltomarkdown.HtmlToMarkdown;
+import io.xberg.htmltomarkdown.ConversionOptions;
+import io.xberg.htmltomarkdown.OutputFormat;
 
 String html = "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.</p>";
 
@@ -299,12 +299,12 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 ## Links
 
 - **GitHub:** [github.com/xberg-io/html-to-markdown](https://github.com/xberg-io/html-to-markdown)
-- **Maven Central:** [central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown](https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown)
+- **Maven Central:** [central.sonatype.com/artifact/io.xberg/html-to-markdown](https://central.sonatype.com/artifact/io.xberg/html-to-markdown)
 - **Discord:** [discord.gg/xt9WY3GnKR](https://discord.gg/xt9WY3GnKR)
 
-## Part of Kreuzberg.dev
+## Part of Xberg
 
-- [Kreuzberg](https://github.com/xberg-io/kreuzberg) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
+- [Xberg](https://github.com/xberg-io/xberg) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
 - [Xberg Enterprise](https://github.com/xberg-io/xberg-enterprise) — managed extraction API with SDKs, dashboards, and observability.
 - [crawlberg](https://github.com/xberg-io/crawlberg) — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
 - [html-to-markdown](https://github.com/xberg-io/html-to-markdown) — fast, lossless HTML→Markdown engine.
@@ -333,7 +333,7 @@ MIT License – see [LICENSE](https://github.com/xberg-io/html-to-markdown/blob/
 
 ## Support
 
-If you find this library useful, consider [sponsoring the project](https://github.com/sponsors/kreuzberg-dev).
+If you find this library useful, consider [sponsoring the project](https://github.com/sponsors/xberg-io).
 
 Have questions or run into issues? We're here to help:
 

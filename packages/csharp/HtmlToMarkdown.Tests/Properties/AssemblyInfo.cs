@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("HtmlToMarkdown.Tests")]
-[assembly: AssemblyCompany("Kreuzberg Team")]
+[assembly: AssemblyCompany("Xberg")]
 [assembly: AssemblyProduct("HtmlToMarkdown.Tests")]
 [assembly: AssemblyDescription("Tests for HTML to Markdown converter")]
 [assembly: AssemblyVersion("3.4.0")]

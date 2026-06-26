@@ -1,6 +1,6 @@
 {
-  "name": "@kreuzberg/html-to-markdown-node",
-  "version": "3.7.2",
+  "name": "@xberg-io/html-to-markdown",
+  "version": "3.8.0-rc.1",
   "description": "High-performance HTML to Markdown converter",
   "license": "MIT",
   "repository": {
@@ -18,17 +18,17 @@
   },
   "files": ["index.js", "index.d.ts", "*.node"],
   "optionalDependencies": {
-    "@kreuzberg/html-to-markdown-node-linux-x64-gnu": "3.7.2",
-    "@kreuzberg/html-to-markdown-node-linux-arm64-gnu": "3.7.2",
-    "@kreuzberg/html-to-markdown-node-linux-x64-musl": "3.7.2",
-    "@kreuzberg/html-to-markdown-node-linux-arm64-musl": "3.7.2",
-    "@kreuzberg/html-to-markdown-node-darwin-x64": "3.7.2",
-    "@kreuzberg/html-to-markdown-node-darwin-arm64": "3.7.2",
-    "@kreuzberg/html-to-markdown-node-win32-x64-msvc": "3.7.2",
-    "@kreuzberg/html-to-markdown-node-win32-arm64-msvc": "3.7.2"
+    "@xberg-io/html-to-markdown-linux-x64-gnu": "3.8.0-rc.1",
+    "@xberg-io/html-to-markdown-linux-arm64-gnu": "3.8.0-rc.1",
+    "@xberg-io/html-to-markdown-linux-x64-musl": "3.8.0-rc.1",
+    "@xberg-io/html-to-markdown-linux-arm64-musl": "3.8.0-rc.1",
+    "@xberg-io/html-to-markdown-darwin-x64": "3.8.0-rc.1",
+    "@xberg-io/html-to-markdown-darwin-arm64": "3.8.0-rc.1",
+    "@xberg-io/html-to-markdown-win32-x64-msvc": "3.8.0-rc.1",
+    "@xberg-io/html-to-markdown-win32-arm64-msvc": "3.8.0-rc.1"
   },
   "napi": {
-    "packageName": "@kreuzberg/html-to-markdown-node",
+    "packageName": "@xberg-io/html-to-markdown",
     "binaryName": "html-to-markdown-node",
     "targets": [
       "x86_64-unknown-linux-gnu",

@@ -1,6 +1,6 @@
 import init, {
 	convert,
-} from "https://cdn.jsdelivr.net/npm/@kreuzberg/html-to-markdown-wasm@latest/dist-web/html_to_markdown_wasm.js";
+} from "https://cdn.jsdelivr.net/npm/@xberg-io/html-to-markdown-wasm@latest/dist-web/html_to_markdown_wasm.js";
 
 let wasmInitialized = false;
 

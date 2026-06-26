@@ -1,5 +1,5 @@
 ```kotlin
-import dev.kreuzberg.android.HtmlToMarkdownRs
+import io.xberg.android.HtmlToMarkdownRs
 
 val html = "<h1>Hello</h1><p>This is <strong>fast</strong>!</p>"
 val result = HtmlToMarkdownRs.convert(html)

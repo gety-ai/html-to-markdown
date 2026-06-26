@@ -6,7 +6,7 @@ name: Publish Release
 #   crates · cli · python · node · typescript · wasm · ruby · php · go · c-ffi
 #   java · csharp · elixir · homebrew
 #
-# Mirrors kreuzberg's publish.yaml composition: every registry interaction,
+# Mirrors Xberg's publish.yaml composition: every registry interaction,
 # every multi-platform build, and every release-asset upload routes through
 # a shared xberg-io/actions composite. Inline bash is reserved for
 # repo-quirky orchestration only (homebrew bottle assembly, Node platform
@@ -97,7 +97,7 @@ jobs:
               with:
                   app-id: ${{ secrets.BOT_APP_ID }}
                   private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-                  owner: kreuzberg-dev
+                  owner: xberg-io
 
             - name: Checkout
               uses: actions/checkout@v6
@@ -110,8 +110,8 @@ jobs:
 
             - name: Configure git identity
               run: |
-                  git config user.name "kreuzberg-dev-publisher[bot]"
-                  git config user.email "291994444+kreuzberg-dev-publisher[bot]@users.noreply.github.com"
+                  git config user.name "xberg-dev-publisher[bot]"
+                  git config user.email "291994444+xberg-dev-publisher[bot]@users.noreply.github.com"
 
             - name: Retag for republish
               if: ${{ inputs.republish == true || github.event.client_payload.republish == true }}
@@ -177,16 +177,13 @@ jobs:
         runs-on: ubuntu-latest
         outputs:
             node_exists: ${{ steps.check.outputs.exists }}
-            ts_exists: ${{ steps.check.outputs.ts_exists }}
         steps:
             - id: check
               uses: xberg-io/actions/check-registry@v1
               with:
                   registry: npm
-                  package: "@kreuzberg/html-to-markdown-node"
+                  package: "@xberg-io/html-to-markdown"
                   version: ${{ needs.prepare.outputs.version }}
-                  extra-packages: |
-                      ts_exists=@kreuzberg/html-to-markdown
 
     check-wasm:
         name: Check npm for existing WASM package
@@ -200,7 +197,7 @@ jobs:
               uses: xberg-io/actions/check-registry@v1
               with:
                   registry: npm
-                  package: "@kreuzberg/html-to-markdown-wasm"
+                  package: "@xberg-io/html-to-markdown-wasm"
                   version: ${{ needs.prepare.outputs.version }}
 
     check-rubygems:
@@ -230,7 +227,7 @@ jobs:
               uses: xberg-io/actions/check-registry@v1
               with:
                   registry: maven
-                  package: "dev.kreuzberg:html-to-markdown"
+                  package: "io.xberg:html-to-markdown"
                   version: ${{ needs.prepare.outputs.version }}
 
     check-nuget:
@@ -245,7 +242,7 @@ jobs:
               uses: xberg-io/actions/check-registry@v1
               with:
                   registry: nuget
-                  package: KreuzbergDev.HtmlToMarkdown
+                  package: XbergIo.HtmlToMarkdown
                   version: ${{ needs.prepare.outputs.version }}
 
     check-packagist:
@@ -408,7 +405,7 @@ jobs:
               uses: xberg-io/actions/check-registry@v1
               with:
                   registry: maven
-                  package: "dev.kreuzberg:html-to-markdown-kotlin"
+                  package: "io.xberg:html-to-markdown-kotlin"
                   version: ${{ needs.prepare.outputs.version }}
 
     check-pub:
@@ -758,9 +755,8 @@ jobs:
               # effect. We keep napi's index.js (its platform-dispatch stub loader)
               # but restore alef's committed index.d.ts: alef adds *Update DTO types
               # (e.g. ConversionOptionsUpdate, PreprocessingOptionsUpdate) that the
-              # napi macros deliberately filter out — those types are re-exported by
-              # packages/typescript/src/index.ts, so dropping them breaks tsc with
-              # TS2724 at the wrapper publish step.
+              # napi macros deliberately filter out — those types are committed in
+              # crates/html-to-markdown-node/index.d.ts.
               shell: bash
               run: |
                   pnpm --filter ./crates/html-to-markdown-node exec napi build --release
@@ -961,7 +957,7 @@ jobs:
 
             - name: Install Ruby dependencies
               # Inline: bundle config + install in the package dir; trivially small
-              # and identical across crawlberg/kreuzberg/html-to-markdown.
+              # and identical across crawlberg/xberg/html-to-markdown.
               shell: bash
               working-directory: packages/ruby
               run: |
@@ -978,8 +974,8 @@ jobs:
               # Inline: each matrix runner builds the gem for its own native platform
               # via `rake compile && rake build`. rake-compiler's compile step sets
               # the gem's native platform tag from rb_config, so the produced gem is
-              # already platform-tagged (e.g. kreuzberg-X.Y.Z-x86_64-linux.gem). This
-              # mirrors the kreuzberg sibling's proven Ruby publish path. For Windows
+              # already platform-tagged (e.g. xberg-X.Y.Z-x86_64-linux.gem). This
+              # mirrors the Xberg sibling's proven Ruby publish path. For Windows
               # we cross-compile inside rb-sys-dock so the GNU toolchain produces a
               # x64-mingw-ucrt gem from the linux runner.
               shell: bash
@@ -1892,7 +1888,7 @@ jobs:
               uses: xberg-io/actions/wait-for-package@v1
               with:
                   registry: npm
-                  package: "@kreuzberg/html-to-markdown-node-linux-x64-gnu"
+                  package: "@xberg-io/html-to-markdown-linux-x64-gnu"
                   version: ${{ needs.prepare.outputs.version }}
                   max-attempts: "60"
 
@@ -1901,11 +1897,11 @@ jobs:
               uses: xberg-io/actions/wait-for-package@v1
               with:
                   registry: npm
-                  package: "@kreuzberg/html-to-markdown-node-linux-arm64-gnu"
+                  package: "@xberg-io/html-to-markdown-linux-arm64-gnu"
                   version: ${{ needs.prepare.outputs.version }}
                   max-attempts: "60"
 
-            - name: Publish main @kreuzberg/html-to-markdown-node package
+            - name: Publish main @xberg-io/html-to-markdown package
               uses: xberg-io/actions/publish-npm@v1
               with:
                   package-dir: crates/html-to-markdown-node
@@ -1913,47 +1909,14 @@ jobs:
                   dry-run: ${{ needs.prepare.outputs.dry_run }}
 
             - name: Wait for main Node package indexing
-              if: ${{ needs.prepare.outputs.dry_run != 'true' && needs.check-npm.outputs.ts_exists != 'true' }}
+              if: ${{ needs.prepare.outputs.dry_run != 'true' }}
               uses: xberg-io/actions/wait-for-package@v1
               with:
                   registry: npm
-                  package: "@kreuzberg/html-to-markdown-node"
+                  package: "@xberg-io/html-to-markdown"
                   version: ${{ needs.prepare.outputs.version }}
                   max-attempts: "60"
 
-            - name: Build TypeScript wrapper package
-              if: ${{ needs.check-npm.outputs.ts_exists != 'true' }}
-              # Inline: pnpm tsc + workspace:* rewrite so npm publish (used by the
-              # publish-npm shared action) ships an installable package. Tightly
-              # coupled to packages/typescript layout and pnpm workspace conventions.
-              shell: bash
-              run: |
-                  (cd packages/typescript && pnpm install --no-frozen-lockfile && pnpm exec tsc --project tsconfig.json)
-                  version="$(node -p "require('./packages/typescript/package.json').version")"
-                  PKG_VERSION="$version" node -e '
-                    const fs = require("node:fs");
-                    const path = "packages/typescript/package.json";
-                    const pkg = JSON.parse(fs.readFileSync(path, "utf8"));
-                    const ver = process.env.PKG_VERSION;
-                    for (const field of ["dependencies", "peerDependencies", "optionalDependencies"]) {
-                      if (pkg[field]) {
-                        for (const [name, spec] of Object.entries(pkg[field])) {
-                          if (typeof spec === "string" && spec.startsWith("workspace:")) {
-                            pkg[field][name] = ver;
-                          }
-                        }
-                      }
-                    }
-                    fs.writeFileSync(path, JSON.stringify(pkg, null, 2) + "\n");
-                  '
-
-            - name: Publish TypeScript wrapper package
-              if: ${{ needs.check-npm.outputs.ts_exists != 'true' }}
-              uses: xberg-io/actions/publish-npm@v1
-              with:
-                  package-dir: packages/typescript
-                  npm-tag: ${{ needs.prepare.outputs.npm_tag }}
-                  dry-run: ${{ needs.prepare.outputs.dry_run }}
 
     publish-wasm:
         name: Publish WASM package
@@ -2144,7 +2107,7 @@ jobs:
               with:
                   app-id: ${{ secrets.BOT_APP_ID }}
                   private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-                  owner: kreuzberg-dev
+                  owner: xberg-io
 
             - uses: actions/checkout@v6
               with:
@@ -2263,7 +2226,7 @@ jobs:
               with:
                   app-id: ${{ secrets.BOT_APP_ID }}
                   private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-                  owner: kreuzberg-dev
+                  owner: xberg-io
 
             - name: Dispatch publish-pubdev workflow
               env:
@@ -2290,7 +2253,7 @@ jobs:
               with:
                   app-id: ${{ secrets.BOT_APP_ID }}
                   private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-                  owner: kreuzberg-dev
+                  owner: xberg-io
 
             - uses: actions/checkout@v6
               with:
@@ -2359,7 +2322,7 @@ jobs:
               with:
                   app-id: ${{ secrets.BOT_APP_ID }}
                   private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-                  owner: kreuzberg-dev
+                  owner: xberg-io
             - name: Flip release out of draft
               env:
                   GH_TOKEN: ${{ steps.app-token.outputs.token }}
@@ -2368,7 +2331,7 @@ jobs:
 
     # ─── Homebrew (formula update + bottles) ──────────────────────────────
     #
-    # Topology (mirrors kreuzberg's; html-to-markdown ships TWO formulas):
+    # Topology (mirrors Xberg's; html-to-markdown ships TWO formulas):
     #   1. publish-homebrew-formula — update Formula/{html-to-markdown,libhtml-to-markdown}.rb
     #      (no bottles). Backed by the repo-quirky update-homebrew-formula.sh.
     #   2. homebrew-bottles         — build per-platform bottle JSON manifests
@@ -2386,7 +2349,7 @@ jobs:
               with:
                   app-id: ${{ secrets.BOT_APP_ID }}
                   private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-                  owner: kreuzberg-dev
+                  owner: xberg-io
                   repositories: homebrew-tap
 
             # source-token: org-wide (no `repositories:`) so the homebrew action's
@@ -2397,7 +2360,7 @@ jobs:
               with:
                   app-id: ${{ secrets.BOT_APP_ID }}
                   private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-                  owner: kreuzberg-dev
+                  owner: xberg-io
 
             - uses: actions/checkout@v6
               with:
@@ -2427,8 +2390,8 @@ jobs:
                   GH_TOKEN: ${{ steps.tap-token.outputs.token }}
               # Inline: tap-side commit/push of the regenerated formulas.
               run: |
-                  git config user.name "kreuzberg-dev-publisher[bot]"
-                  git config user.email "291994444+kreuzberg-dev-publisher[bot]@users.noreply.github.com"
+                  git config user.name "xberg-dev-publisher[bot]"
+                  git config user.email "291994444+xberg-dev-publisher[bot]@users.noreply.github.com"
                   if git diff --quiet Formula/; then
                     echo "No formula changes; skipping commit."
                     exit 0
@@ -2466,7 +2429,7 @@ jobs:
               with:
                   app-id: ${{ secrets.BOT_APP_ID }}
                   private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-                  owner: kreuzberg-dev
+                  owner: xberg-io
 
             # Pinned to checkout@v5: v6 hits an includeIf credential regression on
             # macos-15-intel runners (same workaround liter-llm uses). Other jobs
@@ -2510,7 +2473,7 @@ jobs:
               with:
                   app-id: ${{ secrets.BOT_APP_ID }}
                   private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-                  owner: kreuzberg-dev
+                  owner: xberg-io
                   repositories: homebrew-tap
 
             - uses: actions/checkout@v6
@@ -2548,8 +2511,8 @@ jobs:
                   GH_TOKEN: ${{ steps.tap-token.outputs.token }}
               # Inline: tap-side commit/push of the regenerated formula.
               run: |
-                  git config user.name "kreuzberg-dev-publisher[bot]"
-                  git config user.email "291994444+kreuzberg-dev-publisher[bot]@users.noreply.github.com"
+                  git config user.name "xberg-dev-publisher[bot]"
+                  git config user.email "291994444+xberg-dev-publisher[bot]@users.noreply.github.com"
                   if git diff --quiet Formula/; then
                     echo "No bottle DSL changes; skipping commit."
                     exit 0
@@ -2582,7 +2545,7 @@ jobs:
               with:
                   app-id: ${{ secrets.BOT_APP_ID }}
                   private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-                  owner: kreuzberg-dev
+                  owner: xberg-io
 
             - uses: xberg-io/actions/verify-release-assets@v1
               with:
@@ -2630,7 +2593,7 @@ jobs:
               with:
                   app-id: ${{ secrets.BOT_APP_ID }}
                   private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-                  owner: kreuzberg-dev
+                  owner: xberg-io
 
             - uses: actions/checkout@v6
               with:
@@ -2669,8 +2632,8 @@ jobs:
                   # tag conversion (the lease's expected SHA is the annotated tag object, but the
                   # server compares it differently after we replace it with a lightweight tag).
                   # Use plain `--force` and retry transient network failures.
-                  git config user.name "kreuzberg-dev-publisher[bot]"
-                  git config user.email "291994444+kreuzberg-dev-publisher[bot]@users.noreply.github.com"
+                  git config user.name "xberg-dev-publisher[bot]"
+                  git config user.email "291994444+xberg-dev-publisher[bot]@users.noreply.github.com"
                   git add Package.swift
                   git commit -m "chore(release): substitute Swift checksum for ${VERSION}"
                   git tag -f "v${VERSION}" HEAD
@@ -2823,7 +2786,7 @@ jobs:
               with:
                   app-id: ${{ secrets.BOT_APP_ID }}
                   private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-                  owner: kreuzberg-dev
+                  owner: xberg-io
 
             - uses: xberg-io/actions/finalize-release@v1
               with:
@@ -2870,7 +2833,7 @@ jobs:
               with:
                   app-id: ${{ secrets.BOT_APP_ID }}
                   private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
-                  owner: kreuzberg-dev
+                  owner: xberg-io
 
             - uses: xberg-io/actions/announce-release-discord@v1
               with:

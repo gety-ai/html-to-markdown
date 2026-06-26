@@ -13,31 +13,31 @@ Requires Node.js 18+ or Bun. Native bindings provide superior performance.
 **npm:**
 
 ```bash
-npm install @kreuzberg/html-to-markdown
+npm install @xberg-io/html-to-markdown
 ```
 
 **pnpm:**
 
 ```bash
-pnpm add @kreuzberg/html-to-markdown
+pnpm add @xberg-io/html-to-markdown
 ```
 
 **yarn:**
 
 ```bash
-yarn add @kreuzberg/html-to-markdown
+yarn add @xberg-io/html-to-markdown
 ```
 
 **bun:**
 
 ```bash
-bun add @kreuzberg/html-to-markdown
+bun add @xberg-io/html-to-markdown
 ```
 
 Alternatively, use the WebAssembly version for browser/edge environments:
 
 ```bash
-npm install @kreuzberg/html-to-markdown-wasm
+npm install @xberg-io/html-to-markdown-wasm
 ```
 
 {% elif language == 'ruby' %}
@@ -76,7 +76,7 @@ Requires Java 25+ with Panama FFI support.
 
 ```xml
 <dependency>
-    <groupId>dev.kreuzberg</groupId>
+    <groupId>io.xberg</groupId>
     <artifactId>html-to-markdown</artifactId>
     <version>{{ version }}</version>
 </dependency>
@@ -85,7 +85,7 @@ Requires Java 25+ with Panama FFI support.
 **Gradle (Kotlin DSL):**
 
 ```kotlin
-implementation("dev.kreuzberg:html-to-markdown:{{ version }}")
+implementation("io.xberg:html-to-markdown:{{ version }}")
 ```
 
 {% elif language == 'csharp' %}
@@ -93,7 +93,7 @@ implementation("dev.kreuzberg:html-to-markdown:{{ version }}")
 Requires .NET 8.0+ SDK.
 
 ```bash
-dotnet add package KreuzbergDev.HtmlToMarkdown
+dotnet add package XbergIo.HtmlToMarkdown
 ```
 
 {% elif language == 'elixir' %}

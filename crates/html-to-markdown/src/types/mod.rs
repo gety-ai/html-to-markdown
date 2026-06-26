@@ -1,6 +1,6 @@
 //! Core types for structured HTML extraction results.
 //!
-//! These types are aligned with kreuzberg's `DocumentStructure` model for seamless integration.
+//! These types are aligned with Xberg's `DocumentStructure` model for seamless integration.
 
 mod document;
 mod result;

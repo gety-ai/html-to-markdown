@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.8.0-rc.1] - 2026-06-26
+
+### Changed
+
+- **Rebrand Kreuzberg → Xberg across every published package identity.** The Node binding now ships as
+  `@xberg-io/html-to-markdown` (the NAPI-RS crate itself — the separate `-node` package and the
+  TypeScript wrapper under `packages/typescript/` are removed) with platform packages
+  `@xberg-io/html-to-markdown-<platform>`; WASM and CLI move to `@xberg-io/html-to-markdown-wasm` and
+  `@xberg-io/html-to-markdown-cli`. Java/Kotlin Maven coordinates and namespace move to `io.xberg`
+  (`io.xberg:html-to-markdown[-android]`, JNI symbols `Java_io_xberg_android_…`), and the C# NuGet id to
+  `XbergIo.HtmlToMarkdown`. The GitHub org (`github.com/xberg-io`), Homebrew tap
+  (`xberg-io/homebrew-tap`), publisher GitHub App, sponsors links, and all docs/badges follow. The legal
+  entity name **Kreuzberg, Inc.** is unchanged.
+
 ### Fixed
 
 - **Swift publish now creates the `release/swift/<version>` branch carrying the substituted

@@ -1,4 +1,4 @@
-//! Structured table types aligned with kreuzberg's `TableGrid`.
+//! Structured table types aligned with Xberg's `TableGrid`.
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};

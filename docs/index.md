@@ -55,19 +55,19 @@ Convert HTML to Markdown, Djot, or plain text. One Rust core plus 15 generated p
 | :-------------------- | :---------------------------------------------------------------- | :--------------------------------------- |
 | **Rust**              | `cargo add html-to-markdown-rs`                                   | [Reference](reference/api-rust.md)       |
 | **Python**            | `pip install html-to-markdown`                                    | [Reference](reference/api-python.md)     |
-| **TypeScript / Node** | `npm install @kreuzberg/html-to-markdown`                         | [Reference](reference/api-typescript.md) |
+| **TypeScript / Node** | `npm install @xberg-io/html-to-markdown`                         | [Reference](reference/api-typescript.md) |
 | **Go**                | `go get github.com/xberg-io/html-to-markdown/packages/go/v3` | [Reference](reference/api-go.md)         |
 | **Ruby**              | `gem install html-to-markdown`                                    | [Reference](reference/api-ruby.md)       |
 | **PHP**               | `pie install xberg-io/html-to-markdown`                      | [Reference](reference/api-php.md)        |
-| **Java**              | Maven `dev.kreuzberg:html-to-markdown`                            | [Reference](reference/api-java.md)       |
-| **C#**                | `dotnet add package KreuzbergDev.HtmlToMarkdown`                  | [Reference](reference/api-csharp.md)     |
+| **Java**              | Maven `io.xberg:html-to-markdown`                            | [Reference](reference/api-java.md)       |
+| **C#**                | `dotnet add package XbergIo.HtmlToMarkdown`                  | [Reference](reference/api-csharp.md)     |
 | **Elixir**            | `{:html_to_markdown, "~> 3.4"}`                                   | [Reference](reference/api-elixir.md)     |
 | **R**                 | `install.packages("htmltomarkdown")`                              | [Reference](reference/api-r.md)          |
 | **C (FFI)**           | Shared library + header                                           | [Reference](reference/api-c.md)          |
-| **WebAssembly**       | `npm install @kreuzberg/html-to-markdown-wasm`                    | [Reference](reference/api-wasm.md)       |
+| **WebAssembly**       | `npm install @xberg-io/html-to-markdown-wasm`                    | [Reference](reference/api-wasm.md)       |
 | **Swift**             | Swift Package `HtmlToMarkdown`                                    | [Reference](reference/api-swift.md)      |
 | **Dart**              | `dart pub add h2m`                                                | [Reference](reference/api-dart.md)       |
-| **Kotlin Android**    | Maven `dev.kreuzberg:html-to-markdown-android`                    | [Reference](reference/api-kotlin-android.md) |
+| **Kotlin Android**    | Maven `io.xberg:html-to-markdown-android`                    | [Reference](reference/api-kotlin-android.md) |
 | **Zig**               | Zig package `html_to_markdown_rs`                                 | [Reference](reference/api-zig.md)        |
 | **CLI**               | `cargo install html-to-markdown-cli`                              | [CLI Guide](cli.md)                      |
 
@@ -88,7 +88,7 @@ Convert HTML to Markdown, Djot, or plain text. One Rust core plus 15 generated p
 === "TypeScript"
 
     ```typescript title="index.ts"
-    import { convert } from "@kreuzberg/html-to-markdown";
+    import { convert } from "@xberg-io/html-to-markdown";
 
     const result = convert("<h1>Hello</h1><p>World</p>");
     console.log(result.content);
@@ -109,13 +109,13 @@ Convert HTML to Markdown, Djot, or plain text. One Rust core plus 15 generated p
 
 ---
 
-## Part of Kreuzberg.dev
+## Part of Xberg.dev
 
-html-to-markdown ships as a standalone library and as the HTML pipeline inside the [Kreuzberg](https://docs.xberg.io) document intelligence stack.
+html-to-markdown ships as a standalone library and as the HTML pipeline inside the [Xberg](https://docs.xberg.io) document intelligence stack.
 
 <div class="grid cards" markdown>
 
-- :material-file-document-multiple:{ .lg .middle } **[Kreuzberg](https://docs.xberg.io)**
+- :material-file-document-multiple:{ .lg .middle } **[Xberg](https://docs.xberg.io)**
 
   Document intelligence core — text, tables, and metadata from 91+ file formats. Uses html-to-markdown for every HTML input.
 

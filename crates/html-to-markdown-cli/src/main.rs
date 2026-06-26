@@ -20,7 +20,7 @@ use utils::{DEFAULT_USER_AGENT, decode_bytes, fetch_url};
 /// Run the MCP server (stdio or http transport).
 ///
 /// Builds a blocking Tokio runtime and drives `start_mcp_server` / `start_mcp_server_http`.
-/// Keeps `fn main()` synchronous in line with the kreuzberg pattern.
+/// Keeps `fn main()` synchronous in line with the Xberg pattern.
 #[cfg(feature = "mcp")]
 fn run_mcp(transport: &str, host: &str, port: u16) -> Result<(), Box<dyn std::error::Error>> {
     let rt = tokio::runtime::Runtime::new()?;

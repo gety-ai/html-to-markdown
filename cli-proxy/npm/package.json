@@ -1,5 +1,5 @@
 {
-	"name": "@kreuzberg/html-to-markdown-cli",
+	"name": "@xberg-io/html-to-markdown-cli",
 	"version": "0.0.1",
 	"description": "CLI proxy for html-to-markdown — downloads and runs the native html-to-markdown binary from GitHub releases.",
 	"license": "MIT",

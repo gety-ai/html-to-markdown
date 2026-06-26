@@ -1,6 +1,6 @@
 ```kotlin
-import dev.kreuzberg.android.ConversionError
-import dev.kreuzberg.android.HtmlToMarkdownRs
+import io.xberg.android.ConversionError
+import io.xberg.android.HtmlToMarkdownRs
 
 try {
     val result = HtmlToMarkdownRs.convert("<h1>Hello</h1>")

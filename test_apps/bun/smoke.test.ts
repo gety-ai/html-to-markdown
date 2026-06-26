@@ -1,5 +1,5 @@
 import { test, expect, describe } from "bun:test";
-import { convert } from "@kreuzberg/html-to-markdown";
+import { convert } from "@xberg-io/html-to-markdown";
 
 describe("html-to-markdown Bun smoke tests", () => {
 	describe("Basic conversion", () => {

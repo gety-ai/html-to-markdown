@@ -1,6 +1,6 @@
 ```kotlin
-import dev.kreuzberg.android.ConversionOptions
-import dev.kreuzberg.android.HtmlToMarkdownRs
+import io.xberg.android.ConversionOptions
+import io.xberg.android.HtmlToMarkdownRs
 
 val html = """
     <table>
