@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.8.0] - 2026-06-27
+
+Stable release promoting 3.8.0-rc.2 (fully published). Version-only bump synced across all manifests.
+
 ## [3.8.0-rc.2] - 2026-06-27
 
 ### Changed
