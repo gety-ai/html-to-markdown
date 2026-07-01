@@ -1,22 +1,22 @@
 [workspace]
-alef_version = "0.30.0"
+alef_version = "0.30.2"
 languages = [
-  "python",
-  "node",
-  "ruby",
-  "php",
-  "ffi",
-  "go",
-  "java",
-  "csharp",
-  "elixir",
-  "wasm",
-  "r",
-  "kotlin_android",
-  "jni",
-  "swift",
-  "dart",
-  "zig",
+    "python",
+    "node",
+    "ruby",
+    "php",
+    "ffi",
+    "go",
+    "java",
+    "csharp",
+    "elixir",
+    "wasm",
+    "r",
+    "kotlin_android",
+    "jni",
+    "swift",
+    "dart",
+    "zig",
 ]
 
 [workspace.format]
@@ -45,11 +45,11 @@ dirs = ["docs/snippets"]
 
 [workspace.sync]
 extra_paths = [
-  "packages/ruby/lib/html_to_markdown/version.rb",
-  "packages/python/html_to_markdown/__init__.py",
-  "crates/html-to-markdown-node/package.json",
-  "crates/html-to-markdown-node/npm/*/package.json",
-  "package.json",
+    "packages/ruby/lib/html_to_markdown/version.rb",
+    "packages/python/html_to_markdown/__init__.py",
+    "crates/html-to-markdown-node/package.json",
+    "crates/html-to-markdown-node/npm/*/package.json",
+    "package.json",
 ]
 
 [workspace.citation]
@@ -124,26 +124,52 @@ path = "test_apps/rust/Cargo.toml"
 search = 'package = "html-to-markdown-rs", version = "[^"]*"'
 replace = 'package = "html-to-markdown-rs", version = "{version}"'
 
+# Repo-specific poly suppressions merged into the generated poly.toml (survive re-scaffold).
+[workspace.poly]
+# Injected/vendored/generated JS ported from the old .oxlintrc.json ignorePatterns,
+# plus tsconfig JSONC files that oxc's JSON linter cannot parse.
+exclude = [
+    "**/_generated/**",
+    "**/coverage/**",
+    "**/pkg/**",
+    "**/.next/**",
+    "**/*.min.js",
+    "**/tsconfig*.json",
+    "docs/demo/**",
+    "e2e/wasm/tests/**",
+    "test_apps/wasm/tests/**",
+    "crates/html-to-markdown-node/index.js",
+]
+
+[workspace.poly.per-file-ignores]
+# Hand-written scripts (ported from [tool.ruff] "scripts/*.py"; extended with codes the
+# poly ruff surface now flags that the old global ignore list previously covered).
+"scripts/**/*.py" = ["INP001", "S607", "T201", "D103", "D212"]
+# Redundant "# noqa: S603" (S603 is globally ignored) in a hand-written proxy module.
+"cli-proxy/**/*.py" = ["RUF100"]
+# README template: relative links resolve in the generated root README, not in-place.
+"readme_templates/**" = ["MD057"]
+
 [[crates]]
 name = "html-to-markdown-rs"
 core_import = "html_to_markdown_rs"
 error_type = "ConversionError"
 error_constructor = "html_to_markdown_rs::ConversionError::Other({msg})"
 sources = [
-  "crates/html-to-markdown/src/lib.rs",
-  "crates/html-to-markdown/src/options/conversion.rs",
-  "crates/html-to-markdown/src/options/preprocessing.rs",
-  "crates/html-to-markdown/src/options/validation.rs",
-  "crates/html-to-markdown/src/types/result.rs",
-  "crates/html-to-markdown/src/types/document.rs",
-  "crates/html-to-markdown/src/types/tables.rs",
-  "crates/html-to-markdown/src/types/warnings.rs",
-  "crates/html-to-markdown/src/error.rs",
-  "crates/html-to-markdown/src/convert_api.rs",
-  "crates/html-to-markdown/src/metadata/types.rs",
-  "crates/html-to-markdown/src/visitor/traits.rs",
-  "crates/html-to-markdown/src/visitor/types.rs",
-  "crates/html-to-markdown/src/visitor/default_impl.rs",
+    "crates/html-to-markdown/src/lib.rs",
+    "crates/html-to-markdown/src/options/conversion.rs",
+    "crates/html-to-markdown/src/options/preprocessing.rs",
+    "crates/html-to-markdown/src/options/validation.rs",
+    "crates/html-to-markdown/src/types/result.rs",
+    "crates/html-to-markdown/src/types/document.rs",
+    "crates/html-to-markdown/src/types/tables.rs",
+    "crates/html-to-markdown/src/types/warnings.rs",
+    "crates/html-to-markdown/src/error.rs",
+    "crates/html-to-markdown/src/convert_api.rs",
+    "crates/html-to-markdown/src/metadata/types.rs",
+    "crates/html-to-markdown/src/visitor/traits.rs",
+    "crates/html-to-markdown/src/visitor/types.rs",
+    "crates/html-to-markdown/src/visitor/default_impl.rs",
 ]
 version_from = "Cargo.toml"
 workspace_root = "."
@@ -152,12 +178,8 @@ features = ["serde", "metadata", "visitor", "inline-images", "testkit"]
 [crates.python]
 module_name = "_html_to_markdown"
 pip_name = "html-to-markdown"
-reexported_types = [
-  "ConversionResult",
-]
-sdist_include = [
-  "crates/html-to-markdown",
-]
+reexported_types = ["ConversionResult"]
+sdist_include = ["crates/html-to-markdown"]
 
 [crates.python.stubs]
 output = "packages/python/html_to_markdown/"
@@ -270,16 +292,24 @@ zig = "packages/zig/src/"
 types = []
 functions = []
 methods = [
-  "html_to_markdown::NodeContext.serialize",
-  "html_to_markdown::NodeContext.deserialize",
-  # with_borrowed_attributes cannot be exposed at FFI boundaries: it returns NodeContext<'a>
-  # borrowing from a local &BTreeMap, which cannot outlive the FFI wrapper function.
-  # Callers use with_owned_attributes instead (the FFI layer always owns its data).
-  "NodeContext.with_borrowed_attributes",
+    "html_to_markdown::NodeContext.serialize",
+    "html_to_markdown::NodeContext.deserialize",
+    # with_borrowed_attributes cannot be exposed at FFI boundaries: it returns NodeContext<'a>
+    # borrowing from a local &BTreeMap, which cannot outlive the FFI wrapper function.
+    # Callers use with_owned_attributes instead (the FFI layer always owns its data).
+    "NodeContext.with_borrowed_attributes",
 ]
 
 [crates.include]
-types = ["ConversionOptions", "ConversionResult", "HtmlVisitor", "ImageDimensions", "MetadataEntry", "NodeContext", "VisitResult"]
+types = [
+    "ConversionOptions",
+    "ConversionResult",
+    "HtmlVisitor",
+    "ImageDimensions",
+    "MetadataEntry",
+    "NodeContext",
+    "VisitResult",
+]
 functions = ["convert"]
 
 [crates.lint.python]
@@ -298,10 +328,9 @@ before = "cd packages/ruby && bundle install"
 format = "cd packages/ruby && bundle exec rubocop -a ."
 
 [crates.lint.php]
-precondition = "command -v php >/dev/null 2>&1"
-before = "cd packages/php && composer install"
-format = "cd packages/php && vendor/bin/php-cs-fixer fix"
-check = "cd packages/php && vendor/bin/phpstan --configuration=phpstan.neon --memory-limit=512M"
+precondition = "command -v poly >/dev/null 2>&1"
+format = "poly fmt --fix packages/php"
+check = "poly lint packages/php"
 
 [crates.lint.go]
 precondition = "command -v gofmt >/dev/null 2>&1"
@@ -318,9 +347,9 @@ precondition = "command -v mvn >/dev/null 2>&1"
 check = "mvn -f packages/java/pom.xml spotless:check -q"
 
 [crates.lint.r]
-precondition = "command -v Rscript >/dev/null 2>&1"
-format = "cd packages/r && Rscript -e 'styler::style_dir(\"R\")'"
-check = "cd packages/r && Rscript -e 'lintr::lint_dir(\"R\")'"
+precondition = "command -v poly >/dev/null 2>&1"
+format = "poly fmt --fix packages/r"
+check = "poly lint packages/r"
 
 [crates.lint.ffi]
 precondition = "test -d e2e/c"
@@ -546,42 +575,42 @@ cmake_config = true
 fixtures = "fixtures"
 output = "e2e"
 languages = [
-  "python",
-  "node",
-  "ruby",
-  "php",
-  "php_ext",
-  "c",
-  "go",
-  "java",
-  "csharp",
-  "elixir",
-  "wasm",
-  "r",
-  "rust",
-  "kotlin_android",
-  "swift",
-  "dart",
-  "zig",
-  "homebrew",
+    "python",
+    "node",
+    "ruby",
+    "php",
+    "php_ext",
+    "c",
+    "go",
+    "java",
+    "csharp",
+    "elixir",
+    "wasm",
+    "r",
+    "rust",
+    "kotlin_android",
+    "swift",
+    "dart",
+    "zig",
+    "homebrew",
 ]
 result_fields = ["content", "document", "metadata", "tables", "warnings"]
 fields_optional = [
-  "content",
-  "document",
-  "metadata.document.title",
-  "metadata.document.description",
-  "metadata.document.author",
-  "metadata.document.canonical_url",
-  "metadata.document.open_graph[title]",
-  "metadata.document.open_graph[description]",
-  "metadata.document.open_graph[image]",
-  "metadata.document.open_graph[type]",
-  "metadata.document.open_graph[url]",
-  "metadata.document.open_graph[site_name]",
-  "metadata.document.twitter_card[card]",
-  "metadata.document.twitter_card[title]",
-  "metadata.document.twitter_card[description]",
+    "content",
+    "document",
+    "metadata.document.title",
+    "metadata.document.description",
+    "metadata.document.author",
+    "metadata.document.canonical_url",
+    "metadata.document.open_graph[title]",
+    "metadata.document.open_graph[description]",
+    "metadata.document.open_graph[image]",
+    "metadata.document.open_graph[type]",
+    "metadata.document.open_graph[url]",
+    "metadata.document.open_graph[site_name]",
+    "metadata.document.twitter_card[card]",
+    "metadata.document.twitter_card[title]",
+    "metadata.document.twitter_card[description]",
 ]
 
 [crates.e2e.call]
@@ -590,8 +619,8 @@ module = "html_to_markdown_rs"
 result_var = "result"
 options_type = "ConversionOptions"
 args = [
-  { name = "html", field = "html", type = "string" },
-  { name = "options", field = "options", type = "json_object", optional = true },
+    { name = "html", field = "html", type = "string" },
+    { name = "options", field = "options", type = "json_object", optional = true },
 ]
 
 [crates.e2e.call.overrides.rust]

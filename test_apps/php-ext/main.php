@@ -79,9 +79,7 @@ final class TestRunner
     }
 }
 
-final class SkipException extends \RuntimeException
-{
-}
+final class SkipException extends \RuntimeException {}
 
 function skip(string $reason): never
 {
@@ -108,9 +106,7 @@ function assert_equals(mixed $expected, mixed $actual, string $message = ''): vo
         $expectedStr = var_export($expected, true);
         $actualStr = var_export($actual, true);
         $msg = $message !== '' ? "{$message}: " : '';
-        throw new \RuntimeException(
-            "Assertion failed: {$msg}expected {$expectedStr}, got {$actualStr}"
-        );
+        throw new \RuntimeException("Assertion failed: {$msg}expected {$expectedStr}, got {$actualStr}");
     }
 }
 
@@ -125,9 +121,7 @@ function assert_string_contains(string $needle, string $haystack, string $messag
 {
     if (!str_contains($haystack, $needle)) {
         $msg = $message !== '' ? "{$message}: " : '';
-        throw new \RuntimeException(
-            "Assertion failed: {$msg}string does not contain '{$needle}'"
-        );
+        throw new \RuntimeException("Assertion failed: {$msg}string does not contain '{$needle}'");
     }
 }
 
@@ -135,9 +129,7 @@ function assert_string_not_contains(string $needle, string $haystack, string $me
 {
     if (str_contains($haystack, $needle)) {
         $msg = $message !== '' ? "{$message}: " : '';
-        throw new \RuntimeException(
-            "Assertion failed: {$msg}string should not contain '{$needle}'"
-        );
+        throw new \RuntimeException("Assertion failed: {$msg}string should not contain '{$needle}'");
     }
 }
 
@@ -153,9 +145,7 @@ function assert_greater_than(int|float $expected, int|float $actual, string $mes
 {
     if ($actual <= $expected) {
         $msg = $message !== '' ? "{$message}: " : '';
-        throw new \RuntimeException(
-            "Assertion failed: {$msg}expected value > {$expected}, got {$actual}"
-        );
+        throw new \RuntimeException("Assertion failed: {$msg}expected value > {$expected}, got {$actual}");
     }
 }
 
@@ -164,15 +154,13 @@ function assert_throws(string $exceptionClass, callable $fn, string $message = '
     try {
         $fn();
         $msg = $message !== '' ? "{$message}: " : '';
-        throw new \RuntimeException(
-            "Assertion failed: {$msg}expected {$exceptionClass} to be thrown"
-        );
+        throw new \RuntimeException("Assertion failed: {$msg}expected {$exceptionClass} to be thrown");
     } catch (\Throwable $e) {
-        if (!($e instanceof $exceptionClass)) {
+        if (!$e instanceof $exceptionClass) {
             $actual = get_class($e);
             $msg = $message !== '' ? "{$message}: " : '';
             throw new \RuntimeException(
-                "Assertion failed: {$msg}expected {$exceptionClass}, got {$actual}: {$e->getMessage()}"
+                "Assertion failed: {$msg}expected {$exceptionClass}, got {$actual}: {$e->getMessage()}",
             );
         }
     }
@@ -187,8 +175,8 @@ $runner = new TestRunner();
 echo str_repeat('=', 72) . "\n";
 echo "  html-to-markdown PHP Extension Test Suite\n";
 echo str_repeat('=', 72) . "\n";
-echo "  PHP Version:      " . PHP_VERSION . "\n";
-echo "  Extension Loaded: " . (extension_loaded('html_to_markdown') ? 'Yes' : 'No') . "\n";
+echo '  PHP Version:      ' . PHP_VERSION . "\n";
+echo '  Extension Loaded: ' . (extension_loaded('html_to_markdown') ? 'Yes' : 'No') . "\n";
 
 // =========================================================================
 // Section 1: Extension Loading & Function Availability
@@ -197,17 +185,11 @@ echo "  Extension Loaded: " . (extension_loaded('html_to_markdown') ? 'Yes' : 'N
 $runner->section('1. Extension Loading & Function Availability');
 
 $runner->test('html_to_markdown extension is loaded', function (): void {
-    assert_true(
-        extension_loaded('html_to_markdown'),
-        'html_to_markdown extension must be loaded'
-    );
+    assert_true(extension_loaded('html_to_markdown'), 'html_to_markdown extension must be loaded');
 });
 
 $runner->test('html_to_markdown_convert function exists', function (): void {
-    assert_true(
-        function_exists('html_to_markdown_convert'),
-        'html_to_markdown_convert should be available'
-    );
+    assert_true(function_exists('html_to_markdown_convert'), 'html_to_markdown_convert should be available');
 });
 
 // =========================================================================
@@ -331,10 +313,7 @@ $runner->test('convert with heading_style atx_closed option', function (): void 
 });
 
 $runner->test('convert with code_block_style backticks', function (): void {
-    $result = html_to_markdown_convert(
-        '<pre><code>code</code></pre>',
-        ['code_block_style' => 'backticks']
-    );
+    $result = html_to_markdown_convert('<pre><code>code</code></pre>', ['code_block_style' => 'backticks']);
     assert_string_contains('code', $result);
 });
 
@@ -349,10 +328,7 @@ $runner->test('convert with empty options array', function (): void {
 });
 
 $runner->test('convert with autolinks option', function (): void {
-    $result = html_to_markdown_convert(
-        '<a href="https://example.com">https://example.com</a>',
-        ['autolinks' => true]
-    );
+    $result = html_to_markdown_convert('<a href="https://example.com">https://example.com</a>', ['autolinks' => true]);
     assert_string_contains('example.com', $result);
 });
 
@@ -386,17 +362,17 @@ $runner->test('result is a string', function (): void {
 
 $runner->test('result from full HTML document is a string', function (): void {
     $html = <<<'HTML'
-<html lang="en">
-    <head>
-        <title>Test Article</title>
-        <meta name="description" content="A test description">
-    </head>
-    <body>
-        <h1>Main Title</h1>
-        <p>Content</p>
-    </body>
-</html>
-HTML;
+        <html lang="en">
+            <head>
+                <title>Test Article</title>
+                <meta name="description" content="A test description">
+            </head>
+            <body>
+                <h1>Main Title</h1>
+                <p>Content</p>
+            </body>
+        </html>
+        HTML;
 
     $result = html_to_markdown_convert($html);
     assert_true(is_string($result), 'result should be a string');
@@ -452,17 +428,17 @@ $runner->test('convert mixed inline formatting', function (): void {
 
 $runner->test('convert complex document structure', function (): void {
     $html = <<<'HTML'
-<div>
-    <h1>Header</h1>
-    <p>Paragraph with <strong>bold</strong> and <em>italic</em></p>
-    <ul>
-        <li>Item 1</li>
-        <li>Item 2</li>
-    </ul>
-    <blockquote>Quote</blockquote>
-    <pre><code>code snippet</code></pre>
-</div>
-HTML;
+        <div>
+            <h1>Header</h1>
+            <p>Paragraph with <strong>bold</strong> and <em>italic</em></p>
+            <ul>
+                <li>Item 1</li>
+                <li>Item 2</li>
+            </ul>
+            <blockquote>Quote</blockquote>
+            <pre><code>code snippet</code></pre>
+        </div>
+        HTML;
 
     $result = html_to_markdown_convert($html);
     assert_string_contains('Header', $result);
@@ -527,8 +503,8 @@ $runner->test('convert handles style tags (should be stripped)', function (): vo
 $runner->test('convert with invalid heading_style throws exception', function (): void {
     assert_throws(
         \Exception::class,
-        static fn () => html_to_markdown_convert('<h1>Title</h1>', ['heading_style' => 'invalid']),
-        'invalid heading_style'
+        static fn() => html_to_markdown_convert('<h1>Title</h1>', ['heading_style' => 'invalid']),
+        'invalid heading_style',
     );
 });
 

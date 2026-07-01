@@ -2,18 +2,18 @@
 import PackageDescription
 
 let package = Package(
-    name: "E2eSwift",
-    platforms: [
-        .macOS(.v13),
-        .iOS(.v16),
-    ],
-    dependencies: [
-        .package(name: "HtmlToMarkdown", path: "../../packages/swift"),
-    ],
-    targets: [
-        .testTarget(
-            name: "HtmlToMarkdownE2ETests",
-            dependencies: [.product(name: "HtmlToMarkdown", package: "HtmlToMarkdown")]
-        ),
-    ]
+  name: "E2eSwift",
+  platforms: [
+    .macOS(.v13),
+    .iOS(.v16),
+  ],
+  dependencies: [
+    .package(name: "HtmlToMarkdown", path: "../../packages/swift"),
+  ],
+  targets: [
+    .testTarget(
+      name: "HtmlToMarkdownE2ETests",
+      dependencies: [.product(name: "HtmlToMarkdown", package: "HtmlToMarkdown")]
+    ),
+  ]
 )

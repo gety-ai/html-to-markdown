@@ -229,19 +229,9 @@ test_apps/**/test_output.log
 # basemind code-map index cache (per-developer)
 .basemind/
 
-# BEGIN ai-rulez (DO NOT EDIT - managed by ai-rulez)
-.agents/
-.ai-rulez/.generated-manifest.json
-.codex/
-.cursor/
-.github/agents/
-.github/commands/
-.github/copilot-instructions.md
-.github/skills/
-.mcp.json
-AGENTS.md
-CLAUDE.md
-# END ai-rulez
+# polylint result cache (per-developer)
+.polylint/
+
 
 # Alef-generated skills are source-controlled; other agent-local state stays ignored.
 !.codex/
@@ -282,3 +272,14 @@ CLAUDE.md
 !.github/skills/cli/SKILL.md
 !.github/skills/mcp/
 !.github/skills/mcp/SKILL.md
+
+# BEGIN ai-rulez (DO NOT EDIT - managed by ai-rulez)
+.ai-rulez/.generated-manifest.json
+.cursor/
+.github/agents/
+.github/commands/
+.github/copilot-instructions.md
+.mcp.json
+AGENTS.md
+CLAUDE.md
+# END ai-rulez

@@ -1,6 +1,6 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-requires = [ "setuptools>=69" ]
+requires = ["setuptools>=69"]
 
 [project]
 name = "html-to-markdown-workspace"
@@ -8,133 +8,59 @@ version = "0.0.0"
 description = "Workspace-only metadata for tooling."
 requires-python = ">=3.10"
 classifiers = [
-  "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: 3.13",
-  "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 
 [dependency-groups]
 dev = [
-  "covdefaults>=2.3",
-  "jinja2>=3.1.6",
-  "mypy>=1.19.1",
-  "pre-commit>=4.5.1",
-  "pytest>=9.0.2",
-  "pytest-asyncio>=1.3",
-  "pytest-benchmark>=5.2.3",
-  "pytest-cov>=7",
-  "pytest-mock>=3.15.1",
-  "pyyaml>=6.0.3",
-  "ruff>=0.14.10",
-  "uv-bump",
+    "covdefaults>=2.3",
+    "jinja2>=3.1.6",
+    "pyrefly>=1.1.1",
+    "pytest>=9.0.2",
+    "pytest-asyncio>=1.3",
+    "pytest-benchmark>=5.2.3",
+    "pytest-cov>=7",
+    "pytest-mock>=3.15.1",
+    "pyyaml>=6.0.3",
+    "uv-bump",
 ]
-doc = [ "zensical" ]
+doc = ["zensical"]
 
 [tool.setuptools]
 packages = []
 
 [tool.uv]
-default-groups = [ "dev" ]
+default-groups = ["dev"]
 sources.uv-bump = { git = "https://github.com/Goldziher/uv-bump" }
-workspace.members = [ "packages/python" ]
+workspace.members = ["packages/python"]
 cache-keys = [
-  { file = "pyproject.toml" },
-  { file = "Cargo.toml" },
-  { file = "Cargo.lock" },
-  { file = "packages/python/pyproject.toml" },
-  { file = "crates/**/Cargo.toml" },
-  { file = "crates/**/*.rs" },
-]
-
-[tool.ruff]
-target-version = "py310"
-line-length = 120
-src = [ "packages/python/html_to_markdown", "packages/python/tests", "scripts" ]
-format.docstring-code-line-length = 120
-format.docstring-code-format = true
-lint.select = [ "ALL" ]
-lint.ignore = [
-  "ANN401",
-  "ASYNC109",
-  "ASYNC110",
-  "BLE001",
-  "COM812",
-  "D100",
-  "D101",
-  "D102",
-  "D103",
-  "D104",
-  "D107",
-  "D205",
-  "D301",
-  "E501",
-  "EM",
-  "FBT",
-  "FIX",      # Allow todo and fixme comments
-  "ISC001",
-  "PD011",
-  "PGH003",
-  "PLR0913",
-  "PLR2004",
-  "S104",
-  "TD",       # Allow todo and fixme comments
-  "TRY",
-]
-lint.per-file-ignores."e2e/python/**/*.*" = [ "D", "INP001", "PT018", "S" ]
-lint.per-file-ignores."packages/python/tests/**/*.*" = [ "ARG", "D", "PD", "PT006", "PT013", "S" ]
-lint.per-file-ignores."packages/python/tests/benchmark_*_test.py" = [ "T201" ]
-lint.per-file-ignores."scripts/*.py" = [ "INP001", "S607", "T201" ]
-lint.isort.known-first-party = [ "html_to_markdown", "tests" ]
-lint.pydocstyle.convention = "pep257"
-
-[tool.mypy]
-python_version = "3.10"
-strict = true
-implicit_reexport = false
-show_error_codes = true
-warn_return_any = true
-warn_unused_configs = true
-disable_error_code = [ "import-untyped", "import-not-found" ]
-namespace_packages = true
-files = [ "packages/python" ]
-explicit_package_bases = true
-mypy_path = [ "packages/python" ]
-exclude = [
-  "^crates/",
-  "^e2e/",
-  "^test_apps/",
-  "^packages/typescript/",
-  "^packages/ruby/",
-  "^packages/r/",
-  "^scripts/",
-  "^node_modules/",
-  "^dist/",
-  "^target/",
-]
-overrides = [
-  { module = [
-    "tests.*",
-    "html_to_markdown.tests.*",
-  ], disallow_any_generics = false, disallow_untyped_decorators = false },
+    { file = "pyproject.toml" },
+    { file = "Cargo.toml" },
+    { file = "Cargo.lock" },
+    { file = "packages/python/pyproject.toml" },
+    { file = "crates/**/Cargo.toml" },
+    { file = "crates/**/*.rs" },
 ]
 
 [tool.pytest]
 ini_options.asyncio_mode = "auto"
 ini_options.asyncio_default_fixture_loop_scope = "function"
-ini_options.testpaths = [ "packages/python/tests" ]
+ini_options.testpaths = ["packages/python/tests"]
 ini_options.filterwarnings = [
-  "error",
-  "ignore::pytest.PytestConfigWarning",
-  "ignore::pytest.PytestUnraisableExceptionWarning",
-  "ignore::ResourceWarning",
+    "error",
+    "ignore::pytest.PytestConfigWarning",
+    "ignore::pytest.PytestUnraisableExceptionWarning",
+    "ignore::ResourceWarning",
 ]
 
 [tool.coverage]
-run.omit = [ "packages/python/tests/*" ]
-run.source = [ "packages/python/html_to_markdown" ]
-report.exclude_lines = [ "if TYPE_CHECKING:" ]
+run.omit = ["packages/python/tests/*"]
+run.source = ["packages/python/html_to_markdown"]
+report.exclude_lines = ["if TYPE_CHECKING:"]
 report.fail_under = 0
 report.show_missing = true

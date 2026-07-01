@@ -1,19 +1,19 @@
 packages:
-    - crates/html-to-markdown-node
-    - crates/html-to-markdown-wasm
-    - e2e/node
-    - e2e/wasm
+  - crates/html-to-markdown-node
+  - crates/html-to-markdown-wasm
+  - e2e/node
+  - e2e/wasm
 
 onlyBuiltDependencies:
-    - esbuild
+  - esbuild
 
 ignoredBuiltDependencies:
-    - wasm-pack
+  - wasm-pack
 
 allowBuilds:
-    esbuild: true
+  esbuild: true
 
 minimumReleaseAgeExclude:
-    - "@xberg-io/html-to-markdown-*"
-    - "@xberg-io/html-to-markdown-wasm"
-    - "@xberg-io/html-to-markdown"
+  - "@xberg-io/html-to-markdown-*"
+  - "@xberg-io/html-to-markdown-wasm"
+  - "@xberg-io/html-to-markdown"

@@ -6,11 +6,13 @@
 import 'dart:ffi';
 import 'dart:isolate';
 import 'dart:io';
+import 'dart:core' as _DartCore;
+import 'dart:core';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
 import 'frb_generated.io.dart'
-    if (dart.library.js_interop) 'frb_generated.web.dart';
+if (dart.library.js_interop) 'frb_generated.web.dart';
 import 'lib.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
@@ -20,67 +22,161 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   static final instance = RustLib._();
 
   RustLib._();
-
-  /// Resolve the prebuilt native library from this package's own installed
-  /// location so the load works from any working directory and under hardened
-  /// runtimes. Returns `null` to defer to flutter_rust_bridge's default loader.
+  /// Resolve the prebuilt native library from environment variable,
+  /// package-relative location, or defer to flutter_rust_bridge's default loader.
+  /// Returns `null` to defer to flutter_rust_bridge's default loader.
   ///
-  /// Published pub.dev packages stage natives under `lib/src/native/<rid>/`
-  /// (e.g. `macos-arm64`, `linux-x64`). For local FRB-dev builds the dylib is
-  /// emitted into `lib/src/html_to_markdown_rs_bridge_generated/`; that
-  /// path is searched as a fallback.
+  /// Checks in order:
+  /// 1. FRB_DART_LOAD_EXTERNAL_LIBRARY_NATIVE_LIB_DIR environment variable
+  ///    (allows test harnesses to point to development build paths)
+  /// 2. Package-installed location with RID subdirectory (lib/src/native/<rid>/)
+  ///    (for published pub.dev packages with platform-specific bundled native libraries)
+  /// 3. Package-installed location (lib/src/html_to_markdown_rs_bridge_generated/)
+  ///    (legacy fallback for development or packages without per-platform binaries)
+  /// 4. Returns null (flutter_rust_bridge falls back to its default loader)
   static Future<ExternalLibrary?> _alefResolveExternalLibrary() async {
     try {
-      final packageRoot = await Isolate.resolvePackageUri(
-        Uri.parse('package:h2m/h2m.dart'),
-      );
-      if (packageRoot == null) return null;
-      final libNames = _alefHostLibNames();
-      final searchDirs = <Uri>[
-        if (_alefHostRid() != null)
-          packageRoot.resolve('src/native/${_alefHostRid()}/'),
-        packageRoot.resolve('src/html_to_markdown_rs_bridge_generated/'),
+      const candidates = <String>[
+        // macOS: framework bundle (preferred modern packaging)
+        'html_to_markdown_rs_dart.framework',
+        // macOS: bare dylib fallback
+        'libhtml_to_markdown_rs_dart.dylib',
+        // Linux
+        'libhtml_to_markdown_rs_dart.so',
+        // Windows
+        'html_to_markdown_rs_dart.dll',
       ];
-      for (final dir in searchDirs) {
-        for (final name in libNames) {
-          final libPath = dir.resolve(name).toFilePath();
-          if (File(libPath).existsSync() || Directory(libPath).existsSync()) {
-            return ExternalLibrary.open(libPath);
+
+      // Helper to open a native library by absolute path.
+      // Normalizes path to absolute to avoid hardened-runtime "relative path rejected" errors.
+      ExternalLibrary? tryOpenAbsolute(String libPath) {
+        try {
+          final absPath = File(libPath).absolute.path;
+          return ExternalLibrary.open(absPath);
+        } catch (_) {
+          return null;
+        }
+      }
+
+      bool candidateExists(String libPath) {
+        return File(libPath).existsSync() || Directory(libPath).existsSync();
+      }
+
+      // Check FRB_DART_LOAD_EXTERNAL_LIBRARY_NATIVE_LIB_DIR env var first.
+      // This allows test harnesses to override library location for development.
+      final envDir = Platform.environment['FRB_DART_LOAD_EXTERNAL_LIBRARY_NATIVE_LIB_DIR'];
+      if (envDir != null && envDir.isNotEmpty) {
+        final absEnvDir = Directory(envDir).absolute.path;
+        final libDir = Directory(absEnvDir);
+        if (libDir.existsSync()) {
+          for (final candidate in candidates) {
+            final libPath = '$absEnvDir/$candidate';
+            if (candidateExists(libPath)) {
+              final result = tryOpenAbsolute(libPath);
+              if (result != null) return result;
+            }
           }
         }
+      }
+
+      // Compute RID (runtime identifier) from platform and architecture using Abi.current().
+      // This is more reliable than parsing Platform.version.
+      String? computeRid() {
+        final abi = Abi.current();
+        final os = Platform.operatingSystem;
+
+        // Map from (os, Abi) to RID string.
+        String? ridFromAbi() {
+          if (os == 'linux') {
+            if (abi == Abi.linuxX64) return 'linux-x64';
+            if (abi == Abi.linuxArm64) return 'linux-arm64';
+          } else if (os == 'macos') {
+            if (abi == Abi.macosX64) return 'macos-x64';
+            if (abi == Abi.macosArm64) return 'macos-arm64';
+          } else if (os == 'windows') {
+            if (abi == Abi.windowsX64) return 'windows-x64';
+            if (abi == Abi.windowsArm64) return 'windows-arm64';
+          }
+          return null;
+        }
+
+        return ridFromAbi();
+      }
+
+      final rid = computeRid();
+      if (rid != null) {
+        final packageRoot =
+        await Isolate.resolvePackageUri(_DartCore.Uri.parse('package:html_to_markdown_rs/html_to_markdown_rs.dart'));
+        if (packageRoot != null) {
+          final ridDir = packageRoot.resolve('src/native/$rid/');
+          for (final candidate in candidates) {
+            final libPath = ridDir.resolve(candidate).toFilePath();
+            if (candidateExists(libPath)) {
+              final result = tryOpenAbsolute(libPath);
+              if (result != null) return result;
+            }
+          }
+        }
+      }
+
+      // Check legacy package-installed location as fallback.
+      final packageRoot =
+      await Isolate.resolvePackageUri(_DartCore.Uri.parse('package:html_to_markdown_rs/html_to_markdown_rs.dart'));
+      if (packageRoot != null) {
+        final libDir = packageRoot.resolve('src/html_to_markdown_rs_bridge_generated/');
+        for (final candidate in candidates) {
+          final libPath = libDir.resolve(candidate).toFilePath();
+          if (candidateExists(libPath)) {
+            final result = tryOpenAbsolute(libPath);
+            if (result != null) return result;
+          }
+        }
+      }
+
+      // As a last resort, resolve the running test/script's package root via
+      // `Platform.script` and search standard RID-relative locations there.
+      // Critical on macOS: `Directory.current` under hardened-runtime `dart` is
+      // the dart binary's own bin dir (relative-path dlopen rejected), whereas
+      // `Platform.script` resolves to the running .dart file's absolute URI,
+      // from which we can walk up to find the package root (the dir containing
+      // `pubspec.yaml`) and look for the bundled native library at standard
+      // paths. This handles the case where `Isolate.resolvePackageUri`
+      // resolution did not yield the actual staging location (e.g., a path
+      // dependency in local development, or a test_app whose host package
+      // contains the native lib directly rather than via the bridged package).
+      try {
+        final scriptPath = Platform.script.toFilePath();
+        var dir = File(scriptPath).absolute.parent;
+        while (dir.parent.path != dir.path
+          && !File('${dir.path}/pubspec.yaml').existsSync()) {
+          dir = dir.parent;
+        }
+        if (File('${dir.path}/pubspec.yaml').existsSync()) {
+          final rid = computeRid();
+          final absRootPath = dir.absolute.path;
+          final searchRoots = <String>[
+            if (rid != null) '$absRootPath/lib/src/native/$rid',
+            '$absRootPath/lib',
+            absRootPath,
+          ];
+          for (final root in searchRoots) {
+            final absRoot = Directory(root).absolute.path;
+            for (final candidate in candidates) {
+              final libPath = '$absRoot/$candidate';
+              if (candidateExists(libPath)) {
+                final result = tryOpenAbsolute(libPath);
+                if (result != null) return result;
+              }
+            }
+          }
+        }
+      } catch (_) {
+        // fall through to default loader
       }
     } catch (_) {
       // Fall through to the default loader on any resolution failure.
     }
     return null;
-  }
-
-  /// Map the host platform to the pub.dev native staging RID. Returns `null`
-  /// for unrecognized host triples so the FRB-dev fallback path runs instead.
-  static String? _alefHostRid() {
-    final abi = Abi.current();
-    if (abi == Abi.macosArm64) return 'macos-arm64';
-    if (abi == Abi.macosX64) return 'macos-x64';
-    if (abi == Abi.linuxArm64) return 'linux-arm64';
-    if (abi == Abi.linuxX64) return 'linux-x64';
-    if (abi == Abi.windowsArm64) return 'windows-arm64';
-    if (abi == Abi.windowsX64) return 'windows-x64';
-    return null;
-  }
-
-  static List<String> _alefHostLibNames() {
-    // The Dart-binding Rust crate is `{stem}-dart` (per the cargo manifest
-    // template), which produces a cdylib named `lib{stem}_dart.{ext}` on Unix
-    // and `{stem}_dart.dll` on Windows. On macOS, pub.dev-published packages
-    // may ship the binary as a Framework bundle (preferred modern packaging)
-    // — list that first so the loader finds it before the bare dylib.
-    if (Platform.isMacOS)
-      return const [
-        'html_to_markdown_rs_dart.framework',
-        'libhtml_to_markdown_rs_dart.dylib',
-      ];
-    if (Platform.isWindows) return const ['html_to_markdown_rs_dart.dll'];
-    return const ['libhtml_to_markdown_rs_dart.so'];
   }
 
   /// Initialize flutter_rust_bridge
@@ -113,18 +209,18 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 
   @override
   ApiImplConstructor<RustLibApiImpl, RustLibWire> get apiImplConstructor =>
-      RustLibApiImpl.new;
+  RustLibApiImpl.new;
 
   @override
   WireConstructor<RustLibWire> get wireConstructor =>
-      RustLibWire.fromExternalLibrary;
+  RustLibWire.fromExternalLibrary;
 
   @override
   Future<void> executeRustInitializers() async {}
 
   @override
   ExternalLibraryLoaderConfig get defaultExternalLibraryLoaderConfig =>
-      kDefaultExternalLibraryLoaderConfig;
+  kDefaultExternalLibraryLoaderConfig;
 
   @override
   String get codegenVersion => '2.12.0';
@@ -133,12 +229,12 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   int get rustContentHash => 1406531119;
 
   static const kDefaultExternalLibraryLoaderConfig =
-      ExternalLibraryLoaderConfig(
-        stem: 'html_to_markdown_rs_dart',
-        ioDirectory: 'rust/target/release/',
-        webPrefix: 'pkg/',
-        wasmBindgenName: 'wasm_bindgen',
-      );
+  ExternalLibraryLoaderConfig(
+    stem: 'html_to_markdown_rs_dart',
+    ioDirectory: 'rust/target/release/',
+    webPrefix: 'pkg/',
+    wasmBindgenName: 'wasm_bindgen',
+  );
 }
 
 abstract class RustLibApi extends BaseApi {
@@ -352,7 +448,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateConvertConstMeta =>
-      const TaskConstMeta(debugName: "convert", argNames: ["html", "options"]);
+  const TaskConstMeta(debugName: "convert", argNames: ["html", "options"]);
 
   @override
   Future<ConversionOptions> crateCreateConversionOptionsFromJson({
@@ -382,10 +478,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateConversionOptionsFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_conversion_options_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_conversion_options_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<ConversionOptions> crateCreateConversionOptionsFromJsonWithVisitor({
@@ -420,10 +516,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateConversionOptionsFromJsonWithVisitorConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_conversion_options_from_json_with_visitor",
-        argNames: ["json", "visitor"],
-      );
+  const TaskConstMeta(
+    debugName: "create_conversion_options_from_json_with_visitor",
+    argNames: ["json", "visitor"],
+  );
 
   @override
   Future<ConversionOptionsUpdate> crateCreateConversionOptionsUpdateFromJson({
@@ -453,10 +549,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateConversionOptionsUpdateFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_conversion_options_update_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_conversion_options_update_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<ConversionResult> crateCreateConversionResultFromJson({
@@ -486,10 +582,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateConversionResultFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_conversion_result_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_conversion_result_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<DocumentMetadata> crateCreateDocumentMetadataFromJson({
@@ -519,10 +615,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateDocumentMetadataFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_document_metadata_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_document_metadata_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<DocumentNode> crateCreateDocumentNodeFromJson({required String json}) {
@@ -550,10 +646,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateDocumentNodeFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_document_node_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_document_node_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<DocumentStructure> crateCreateDocumentStructureFromJson({
@@ -583,10 +679,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateDocumentStructureFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_document_structure_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_document_structure_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<GridCell> crateCreateGridCellFromJson({required String json}) {
@@ -614,10 +710,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateGridCellFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_grid_cell_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_grid_cell_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<HeaderMetadata> crateCreateHeaderMetadataFromJson({
@@ -647,10 +743,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateHeaderMetadataFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_header_metadata_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_header_metadata_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<HtmlMetadata> crateCreateHtmlMetadataFromJson({required String json}) {
@@ -678,10 +774,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateHtmlMetadataFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_html_metadata_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_html_metadata_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<VisitorHandle> crateCreateHtmlVisitor({
@@ -939,7 +1035,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         },
         codec: SseCodec(
           decodeSuccessData:
-              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle,
+          sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle,
           decodeErrorData: null,
         ),
         constMeta: kCrateCreateHtmlVisitorConstMeta,
@@ -1064,10 +1160,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateImageDimensionsFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_image_dimensions_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_image_dimensions_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<ImageMetadata> crateCreateImageMetadataFromJson({
@@ -1097,10 +1193,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateImageMetadataFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_image_metadata_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_image_metadata_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<LinkMetadata> crateCreateLinkMetadataFromJson({required String json}) {
@@ -1128,10 +1224,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateLinkMetadataFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_link_metadata_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_link_metadata_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<MetadataEntry> crateCreateMetadataEntryFromJson({
@@ -1161,10 +1257,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateMetadataEntryFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_metadata_entry_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_metadata_entry_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<NodeContext> crateCreateNodeContextFromJson({required String json}) {
@@ -1192,10 +1288,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateNodeContextFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_node_context_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_node_context_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<PreprocessingOptions> crateCreatePreprocessingOptionsFromJson({
@@ -1225,10 +1321,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreatePreprocessingOptionsFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_preprocessing_options_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_preprocessing_options_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<PreprocessingOptionsUpdate>
@@ -1257,10 +1353,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreatePreprocessingOptionsUpdateFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_preprocessing_options_update_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_preprocessing_options_update_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<ProcessingWarning> crateCreateProcessingWarningFromJson({
@@ -1290,10 +1386,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateProcessingWarningFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_processing_warning_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_processing_warning_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<StructuredData> crateCreateStructuredDataFromJson({
@@ -1323,10 +1419,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateStructuredDataFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_structured_data_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_structured_data_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<TableData> crateCreateTableDataFromJson({required String json}) {
@@ -1354,10 +1450,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateTableDataFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_table_data_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_table_data_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<TableGrid> crateCreateTableGridFromJson({required String json}) {
@@ -1385,10 +1481,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateTableGridFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_table_grid_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_table_grid_from_json",
+    argNames: ["json"],
+  );
 
   @override
   Future<TextAnnotation> crateCreateTextAnnotationFromJson({
@@ -1418,10 +1514,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCreateTextAnnotationFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_text_annotation_from_json",
-        argNames: ["json"],
-      );
+  const TaskConstMeta(
+    debugName: "create_text_annotation_from_json",
+    argNames: ["json"],
+  );
 
   Future<void> Function(int, dynamic)
   encode_DartFn_Inputs_node_context_Output_visit_result_AnyhowException(
@@ -1943,11 +2039,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_VisitorHandle => wire
-      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle;
+  .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle;
 
   RustArcDecrementStrongCountFnType
   get rust_arc_decrement_strong_count_VisitorHandle => wire
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle;
+  .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle;
 
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw) {
@@ -2126,28 +2222,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
       case 0:
-        return AnnotationKind_Bold();
+      return AnnotationKind_Bold();
       case 1:
-        return AnnotationKind_Italic();
+      return AnnotationKind_Italic();
       case 2:
-        return AnnotationKind_Underline();
+      return AnnotationKind_Underline();
       case 3:
-        return AnnotationKind_Strikethrough();
+      return AnnotationKind_Strikethrough();
       case 4:
-        return AnnotationKind_Code();
+      return AnnotationKind_Code();
       case 5:
-        return AnnotationKind_Subscript();
+      return AnnotationKind_Subscript();
       case 6:
-        return AnnotationKind_Superscript();
+      return AnnotationKind_Superscript();
       case 7:
-        return AnnotationKind_Highlight();
+      return AnnotationKind_Highlight();
       case 8:
-        return AnnotationKind_Link(
+      return AnnotationKind_Link(
           url: dco_decode_String(raw[1]),
           title: dco_decode_String(raw[2]),
         );
       default:
-        throw Exception("unreachable");
+      throw Exception("unreachable");
     }
   }
 
@@ -2294,23 +2390,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
       case 0:
-        return ConversionError_ParseError(field0: dco_decode_String(raw[1]));
+      return ConversionError_ParseError(field0: dco_decode_String(raw[1]));
       case 1:
-        return ConversionError_SanitizationError(
+      return ConversionError_SanitizationError(
           field0: dco_decode_String(raw[1]),
         );
       case 2:
-        return ConversionError_ConfigError(field0: dco_decode_String(raw[1]));
+      return ConversionError_ConfigError(field0: dco_decode_String(raw[1]));
       case 3:
-        return ConversionError_IoError(field0: dco_decode_String(raw[1]));
+      return ConversionError_IoError(field0: dco_decode_String(raw[1]));
       case 4:
-        return ConversionError_Panic(field0: dco_decode_String(raw[1]));
+      return ConversionError_Panic(field0: dco_decode_String(raw[1]));
       case 5:
-        return ConversionError_InvalidInput(field0: dco_decode_String(raw[1]));
+      return ConversionError_InvalidInput(field0: dco_decode_String(raw[1]));
       case 6:
-        return ConversionError_Other(field0: dco_decode_String(raw[1]));
+      return ConversionError_Other(field0: dco_decode_String(raw[1]));
       default:
-        throw Exception("unreachable");
+      throw Exception("unreachable");
     }
   }
 
@@ -2319,7 +2415,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 44)
-      throw Exception('unexpected arr length: expect 44 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 44 but see ${arr.length}');
     return ConversionOptions(
       headingStyle: dco_decode_heading_style(arr[0]),
       listIndentType: dco_decode_list_indent_type(arr[1]),
@@ -2365,9 +2461,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       excludeSelectors: dco_decode_list_String(arr[41]),
       tierStrategy: dco_decode_tier_strategy(arr[42]),
       visitor:
-          dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-            arr[43],
-          ),
+      dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+        arr[43],
+      ),
     );
   }
 
@@ -2376,7 +2472,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 44)
-      throw Exception('unexpected arr length: expect 44 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 44 but see ${arr.length}');
     return ConversionOptionsUpdate(
       headingStyle: dco_decode_opt_box_autoadd_heading_style(arr[0]),
       listIndentType: dco_decode_opt_box_autoadd_list_indent_type(arr[1]),
@@ -2424,9 +2520,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       excludeSelectors: dco_decode_opt_list_String(arr[41]),
       tierStrategy: dco_decode_opt_box_autoadd_tier_strategy(arr[42]),
       visitor:
-          dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-            arr[43],
-          ),
+      dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+        arr[43],
+      ),
     );
   }
 
@@ -2435,7 +2531,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return ConversionResult(
       content: dco_decode_opt_String(arr[0]),
       document: dco_decode_opt_box_autoadd_document_structure(arr[1]),
@@ -2450,7 +2546,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 11)
-      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
     return DocumentMetadata(
       title: dco_decode_opt_String(arr[0]),
       description: dco_decode_opt_String(arr[1]),
@@ -2471,7 +2567,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
     return DocumentNode(
       id: dco_decode_String(arr[0]),
       content: dco_decode_node_content(arr[1]),
@@ -2487,7 +2583,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
     return DocumentStructure(
       nodes: dco_decode_list_document_node(arr[0]),
       sourceFormat: dco_decode_opt_String(arr[1]),
@@ -2499,7 +2595,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
     return GridCell(
       content: dco_decode_String(arr[0]),
       row: dco_decode_i_64(arr[1]),
@@ -2515,7 +2611,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return HeaderMetadata(
       level: dco_decode_i_64(arr[0]),
       text: dco_decode_String(arr[1]),
@@ -2542,7 +2638,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return HtmlMetadata(
       document: dco_decode_document_metadata(arr[0]),
       headers: dco_decode_list_header_metadata(arr[1]),
@@ -2569,7 +2665,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
     return ImageDimensions(
       width: dco_decode_i_64(arr[0]),
       height: dco_decode_i_64(arr[1]),
@@ -2581,7 +2677,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
     return ImageMetadata(
       src: dco_decode_String(arr[0]),
       alt: dco_decode_opt_String(arr[1]),
@@ -2609,7 +2705,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
     return LinkMetadata(
       href: dco_decode_String(arr[0]),
       text: dco_decode_String(arr[1]),
@@ -2727,7 +2823,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
     return MetadataEntry(
       key: dco_decode_String(arr[0]),
       value: dco_decode_String(arr[1]),
@@ -2745,57 +2841,57 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
       case 0:
-        return NodeContent_Heading(
+      return NodeContent_Heading(
           level: dco_decode_i_64(raw[1]),
           text: dco_decode_String(raw[2]),
         );
       case 1:
-        return NodeContent_Paragraph(text: dco_decode_String(raw[1]));
+      return NodeContent_Paragraph(text: dco_decode_String(raw[1]));
       case 2:
-        return NodeContent_List(ordered: dco_decode_bool(raw[1]));
+      return NodeContent_List(ordered: dco_decode_bool(raw[1]));
       case 3:
-        return NodeContent_ListItem(text: dco_decode_String(raw[1]));
+      return NodeContent_ListItem(text: dco_decode_String(raw[1]));
       case 4:
-        return NodeContent_Table(
+      return NodeContent_Table(
           grid: dco_decode_box_autoadd_table_grid(raw[1]),
         );
       case 5:
-        return NodeContent_Image(
+      return NodeContent_Image(
           description: dco_decode_String(raw[1]),
           src: dco_decode_String(raw[2]),
           imageIndex: dco_decode_i_64(raw[3]),
         );
       case 6:
-        return NodeContent_Code(
+      return NodeContent_Code(
           text: dco_decode_String(raw[1]),
           language: dco_decode_String(raw[2]),
         );
       case 7:
-        return NodeContent_Quote();
+      return NodeContent_Quote();
       case 8:
-        return NodeContent_DefinitionList();
+      return NodeContent_DefinitionList();
       case 9:
-        return NodeContent_DefinitionItem(
+      return NodeContent_DefinitionItem(
           term: dco_decode_String(raw[1]),
           definition: dco_decode_String(raw[2]),
         );
       case 10:
-        return NodeContent_RawBlock(
+      return NodeContent_RawBlock(
           format: dco_decode_String(raw[1]),
           content: dco_decode_String(raw[2]),
         );
       case 11:
-        return NodeContent_MetadataBlock(
+      return NodeContent_MetadataBlock(
           entries: dco_decode_list_metadata_entry(raw[1]),
         );
       case 12:
-        return NodeContent_Group(
+      return NodeContent_Group(
           label: dco_decode_String(raw[1]),
           headingLevel: dco_decode_i_64(raw[2]),
           headingText: dco_decode_String(raw[3]),
         );
       default:
-        throw Exception("unreachable");
+      throw Exception("unreachable");
     }
   }
 
@@ -2804,7 +2900,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
     return NodeContext(
       nodeType: dco_decode_node_type(arr[0]),
       tagName: dco_decode_String(arr[1]),
@@ -2840,10 +2936,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null
-        ? null
-        : dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-            raw,
-          );
+    ? null
+    : dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+      raw,
+    );
   }
 
   @protected
@@ -2927,8 +3023,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   dco_decode_opt_box_autoadd_preprocessing_options_update(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null
-        ? null
-        : dco_decode_box_autoadd_preprocessing_options_update(raw);
+    ? null
+    : dco_decode_box_autoadd_preprocessing_options_update(raw);
   }
 
   @protected
@@ -2937,8 +3033,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null
-        ? null
-        : dco_decode_box_autoadd_preprocessing_preset(raw);
+    ? null
+    : dco_decode_box_autoadd_preprocessing_preset(raw);
   }
 
   @protected
@@ -2982,7 +3078,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return PreprocessingOptions(
       enabled: dco_decode_bool(arr[0]),
       preset: dco_decode_preprocessing_preset(arr[1]),
@@ -2998,7 +3094,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return PreprocessingOptionsUpdate(
       enabled: dco_decode_opt_box_autoadd_bool(arr[0]),
       preset: dco_decode_opt_box_autoadd_preprocessing_preset(arr[1]),
@@ -3018,7 +3114,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
     return ProcessingWarning(
       message: dco_decode_String(arr[0]),
       kind: dco_decode_warning_kind(arr[1]),
@@ -3040,7 +3136,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
     return StructuredData(
       dataType: dco_decode_structured_data_type(arr[0]),
       rawJson: dco_decode_String(arr[1]),
@@ -3059,7 +3155,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
     return TableData(
       grid: dco_decode_table_grid(arr[0]),
       markdown: dco_decode_String(arr[1]),
@@ -3071,7 +3167,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
     return TableGrid(
       rows: dco_decode_i_64(arr[0]),
       cols: dco_decode_i_64(arr[1]),
@@ -3084,7 +3180,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
     return TextAnnotation(
       start: dco_decode_i_64(arr[0]),
       end: dco_decode_i_64(arr[1]),
@@ -3133,17 +3229,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
       case 0:
-        return VisitResult_Continue();
+      return VisitResult_Continue();
       case 1:
-        return VisitResult_Custom(field0: dco_decode_String(raw[1]));
+      return VisitResult_Custom(field0: dco_decode_String(raw[1]));
       case 2:
-        return VisitResult_Skip();
+      return VisitResult_Skip();
       case 3:
-        return VisitResult_PreserveHtml();
+      return VisitResult_PreserveHtml();
       case 4:
-        return VisitResult_Error(field0: dco_decode_String(raw[1]));
+      return VisitResult_Error(field0: dco_decode_String(raw[1]));
       default:
-        throw Exception("unreachable");
+      throw Exception("unreachable");
     }
   }
 
@@ -3220,27 +3316,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var tag_ = sse_decode_i_32(deserializer);
     switch (tag_) {
       case 0:
-        return AnnotationKind_Bold();
+      return AnnotationKind_Bold();
       case 1:
-        return AnnotationKind_Italic();
+      return AnnotationKind_Italic();
       case 2:
-        return AnnotationKind_Underline();
+      return AnnotationKind_Underline();
       case 3:
-        return AnnotationKind_Strikethrough();
+      return AnnotationKind_Strikethrough();
       case 4:
-        return AnnotationKind_Code();
+      return AnnotationKind_Code();
       case 5:
-        return AnnotationKind_Subscript();
+      return AnnotationKind_Subscript();
       case 6:
-        return AnnotationKind_Superscript();
+      return AnnotationKind_Superscript();
       case 7:
-        return AnnotationKind_Highlight();
+      return AnnotationKind_Highlight();
       case 8:
-        var var_url = sse_decode_String(deserializer);
-        var var_title = sse_decode_String(deserializer);
-        return AnnotationKind_Link(url: var_url, title: var_title);
+      var var_url = sse_decode_String(deserializer);
+      var var_title = sse_decode_String(deserializer);
+      return AnnotationKind_Link(url: var_url, title: var_title);
       default:
-        throw UnimplementedError('');
+      throw UnimplementedError('');
     }
   }
 
@@ -3420,28 +3516,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var tag_ = sse_decode_i_32(deserializer);
     switch (tag_) {
       case 0:
-        var var_field0 = sse_decode_String(deserializer);
-        return ConversionError_ParseError(field0: var_field0);
+      var var_field0 = sse_decode_String(deserializer);
+      return ConversionError_ParseError(field0: var_field0);
       case 1:
-        var var_field0 = sse_decode_String(deserializer);
-        return ConversionError_SanitizationError(field0: var_field0);
+      var var_field0 = sse_decode_String(deserializer);
+      return ConversionError_SanitizationError(field0: var_field0);
       case 2:
-        var var_field0 = sse_decode_String(deserializer);
-        return ConversionError_ConfigError(field0: var_field0);
+      var var_field0 = sse_decode_String(deserializer);
+      return ConversionError_ConfigError(field0: var_field0);
       case 3:
-        var var_field0 = sse_decode_String(deserializer);
-        return ConversionError_IoError(field0: var_field0);
+      var var_field0 = sse_decode_String(deserializer);
+      return ConversionError_IoError(field0: var_field0);
       case 4:
-        var var_field0 = sse_decode_String(deserializer);
-        return ConversionError_Panic(field0: var_field0);
+      var var_field0 = sse_decode_String(deserializer);
+      return ConversionError_Panic(field0: var_field0);
       case 5:
-        var var_field0 = sse_decode_String(deserializer);
-        return ConversionError_InvalidInput(field0: var_field0);
+      var var_field0 = sse_decode_String(deserializer);
+      return ConversionError_InvalidInput(field0: var_field0);
       case 6:
-        var var_field0 = sse_decode_String(deserializer);
-        return ConversionError_Other(field0: var_field0);
+      var var_field0 = sse_decode_String(deserializer);
+      return ConversionError_Other(field0: var_field0);
       default:
-        throw UnimplementedError('');
+      throw UnimplementedError('');
     }
   }
 
@@ -3494,9 +3590,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_excludeSelectors = sse_decode_list_String(deserializer);
     var var_tierStrategy = sse_decode_tier_strategy(deserializer);
     var var_visitor =
-        sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-          deserializer,
-        );
+    sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+      deserializer,
+    );
     return ConversionOptions(
       headingStyle: var_headingStyle,
       listIndentType: var_listIndentType,
@@ -3589,7 +3685,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
     var var_keepInlineImagesIn = sse_decode_opt_list_String(deserializer);
     var var_preprocessing =
-        sse_decode_opt_box_autoadd_preprocessing_options_update(deserializer);
+    sse_decode_opt_box_autoadd_preprocessing_options_update(deserializer);
     var var_encoding = sse_decode_opt_String(deserializer);
     var var_debug = sse_decode_opt_box_autoadd_bool(deserializer);
     var var_stripTags = sse_decode_opt_list_String(deserializer);
@@ -3615,9 +3711,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       deserializer,
     );
     var var_visitor =
-        sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-          deserializer,
-        );
+    sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+      deserializer,
+    );
     return ConversionOptionsUpdate(
       headingStyle: var_headingStyle,
       listIndentType: var_listIndentType,
@@ -4104,63 +4200,63 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var tag_ = sse_decode_i_32(deserializer);
     switch (tag_) {
       case 0:
-        var var_level = sse_decode_i_64(deserializer);
-        var var_text = sse_decode_String(deserializer);
-        return NodeContent_Heading(level: var_level, text: var_text);
+      var var_level = sse_decode_i_64(deserializer);
+      var var_text = sse_decode_String(deserializer);
+      return NodeContent_Heading(level: var_level, text: var_text);
       case 1:
-        var var_text = sse_decode_String(deserializer);
-        return NodeContent_Paragraph(text: var_text);
+      var var_text = sse_decode_String(deserializer);
+      return NodeContent_Paragraph(text: var_text);
       case 2:
-        var var_ordered = sse_decode_bool(deserializer);
-        return NodeContent_List(ordered: var_ordered);
+      var var_ordered = sse_decode_bool(deserializer);
+      return NodeContent_List(ordered: var_ordered);
       case 3:
-        var var_text = sse_decode_String(deserializer);
-        return NodeContent_ListItem(text: var_text);
+      var var_text = sse_decode_String(deserializer);
+      return NodeContent_ListItem(text: var_text);
       case 4:
-        var var_grid = sse_decode_box_autoadd_table_grid(deserializer);
-        return NodeContent_Table(grid: var_grid);
+      var var_grid = sse_decode_box_autoadd_table_grid(deserializer);
+      return NodeContent_Table(grid: var_grid);
       case 5:
-        var var_description = sse_decode_String(deserializer);
-        var var_src = sse_decode_String(deserializer);
-        var var_imageIndex = sse_decode_i_64(deserializer);
-        return NodeContent_Image(
+      var var_description = sse_decode_String(deserializer);
+      var var_src = sse_decode_String(deserializer);
+      var var_imageIndex = sse_decode_i_64(deserializer);
+      return NodeContent_Image(
           description: var_description,
           src: var_src,
           imageIndex: var_imageIndex,
         );
       case 6:
-        var var_text = sse_decode_String(deserializer);
-        var var_language = sse_decode_String(deserializer);
-        return NodeContent_Code(text: var_text, language: var_language);
+      var var_text = sse_decode_String(deserializer);
+      var var_language = sse_decode_String(deserializer);
+      return NodeContent_Code(text: var_text, language: var_language);
       case 7:
-        return NodeContent_Quote();
+      return NodeContent_Quote();
       case 8:
-        return NodeContent_DefinitionList();
+      return NodeContent_DefinitionList();
       case 9:
-        var var_term = sse_decode_String(deserializer);
-        var var_definition = sse_decode_String(deserializer);
-        return NodeContent_DefinitionItem(
+      var var_term = sse_decode_String(deserializer);
+      var var_definition = sse_decode_String(deserializer);
+      return NodeContent_DefinitionItem(
           term: var_term,
           definition: var_definition,
         );
       case 10:
-        var var_format = sse_decode_String(deserializer);
-        var var_content = sse_decode_String(deserializer);
-        return NodeContent_RawBlock(format: var_format, content: var_content);
+      var var_format = sse_decode_String(deserializer);
+      var var_content = sse_decode_String(deserializer);
+      return NodeContent_RawBlock(format: var_format, content: var_content);
       case 11:
-        var var_entries = sse_decode_list_metadata_entry(deserializer);
-        return NodeContent_MetadataBlock(entries: var_entries);
+      var var_entries = sse_decode_list_metadata_entry(deserializer);
+      return NodeContent_MetadataBlock(entries: var_entries);
       case 12:
-        var var_label = sse_decode_String(deserializer);
-        var var_headingLevel = sse_decode_i_64(deserializer);
-        var var_headingText = sse_decode_String(deserializer);
-        return NodeContent_Group(
+      var var_label = sse_decode_String(deserializer);
+      var var_headingLevel = sse_decode_i_64(deserializer);
+      var var_headingText = sse_decode_String(deserializer);
+      return NodeContent_Group(
           label: var_label,
           headingLevel: var_headingLevel,
           headingText: var_headingText,
         );
       default:
-        throw UnimplementedError('');
+      throw UnimplementedError('');
     }
   }
 
@@ -4639,19 +4735,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var tag_ = sse_decode_i_32(deserializer);
     switch (tag_) {
       case 0:
-        return VisitResult_Continue();
+      return VisitResult_Continue();
       case 1:
-        var var_field0 = sse_decode_String(deserializer);
-        return VisitResult_Custom(field0: var_field0);
+      var var_field0 = sse_decode_String(deserializer);
+      return VisitResult_Custom(field0: var_field0);
       case 2:
-        return VisitResult_Skip();
+      return VisitResult_Skip();
       case 3:
-        return VisitResult_PreserveHtml();
+      return VisitResult_PreserveHtml();
       case 4:
-        var var_field0 = sse_decode_String(deserializer);
-        return VisitResult_Error(field0: var_field0);
+      var var_field0 = sse_decode_String(deserializer);
+      return VisitResult_Error(field0: var_field0);
       default:
-        throw UnimplementedError('');
+      throw UnimplementedError('');
     }
   }
 
@@ -4956,25 +5052,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
       case AnnotationKind_Bold():
-        sse_encode_i_32(0, serializer);
+      sse_encode_i_32(0, serializer);
       case AnnotationKind_Italic():
-        sse_encode_i_32(1, serializer);
+      sse_encode_i_32(1, serializer);
       case AnnotationKind_Underline():
-        sse_encode_i_32(2, serializer);
+      sse_encode_i_32(2, serializer);
       case AnnotationKind_Strikethrough():
-        sse_encode_i_32(3, serializer);
+      sse_encode_i_32(3, serializer);
       case AnnotationKind_Code():
-        sse_encode_i_32(4, serializer);
+      sse_encode_i_32(4, serializer);
       case AnnotationKind_Subscript():
-        sse_encode_i_32(5, serializer);
+      sse_encode_i_32(5, serializer);
       case AnnotationKind_Superscript():
-        sse_encode_i_32(6, serializer);
+      sse_encode_i_32(6, serializer);
       case AnnotationKind_Highlight():
-        sse_encode_i_32(7, serializer);
+      sse_encode_i_32(7, serializer);
       case AnnotationKind_Link(url: final url, title: final title):
-        sse_encode_i_32(8, serializer);
-        sse_encode_String(url, serializer);
-        sse_encode_String(title, serializer);
+      sse_encode_i_32(8, serializer);
+      sse_encode_String(url, serializer);
+      sse_encode_String(title, serializer);
     }
   }
 
@@ -5182,26 +5278,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
       case ConversionError_ParseError(field0: final field0):
-        sse_encode_i_32(0, serializer);
-        sse_encode_String(field0, serializer);
+      sse_encode_i_32(0, serializer);
+      sse_encode_String(field0, serializer);
       case ConversionError_SanitizationError(field0: final field0):
-        sse_encode_i_32(1, serializer);
-        sse_encode_String(field0, serializer);
+      sse_encode_i_32(1, serializer);
+      sse_encode_String(field0, serializer);
       case ConversionError_ConfigError(field0: final field0):
-        sse_encode_i_32(2, serializer);
-        sse_encode_String(field0, serializer);
+      sse_encode_i_32(2, serializer);
+      sse_encode_String(field0, serializer);
       case ConversionError_IoError(field0: final field0):
-        sse_encode_i_32(3, serializer);
-        sse_encode_String(field0, serializer);
+      sse_encode_i_32(3, serializer);
+      sse_encode_String(field0, serializer);
       case ConversionError_Panic(field0: final field0):
-        sse_encode_i_32(4, serializer);
-        sse_encode_String(field0, serializer);
+      sse_encode_i_32(4, serializer);
+      sse_encode_String(field0, serializer);
       case ConversionError_InvalidInput(field0: final field0):
-        sse_encode_i_32(5, serializer);
-        sse_encode_String(field0, serializer);
+      sse_encode_i_32(5, serializer);
+      sse_encode_String(field0, serializer);
       case ConversionError_Other(field0: final field0):
-        sse_encode_i_32(6, serializer);
-        sse_encode_String(field0, serializer);
+      sse_encode_i_32(6, serializer);
+      sse_encode_String(field0, serializer);
     }
   }
 
@@ -5685,61 +5781,61 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
       case NodeContent_Heading(level: final level, text: final text):
-        sse_encode_i_32(0, serializer);
-        sse_encode_i_64(level, serializer);
-        sse_encode_String(text, serializer);
+      sse_encode_i_32(0, serializer);
+      sse_encode_i_64(level, serializer);
+      sse_encode_String(text, serializer);
       case NodeContent_Paragraph(text: final text):
-        sse_encode_i_32(1, serializer);
-        sse_encode_String(text, serializer);
+      sse_encode_i_32(1, serializer);
+      sse_encode_String(text, serializer);
       case NodeContent_List(ordered: final ordered):
-        sse_encode_i_32(2, serializer);
-        sse_encode_bool(ordered, serializer);
+      sse_encode_i_32(2, serializer);
+      sse_encode_bool(ordered, serializer);
       case NodeContent_ListItem(text: final text):
-        sse_encode_i_32(3, serializer);
-        sse_encode_String(text, serializer);
+      sse_encode_i_32(3, serializer);
+      sse_encode_String(text, serializer);
       case NodeContent_Table(grid: final grid):
-        sse_encode_i_32(4, serializer);
-        sse_encode_box_autoadd_table_grid(grid, serializer);
+      sse_encode_i_32(4, serializer);
+      sse_encode_box_autoadd_table_grid(grid, serializer);
       case NodeContent_Image(
         description: final description,
         src: final src,
         imageIndex: final imageIndex,
       ):
-        sse_encode_i_32(5, serializer);
-        sse_encode_String(description, serializer);
-        sse_encode_String(src, serializer);
-        sse_encode_i_64(imageIndex, serializer);
+      sse_encode_i_32(5, serializer);
+      sse_encode_String(description, serializer);
+      sse_encode_String(src, serializer);
+      sse_encode_i_64(imageIndex, serializer);
       case NodeContent_Code(text: final text, language: final language):
-        sse_encode_i_32(6, serializer);
-        sse_encode_String(text, serializer);
-        sse_encode_String(language, serializer);
+      sse_encode_i_32(6, serializer);
+      sse_encode_String(text, serializer);
+      sse_encode_String(language, serializer);
       case NodeContent_Quote():
-        sse_encode_i_32(7, serializer);
+      sse_encode_i_32(7, serializer);
       case NodeContent_DefinitionList():
-        sse_encode_i_32(8, serializer);
+      sse_encode_i_32(8, serializer);
       case NodeContent_DefinitionItem(
         term: final term,
         definition: final definition,
       ):
-        sse_encode_i_32(9, serializer);
-        sse_encode_String(term, serializer);
-        sse_encode_String(definition, serializer);
+      sse_encode_i_32(9, serializer);
+      sse_encode_String(term, serializer);
+      sse_encode_String(definition, serializer);
       case NodeContent_RawBlock(format: final format, content: final content):
-        sse_encode_i_32(10, serializer);
-        sse_encode_String(format, serializer);
-        sse_encode_String(content, serializer);
+      sse_encode_i_32(10, serializer);
+      sse_encode_String(format, serializer);
+      sse_encode_String(content, serializer);
       case NodeContent_MetadataBlock(entries: final entries):
-        sse_encode_i_32(11, serializer);
-        sse_encode_list_metadata_entry(entries, serializer);
+      sse_encode_i_32(11, serializer);
+      sse_encode_list_metadata_entry(entries, serializer);
       case NodeContent_Group(
         label: final label,
         headingLevel: final headingLevel,
         headingText: final headingText,
       ):
-        sse_encode_i_32(12, serializer);
-        sse_encode_String(label, serializer);
-        sse_encode_i_64(headingLevel, serializer);
-        sse_encode_String(headingText, serializer);
+      sse_encode_i_32(12, serializer);
+      sse_encode_String(label, serializer);
+      sse_encode_i_64(headingLevel, serializer);
+      sse_encode_String(headingText, serializer);
     }
   }
 
@@ -6192,17 +6288,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
       case VisitResult_Continue():
-        sse_encode_i_32(0, serializer);
+      sse_encode_i_32(0, serializer);
       case VisitResult_Custom(field0: final field0):
-        sse_encode_i_32(1, serializer);
-        sse_encode_String(field0, serializer);
+      sse_encode_i_32(1, serializer);
+      sse_encode_String(field0, serializer);
       case VisitResult_Skip():
-        sse_encode_i_32(2, serializer);
+      sse_encode_i_32(2, serializer);
       case VisitResult_PreserveHtml():
-        sse_encode_i_32(3, serializer);
+      sse_encode_i_32(3, serializer);
       case VisitResult_Error(field0: final field0):
-        sse_encode_i_32(4, serializer);
-        sse_encode_String(field0, serializer);
+      sse_encode_i_32(4, serializer);
+      sse_encode_String(field0, serializer);
     }
   }
 
@@ -6226,18 +6322,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 class VisitorHandleImpl extends RustOpaque implements VisitorHandle {
   // Not to be used by end users
   VisitorHandleImpl.frbInternalDcoDecode(List<dynamic> wire)
-    : super.frbInternalDcoDecode(wire, _kStaticData);
+  : super.frbInternalDcoDecode(wire, _kStaticData);
 
   // Not to be used by end users
   VisitorHandleImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
-    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+  : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
 
   static final _kStaticData = RustArcStaticData(
     rustArcIncrementStrongCount:
-        RustLib.instance.api.rust_arc_increment_strong_count_VisitorHandle,
+    RustLib.instance.api.rust_arc_increment_strong_count_VisitorHandle,
     rustArcDecrementStrongCount:
-        RustLib.instance.api.rust_arc_decrement_strong_count_VisitorHandle,
+    RustLib.instance.api.rust_arc_decrement_strong_count_VisitorHandle,
     rustArcDecrementStrongCountPtr:
-        RustLib.instance.api.rust_arc_decrement_strong_count_VisitorHandlePtr,
+    RustLib.instance.api.rust_arc_decrement_strong_count_VisitorHandlePtr,
   );
 }

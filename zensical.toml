@@ -11,55 +11,55 @@ copyright = "Copyright &copy; 2023-2026 Kreuzberg, Inc."
 extra_css = ["css/extra.css"]
 
 nav = [
-  { "Home" = "index.md" },
-  { "Get Started" = [
-    { "Installation" = "installation.md" },
-    { "Usage" = "usage.md" },
-    { "CLI" = "cli.md" },
-  ] },
-  { "Guides" = [
-    { "Visitor pattern" = "visitor.md" },
-    { "Table extraction" = "tables.md" },
-    { "Error handling" = "errors.md" },
-    { "AI Coding Assistants" = "agent-skills.md" },
-  ] },
-  { "Concepts" = [
-    { "Architecture" = "concepts/architecture.md" },
-    { "Conversion pipeline" = "concepts/pipeline.md" },
-    { "Plugin system" = "concepts/plugin-system.md" },
-  ] },
-  { "Reference" = [
-    { "Configuration" = "configuration.md" },
-    { "API reference" = "api-reference.md" },
-    { "Language guides" = "language-guides.md" },
-    { "Language APIs" = [
-      { "Rust" = "reference/api-rust.md" },
-      { "Python" = "reference/api-python.md" },
-      { "TypeScript" = "reference/api-typescript.md" },
-      { "Go" = "reference/api-go.md" },
-      { "Ruby" = "reference/api-ruby.md" },
-      { "PHP" = "reference/api-php.md" },
-      { "Java" = "reference/api-java.md" },
-      { "C#" = "reference/api-csharp.md" },
-      { "Elixir" = "reference/api-elixir.md" },
-      { "R" = "reference/api-r.md" },
-      { "Dart" = "reference/api-dart.md" },
-      { "Kotlin (Android)" = "reference/api-kotlin-android.md" },
-      { "Swift" = "reference/api-swift.md" },
-      { "Zig" = "reference/api-zig.md" },
-      { "C" = "reference/api-c.md" },
-      { "WebAssembly" = "reference/api-wasm.md" },
+    { "Home" = "index.md" },
+    { "Get Started" = [
+        { "Installation" = "installation.md" },
+        { "Usage" = "usage.md" },
+        { "CLI" = "cli.md" },
     ] },
-    { "Types" = "reference/types.md" },
-    { "Configuration (generated)" = "reference/configuration.md" },
-    { "Error types (generated)" = "reference/errors.md" },
-  ] },
-  { "More" = [
-    { "Migration" = "migration.md" },
-    { "Contributing" = "contributing.md" },
-    { "Changelog" = "https://github.com/xberg-io/html-to-markdown/blob/main/CHANGELOG.md" },
-    { "Ecosystem" = "ecosystem.md" },
-  ] },
+    { "Guides" = [
+        { "Visitor pattern" = "visitor.md" },
+        { "Table extraction" = "tables.md" },
+        { "Error handling" = "errors.md" },
+        { "AI Coding Assistants" = "agent-skills.md" },
+    ] },
+    { "Concepts" = [
+        { "Architecture" = "concepts/architecture.md" },
+        { "Conversion pipeline" = "concepts/pipeline.md" },
+        { "Plugin system" = "concepts/plugin-system.md" },
+    ] },
+    { "Reference" = [
+        { "Configuration" = "configuration.md" },
+        { "API reference" = "api-reference.md" },
+        { "Language guides" = "language-guides.md" },
+        { "Language APIs" = [
+            { "Rust" = "reference/api-rust.md" },
+            { "Python" = "reference/api-python.md" },
+            { "TypeScript" = "reference/api-typescript.md" },
+            { "Go" = "reference/api-go.md" },
+            { "Ruby" = "reference/api-ruby.md" },
+            { "PHP" = "reference/api-php.md" },
+            { "Java" = "reference/api-java.md" },
+            { "C#" = "reference/api-csharp.md" },
+            { "Elixir" = "reference/api-elixir.md" },
+            { "R" = "reference/api-r.md" },
+            { "Dart" = "reference/api-dart.md" },
+            { "Kotlin (Android)" = "reference/api-kotlin-android.md" },
+            { "Swift" = "reference/api-swift.md" },
+            { "Zig" = "reference/api-zig.md" },
+            { "C" = "reference/api-c.md" },
+            { "WebAssembly" = "reference/api-wasm.md" },
+        ] },
+        { "Types" = "reference/types.md" },
+        { "Configuration (generated)" = "reference/configuration.md" },
+        { "Error types (generated)" = "reference/errors.md" },
+    ] },
+    { "More" = [
+        { "Migration" = "migration.md" },
+        { "Contributing" = "contributing.md" },
+        { "Changelog" = "https://github.com/xberg-io/html-to-markdown/blob/main/CHANGELOG.md" },
+        { "Ecosystem" = "ecosystem.md" },
+    ] },
 ]
 
 [project.theme]
@@ -69,25 +69,25 @@ logo = "https://cdn.jsdelivr.net/gh/xberg-io/assets@v1/docs/navbar-logo-dark.svg
 favicon = "https://cdn.jsdelivr.net/gh/xberg-io/assets@v1/favicon/favicon.ico"
 language = "en"
 features = [
-  "content.code.copy",
-  "content.code.annotate",
-  "content.tabs.link",
-  "navigation.instant",
-  "navigation.instant.progress",
-  "navigation.path",
-  "navigation.prune",
-  "navigation.indexes",
-  "navigation.sections",
-  "navigation.tabs",
-  "navigation.tabs.sticky",
-  "navigation.tracking",
-  "navigation.top",
-  "search.highlight",
-  "search.share",
-  "search.suggest",
-  "toc.follow",
-  "toc.integrate",
-  "announce.dismiss",
+    "content.code.copy",
+    "content.code.annotate",
+    "content.tabs.link",
+    "navigation.instant",
+    "navigation.instant.progress",
+    "navigation.path",
+    "navigation.prune",
+    "navigation.indexes",
+    "navigation.sections",
+    "navigation.tabs",
+    "navigation.tabs.sticky",
+    "navigation.tracking",
+    "navigation.top",
+    "search.highlight",
+    "search.share",
+    "search.suggest",
+    "toc.follow",
+    "toc.integrate",
+    "announce.dismiss",
 ]
 
 [project.theme.font]
@@ -162,9 +162,7 @@ base_path = [".", "docs"]
 check_paths = true
 
 [project.markdown_extensions.pymdownx.superfences]
-custom_fences = [
-  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
-]
+custom_fences = [{ name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" }]
 
 [project.markdown_extensions.pymdownx.tabbed]
 alternate_style = true

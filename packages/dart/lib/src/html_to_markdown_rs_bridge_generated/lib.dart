@@ -33,19 +33,19 @@ Future<DocumentMetadata> createDocumentMetadataFromJson({
 }) => RustLib.instance.api.crateCreateDocumentMetadataFromJson(json: json);
 
 Future<HeaderMetadata> createHeaderMetadataFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateHeaderMetadataFromJson(json: json);
+RustLib.instance.api.crateCreateHeaderMetadataFromJson(json: json);
 
 Future<LinkMetadata> createLinkMetadataFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateLinkMetadataFromJson(json: json);
+RustLib.instance.api.crateCreateLinkMetadataFromJson(json: json);
 
 Future<ImageMetadata> createImageMetadataFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateImageMetadataFromJson(json: json);
+RustLib.instance.api.crateCreateImageMetadataFromJson(json: json);
 
 Future<StructuredData> createStructuredDataFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateStructuredDataFromJson(json: json);
+RustLib.instance.api.crateCreateStructuredDataFromJson(json: json);
 
 Future<HtmlMetadata> createHtmlMetadataFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateHtmlMetadataFromJson(json: json);
+RustLib.instance.api.crateCreateHtmlMetadataFromJson(json: json);
 
 Future<ConversionOptions> createConversionOptionsFromJson({
   required String json,
@@ -54,7 +54,7 @@ Future<ConversionOptions> createConversionOptionsFromJson({
 Future<ConversionOptionsUpdate> createConversionOptionsUpdateFromJson({
   required String json,
 }) =>
-    RustLib.instance.api.crateCreateConversionOptionsUpdateFromJson(json: json);
+RustLib.instance.api.crateCreateConversionOptionsUpdateFromJson(json: json);
 
 Future<PreprocessingOptions> createPreprocessingOptionsFromJson({
   required String json,
@@ -67,40 +67,40 @@ Future<PreprocessingOptionsUpdate> createPreprocessingOptionsUpdateFromJson({
 );
 
 Future<ImageDimensions> createImageDimensionsFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateImageDimensionsFromJson(json: json);
+RustLib.instance.api.crateCreateImageDimensionsFromJson(json: json);
 
 Future<DocumentStructure> createDocumentStructureFromJson({
   required String json,
 }) => RustLib.instance.api.crateCreateDocumentStructureFromJson(json: json);
 
 Future<DocumentNode> createDocumentNodeFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateDocumentNodeFromJson(json: json);
+RustLib.instance.api.crateCreateDocumentNodeFromJson(json: json);
 
 Future<TextAnnotation> createTextAnnotationFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateTextAnnotationFromJson(json: json);
+RustLib.instance.api.crateCreateTextAnnotationFromJson(json: json);
 
 Future<MetadataEntry> createMetadataEntryFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateMetadataEntryFromJson(json: json);
+RustLib.instance.api.crateCreateMetadataEntryFromJson(json: json);
 
 Future<ConversionResult> createConversionResultFromJson({
   required String json,
 }) => RustLib.instance.api.crateCreateConversionResultFromJson(json: json);
 
 Future<TableGrid> createTableGridFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateTableGridFromJson(json: json);
+RustLib.instance.api.crateCreateTableGridFromJson(json: json);
 
 Future<GridCell> createGridCellFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateGridCellFromJson(json: json);
+RustLib.instance.api.crateCreateGridCellFromJson(json: json);
 
 Future<TableData> createTableDataFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateTableDataFromJson(json: json);
+RustLib.instance.api.crateCreateTableDataFromJson(json: json);
 
 Future<ProcessingWarning> createProcessingWarningFromJson({
   required String json,
 }) => RustLib.instance.api.crateCreateProcessingWarningFromJson(json: json);
 
 Future<NodeContext> createNodeContextFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateNodeContextFromJson(json: json);
+RustLib.instance.api.crateCreateNodeContextFromJson(json: json);
 
 /// Construct a `VisitorHandle` from Dart callback closures.
 /// FRB synthesises a Dart-callable function type for each closure parameter,
@@ -292,33 +292,33 @@ sealed class ConversionError with _$ConversionError {
 
   /// HTML parsing error
   const factory ConversionError.parseError({required String field0}) =
-      ConversionError_ParseError;
+  ConversionError_ParseError;
 
   /// HTML sanitization error
   const factory ConversionError.sanitizationError({required String field0}) =
-      ConversionError_SanitizationError;
+  ConversionError_SanitizationError;
 
   /// Invalid configuration
   const factory ConversionError.configError({required String field0}) =
-      ConversionError_ConfigError;
+  ConversionError_ConfigError;
 
   /// I/O error — stores the error message string so the variant is FFI-safe.
   ///
   /// Use `ConversionError::from(io_error)` to convert from `std::io::Error`.
   const factory ConversionError.ioError({required String field0}) =
-      ConversionError_IoError;
+  ConversionError_IoError;
 
   /// Panic caught during conversion to prevent unwinding across FFI boundaries
   const factory ConversionError.panic({required String field0}) =
-      ConversionError_Panic;
+  ConversionError_Panic;
 
   /// Invalid input data
   const factory ConversionError.invalidInput({required String field0}) =
-      ConversionError_InvalidInput;
+  ConversionError_InvalidInput;
 
   /// Generic conversion error
   const factory ConversionError.other({required String field0}) =
-      ConversionError_Other;
+  ConversionError_Other;
 }
 
 /// Main conversion options for HTML to Markdown conversion.
@@ -573,100 +573,100 @@ class ConversionOptions {
 
   @override
   int get hashCode =>
-      headingStyle.hashCode ^
-      listIndentType.hashCode ^
-      listIndentWidth.hashCode ^
-      bullets.hashCode ^
-      strongEmSymbol.hashCode ^
-      escapeAsterisks.hashCode ^
-      escapeUnderscores.hashCode ^
-      escapeMisc.hashCode ^
-      escapeAscii.hashCode ^
-      codeLanguage.hashCode ^
-      autolinks.hashCode ^
-      defaultTitle.hashCode ^
-      brInTables.hashCode ^
-      compactTables.hashCode ^
-      highlightStyle.hashCode ^
-      extractMetadata.hashCode ^
-      whitespaceMode.hashCode ^
-      stripNewlines.hashCode ^
-      wrap.hashCode ^
-      wrapWidth.hashCode ^
-      convertAsInline.hashCode ^
-      subSymbol.hashCode ^
-      supSymbol.hashCode ^
-      newlineStyle.hashCode ^
-      codeBlockStyle.hashCode ^
-      keepInlineImagesIn.hashCode ^
-      preprocessing.hashCode ^
-      encoding.hashCode ^
-      debug.hashCode ^
-      stripTags.hashCode ^
-      preserveTags.hashCode ^
-      skipImages.hashCode ^
-      urlEscapeStyle.hashCode ^
-      linkStyle.hashCode ^
-      outputFormat.hashCode ^
-      includeDocumentStructure.hashCode ^
-      extractImages.hashCode ^
-      maxImageSize.hashCode ^
-      captureSvg.hashCode ^
-      inferDimensions.hashCode ^
-      maxDepth.hashCode ^
-      excludeSelectors.hashCode ^
-      tierStrategy.hashCode ^
-      visitor.hashCode;
+  headingStyle.hashCode ^
+  listIndentType.hashCode ^
+  listIndentWidth.hashCode ^
+  bullets.hashCode ^
+  strongEmSymbol.hashCode ^
+  escapeAsterisks.hashCode ^
+  escapeUnderscores.hashCode ^
+  escapeMisc.hashCode ^
+  escapeAscii.hashCode ^
+  codeLanguage.hashCode ^
+  autolinks.hashCode ^
+  defaultTitle.hashCode ^
+  brInTables.hashCode ^
+  compactTables.hashCode ^
+  highlightStyle.hashCode ^
+  extractMetadata.hashCode ^
+  whitespaceMode.hashCode ^
+  stripNewlines.hashCode ^
+  wrap.hashCode ^
+  wrapWidth.hashCode ^
+  convertAsInline.hashCode ^
+  subSymbol.hashCode ^
+  supSymbol.hashCode ^
+  newlineStyle.hashCode ^
+  codeBlockStyle.hashCode ^
+  keepInlineImagesIn.hashCode ^
+  preprocessing.hashCode ^
+  encoding.hashCode ^
+  debug.hashCode ^
+  stripTags.hashCode ^
+  preserveTags.hashCode ^
+  skipImages.hashCode ^
+  urlEscapeStyle.hashCode ^
+  linkStyle.hashCode ^
+  outputFormat.hashCode ^
+  includeDocumentStructure.hashCode ^
+  extractImages.hashCode ^
+  maxImageSize.hashCode ^
+  captureSvg.hashCode ^
+  inferDimensions.hashCode ^
+  maxDepth.hashCode ^
+  excludeSelectors.hashCode ^
+  tierStrategy.hashCode ^
+  visitor.hashCode;
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ConversionOptions &&
-          runtimeType == other.runtimeType &&
-          headingStyle == other.headingStyle &&
-          listIndentType == other.listIndentType &&
-          listIndentWidth == other.listIndentWidth &&
-          bullets == other.bullets &&
-          strongEmSymbol == other.strongEmSymbol &&
-          escapeAsterisks == other.escapeAsterisks &&
-          escapeUnderscores == other.escapeUnderscores &&
-          escapeMisc == other.escapeMisc &&
-          escapeAscii == other.escapeAscii &&
-          codeLanguage == other.codeLanguage &&
-          autolinks == other.autolinks &&
-          defaultTitle == other.defaultTitle &&
-          brInTables == other.brInTables &&
-          compactTables == other.compactTables &&
-          highlightStyle == other.highlightStyle &&
-          extractMetadata == other.extractMetadata &&
-          whitespaceMode == other.whitespaceMode &&
-          stripNewlines == other.stripNewlines &&
-          wrap == other.wrap &&
-          wrapWidth == other.wrapWidth &&
-          convertAsInline == other.convertAsInline &&
-          subSymbol == other.subSymbol &&
-          supSymbol == other.supSymbol &&
-          newlineStyle == other.newlineStyle &&
-          codeBlockStyle == other.codeBlockStyle &&
-          keepInlineImagesIn == other.keepInlineImagesIn &&
-          preprocessing == other.preprocessing &&
-          encoding == other.encoding &&
-          debug == other.debug &&
-          stripTags == other.stripTags &&
-          preserveTags == other.preserveTags &&
-          skipImages == other.skipImages &&
-          urlEscapeStyle == other.urlEscapeStyle &&
-          linkStyle == other.linkStyle &&
-          outputFormat == other.outputFormat &&
-          includeDocumentStructure == other.includeDocumentStructure &&
-          extractImages == other.extractImages &&
-          maxImageSize == other.maxImageSize &&
-          captureSvg == other.captureSvg &&
-          inferDimensions == other.inferDimensions &&
-          maxDepth == other.maxDepth &&
-          excludeSelectors == other.excludeSelectors &&
-          tierStrategy == other.tierStrategy &&
-          visitor == other.visitor;
+  identical(this, other) ||
+  other is ConversionOptions &&
+  runtimeType == other.runtimeType &&
+  headingStyle == other.headingStyle &&
+  listIndentType == other.listIndentType &&
+  listIndentWidth == other.listIndentWidth &&
+  bullets == other.bullets &&
+  strongEmSymbol == other.strongEmSymbol &&
+  escapeAsterisks == other.escapeAsterisks &&
+  escapeUnderscores == other.escapeUnderscores &&
+  escapeMisc == other.escapeMisc &&
+  escapeAscii == other.escapeAscii &&
+  codeLanguage == other.codeLanguage &&
+  autolinks == other.autolinks &&
+  defaultTitle == other.defaultTitle &&
+  brInTables == other.brInTables &&
+  compactTables == other.compactTables &&
+  highlightStyle == other.highlightStyle &&
+  extractMetadata == other.extractMetadata &&
+  whitespaceMode == other.whitespaceMode &&
+  stripNewlines == other.stripNewlines &&
+  wrap == other.wrap &&
+  wrapWidth == other.wrapWidth &&
+  convertAsInline == other.convertAsInline &&
+  subSymbol == other.subSymbol &&
+  supSymbol == other.supSymbol &&
+  newlineStyle == other.newlineStyle &&
+  codeBlockStyle == other.codeBlockStyle &&
+  keepInlineImagesIn == other.keepInlineImagesIn &&
+  preprocessing == other.preprocessing &&
+  encoding == other.encoding &&
+  debug == other.debug &&
+  stripTags == other.stripTags &&
+  preserveTags == other.preserveTags &&
+  skipImages == other.skipImages &&
+  urlEscapeStyle == other.urlEscapeStyle &&
+  linkStyle == other.linkStyle &&
+  outputFormat == other.outputFormat &&
+  includeDocumentStructure == other.includeDocumentStructure &&
+  extractImages == other.extractImages &&
+  maxImageSize == other.maxImageSize &&
+  captureSvg == other.captureSvg &&
+  inferDimensions == other.inferDimensions &&
+  maxDepth == other.maxDepth &&
+  excludeSelectors == other.excludeSelectors &&
+  tierStrategy == other.tierStrategy &&
+  visitor == other.visitor;
 }
 
 /// Partial update for `ConversionOptions`.
@@ -855,100 +855,100 @@ class ConversionOptionsUpdate {
 
   @override
   int get hashCode =>
-      headingStyle.hashCode ^
-      listIndentType.hashCode ^
-      listIndentWidth.hashCode ^
-      bullets.hashCode ^
-      strongEmSymbol.hashCode ^
-      escapeAsterisks.hashCode ^
-      escapeUnderscores.hashCode ^
-      escapeMisc.hashCode ^
-      escapeAscii.hashCode ^
-      codeLanguage.hashCode ^
-      autolinks.hashCode ^
-      defaultTitle.hashCode ^
-      brInTables.hashCode ^
-      compactTables.hashCode ^
-      highlightStyle.hashCode ^
-      extractMetadata.hashCode ^
-      whitespaceMode.hashCode ^
-      stripNewlines.hashCode ^
-      wrap.hashCode ^
-      wrapWidth.hashCode ^
-      convertAsInline.hashCode ^
-      subSymbol.hashCode ^
-      supSymbol.hashCode ^
-      newlineStyle.hashCode ^
-      codeBlockStyle.hashCode ^
-      keepInlineImagesIn.hashCode ^
-      preprocessing.hashCode ^
-      encoding.hashCode ^
-      debug.hashCode ^
-      stripTags.hashCode ^
-      preserveTags.hashCode ^
-      skipImages.hashCode ^
-      urlEscapeStyle.hashCode ^
-      linkStyle.hashCode ^
-      outputFormat.hashCode ^
-      includeDocumentStructure.hashCode ^
-      extractImages.hashCode ^
-      maxImageSize.hashCode ^
-      captureSvg.hashCode ^
-      inferDimensions.hashCode ^
-      maxDepth.hashCode ^
-      excludeSelectors.hashCode ^
-      tierStrategy.hashCode ^
-      visitor.hashCode;
+  headingStyle.hashCode ^
+  listIndentType.hashCode ^
+  listIndentWidth.hashCode ^
+  bullets.hashCode ^
+  strongEmSymbol.hashCode ^
+  escapeAsterisks.hashCode ^
+  escapeUnderscores.hashCode ^
+  escapeMisc.hashCode ^
+  escapeAscii.hashCode ^
+  codeLanguage.hashCode ^
+  autolinks.hashCode ^
+  defaultTitle.hashCode ^
+  brInTables.hashCode ^
+  compactTables.hashCode ^
+  highlightStyle.hashCode ^
+  extractMetadata.hashCode ^
+  whitespaceMode.hashCode ^
+  stripNewlines.hashCode ^
+  wrap.hashCode ^
+  wrapWidth.hashCode ^
+  convertAsInline.hashCode ^
+  subSymbol.hashCode ^
+  supSymbol.hashCode ^
+  newlineStyle.hashCode ^
+  codeBlockStyle.hashCode ^
+  keepInlineImagesIn.hashCode ^
+  preprocessing.hashCode ^
+  encoding.hashCode ^
+  debug.hashCode ^
+  stripTags.hashCode ^
+  preserveTags.hashCode ^
+  skipImages.hashCode ^
+  urlEscapeStyle.hashCode ^
+  linkStyle.hashCode ^
+  outputFormat.hashCode ^
+  includeDocumentStructure.hashCode ^
+  extractImages.hashCode ^
+  maxImageSize.hashCode ^
+  captureSvg.hashCode ^
+  inferDimensions.hashCode ^
+  maxDepth.hashCode ^
+  excludeSelectors.hashCode ^
+  tierStrategy.hashCode ^
+  visitor.hashCode;
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ConversionOptionsUpdate &&
-          runtimeType == other.runtimeType &&
-          headingStyle == other.headingStyle &&
-          listIndentType == other.listIndentType &&
-          listIndentWidth == other.listIndentWidth &&
-          bullets == other.bullets &&
-          strongEmSymbol == other.strongEmSymbol &&
-          escapeAsterisks == other.escapeAsterisks &&
-          escapeUnderscores == other.escapeUnderscores &&
-          escapeMisc == other.escapeMisc &&
-          escapeAscii == other.escapeAscii &&
-          codeLanguage == other.codeLanguage &&
-          autolinks == other.autolinks &&
-          defaultTitle == other.defaultTitle &&
-          brInTables == other.brInTables &&
-          compactTables == other.compactTables &&
-          highlightStyle == other.highlightStyle &&
-          extractMetadata == other.extractMetadata &&
-          whitespaceMode == other.whitespaceMode &&
-          stripNewlines == other.stripNewlines &&
-          wrap == other.wrap &&
-          wrapWidth == other.wrapWidth &&
-          convertAsInline == other.convertAsInline &&
-          subSymbol == other.subSymbol &&
-          supSymbol == other.supSymbol &&
-          newlineStyle == other.newlineStyle &&
-          codeBlockStyle == other.codeBlockStyle &&
-          keepInlineImagesIn == other.keepInlineImagesIn &&
-          preprocessing == other.preprocessing &&
-          encoding == other.encoding &&
-          debug == other.debug &&
-          stripTags == other.stripTags &&
-          preserveTags == other.preserveTags &&
-          skipImages == other.skipImages &&
-          urlEscapeStyle == other.urlEscapeStyle &&
-          linkStyle == other.linkStyle &&
-          outputFormat == other.outputFormat &&
-          includeDocumentStructure == other.includeDocumentStructure &&
-          extractImages == other.extractImages &&
-          maxImageSize == other.maxImageSize &&
-          captureSvg == other.captureSvg &&
-          inferDimensions == other.inferDimensions &&
-          maxDepth == other.maxDepth &&
-          excludeSelectors == other.excludeSelectors &&
-          tierStrategy == other.tierStrategy &&
-          visitor == other.visitor;
+  identical(this, other) ||
+  other is ConversionOptionsUpdate &&
+  runtimeType == other.runtimeType &&
+  headingStyle == other.headingStyle &&
+  listIndentType == other.listIndentType &&
+  listIndentWidth == other.listIndentWidth &&
+  bullets == other.bullets &&
+  strongEmSymbol == other.strongEmSymbol &&
+  escapeAsterisks == other.escapeAsterisks &&
+  escapeUnderscores == other.escapeUnderscores &&
+  escapeMisc == other.escapeMisc &&
+  escapeAscii == other.escapeAscii &&
+  codeLanguage == other.codeLanguage &&
+  autolinks == other.autolinks &&
+  defaultTitle == other.defaultTitle &&
+  brInTables == other.brInTables &&
+  compactTables == other.compactTables &&
+  highlightStyle == other.highlightStyle &&
+  extractMetadata == other.extractMetadata &&
+  whitespaceMode == other.whitespaceMode &&
+  stripNewlines == other.stripNewlines &&
+  wrap == other.wrap &&
+  wrapWidth == other.wrapWidth &&
+  convertAsInline == other.convertAsInline &&
+  subSymbol == other.subSymbol &&
+  supSymbol == other.supSymbol &&
+  newlineStyle == other.newlineStyle &&
+  codeBlockStyle == other.codeBlockStyle &&
+  keepInlineImagesIn == other.keepInlineImagesIn &&
+  preprocessing == other.preprocessing &&
+  encoding == other.encoding &&
+  debug == other.debug &&
+  stripTags == other.stripTags &&
+  preserveTags == other.preserveTags &&
+  skipImages == other.skipImages &&
+  urlEscapeStyle == other.urlEscapeStyle &&
+  linkStyle == other.linkStyle &&
+  outputFormat == other.outputFormat &&
+  includeDocumentStructure == other.includeDocumentStructure &&
+  extractImages == other.extractImages &&
+  maxImageSize == other.maxImageSize &&
+  captureSvg == other.captureSvg &&
+  inferDimensions == other.inferDimensions &&
+  maxDepth == other.maxDepth &&
+  excludeSelectors == other.excludeSelectors &&
+  tierStrategy == other.tierStrategy &&
+  visitor == other.visitor;
 }
 
 /// The primary result of HTML conversion and extraction.
@@ -1003,22 +1003,22 @@ class ConversionResult {
 
   @override
   int get hashCode =>
-      content.hashCode ^
-      document.hashCode ^
-      metadata.hashCode ^
-      tables.hashCode ^
-      warnings.hashCode;
+  content.hashCode ^
+  document.hashCode ^
+  metadata.hashCode ^
+  tables.hashCode ^
+  warnings.hashCode;
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ConversionResult &&
-          runtimeType == other.runtimeType &&
-          content == other.content &&
-          document == other.document &&
-          metadata == other.metadata &&
-          tables == other.tables &&
-          warnings == other.warnings;
+  identical(this, other) ||
+  other is ConversionResult &&
+  runtimeType == other.runtimeType &&
+  content == other.content &&
+  document == other.document &&
+  metadata == other.metadata &&
+  tables == other.tables &&
+  warnings == other.warnings;
 }
 
 /// Document-level metadata extracted from `<head>` and top-level elements.
@@ -1091,34 +1091,34 @@ class DocumentMetadata {
 
   @override
   int get hashCode =>
-      title.hashCode ^
-      description.hashCode ^
-      keywords.hashCode ^
-      author.hashCode ^
-      canonicalUrl.hashCode ^
-      baseHref.hashCode ^
-      language.hashCode ^
-      textDirection.hashCode ^
-      openGraph.hashCode ^
-      twitterCard.hashCode ^
-      metaTags.hashCode;
+  title.hashCode ^
+  description.hashCode ^
+  keywords.hashCode ^
+  author.hashCode ^
+  canonicalUrl.hashCode ^
+  baseHref.hashCode ^
+  language.hashCode ^
+  textDirection.hashCode ^
+  openGraph.hashCode ^
+  twitterCard.hashCode ^
+  metaTags.hashCode;
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is DocumentMetadata &&
-          runtimeType == other.runtimeType &&
-          title == other.title &&
-          description == other.description &&
-          keywords == other.keywords &&
-          author == other.author &&
-          canonicalUrl == other.canonicalUrl &&
-          baseHref == other.baseHref &&
-          language == other.language &&
-          textDirection == other.textDirection &&
-          openGraph == other.openGraph &&
-          twitterCard == other.twitterCard &&
-          metaTags == other.metaTags;
+  identical(this, other) ||
+  other is DocumentMetadata &&
+  runtimeType == other.runtimeType &&
+  title == other.title &&
+  description == other.description &&
+  keywords == other.keywords &&
+  author == other.author &&
+  canonicalUrl == other.canonicalUrl &&
+  baseHref == other.baseHref &&
+  language == other.language &&
+  textDirection == other.textDirection &&
+  openGraph == other.openGraph &&
+  twitterCard == other.twitterCard &&
+  metaTags == other.metaTags;
 }
 
 /// A single node in the document tree.
@@ -1161,24 +1161,24 @@ class DocumentNode {
 
   @override
   int get hashCode =>
-      id.hashCode ^
-      content.hashCode ^
-      parent.hashCode ^
-      children.hashCode ^
-      annotations.hashCode ^
-      attributes.hashCode;
+  id.hashCode ^
+  content.hashCode ^
+  parent.hashCode ^
+  children.hashCode ^
+  annotations.hashCode ^
+  attributes.hashCode;
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is DocumentNode &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          content == other.content &&
-          parent == other.parent &&
-          children == other.children &&
-          annotations == other.annotations &&
-          attributes == other.attributes;
+  identical(this, other) ||
+  other is DocumentNode &&
+  runtimeType == other.runtimeType &&
+  id == other.id &&
+  content == other.content &&
+  parent == other.parent &&
+  children == other.children &&
+  annotations == other.annotations &&
+  attributes == other.attributes;
 }
 
 /// A structured document tree representing the semantic content of an HTML document.
@@ -1198,11 +1198,11 @@ class DocumentStructure {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is DocumentStructure &&
-          runtimeType == other.runtimeType &&
-          nodes == other.nodes &&
-          sourceFormat == other.sourceFormat;
+  identical(this, other) ||
+  other is DocumentStructure &&
+  runtimeType == other.runtimeType &&
+  nodes == other.nodes &&
+  sourceFormat == other.sourceFormat;
 }
 
 /// A single cell in a table grid.
@@ -1236,24 +1236,24 @@ class GridCell {
 
   @override
   int get hashCode =>
-      content.hashCode ^
-      row.hashCode ^
-      col.hashCode ^
-      rowSpan.hashCode ^
-      colSpan.hashCode ^
-      isHeader.hashCode;
+  content.hashCode ^
+  row.hashCode ^
+  col.hashCode ^
+  rowSpan.hashCode ^
+  colSpan.hashCode ^
+  isHeader.hashCode;
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is GridCell &&
-          runtimeType == other.runtimeType &&
-          content == other.content &&
-          row == other.row &&
-          col == other.col &&
-          rowSpan == other.rowSpan &&
-          colSpan == other.colSpan &&
-          isHeader == other.isHeader;
+  identical(this, other) ||
+  other is GridCell &&
+  runtimeType == other.runtimeType &&
+  content == other.content &&
+  row == other.row &&
+  col == other.col &&
+  rowSpan == other.rowSpan &&
+  colSpan == other.colSpan &&
+  isHeader == other.isHeader;
 }
 
 /// Header element metadata with hierarchy tracking.
@@ -1301,22 +1301,22 @@ class HeaderMetadata {
 
   @override
   int get hashCode =>
-      level.hashCode ^
-      text.hashCode ^
-      id.hashCode ^
-      depth.hashCode ^
-      htmlOffset.hashCode;
+  level.hashCode ^
+  text.hashCode ^
+  id.hashCode ^
+  depth.hashCode ^
+  htmlOffset.hashCode;
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is HeaderMetadata &&
-          runtimeType == other.runtimeType &&
-          level == other.level &&
-          text == other.text &&
-          id == other.id &&
-          depth == other.depth &&
-          htmlOffset == other.htmlOffset;
+  identical(this, other) ||
+  other is HeaderMetadata &&
+  runtimeType == other.runtimeType &&
+  level == other.level &&
+  text == other.text &&
+  id == other.id &&
+  depth == other.depth &&
+  htmlOffset == other.htmlOffset;
 }
 
 /// Heading style options for Markdown output.
@@ -1394,22 +1394,22 @@ class HtmlMetadata {
 
   @override
   int get hashCode =>
-      document.hashCode ^
-      headers.hashCode ^
-      links.hashCode ^
-      images.hashCode ^
-      structuredData.hashCode;
+  document.hashCode ^
+  headers.hashCode ^
+  links.hashCode ^
+  images.hashCode ^
+  structuredData.hashCode;
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is HtmlMetadata &&
-          runtimeType == other.runtimeType &&
-          document == other.document &&
-          headers == other.headers &&
-          links == other.links &&
-          images == other.images &&
-          structuredData == other.structuredData;
+  identical(this, other) ||
+  other is HtmlMetadata &&
+  runtimeType == other.runtimeType &&
+  document == other.document &&
+  headers == other.headers &&
+  links == other.links &&
+  images == other.images &&
+  structuredData == other.structuredData;
 }
 
 /// Image dimensions in pixels.
@@ -1432,11 +1432,11 @@ class ImageDimensions {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ImageDimensions &&
-          runtimeType == other.runtimeType &&
-          width == other.width &&
-          height == other.height;
+  identical(this, other) ||
+  other is ImageDimensions &&
+  runtimeType == other.runtimeType &&
+  width == other.width &&
+  height == other.height;
 }
 
 /// Image metadata with source and dimensions.
@@ -1488,24 +1488,24 @@ class ImageMetadata {
 
   @override
   int get hashCode =>
-      src.hashCode ^
-      alt.hashCode ^
-      title.hashCode ^
-      dimensions.hashCode ^
-      imageType.hashCode ^
-      attributes.hashCode;
+  src.hashCode ^
+  alt.hashCode ^
+  title.hashCode ^
+  dimensions.hashCode ^
+  imageType.hashCode ^
+  attributes.hashCode;
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ImageMetadata &&
-          runtimeType == other.runtimeType &&
-          src == other.src &&
-          alt == other.alt &&
-          title == other.title &&
-          dimensions == other.dimensions &&
-          imageType == other.imageType &&
-          attributes == other.attributes;
+  identical(this, other) ||
+  other is ImageMetadata &&
+  runtimeType == other.runtimeType &&
+  src == other.src &&
+  alt == other.alt &&
+  title == other.title &&
+  dimensions == other.dimensions &&
+  imageType == other.imageType &&
+  attributes == other.attributes;
 }
 
 /// Image source classification for proper handling and processing.
@@ -1574,24 +1574,24 @@ class LinkMetadata {
 
   @override
   int get hashCode =>
-      href.hashCode ^
-      text.hashCode ^
-      title.hashCode ^
-      linkType.hashCode ^
-      rel.hashCode ^
-      attributes.hashCode;
+  href.hashCode ^
+  text.hashCode ^
+  title.hashCode ^
+  linkType.hashCode ^
+  rel.hashCode ^
+  attributes.hashCode;
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is LinkMetadata &&
-          runtimeType == other.runtimeType &&
-          href == other.href &&
-          text == other.text &&
-          title == other.title &&
-          linkType == other.linkType &&
-          rel == other.rel &&
-          attributes == other.attributes;
+  identical(this, other) ||
+  other is LinkMetadata &&
+  runtimeType == other.runtimeType &&
+  href == other.href &&
+  text == other.text &&
+  title == other.title &&
+  linkType == other.linkType &&
+  rel == other.rel &&
+  attributes == other.attributes;
 }
 
 /// Link rendering style in Markdown output.
@@ -1659,11 +1659,11 @@ class MetadataEntry {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is MetadataEntry &&
-          runtimeType == other.runtimeType &&
-          key == other.key &&
-          value == other.value;
+  identical(this, other) ||
+  other is MetadataEntry &&
+  runtimeType == other.runtimeType &&
+  key == other.key &&
+  value == other.value;
 }
 
 /// Line break syntax in Markdown output.
@@ -1826,24 +1826,24 @@ class NodeContext {
 
   @override
   int get hashCode =>
-      nodeType.hashCode ^
-      tagName.hashCode ^
-      depth.hashCode ^
-      indexInParent.hashCode ^
-      parentTag.hashCode ^
-      isInline.hashCode;
+  nodeType.hashCode ^
+  tagName.hashCode ^
+  depth.hashCode ^
+  indexInParent.hashCode ^
+  parentTag.hashCode ^
+  isInline.hashCode;
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is NodeContext &&
-          runtimeType == other.runtimeType &&
-          nodeType == other.nodeType &&
-          tagName == other.tagName &&
-          depth == other.depth &&
-          indexInParent == other.indexInParent &&
-          parentTag == other.parentTag &&
-          isInline == other.isInline;
+  identical(this, other) ||
+  other is NodeContext &&
+  runtimeType == other.runtimeType &&
+  nodeType == other.nodeType &&
+  tagName == other.tagName &&
+  depth == other.depth &&
+  indexInParent == other.indexInParent &&
+  parentTag == other.parentTag &&
+  isInline == other.isInline;
 }
 
 /// Node type enumeration covering all HTML element types.
@@ -2153,20 +2153,20 @@ class PreprocessingOptions {
 
   @override
   int get hashCode =>
-      enabled.hashCode ^
-      preset.hashCode ^
-      removeNavigation.hashCode ^
-      removeForms.hashCode;
+  enabled.hashCode ^
+  preset.hashCode ^
+  removeNavigation.hashCode ^
+  removeForms.hashCode;
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is PreprocessingOptions &&
-          runtimeType == other.runtimeType &&
-          enabled == other.enabled &&
-          preset == other.preset &&
-          removeNavigation == other.removeNavigation &&
-          removeForms == other.removeForms;
+  identical(this, other) ||
+  other is PreprocessingOptions &&
+  runtimeType == other.runtimeType &&
+  enabled == other.enabled &&
+  preset == other.preset &&
+  removeNavigation == other.removeNavigation &&
+  removeForms == other.removeForms;
 }
 
 /// Partial update for `PreprocessingOptions`.
@@ -2196,20 +2196,20 @@ class PreprocessingOptionsUpdate {
 
   @override
   int get hashCode =>
-      enabled.hashCode ^
-      preset.hashCode ^
-      removeNavigation.hashCode ^
-      removeForms.hashCode;
+  enabled.hashCode ^
+  preset.hashCode ^
+  removeNavigation.hashCode ^
+  removeForms.hashCode;
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is PreprocessingOptionsUpdate &&
-          runtimeType == other.runtimeType &&
-          enabled == other.enabled &&
-          preset == other.preset &&
-          removeNavigation == other.removeNavigation &&
-          removeForms == other.removeForms;
+  identical(this, other) ||
+  other is PreprocessingOptionsUpdate &&
+  runtimeType == other.runtimeType &&
+  enabled == other.enabled &&
+  preset == other.preset &&
+  removeNavigation == other.removeNavigation &&
+  removeForms == other.removeForms;
 }
 
 /// HTML preprocessing aggressiveness level.
@@ -2255,11 +2255,11 @@ class ProcessingWarning {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ProcessingWarning &&
-          runtimeType == other.runtimeType &&
-          message == other.message &&
-          kind == other.kind;
+  identical(this, other) ||
+  other is ProcessingWarning &&
+  runtimeType == other.runtimeType &&
+  message == other.message &&
+  kind == other.kind;
 }
 
 /// Structured data block (JSON-LD, Microdata, or `RDFa`).
@@ -2296,16 +2296,16 @@ class StructuredData {
 
   @override
   int get hashCode =>
-      dataType.hashCode ^ rawJson.hashCode ^ schemaType.hashCode;
+  dataType.hashCode ^ rawJson.hashCode ^ schemaType.hashCode;
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is StructuredData &&
-          runtimeType == other.runtimeType &&
-          dataType == other.dataType &&
-          rawJson == other.rawJson &&
-          schemaType == other.schemaType;
+  identical(this, other) ||
+  other is StructuredData &&
+  runtimeType == other.runtimeType &&
+  dataType == other.dataType &&
+  rawJson == other.rawJson &&
+  schemaType == other.schemaType;
 }
 
 /// Structured data format type.
@@ -2337,11 +2337,11 @@ class TableData {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TableData &&
-          runtimeType == other.runtimeType &&
-          grid == other.grid &&
-          markdown == other.markdown;
+  identical(this, other) ||
+  other is TableData &&
+  runtimeType == other.runtimeType &&
+  grid == other.grid &&
+  markdown == other.markdown;
 }
 
 /// A structured table grid with cell-level data including spans.
@@ -2379,12 +2379,12 @@ class TableGrid {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TableGrid &&
-          runtimeType == other.runtimeType &&
-          rows == other.rows &&
-          cols == other.cols &&
-          cells == other.cells;
+  identical(this, other) ||
+  other is TableGrid &&
+  runtimeType == other.runtimeType &&
+  rows == other.rows &&
+  cols == other.cols &&
+  cells == other.cells;
 }
 
 /// A styling or semantic annotation that applies to a byte range within a node's text.
@@ -2421,12 +2421,12 @@ class TextAnnotation {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TextAnnotation &&
-          runtimeType == other.runtimeType &&
-          start == other.start &&
-          end == other.end &&
-          kind == other.kind;
+  identical(this, other) ||
+  other is TextAnnotation &&
+  runtimeType == other.runtimeType &&
+  start == other.start &&
+  end == other.end &&
+  kind == other.kind;
 }
 
 /// Text directionality of document content.
@@ -2492,7 +2492,7 @@ sealed class VisitResult with _$VisitResult {
   /// The visitor takes full responsibility for the markdown output
   /// of this node and its children.
   const factory VisitResult.custom({required String field0}) =
-      VisitResult_Custom;
+  VisitResult_Custom;
 
   /// Skip this element entirely (don't output anything)
   ///

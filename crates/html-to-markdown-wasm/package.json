@@ -13,15 +13,13 @@
     "access": "public"
   },
   "type": "module",
-  "files": [
-    "pkg",
-    "*.wasm",
-    "*.d.ts",
-    "README.md"
-  ],
+  "files": ["pkg", "*.wasm", "*.d.ts", "README.md"],
   "main": "pkg/nodejs/html_to_markdown_wasm.js",
   "module": "pkg/web/html_to_markdown_wasm.js",
   "types": "pkg/nodejs/html_to_markdown_wasm.d.ts",
+  "engines": {
+    "node": ">= 22"
+  },
   "scripts": {
     "build": "wasm-pack build --target nodejs --out-dir pkg/nodejs",
     "build:ci": "wasm-pack build --release --target nodejs --out-dir pkg/nodejs",

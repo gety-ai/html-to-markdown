@@ -1,48 +1,48 @@
 module HtmlToMarkdown
-  module CLIProxy
-    # Base error class
-    class Error < StandardError
-    end
+    module CLIProxy
+        # Base error class
+        class Error < StandardError
+        end
 
-    # Error when CLI binary is not found
-    class MissingBinaryError < Error
-    end
+        # Error when CLI binary is not found
+        class MissingBinaryError < Error
+        end
 
-    # Error when CLI execution fails
-    class CLIExecutionError < Error
-      attr_reader stderr: String
-      attr_reader status: Integer?
+        # Error when CLI execution fails
+        class CLIExecutionError < Error
+            attr_reader stderr: String
+            attr_reader status: Integer?
 
-      def initialize: (String message, stderr: String, status: Integer?) -> void
-    end
+        def initialize: (String message, stderr: String, status: Integer?) -> void
+        end
 
-    # Module methods (module_function creates both module and instance methods)
+        # Module methods (module_function creates both module and instance methods)
 
-    # Execute CLI with given arguments
-    def self.call: (Array[String] argv) -> String
+        # Execute CLI with given arguments
+def self.call: (Array[String] argv) -> String
 
-    # Find the CLI binary in search paths
+        # Find the CLI binary in search paths
     def self.find_cli_binary: () -> Pathname
 
-    # Get root path of the gem
+        # Get root path of the gem
     def self.root_path: () -> Pathname
 
-    # Get lib path of the gem
+        # Get lib path of the gem
     def self.lib_path: () -> Pathname
 
-    # Get search paths for CLI binary
-    def self.search_paths: (String binary_name) -> Array[Pathname]
+        # Get search paths for CLI binary
+def self.search_paths: (String binary_name) -> Array[Pathname]
 
-    # Get error message for missing binary
+        # Get error message for missing binary
     def self.missing_binary_message: () -> String
 
-    # Instance method versions (created by module_function)
+        # Instance method versions (created by module_function)
 
-    def call: (Array[String] argv) -> String
+def call: (Array[String] argv) -> String
     def find_cli_binary: () -> Pathname
     def root_path: () -> Pathname
     def lib_path: () -> Pathname
-    def search_paths: (String binary_name) -> Array[Pathname]
+def search_paths: (String binary_name) -> Array[Pathname]
     def missing_binary_message: () -> String
-  end
+    end
 end

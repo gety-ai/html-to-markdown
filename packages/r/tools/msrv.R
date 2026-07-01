@@ -23,7 +23,8 @@ if (!grepl("rustc", sysreqs, ignore.case = TRUE)) {
 
 # Add ~/.cargo/bin to PATH so we can find cargo/rustc
 new_path <- paste0(
-  Sys.getenv("PATH"), ":",
+  Sys.getenv("PATH"),
+  ":",
   paste0(Sys.getenv("HOME"), "/.cargo/bin")
 )
 Sys.setenv("PATH" = new_path)
@@ -61,7 +62,8 @@ if (!is.na(msrv) && !is.na(current_version)) {
     stop(
       sprintf(
         "Minimum supported Rust version is %s but installed rustc is %s. Please update Rust.",
-        msrv, current_version
+        msrv,
+        current_version
       ),
       call. = FALSE
     )

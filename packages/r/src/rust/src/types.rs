@@ -47,8 +47,7 @@ pub fn metadata_to_robj(metadata: HtmlMetadata) -> Robj {
         headers = List::from_values(metadata.headers.into_iter().map(header_metadata_to_robj)),
         links = List::from_values(metadata.links.into_iter().map(link_metadata_to_robj)),
         images = List::from_values(metadata.images.into_iter().map(image_metadata_to_robj)),
-        structured_data =
-            List::from_values(metadata.structured_data.into_iter().map(structured_data_to_robj))
+        structured_data = List::from_values(metadata.structured_data.into_iter().map(structured_data_to_robj))
     )
     .into()
 }
@@ -211,8 +210,7 @@ pub fn conversion_result_to_robj(result: ConversionResult) -> Robj {
                     None => ().into(),
                 };
                 let attr_names: Vec<&str> = img.attributes.keys().map(|k: &String| k.as_str()).collect();
-                let attr_values: Vec<Robj> =
-                    img.attributes.values().map(|v: &String| v.into_robj()).collect();
+                let attr_values: Vec<Robj> = img.attributes.values().map(|v: &String| v.into_robj()).collect();
                 let mut attr_list = List::from_values(attr_values);
                 let _ = attr_list.set_names(attr_names);
                 list!(

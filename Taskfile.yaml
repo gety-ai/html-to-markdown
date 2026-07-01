@@ -11,7 +11,7 @@ version: "3"
 #   task setup         -> install all dependencies
 #   task build         -> build Rust core only
 #   task test          -> run Rust core tests only
-#   task lint          -> run all linters via prek
+#   task lint          -> run all linters via poly
 #   task format        -> format Rust core code
 #   task rust:build    -> Rust-specific tasks
 # ============================================================================
@@ -19,7 +19,7 @@ version: "3"
 # Preconditions for task setup:
 # - Rust toolchain (rustup) — install via https://rustup.rs
 # - alef CLI — install via cargo install --git https://github.com/xberg-io/alef
-# - prek — install via cargo install prek
+# - poly — install via cargo install --git https://github.com/xberg-io/polylint
 # - Per-language tools auto-skipped via alef preconditions; install as needed:
 #   - Python: uv, Node: pnpm (corepack enable), Ruby: bundle, PHP: composer
 #   - Go: go, Java: mvn, C#: dotnet, Elixir: mix, R: Rscript
@@ -70,8 +70,7 @@ tasks:
     cmds:
       - task: rust:install
       - alef setup
-      - prek install
-      - prek install --hook-type commit-msg
+      - poly hooks install
 
   # === Build ===
   build:
@@ -140,14 +139,14 @@ tasks:
 
   # === Lint & Format ===
   lint:
-    desc: "Lint all code via prek (pre-commit framework)"
+    desc: "Lint all code via poly"
     cmds:
-      - prek run --all-files
+      - poly lint .
 
   lint:check:
     desc: "Lint all code WITHOUT auto-fix (check-only)"
     cmds:
-      - task: rust:lint:check
+      - poly lint .
 
   go:lint:
     desc: "Lint Go bindings with golangci-lint"
@@ -186,14 +185,14 @@ tasks:
       - alef lint --lang csharp
 
   format:
-    desc: "Format Rust core code"
+    desc: "Format all code via poly"
     cmds:
-      - task: rust:format
+      - poly fmt --fix .
 
   format:check:
     desc: "Check code formatting without modifications"
     cmds:
-      - task: rust:format:check
+      - poly fmt --check .
 
   check:
     desc: "Run all checks (format + lint, no modifications)"
@@ -221,7 +220,6 @@ tasks:
       - task: swift:update
       - task: kotlin-android:update
       - task: zig:update
-      - prek autoupdate
 
   upgrade:
     desc: "Upgrade all dependencies to latest (including breaking changes)"
@@ -242,7 +240,6 @@ tasks:
       - task: swift:upgrade
       - task: kotlin-android:upgrade
       - task: zig:upgrade
-      - prek autoupdate
 
   # === Coverage ===
   cov:rust:
