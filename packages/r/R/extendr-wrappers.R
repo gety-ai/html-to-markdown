@@ -185,7 +185,7 @@ StructuredData <- new.env(parent = emptyenv())
 #' @field max_image_size Maximum decoded image size in bytes (default 5MB).
 #' @field capture_svg Capture SVG elements as images.
 #' @field infer_dimensions Infer image dimensions from data.
-#' @field max_depth Maximum DOM traversal depth. `None` means unlimited. When set, subtrees beyond this depth are
+#' @field max_depth Maximum DOM traversal depth.
 #' @field exclude_selectors CSS selectors for elements to exclude entirely (element + all content).
 #' @field tier_strategy Which conversion tier to use.
 #' @field visitor Optional visitor for custom traversal logic.

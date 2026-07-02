@@ -43,7 +43,7 @@
 #' @param max_image_size Maximum decoded image size in bytes (default 5MB)
 #' @param capture_svg Capture SVG elements as images
 #' @param infer_dimensions Infer image dimensions from data
-#' @param max_depth Maximum DOM traversal depth. `None` means unlimited
+#' @param max_depth Maximum DOM traversal depth
 #' @param exclude_selectors CSS selectors for elements to exclude entirely (element + all content)
 #' @param tier_strategy Which conversion tier to use
 #' @param visitor Optional visitor for custom traversal logic

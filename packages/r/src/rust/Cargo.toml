@@ -1,6 +1,6 @@
 [package]
 name = "html-to-markdown-r"
-version = "3.8.0"
+version = "3.8.1"
 edition = "2024"
 license = "MIT"
 description = "High-performance HTML to Markdown converter"
@@ -10,7 +10,7 @@ categories = []
 
 [package.metadata.cargo-machete]
 # Declared for the extendr binding surface but not referenced by the current
-# generated wrapper; retained to avoid churn in the committed src/rust lockfile.
+# generated wrapper.
 ignored = ["async-trait"]
 
 [lib]
@@ -19,13 +19,7 @@ crate-type = ["staticlib", "lib"]
 [dependencies]
 async-trait = "0.1"
 extendr-api = "0.9"
-html-to-markdown-rs = { version = "3.8.0", path = "../../../../crates/html-to-markdown", features = [
-    "serde",
-    "metadata",
-    "visitor",
-    "inline-images",
-    "testkit",
-] }
+html-to-markdown-rs = { version = "3.8.1", path = "../../../../crates/html-to-markdown", features = ["serde", "metadata", "visitor", "inline-images", "testkit"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 

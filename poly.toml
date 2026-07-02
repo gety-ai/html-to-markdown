@@ -2,11 +2,9 @@
 exclude = [
     "**/*.freezed.dart",
     "**/*.g.dart",
-    "**/*_bridge_generated/**",
     "**/*.jinja",
     "**/*.lock",
     "**/Cargo.lock",
-    "**/Cargo.toml",
     "**/go.sum",
     "**/package-lock.json",
     "**/pnpm-lock.yaml",
@@ -33,6 +31,8 @@ exclude = [
     "e2e/wasm/tests/**",
     "test_apps/wasm/tests/**",
     "crates/html-to-markdown-node/index.js",
+    "**/Cargo.toml",
+    "**/*_bridge_generated/**",
 ]
 
 [lint.markdown.rumdl]
@@ -207,13 +207,12 @@ php_version = "8.2"
     "A001",
     "N801",
 ]
+".github/workflows/publish.yaml" = ["typo"]
 "cli-proxy/**/*.py" = ["RUF100"]
+"crates/html-to-markdown/src/visitor/types.rs" = ["typo"]
+"packages/r/R/version.R" = ["empty_file"]
 "readme_templates/**" = ["MD057"]
 "scripts/**/*.py" = ["INP001", "S607", "T201", "D103", "D212"]
-".github/workflows/publish.yaml" = ["typo"]
-"packages/r/R/version.R" = ["empty_file"]
-# serde serializer module path flagged as a false positive by the typos dictionary.
-"crates/html-to-markdown/src/visitor/types.rs" = ["typo"]
 
 [hooks]
 stages = ["pre-commit"]
@@ -251,6 +250,8 @@ polylint = { exclude = [
     "e2e/wasm/tests/**",
     "test_apps/wasm/tests/**",
     "crates/html-to-markdown-node/index.js",
+    "**/Cargo.toml",
+    "**/*_bridge_generated/**",
 ] }
 polyfmt = { exclude = [
     "**/*.freezed.dart",
@@ -258,7 +259,6 @@ polyfmt = { exclude = [
     "**/*.jinja",
     "**/*.lock",
     "**/Cargo.lock",
-    "**/Cargo.toml",
     "**/go.sum",
     "**/package-lock.json",
     "**/pnpm-lock.yaml",
@@ -285,6 +285,8 @@ polyfmt = { exclude = [
     "e2e/wasm/tests/**",
     "test_apps/wasm/tests/**",
     "crates/html-to-markdown-node/index.js",
+    "**/Cargo.toml",
+    "**/*_bridge_generated/**",
 ] }
 file_safety = { exclude = [
     "**/*.freezed.dart",
@@ -318,6 +320,8 @@ file_safety = { exclude = [
     "e2e/wasm/tests/**",
     "test_apps/wasm/tests/**",
     "crates/html-to-markdown-node/index.js",
+    "**/Cargo.toml",
+    "**/*_bridge_generated/**",
 ] }
 cargo = true
 commit = { stages = ["commit-msg"] }

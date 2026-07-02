@@ -139,6 +139,10 @@ exclude = [
     "e2e/wasm/tests/**",
     "test_apps/wasm/tests/**",
     "crates/html-to-markdown-node/index.js",
+    # Cargo.toml is owned by cargo-sort; oxfmt's TOML formatter fights it.
+    "**/Cargo.toml",
+    # flutter_rust_bridge output; formatting it is non-idempotent (like *.g.dart).
+    "**/*_bridge_generated/**",
 ]
 
 [workspace.poly.per-file-ignores]
@@ -149,6 +153,12 @@ exclude = [
 "cli-proxy/**/*.py" = ["RUF100"]
 # README template: relative links resolve in the generated root README, not in-place.
 "readme_templates/**" = ["MD057"]
+# References a cibuildwheel macOS wheel-bundling tool name flagged by typos.
+".github/workflows/publish.yaml" = ["typo"]
+# extendr stub whose only content is a pointer comment to extendr-wrappers.R.
+"packages/r/R/version.R" = ["empty_file"]
+# serde serializer module path flagged as a false positive by the typos dictionary.
+"crates/html-to-markdown/src/visitor/types.rs" = ["typo"]
 
 [[crates]]
 name = "html-to-markdown-rs"
@@ -834,85 +844,85 @@ categories = ["smoke", "conversion"]
 
 [crates.e2e.registry.packages.python]
 name = "html-to-markdown"
-version = ">=3.8.0"
+version = ">=3.8.1"
 
 [crates.e2e.registry.packages.node]
 name = "@xberg-io/html-to-markdown"
-version = "^3.8.0"
+version = "^3.8.1"
 
 [crates.e2e.registry.packages.rust]
 name = "html-to-markdown-rs"
-version = "3.8.0"
+version = "3.8.1"
 
 [crates.e2e.registry.packages.go]
 module = "github.com/xberg-io/html-to-markdown/packages/go/v3"
-version = "v3.8.0"
+version = "v3.8.1"
 
 [crates.e2e.registry.packages.java]
 name = "io.xberg:html-to-markdown"
-version = "3.8.0"
+version = "3.8.1"
 
 [crates.e2e.registry.packages.csharp]
 name = "XbergIo.HtmlToMarkdown"
-version = "3.8.0"
+version = "3.8.1"
 
 [crates.e2e.registry.packages.php]
 name = "xberg-io/html-to-markdown"
-version = ">=3.8.0"
+version = ">=3.8.1"
 
 [crates.e2e.registry.packages.ruby]
 name = "html-to-markdown"
-version = "~> 3.8.0"
+version = "~> 3.8.1"
 
 [crates.e2e.registry.packages.elixir]
 name = "html_to_markdown"
-version = "~> 3.8.0"
+version = "~> 3.8.1"
 
 [crates.e2e.registry.packages.wasm]
 name = "@xberg-io/html-to-markdown-wasm"
-version = "^3.8.0"
+version = "^3.8.1"
 
 [crates.e2e.registry.packages.r]
 name = "htmltomarkdown"
-version = "3.8.0"
+version = "3.8.1"
 
 [crates.e2e.registry.packages.c]
 # Matches `publish.yaml`'s `asset-prefix: html-to-markdown-rs-ffi-` for the
 # upload-release-assets step. Drift causes test_apps/c/download_ffi.sh to 404
 # on the GH release tarball.
 name = "html-to-markdown-rs-ffi"
-version = "3.8.0"
+version = "3.8.1"
 
 [crates.e2e.registry.packages.kotlin_android]
 name = "io.xberg:html-to-markdown-android"
-version = "3.8.0"
+version = "3.8.1"
 
 [crates.e2e.registry.packages.swift]
 name = "HtmlToMarkdown"
-version = "3.8.0"
+version = "3.8.1"
 
 [crates.e2e.registry.packages.dart]
 name = "h2m"
-version = "^3.8.0"
+version = "^3.8.1"
 
 [crates.e2e.registry.packages.zig]
 name = "html_to_markdown"
-version = "3.8.0"
+version = "3.8.1"
 # Placeholder hash with embedded version triggers alef's STALE detection (added
 # in v0.22.1) — the generator emits a STALE comment in build.zig.zon and the
 # zig fetch flow auto-recomputes the real multihash at consume time. Update
 # after publishing the first zig tarball: `zig fetch --save <release-url>`.
-hash = "html-to-markdown-3.8.0-STALE_PLACEHOLDER_TO_BE_RESOLVED_BY_ZIG_FETCH"
+hash = "html-to-markdown-3.8.1-STALE_PLACEHOLDER_TO_BE_RESOLVED_BY_ZIG_FETCH"
 
 [crates.e2e.registry.packages.php_ext]
 name = "xberg-io/html-to-markdown"
-version = "3.8.0"
+version = "3.8.1"
 
 [crates.e2e.registry.packages.homebrew]
 tap = "xberg-io/tap"
 cli_formula = "html-to-markdown"
 ffi_formula = "libhtml-to-markdown"
-version = "3.8.0"
+version = "3.8.1"
 
 [crates.e2e.packages.rust]
 path = "../../crates/html-to-markdown"

@@ -494,8 +494,11 @@ class ConversionOptions {
   /// Infer image dimensions from data.
   final bool inferDimensions;
 
-  /// Maximum DOM traversal depth. `None` means unlimited.
-  /// When set, subtrees beyond this depth are silently truncated.
+  /// Maximum DOM traversal depth.
+  ///
+  /// `None` uses the library's internal native-stack safety limit. Explicit
+  /// values above that safety limit are clamped to prevent process-aborting
+  /// stack overflows on pathologically deep DOM trees.
   final PlatformInt64? maxDepth;
 
   /// CSS selectors for elements to exclude entirely (element + all content).
