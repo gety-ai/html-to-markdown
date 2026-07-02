@@ -1399,6 +1399,7 @@ fn emit_void(
 /// Ancestor matching is ASCII-case-insensitive so callers may supply "H1" or
 /// "h1" interchangeably.
 #[inline]
+#[allow(clippy::missing_const_for_fn)]
 fn should_keep_image_as_markdown(html: &str, stack: &[OpenTag], options: &ConversionOptions) -> bool {
     #[cfg(feature = "inline-images")]
     {

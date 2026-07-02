@@ -8,6 +8,11 @@ readme = false
 keywords = ["converter", "html", "markdown"]
 categories = []
 
+[package.metadata.cargo-machete]
+# Declared for the extendr binding surface but not referenced by the current
+# generated wrapper; retained to avoid churn in the committed src/rust lockfile.
+ignored = ["async-trait"]
+
 [lib]
 crate-type = ["staticlib", "lib"]
 

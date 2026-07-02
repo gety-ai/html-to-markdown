@@ -75,7 +75,7 @@ struct WalkState<'a> {
 }
 
 impl WalkState<'_> {
-    fn descend(&self) -> Self {
+    const fn descend(&self) -> Self {
         WalkState {
             options: self.options,
             excluded_node_ids: self.excluded_node_ids,

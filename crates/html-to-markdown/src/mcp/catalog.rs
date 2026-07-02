@@ -6,9 +6,8 @@
 
 use rmcp::ErrorData as McpError;
 use rmcp::model::{
-    AnnotateAble, ArgumentInfo, CompleteResult, CompletionInfo, GetPromptResult, JsonObject, ListPromptsResult,
-    ListResourcesResult, Prompt, PromptArgument, PromptMessage, PromptMessageRole, RawResource, ReadResourceResult,
-    Reference, ResourceContents,
+    ArgumentInfo, CompleteResult, CompletionInfo, GetPromptResult, JsonObject, ListPromptsResult, ListResourcesResult,
+    Prompt, PromptArgument, PromptMessage, ReadResourceResult, Reference, Resource, ResourceContents, Role,
 };
 use rmcp::schemars;
 
@@ -130,14 +129,12 @@ pub fn get_prompt(name: &str, arguments: Option<&JsonObject>) -> Result<GetPromp
 /// List the readable resources.
 pub fn list_resources() -> ListResourcesResult {
     let resources = vec![
-        RawResource::new(RES_OPTIONS, "Conversion options schema")
+        Resource::new(RES_OPTIONS, "Conversion options schema")
             .with_description("JSON Schema of every convert_html config option, with descriptions and defaults.")
-            .with_mime_type("application/json")
-            .no_annotation(),
-        RawResource::new(RES_FORMATS, "Output formats guide")
+            .with_mime_type("application/json"),
+        Resource::new(RES_FORMATS, "Output formats guide")
             .with_description("How the markdown, djot, and plain output formats differ.")
-            .with_mime_type("text/markdown")
-            .no_annotation(),
+            .with_mime_type("text/markdown"),
     ];
     ListResourcesResult::with_all_items(resources)
 }
@@ -171,17 +168,12 @@ pub fn complete(reference: &Reference, argument: &ArgumentInfo) -> CompleteResul
         }
         _ => Vec::new(),
     };
-    let total = u32::try_from(values.len()).ok();
-    CompleteResult::new(CompletionInfo {
-        values,
-        total,
-        has_more: Some(false),
-    })
+    CompleteResult::new(CompletionInfo::with_all_values(values).unwrap_or_default())
 }
 
 /// Build a single-message user prompt result.
 fn prompt_result(description: String, text: String) -> GetPromptResult {
-    GetPromptResult::new(vec![PromptMessage::new_text(PromptMessageRole::User, text)]).with_description(description)
+    GetPromptResult::new(vec![PromptMessage::new_text(Role::User, text)]).with_description(description)
 }
 
 /// Read a required string argument, erroring if absent or empty.
@@ -223,7 +215,7 @@ mod tests {
         args.insert("output_format".into(), "djot".into());
         let result = get_prompt(PROMPT_CONVERT, Some(&args)).expect("must resolve");
         let text = match &result.messages[0].content {
-            rmcp::model::PromptMessageContent::Text { text } => text.clone(),
+            rmcp::model::ContentBlock::Text(t) => t.text.clone(),
             _ => panic!("expected text content"),
         };
         assert!(text.contains("<h1>Hi</h1>"), "must embed the html");
@@ -236,7 +228,7 @@ mod tests {
         args.insert("html".into(), "<p>x</p>".into());
         let result = get_prompt(PROMPT_CONVERT, Some(&args)).expect("must resolve");
         let text = match &result.messages[0].content {
-            rmcp::model::PromptMessageContent::Text { text } => text.clone(),
+            rmcp::model::ContentBlock::Text(t) => t.text.clone(),
             _ => panic!("expected text content"),
         };
         assert!(text.contains("markdown"), "default format is markdown");
@@ -258,7 +250,7 @@ mod tests {
 
     #[test]
     fn test_list_resources_exposes_both_uris() {
-        let uris: Vec<String> = list_resources().resources.into_iter().map(|r| r.raw.uri).collect();
+        let uris: Vec<String> = list_resources().resources.into_iter().map(|r| r.uri).collect();
         assert!(uris.contains(&RES_OPTIONS.to_string()));
         assert!(uris.contains(&RES_FORMATS.to_string()));
     }
@@ -272,6 +264,7 @@ mod tests {
                 text.clone()
             }
             ResourceContents::BlobResourceContents { .. } => panic!("expected text"),
+            _ => panic!("unexpected resource contents variant"),
         };
         let parsed: serde_json::Value = serde_json::from_str(&text).expect("schema must be valid JSON");
         assert!(
@@ -286,6 +279,7 @@ mod tests {
         let text = match &result.contents[0] {
             ResourceContents::TextResourceContents { text, .. } => text.clone(),
             ResourceContents::BlobResourceContents { .. } => panic!("expected text"),
+            _ => panic!("unexpected resource contents variant"),
         };
         assert!(text.contains("Djot"), "guide must describe djot");
     }
@@ -299,10 +293,7 @@ mod tests {
     #[test]
     fn test_complete_output_format_prefix() {
         let reference = Reference::for_prompt(PROMPT_CONVERT);
-        let arg = ArgumentInfo {
-            name: "output_format".into(),
-            value: "d".into(),
-        };
+        let arg = ArgumentInfo::new("output_format", "d");
         let result = complete(&reference, &arg);
         assert_eq!(result.completion.values, vec!["djot"]);
         assert_eq!(result.completion.total, Some(1));
@@ -311,10 +302,7 @@ mod tests {
     #[test]
     fn test_complete_output_format_empty_returns_all() {
         let reference = Reference::for_prompt(PROMPT_CONVERT);
-        let arg = ArgumentInfo {
-            name: "output_format".into(),
-            value: String::new(),
-        };
+        let arg = ArgumentInfo::new("output_format", "");
         let result = complete(&reference, &arg);
         assert_eq!(result.completion.values, vec!["markdown", "djot", "plain"]);
     }
@@ -322,10 +310,7 @@ mod tests {
     #[test]
     fn test_complete_unknown_argument_is_empty() {
         let reference = Reference::for_prompt(PROMPT_CONVERT);
-        let arg = ArgumentInfo {
-            name: "unknown".into(),
-            value: String::new(),
-        };
+        let arg = ArgumentInfo::new("unknown", "");
         assert!(complete(&reference, &arg).completion.values.is_empty());
     }
 }

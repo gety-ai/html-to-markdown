@@ -2,9 +2,11 @@
 exclude = [
     "**/*.freezed.dart",
     "**/*.g.dart",
+    "**/*_bridge_generated/**",
     "**/*.jinja",
     "**/*.lock",
     "**/Cargo.lock",
+    "**/Cargo.toml",
     "**/go.sum",
     "**/package-lock.json",
     "**/pnpm-lock.yaml",
@@ -80,7 +82,7 @@ php_version = "8.2"
 [per-file-ignores]
 "**/api.py" = ["F401", "I001", "TC006", "UP035"]
 "**/*.pyi" = ["A002", "F401", "I001", "PYI033", "TC006", "UP035"]
-"**/options.py" = ["F401", "RUF100"]
+"**/options.py" = ["F401", "I001", "RUF100"]
 "**/__init__.py" = ["I001"]
 "**/tests/**" = [
     "ANN",
@@ -120,6 +122,8 @@ php_version = "8.2"
     "RUF015",
     "F541",
     "EXE001",
+    "A001",
+    "N801",
 ]
 "**/e2e/**" = [
     "ANN",
@@ -159,6 +163,8 @@ php_version = "8.2"
     "RUF015",
     "F541",
     "EXE001",
+    "A001",
+    "N801",
 ]
 "**/test_apps/**" = [
     "ANN",
@@ -198,10 +204,16 @@ php_version = "8.2"
     "RUF015",
     "F541",
     "EXE001",
+    "A001",
+    "N801",
 ]
 "cli-proxy/**/*.py" = ["RUF100"]
 "readme_templates/**" = ["MD057"]
 "scripts/**/*.py" = ["INP001", "S607", "T201", "D103", "D212"]
+".github/workflows/publish.yaml" = ["typo"]
+"packages/r/R/version.R" = ["empty_file"]
+# serde serializer module path flagged as a false positive by the typos dictionary.
+"crates/html-to-markdown/src/visitor/types.rs" = ["typo"]
 
 [hooks]
 stages = ["pre-commit"]
@@ -246,6 +258,7 @@ polyfmt = { exclude = [
     "**/*.jinja",
     "**/*.lock",
     "**/Cargo.lock",
+    "**/Cargo.toml",
     "**/go.sum",
     "**/package-lock.json",
     "**/pnpm-lock.yaml",

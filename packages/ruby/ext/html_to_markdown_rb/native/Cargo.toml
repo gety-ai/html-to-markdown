@@ -9,7 +9,7 @@ keywords = ["converter", "html", "markdown"]
 categories = []
 
 [package.metadata.cargo-machete]
-ignored = ["rb-sys"]
+ignored = ["rb-sys", "async-trait", "tokio"]
 
 [lib]
 name = "html_to_markdown_rb"

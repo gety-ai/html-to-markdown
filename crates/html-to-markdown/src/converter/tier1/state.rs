@@ -367,7 +367,7 @@ impl Tier1State {
 /// Trim trailing ASCII horizontal whitespace (spaces and tabs) from a string
 /// buffer.  Used before emitting block separators to drop the optimistic
 /// inter-tag space pushed by `flush_text` (Phase U-2).
-pub(crate) fn trim_trailing_horizontal(buf: &mut String) {
+pub fn trim_trailing_horizontal(buf: &mut String) {
     while buf.ends_with(' ') || buf.ends_with('\t') {
         buf.pop();
     }

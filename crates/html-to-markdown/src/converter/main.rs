@@ -226,6 +226,7 @@ pub fn convert_html_impl(
         reference_collector.as_ref().map(std::rc::Rc::clone),
     );
     #[cfg(all(feature = "metadata", not(feature = "visitor")))]
+    #[allow(clippy::used_underscore_binding)]
     let mut ctx = Context::new(
         options,
         inline_collector,

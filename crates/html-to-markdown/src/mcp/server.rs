@@ -5,7 +5,7 @@ use rmcp::{
     ErrorData as McpError, RoleServer, ServerHandler, ServiceExt,
     handler::server::{router::tool::ToolRouter, wrapper::Parameters},
     model::{
-        CallToolResult, CompleteRequestParams, CompleteResult, Content, GetPromptRequestParams, GetPromptResult,
+        CallToolResult, CompleteRequestParams, CompleteResult, ContentBlock, GetPromptRequestParams, GetPromptResult,
         Implementation, InitializeResult, JsonObject, ListPromptsResult, ListResourcesResult, PaginatedRequestParams,
         PromptsCapability, ReadResourceRequestParams, ReadResourceResult, ResourcesCapability, ServerCapabilities,
         ServerInfo, ToolsCapability,
@@ -84,7 +84,7 @@ impl HtmlToMarkdownMcp {
             result.content.unwrap_or_default()
         };
 
-        Ok(CallToolResult::success(vec![Content::text(text)]))
+        Ok(CallToolResult::success(vec![ContentBlock::text(text)]))
     }
 
     /// Extract structured metadata from HTML.
@@ -120,7 +120,7 @@ impl HtmlToMarkdownMcp {
             .map_err(|e| rmcp::ErrorData::internal_error(format!("Conversion task panicked: {e}"), None))?
             .map_err(map_conversion_error_to_mcp)?;
 
-        Ok(CallToolResult::success(vec![Content::text(format_metadata(
+        Ok(CallToolResult::success(vec![ContentBlock::text(format_metadata(
             &result.metadata,
         ))]))
     }
@@ -275,11 +275,11 @@ pub async fn start_mcp_server_http(
 mod tests {
     use super::super::params::{ConvertConfig, ConvertHtmlParams, ExtractMetadataParams};
     use super::*;
-    use rmcp::model::{ProtocolVersion, RawContent};
+    use rmcp::model::ProtocolVersion;
 
     fn text_of(result: &CallToolResult) -> String {
-        match &result.content[0].raw {
-            RawContent::Text(t) => t.text.clone(),
+        match &result.content[0] {
+            rmcp::model::ContentBlock::Text(t) => t.text.clone(),
             _ => panic!("expected text content"),
         }
     }

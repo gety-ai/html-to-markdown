@@ -10,6 +10,10 @@ homepage.workspace = true
 description = "Benchmark harness and golden oracle for html-to-markdown-rs"
 publish = false
 
+[package.metadata.cargo-machete]
+# Kept available for golden-oracle diff assertions; not currently referenced.
+ignored = ["pretty_assertions"]
+
 [lib]
 name = "html_to_markdown_bench"
 path = "src/lib.rs"
