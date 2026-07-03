@@ -13,8 +13,8 @@
     "test:wasm": "pnpm --filter @xberg-io/html-to-markdown-wasm test",
     "test:ts": "pnpm --filter @xberg-io/html-to-markdown test",
     "clean": "pnpm -r run clean && rm -rf node_modules",
-    "lint": "prek run oxlint --all-files",
-    "format": "prek run oxfmt --all-files"
+    "lint": "poly lint .",
+    "format": "poly fmt --fix ."
   },
   "devDependencies": {
     "@types/node": "^26.0.1",
