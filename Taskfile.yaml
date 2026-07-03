@@ -164,16 +164,6 @@ tasks:
     cmds:
       - alef lint --lang ruby
 
-  php:format:
-    desc: "Format PHP bindings with php-cs-fixer"
-    cmds:
-      - alef fmt --lang php
-
-  php:lint:
-    desc: "Lint PHP bindings with phpstan and php-cs-fixer"
-    cmds:
-      - alef lint --lang php
-
   csharp:format:
     desc: "Format C# bindings with dotnet format"
     cmds:

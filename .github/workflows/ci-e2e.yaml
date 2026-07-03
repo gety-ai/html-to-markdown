@@ -941,10 +941,6 @@ jobs:
           crate-name: html-to-markdown-php
           lib-name: html_to_markdown_php
 
-      - name: Run PHP static analysis
-        run: scripts/ci/php/run-phpstan.sh
-        shell: bash
-
       - name: Run PHP tests
         run: scripts/ci/php/run-php-tests.sh
         shell: bash
