@@ -21,6 +21,7 @@ exclude = [
     "templates/readme/**",
     "test_documents/**",
     "vendor/**",
+    "**/Cargo.toml",
     "**/_generated/**",
     "**/coverage/**",
     "**/pkg/**",
@@ -36,13 +37,33 @@ exclude = [
 ]
 
 [lint.markdown.rumdl]
-disable = ["MD012", "MD013", "MD024", "MD033", "MD036", "MD041", "MD046", "MD051", "MD076"]
+disable = [
+    "MD012",
+    "MD013",
+    "MD024",
+    "MD033",
+    "MD036",
+    "MD041",
+    "MD046",
+    "MD051",
+    "MD076",
+]
 
 [fmt.markdown.rumdl]
-disable = ["MD012", "MD013", "MD024", "MD033", "MD036", "MD041", "MD046", "MD051", "MD076"]
+disable = [
+    "MD012",
+    "MD013",
+    "MD024",
+    "MD033",
+    "MD036",
+    "MD041",
+    "MD046",
+    "MD051",
+    "MD076",
+]
 
 [lint.python.ruff]
-select = ["ALL"]
+select = [ "ALL" ]
 ignore = [
     "ANN401",
     "ASYNC109",
@@ -75,15 +96,20 @@ pylint_max_branches = 15
 pylint_max_returns = 10
 
 [lint.php.mago]
-select = ["correctness", "security"]
-ignore = ["strict-assertions", "use-specific-assertions", "no-redundant-variable", "sensitive-parameter"]
+select = [ "correctness", "security" ]
+ignore = [
+    "strict-assertions",
+    "use-specific-assertions",
+    "no-redundant-variable",
+    "sensitive-parameter",
+]
 php_version = "8.2"
 
 [per-file-ignores]
-"**/api.py" = ["F401", "I001", "TC006", "UP035"]
-"**/*.pyi" = ["A002", "F401", "I001", "PYI033", "TC006", "UP035"]
-"**/options.py" = ["F401", "I001", "RUF100"]
-"**/__init__.py" = ["I001"]
+"**/api.py" = [ "F401", "I001", "TC006", "UP035" ]
+"**/*.pyi" = [ "A002", "F401", "I001", "PYI033", "TC006", "UP035" ]
+"**/options.py" = [ "F401", "I001", "RUF100" ]
+"**/__init__.py" = [ "I001" ]
 "**/tests/**" = [
     "ANN",
     "D103",
@@ -207,15 +233,31 @@ php_version = "8.2"
     "A001",
     "N801",
 ]
-".github/workflows/publish.yaml" = ["typo"]
-"cli-proxy/**/*.py" = ["RUF100"]
-"crates/html-to-markdown/src/visitor/types.rs" = ["typo"]
-"packages/r/R/version.R" = ["empty_file"]
-"readme_templates/**" = ["MD057"]
-"scripts/**/*.py" = ["INP001", "S607", "T201", "D103", "D212"]
+".github/workflows/publish.yaml" = [
+    "typo",
+]
+"cli-proxy/**/*.py" = [
+    "RUF100",
+]
+"crates/html-to-markdown/src/visitor/types.rs" = [
+    "typo",
+]
+"packages/r/R/version.R" = [
+    "empty_file",
+]
+"readme_templates/**" = [
+    "MD057",
+]
+"scripts/**/*.py" = [
+    "INP001",
+    "S607",
+    "T201",
+    "D103",
+    "D212",
+]
 
 [hooks]
-stages = ["pre-commit"]
+stages = [ "pre-commit" ]
 
 [hooks.builtin]
 polylint = { exclude = [
@@ -240,6 +282,7 @@ polylint = { exclude = [
     "templates/readme/**",
     "test_documents/**",
     "vendor/**",
+    "**/Cargo.toml",
     "**/_generated/**",
     "**/coverage/**",
     "**/pkg/**",
@@ -275,6 +318,7 @@ polyfmt = { exclude = [
     "templates/readme/**",
     "test_documents/**",
     "vendor/**",
+    "**/Cargo.toml",
     "**/_generated/**",
     "**/coverage/**",
     "**/pkg/**",
@@ -310,6 +354,7 @@ file_safety = { exclude = [
     "templates/readme/**",
     "test_documents/**",
     "vendor/**",
+    "**/Cargo.toml",
     "**/_generated/**",
     "**/coverage/**",
     "**/pkg/**",
@@ -324,7 +369,7 @@ file_safety = { exclude = [
     "**/*_bridge_generated/**",
 ] }
 cargo = true
-commit = { stages = ["commit-msg"] }
+commit = { stages = [ "commit-msg" ] }
 
 [hooks.pre-commit.commands.pyrefly]
 run = "pyrefly check packages/python"

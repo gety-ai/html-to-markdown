@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.30.7"
+alef_version = "0.30.17"
 languages = [
     "python",
     "node",
@@ -20,7 +20,7 @@ languages = [
 ]
 
 [workspace.format]
-enabled = false
+enabled = true
 
 [workspace.docs]
 reference_output = "docs/reference"
@@ -329,23 +329,19 @@ typecheck = "cd packages/python && uv run --no-sync mypy ."
 
 [crates.lint.node]
 precondition = "command -v pnpm >/dev/null 2>&1"
-format = "pnpm dlx oxfmt crates/html-to-markdown-node/index.js crates/html-to-markdown-node/index.d.ts"
 check = "pnpm dlx oxlint crates/html-to-markdown-node/index.js crates/html-to-markdown-node/index.d.ts"
 
 [crates.lint.ruby]
 precondition = "command -v bundle >/dev/null 2>&1"
 before = "cd packages/ruby && bundle install"
-format = "cd packages/ruby && bundle exec rubocop -a ."
 
 [crates.lint.php]
 precondition = "command -v poly >/dev/null 2>&1"
-format = "poly fmt --fix packages/php"
 check = "poly lint packages/php"
 
 [crates.lint.go]
 precondition = "command -v gofmt >/dev/null 2>&1"
 before = "cargo build --release --locked -p html-to-markdown-ffi"
-format = "gofmt -w packages/go e2e/go"
 
 [crates.lint.elixir]
 precondition = "command -v mix >/dev/null 2>&1"
@@ -358,41 +354,18 @@ check = "mvn -f packages/java/pom.xml spotless:check -q"
 
 [crates.lint.r]
 precondition = "command -v poly >/dev/null 2>&1"
-format = "poly fmt --fix packages/r"
 check = "poly lint packages/r"
 
 [crates.lint.ffi]
 precondition = "test -d e2e/c"
-# Chain alef's default Rust formatting (cargo fmt --all + cargo sort -w) with
-# the C e2e formatting. Without the cargo fmt step here, the consumer-level
-# `[crates.lint.ffi].format` override fully replaces alef's default formatter
-# for `Language::Ffi` — and since the default formatter is the one responsible
-# for workspace-wide Rust formatting (FFI/PyO3/NAPI/Magnus/ext-php-rs/Rustler/
-# wasm-bindgen all emit `.rs` files into the consumer workspace), every
-# alef-generated `.rs` file ships unformatted, and prek's `cargo fmt` hook
-# rewrites them after `alef finalize_hashes` runs, invalidating the embedded
-# hash and breaking `alef verify`.
-format = "cargo fmt --all && cargo sort -w >/dev/null && find e2e/c -name '*.c' -o -name '*.h' | xargs clang-format -i"
 check = "cppcheck --std=c11 --enable=warning,style,performance --suppress=missingIncludeSystem --suppress=unusedStructMember e2e/c/"
 
 [crates.lint.wasm]
 precondition = "command -v pnpm >/dev/null 2>&1"
-# Scope oxfmt to src/ — the default scopes oxfmt to the whole crate dir, which
-# pulls Cargo.toml into oxfmt's TOML formatter. oxfmt's TOML defaults (collapse
-# short arrays to one line, 2-space indent on multi-line arrays) disagree with
-# the canonical `cargo sort -w` shape that the polyrepo prek hook enforces
-# (multi-line arrays, 4-space indent), producing a hash-vs-format ping-pong on
-# every commit. Restrict oxfmt to src/ so Cargo.toml is owned solely by the
-# alef template and prek's `cargo sort -w`.
-# src/ contains only lib.rs (Rust source); oxfmt 0.54+ errors when no JS/TS/JSON/CSS targets
-# match. The dist/ directory holds wasm-bindgen output (.d.ts) but is gitignored. Guard with
-# `|| true` so the alef:format pipeline doesn't bail when this crate has nothing for oxfmt.
-format = "pnpm exec oxfmt crates/html-to-markdown-wasm/src/ 2>/dev/null || true"
 check = "pnpm exec oxlint crates/html-to-markdown-wasm/src/ 2>/dev/null || true"
 
 [crates.lint.kotlin_android]
 precondition = "command -v ktfmt >/dev/null 2>&1"
-format = "find packages/kotlin-android \\( -name build -o -name .gradle \\) -prune -o \\( -name '*.kt' -o -name '*.kts' \\) -type f -print0 | xargs -0 ktfmt --kotlinlang-style"
 check = "find packages/kotlin-android \\( -name build -o -name .gradle \\) -prune -o \\( -name '*.kt' -o -name '*.kts' \\) -type f -print0 | xargs -0 ktfmt --kotlinlang-style --dry-run --set-exit-if-changed"
 
 [crates.update.kotlin_android]
@@ -409,17 +382,14 @@ upgrade = "echo '[kotlin_android] skip: ben-manes/gradle-versions-plugin incompa
 
 [crates.lint.swift]
 precondition = "command -v swift >/dev/null 2>&1"
-format = "swift format --in-place --recursive packages/swift/Sources"
 check = "swift format lint --recursive packages/swift/Sources"
 
 [crates.lint.dart]
 precondition = "command -v dart >/dev/null 2>&1"
-format = "cd packages/dart && dart format ."
 check = "cd packages/dart && dart analyze"
 
 [crates.lint.zig]
 precondition = "command -v zig >/dev/null 2>&1"
-format = "cd packages/zig && zig fmt src build.zig"
 check = "cd packages/zig && zig fmt --check src build.zig"
 
 [crates.test.python]
@@ -1002,12 +972,6 @@ path = "../../packages/zig"
 "metadata.twitter.card" = "metadata.document.twitter_card[card]"
 "metadata.twitter.title" = "metadata.document.twitter_card[title]"
 "metadata.twitter.description" = "metadata.document.twitter_card[description]"
-
-[crates.e2e.format]
-python = "ruff check --fix {dir} && ruff format {dir}"
-go = "gofmt -w {dir}"
-rust = "(cd {dir} && cargo fmt --all)"
-c = "find {dir} \\( -name '*.c' -o -name '*.h' \\) | xargs clang-format -i"
 
 [crates.e2e.fields_c_types]
 "conversion_result.metadata" = "HtmlMetadata"

@@ -492,30 +492,30 @@ typedef struct HTMHtmVisitor HTMHtmVisitor;
  * valid only for the duration of the callback invocation.
  */
 typedef struct HTMHtmContext {
-  /**
+    /**
    * Coarse-grained node type classification
    */
-  int32_t node_type;
-  /**
+    int32_t node_type;
+    /**
    * Raw HTML tag name (e.g., "div", "h1", "custom-element")
    */
-  const char *tag_name;
-  /**
+    const char *tag_name;
+    /**
    * Depth in the DOM tree (0 = root)
    */
-  uintptr_t depth;
-  /**
+    uintptr_t depth;
+    /**
    * Index among siblings (0-based)
    */
-  uintptr_t index_in_parent;
-  /**
+    uintptr_t index_in_parent;
+    /**
    * Parent element's tag name (None if root)
    */
-  const char *parent_tag;
-  /**
+    const char *parent_tag;
+    /**
    * Whether this element is treated as inline vs block
    */
-  int32_t is_inline;
+    int32_t is_inline;
 } HTMHtmContext;
 
 /**
@@ -548,44 +548,44 @@ typedef struct HTMHtmContext {
  * followed by method-specific parameters documented on each field.
  */
 typedef struct HTMHtmVisitorCallbacks {
-  /**
+    /**
    * Arbitrary caller context forwarded to every callback.
    */
-  void *user_data;
-  /**
+    void *user_data;
+    /**
    * Visit text nodes (most frequent callback - ~100+ per document).
    *
    * # Arguments
    * - `ctx`: Node context (will have `node_type: NodeType::Text`)
    * - `text`: The raw text content (HTML entities already decoded)
    */
-  int32_t (*visit_text)(const struct HTMHtmContext *ctx,
-                        void *user_data,
-                        const char *text,
-                        char **out_custom,
-                        uintptr_t *out_len);
-  /**
+    int32_t (*visit_text)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *text,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Called before entering any element.
    *
    * This is the first callback invoked for every HTML element, allowing
    * visitors to implement generic element handling before tag-specific logic.
    */
-  int32_t (*visit_element_start)(const struct HTMHtmContext *ctx,
-                                 void *user_data,
-                                 char **out_custom,
-                                 uintptr_t *out_len);
-  /**
+    int32_t (*visit_element_start)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Called after exiting any element.
    *
    * Receives the default markdown output that would be generated.
    * Visitors can inspect or replace this output.
    */
-  int32_t (*visit_element_end)(const struct HTMHtmContext *ctx,
-                               void *user_data,
-                               const char *output,
-                               char **out_custom,
-                               uintptr_t *out_len);
-  /**
+    int32_t (*visit_element_end)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *output,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit anchor links `<a href="...">`.
    *
    * # Arguments
@@ -594,14 +594,14 @@ typedef struct HTMHtmVisitorCallbacks {
    * - `text`: The link text content (already converted to markdown)
    * - `title`: Optional title attribute
    */
-  int32_t (*visit_link)(const struct HTMHtmContext *ctx,
-                        void *user_data,
-                        const char *href,
-                        const char *text,
-                        const char *title,
-                        char **out_custom,
-                        uintptr_t *out_len);
-  /**
+    int32_t (*visit_link)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *href,
+        const char *text,
+        const char *title,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit images `<img src="...">`.
    *
    * # Arguments
@@ -610,14 +610,14 @@ typedef struct HTMHtmVisitorCallbacks {
    * - `alt`: The alt text
    * - `title`: Optional title attribute
    */
-  int32_t (*visit_image)(const struct HTMHtmContext *ctx,
-                         void *user_data,
-                         const char *src,
-                         const char *alt,
-                         const char *title,
-                         char **out_custom,
-                         uintptr_t *out_len);
-  /**
+    int32_t (*visit_image)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *src,
+        const char *alt,
+        const char *title,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit heading elements `<h1>` through `<h6>`.
    *
    * # Arguments
@@ -626,14 +626,14 @@ typedef struct HTMHtmVisitorCallbacks {
    * - `text`: The heading text content
    * - `id`: Optional id attribute (for anchor links)
    */
-  int32_t (*visit_heading)(const struct HTMHtmContext *ctx,
-                           void *user_data,
-                           uint32_t level,
-                           const char *text,
-                           const char *id,
-                           char **out_custom,
-                           uintptr_t *out_len);
-  /**
+    int32_t (*visit_heading)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        uint32_t level,
+        const char *text,
+        const char *id,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit code blocks `<pre><code>`.
    *
    * # Arguments
@@ -641,25 +641,25 @@ typedef struct HTMHtmVisitorCallbacks {
    * - `lang`: Optional language specifier (from class attribute)
    * - `code`: The code content
    */
-  int32_t (*visit_code_block)(const struct HTMHtmContext *ctx,
-                              void *user_data,
-                              const char *lang,
-                              const char *code,
-                              char **out_custom,
-                              uintptr_t *out_len);
-  /**
+    int32_t (*visit_code_block)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *lang,
+        const char *code,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit inline code `<code>`.
    *
    * # Arguments
    * - `ctx`: Node context
    * - `code`: The code content
    */
-  int32_t (*visit_code_inline)(const struct HTMHtmContext *ctx,
-                               void *user_data,
-                               const char *code,
-                               char **out_custom,
-                               uintptr_t *out_len);
-  /**
+    int32_t (*visit_code_inline)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *code,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit list items `<li>`.
    *
    * # Arguments
@@ -668,38 +668,38 @@ typedef struct HTMHtmVisitorCallbacks {
    * - `marker`: The list marker (e.g., "-", "1.", "a)")
    * - `text`: The list item content (already converted)
    */
-  int32_t (*visit_list_item)(const struct HTMHtmContext *ctx,
-                             void *user_data,
-                             int32_t ordered,
-                             const char *marker,
-                             const char *text,
-                             char **out_custom,
-                             uintptr_t *out_len);
-  /**
+    int32_t (*visit_list_item)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        int32_t ordered,
+        const char *marker,
+        const char *text,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Called before processing a list `<ul>` or `<ol>`.
    */
-  int32_t (*visit_list_start)(const struct HTMHtmContext *ctx,
-                              void *user_data,
-                              int32_t ordered,
-                              char **out_custom,
-                              uintptr_t *out_len);
-  /**
+    int32_t (*visit_list_start)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        int32_t ordered,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Called after processing a list `</ul>` or `</ol>`.
    */
-  int32_t (*visit_list_end)(const struct HTMHtmContext *ctx,
-                            void *user_data,
-                            int32_t ordered,
-                            const char *output,
-                            char **out_custom,
-                            uintptr_t *out_len);
-  /**
+    int32_t (*visit_list_end)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        int32_t ordered,
+        const char *output,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Called before processing a table `<table>`.
    */
-  int32_t (*visit_table_start)(const struct HTMHtmContext *ctx,
-                               void *user_data,
-                               char **out_custom,
-                               uintptr_t *out_len);
-  /**
+    int32_t (*visit_table_start)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit table rows `<tr>`.
    *
    * # Arguments
@@ -707,22 +707,22 @@ typedef struct HTMHtmVisitorCallbacks {
    * - `cells`: Cell contents (already converted to markdown)
    * - `is_header`: Whether this row is in `<thead>`
    */
-  int32_t (*visit_table_row)(const struct HTMHtmContext *ctx,
-                             void *user_data,
-                             const char *const *cells,
-                             uintptr_t cell_count,
-                             int32_t is_header,
-                             char **out_custom,
-                             uintptr_t *out_len);
-  /**
+    int32_t (*visit_table_row)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *const *cells,
+        uintptr_t cell_count,
+        int32_t is_header,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Called after processing a table `</table>`.
    */
-  int32_t (*visit_table_end)(const struct HTMHtmContext *ctx,
-                             void *user_data,
-                             const char *output,
-                             char **out_custom,
-                             uintptr_t *out_len);
-  /**
+    int32_t (*visit_table_end)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *output,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit blockquote elements `<blockquote>`.
    *
    * # Arguments
@@ -730,83 +730,83 @@ typedef struct HTMHtmVisitorCallbacks {
    * - `content`: The blockquote content (already converted)
    * - `depth`: Nesting depth (for nested blockquotes)
    */
-  int32_t (*visit_blockquote)(const struct HTMHtmContext *ctx,
-                              void *user_data,
-                              const char *content,
-                              uintptr_t depth,
-                              char **out_custom,
-                              uintptr_t *out_len);
-  /**
+    int32_t (*visit_blockquote)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *content,
+        uintptr_t depth,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit strong/bold elements `<strong>`, `<b>`.
    */
-  int32_t (*visit_strong)(const struct HTMHtmContext *ctx,
-                          void *user_data,
-                          const char *text,
-                          char **out_custom,
-                          uintptr_t *out_len);
-  /**
+    int32_t (*visit_strong)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *text,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit emphasis/italic elements `<em>`, `<i>`.
    */
-  int32_t (*visit_emphasis)(const struct HTMHtmContext *ctx,
-                            void *user_data,
-                            const char *text,
-                            char **out_custom,
-                            uintptr_t *out_len);
-  /**
+    int32_t (*visit_emphasis)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *text,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
    */
-  int32_t (*visit_strikethrough)(const struct HTMHtmContext *ctx,
-                                 void *user_data,
-                                 const char *text,
-                                 char **out_custom,
-                                 uintptr_t *out_len);
-  /**
+    int32_t (*visit_strikethrough)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *text,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit underline elements `<u>`, `<ins>`.
    */
-  int32_t (*visit_underline)(const struct HTMHtmContext *ctx,
-                             void *user_data,
-                             const char *text,
-                             char **out_custom,
-                             uintptr_t *out_len);
-  /**
+    int32_t (*visit_underline)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *text,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit subscript elements `<sub>`.
    */
-  int32_t (*visit_subscript)(const struct HTMHtmContext *ctx,
-                             void *user_data,
-                             const char *text,
-                             char **out_custom,
-                             uintptr_t *out_len);
-  /**
+    int32_t (*visit_subscript)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *text,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit superscript elements `<sup>`.
    */
-  int32_t (*visit_superscript)(const struct HTMHtmContext *ctx,
-                               void *user_data,
-                               const char *text,
-                               char **out_custom,
-                               uintptr_t *out_len);
-  /**
+    int32_t (*visit_superscript)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *text,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit mark/highlight elements `<mark>`.
    */
-  int32_t (*visit_mark)(const struct HTMHtmContext *ctx,
-                        void *user_data,
-                        const char *text,
-                        char **out_custom,
-                        uintptr_t *out_len);
-  /**
+    int32_t (*visit_mark)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *text,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit line break elements `<br>`.
    */
-  int32_t (*visit_line_break)(const struct HTMHtmContext *ctx,
-                              void *user_data,
-                              char **out_custom,
-                              uintptr_t *out_len);
-  /**
+    int32_t (*visit_line_break)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit horizontal rule elements `<hr>`.
    */
-  int32_t (*visit_horizontal_rule)(const struct HTMHtmContext *ctx,
-                                   void *user_data,
-                                   char **out_custom,
-                                   uintptr_t *out_len);
-  /**
+    int32_t (*visit_horizontal_rule)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit custom elements (web components) or unknown tags.
    *
    * # Arguments
@@ -814,133 +814,133 @@ typedef struct HTMHtmVisitorCallbacks {
    * - `tag_name`: The custom element's tag name
    * - `html`: The raw HTML of this element
    */
-  int32_t (*visit_custom_element)(const struct HTMHtmContext *ctx,
-                                  void *user_data,
-                                  const char *tag_name,
-                                  const char *html,
-                                  char **out_custom,
-                                  uintptr_t *out_len);
-  /**
+    int32_t (*visit_custom_element)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *tag_name,
+        const char *html,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit definition list `<dl>`.
    */
-  int32_t (*visit_definition_list_start)(const struct HTMHtmContext *ctx,
-                                         void *user_data,
-                                         char **out_custom,
-                                         uintptr_t *out_len);
-  /**
+    int32_t (*visit_definition_list_start)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit definition term `<dt>`.
    */
-  int32_t (*visit_definition_term)(const struct HTMHtmContext *ctx,
-                                   void *user_data,
-                                   const char *text,
-                                   char **out_custom,
-                                   uintptr_t *out_len);
-  /**
+    int32_t (*visit_definition_term)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *text,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit definition description `<dd>`.
    */
-  int32_t (*visit_definition_description)(const struct HTMHtmContext *ctx,
-                                          void *user_data,
-                                          const char *text,
-                                          char **out_custom,
-                                          uintptr_t *out_len);
-  /**
+    int32_t (*visit_definition_description)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *text,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Called after processing a definition list `</dl>`.
    */
-  int32_t (*visit_definition_list_end)(const struct HTMHtmContext *ctx,
-                                       void *user_data,
-                                       const char *output,
-                                       char **out_custom,
-                                       uintptr_t *out_len);
-  /**
+    int32_t (*visit_definition_list_end)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *output,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit form elements `<form>`.
    */
-  int32_t (*visit_form)(const struct HTMHtmContext *ctx,
-                        void *user_data,
-                        const char *action,
-                        const char *method,
-                        char **out_custom,
-                        uintptr_t *out_len);
-  /**
+    int32_t (*visit_form)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *action,
+        const char *method,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit input elements `<input>`.
    */
-  int32_t (*visit_input)(const struct HTMHtmContext *ctx,
-                         void *user_data,
-                         const char *input_type,
-                         const char *name,
-                         const char *value,
-                         char **out_custom,
-                         uintptr_t *out_len);
-  /**
+    int32_t (*visit_input)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *input_type,
+        const char *name,
+        const char *value,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit button elements `<button>`.
    */
-  int32_t (*visit_button)(const struct HTMHtmContext *ctx,
-                          void *user_data,
-                          const char *text,
-                          char **out_custom,
-                          uintptr_t *out_len);
-  /**
+    int32_t (*visit_button)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *text,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit audio elements `<audio>`.
    */
-  int32_t (*visit_audio)(const struct HTMHtmContext *ctx,
-                         void *user_data,
-                         const char *src,
-                         char **out_custom,
-                         uintptr_t *out_len);
-  /**
+    int32_t (*visit_audio)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *src,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit video elements `<video>`.
    */
-  int32_t (*visit_video)(const struct HTMHtmContext *ctx,
-                         void *user_data,
-                         const char *src,
-                         char **out_custom,
-                         uintptr_t *out_len);
-  /**
+    int32_t (*visit_video)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *src,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit iframe elements `<iframe>`.
    */
-  int32_t (*visit_iframe)(const struct HTMHtmContext *ctx,
-                          void *user_data,
-                          const char *src,
-                          char **out_custom,
-                          uintptr_t *out_len);
-  /**
+    int32_t (*visit_iframe)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *src,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit details elements `<details>`.
    */
-  int32_t (*visit_details)(const struct HTMHtmContext *ctx,
-                           void *user_data,
-                           int32_t open,
-                           char **out_custom,
-                           uintptr_t *out_len);
-  /**
+    int32_t (*visit_details)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        int32_t open,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit summary elements `<summary>`.
    */
-  int32_t (*visit_summary)(const struct HTMHtmContext *ctx,
-                           void *user_data,
-                           const char *text,
-                           char **out_custom,
-                           uintptr_t *out_len);
-  /**
+    int32_t (*visit_summary)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *text,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit figure elements `<figure>`.
    */
-  int32_t (*visit_figure_start)(const struct HTMHtmContext *ctx,
-                                void *user_data,
-                                char **out_custom,
-                                uintptr_t *out_len);
-  /**
+    int32_t (*visit_figure_start)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Visit figcaption elements `<figcaption>`.
    */
-  int32_t (*visit_figcaption)(const struct HTMHtmContext *ctx,
-                              void *user_data,
-                              const char *text,
-                              char **out_custom,
-                              uintptr_t *out_len);
-  /**
+    int32_t (*visit_figcaption)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *text,
+        char **out_custom,
+        uintptr_t *out_len);
+    /**
    * Called after processing a figure `</figure>`.
    */
-  int32_t (*visit_figure_end)(const struct HTMHtmContext *ctx,
-                              void *user_data,
-                              const char *output,
-                              char **out_custom,
-                              uintptr_t *out_len);
+    int32_t (*visit_figure_end)(const struct HTMHtmContext *ctx,
+        void *user_data,
+        const char *output,
+        char **out_custom,
+        uintptr_t *out_len);
 } HTMHtmVisitorCallbacks;
 
 /**
@@ -953,40 +953,40 @@ typedef struct HTMHtmVisitorCallbacks {
  * when the bridge is dropped.
  */
 typedef struct HTMHtmHtmlVisitorVTable {
-  /**
+    /**
    * Visit text nodes (most frequent callback - ~100+ per document).
    *
    * # Arguments
    * - `ctx`: Node context (will have `node_type: NodeType::Text`)
    * - `text`: The raw text content (HTML entities already decoded)
    */
-  int32_t (*visit_text)(const void *user_data,
-                        const char *_ctx,
-                        const char *_text,
-                        char **out_result,
-                        char **out_error);
-  /**
+    int32_t (*visit_text)(const void *user_data,
+        const char *_ctx,
+        const char *_text,
+        char **out_result,
+        char **out_error);
+    /**
    * Called before entering any element.
    *
    * This is the first callback invoked for every HTML element, allowing
    * visitors to implement generic element handling before tag-specific logic.
    */
-  int32_t (*visit_element_start)(const void *user_data,
-                                 const char *_ctx,
-                                 char **out_result,
-                                 char **out_error);
-  /**
+    int32_t (*visit_element_start)(const void *user_data,
+        const char *_ctx,
+        char **out_result,
+        char **out_error);
+    /**
    * Called after exiting any element.
    *
    * Receives the default markdown output that would be generated.
    * Visitors can inspect or replace this output.
    */
-  int32_t (*visit_element_end)(const void *user_data,
-                               const char *_ctx,
-                               const char *_output,
-                               char **out_result,
-                               char **out_error);
-  /**
+    int32_t (*visit_element_end)(const void *user_data,
+        const char *_ctx,
+        const char *_output,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit anchor links `<a href="...">`.
    *
    * # Arguments
@@ -995,14 +995,14 @@ typedef struct HTMHtmHtmlVisitorVTable {
    * - `text`: The link text content (already converted to markdown)
    * - `title`: Optional title attribute
    */
-  int32_t (*visit_link)(const void *user_data,
-                        const char *_ctx,
-                        const char *_href,
-                        const char *_text,
-                        const char *_title,
-                        char **out_result,
-                        char **out_error);
-  /**
+    int32_t (*visit_link)(const void *user_data,
+        const char *_ctx,
+        const char *_href,
+        const char *_text,
+        const char *_title,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit images `<img src="...">`.
    *
    * # Arguments
@@ -1011,14 +1011,14 @@ typedef struct HTMHtmHtmlVisitorVTable {
    * - `alt`: The alt text
    * - `title`: Optional title attribute
    */
-  int32_t (*visit_image)(const void *user_data,
-                         const char *_ctx,
-                         const char *_src,
-                         const char *_alt,
-                         const char *_title,
-                         char **out_result,
-                         char **out_error);
-  /**
+    int32_t (*visit_image)(const void *user_data,
+        const char *_ctx,
+        const char *_src,
+        const char *_alt,
+        const char *_title,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit heading elements `<h1>` through `<h6>`.
    *
    * # Arguments
@@ -1027,14 +1027,14 @@ typedef struct HTMHtmHtmlVisitorVTable {
    * - `text`: The heading text content
    * - `id`: Optional id attribute (for anchor links)
    */
-  int32_t (*visit_heading)(const void *user_data,
-                           const char *_ctx,
-                           uint32_t _level,
-                           const char *_text,
-                           const char *_id,
-                           char **out_result,
-                           char **out_error);
-  /**
+    int32_t (*visit_heading)(const void *user_data,
+        const char *_ctx,
+        uint32_t _level,
+        const char *_text,
+        const char *_id,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit code blocks `<pre><code>`.
    *
    * # Arguments
@@ -1042,25 +1042,25 @@ typedef struct HTMHtmHtmlVisitorVTable {
    * - `lang`: Optional language specifier (from class attribute)
    * - `code`: The code content
    */
-  int32_t (*visit_code_block)(const void *user_data,
-                              const char *_ctx,
-                              const char *_lang,
-                              const char *_code,
-                              char **out_result,
-                              char **out_error);
-  /**
+    int32_t (*visit_code_block)(const void *user_data,
+        const char *_ctx,
+        const char *_lang,
+        const char *_code,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit inline code `<code>`.
    *
    * # Arguments
    * - `ctx`: Node context
    * - `code`: The code content
    */
-  int32_t (*visit_code_inline)(const void *user_data,
-                               const char *_ctx,
-                               const char *_code,
-                               char **out_result,
-                               char **out_error);
-  /**
+    int32_t (*visit_code_inline)(const void *user_data,
+        const char *_ctx,
+        const char *_code,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit list items `<li>`.
    *
    * # Arguments
@@ -1069,38 +1069,38 @@ typedef struct HTMHtmHtmlVisitorVTable {
    * - `marker`: The list marker (e.g., "-", "1.", "a)")
    * - `text`: The list item content (already converted)
    */
-  int32_t (*visit_list_item)(const void *user_data,
-                             const char *_ctx,
-                             int32_t _ordered,
-                             const char *_marker,
-                             const char *_text,
-                             char **out_result,
-                             char **out_error);
-  /**
+    int32_t (*visit_list_item)(const void *user_data,
+        const char *_ctx,
+        int32_t _ordered,
+        const char *_marker,
+        const char *_text,
+        char **out_result,
+        char **out_error);
+    /**
    * Called before processing a list `<ul>` or `<ol>`.
    */
-  int32_t (*visit_list_start)(const void *user_data,
-                              const char *_ctx,
-                              int32_t _ordered,
-                              char **out_result,
-                              char **out_error);
-  /**
+    int32_t (*visit_list_start)(const void *user_data,
+        const char *_ctx,
+        int32_t _ordered,
+        char **out_result,
+        char **out_error);
+    /**
    * Called after processing a list `</ul>` or `</ol>`.
    */
-  int32_t (*visit_list_end)(const void *user_data,
-                            const char *_ctx,
-                            int32_t _ordered,
-                            const char *_output,
-                            char **out_result,
-                            char **out_error);
-  /**
+    int32_t (*visit_list_end)(const void *user_data,
+        const char *_ctx,
+        int32_t _ordered,
+        const char *_output,
+        char **out_result,
+        char **out_error);
+    /**
    * Called before processing a table `<table>`.
    */
-  int32_t (*visit_table_start)(const void *user_data,
-                               const char *_ctx,
-                               char **out_result,
-                               char **out_error);
-  /**
+    int32_t (*visit_table_start)(const void *user_data,
+        const char *_ctx,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit table rows `<tr>`.
    *
    * # Arguments
@@ -1108,21 +1108,21 @@ typedef struct HTMHtmHtmlVisitorVTable {
    * - `cells`: Cell contents (already converted to markdown)
    * - `is_header`: Whether this row is in `<thead>`
    */
-  int32_t (*visit_table_row)(const void *user_data,
-                             const char *_ctx,
-                             const char *_cells,
-                             int32_t _is_header,
-                             char **out_result,
-                             char **out_error);
-  /**
+    int32_t (*visit_table_row)(const void *user_data,
+        const char *_ctx,
+        const char *_cells,
+        int32_t _is_header,
+        char **out_result,
+        char **out_error);
+    /**
    * Called after processing a table `</table>`.
    */
-  int32_t (*visit_table_end)(const void *user_data,
-                             const char *_ctx,
-                             const char *_output,
-                             char **out_result,
-                             char **out_error);
-  /**
+    int32_t (*visit_table_end)(const void *user_data,
+        const char *_ctx,
+        const char *_output,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit blockquote elements `<blockquote>`.
    *
    * # Arguments
@@ -1130,83 +1130,83 @@ typedef struct HTMHtmHtmlVisitorVTable {
    * - `content`: The blockquote content (already converted)
    * - `depth`: Nesting depth (for nested blockquotes)
    */
-  int32_t (*visit_blockquote)(const void *user_data,
-                              const char *_ctx,
-                              const char *_content,
-                              uintptr_t _depth,
-                              char **out_result,
-                              char **out_error);
-  /**
+    int32_t (*visit_blockquote)(const void *user_data,
+        const char *_ctx,
+        const char *_content,
+        uintptr_t _depth,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit strong/bold elements `<strong>`, `<b>`.
    */
-  int32_t (*visit_strong)(const void *user_data,
-                          const char *_ctx,
-                          const char *_text,
-                          char **out_result,
-                          char **out_error);
-  /**
+    int32_t (*visit_strong)(const void *user_data,
+        const char *_ctx,
+        const char *_text,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit emphasis/italic elements `<em>`, `<i>`.
    */
-  int32_t (*visit_emphasis)(const void *user_data,
-                            const char *_ctx,
-                            const char *_text,
-                            char **out_result,
-                            char **out_error);
-  /**
+    int32_t (*visit_emphasis)(const void *user_data,
+        const char *_ctx,
+        const char *_text,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
    */
-  int32_t (*visit_strikethrough)(const void *user_data,
-                                 const char *_ctx,
-                                 const char *_text,
-                                 char **out_result,
-                                 char **out_error);
-  /**
+    int32_t (*visit_strikethrough)(const void *user_data,
+        const char *_ctx,
+        const char *_text,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit underline elements `<u>`, `<ins>`.
    */
-  int32_t (*visit_underline)(const void *user_data,
-                             const char *_ctx,
-                             const char *_text,
-                             char **out_result,
-                             char **out_error);
-  /**
+    int32_t (*visit_underline)(const void *user_data,
+        const char *_ctx,
+        const char *_text,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit subscript elements `<sub>`.
    */
-  int32_t (*visit_subscript)(const void *user_data,
-                             const char *_ctx,
-                             const char *_text,
-                             char **out_result,
-                             char **out_error);
-  /**
+    int32_t (*visit_subscript)(const void *user_data,
+        const char *_ctx,
+        const char *_text,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit superscript elements `<sup>`.
    */
-  int32_t (*visit_superscript)(const void *user_data,
-                               const char *_ctx,
-                               const char *_text,
-                               char **out_result,
-                               char **out_error);
-  /**
+    int32_t (*visit_superscript)(const void *user_data,
+        const char *_ctx,
+        const char *_text,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit mark/highlight elements `<mark>`.
    */
-  int32_t (*visit_mark)(const void *user_data,
-                        const char *_ctx,
-                        const char *_text,
-                        char **out_result,
-                        char **out_error);
-  /**
+    int32_t (*visit_mark)(const void *user_data,
+        const char *_ctx,
+        const char *_text,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit line break elements `<br>`.
    */
-  int32_t (*visit_line_break)(const void *user_data,
-                              const char *_ctx,
-                              char **out_result,
-                              char **out_error);
-  /**
+    int32_t (*visit_line_break)(const void *user_data,
+        const char *_ctx,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit horizontal rule elements `<hr>`.
    */
-  int32_t (*visit_horizontal_rule)(const void *user_data,
-                                   const char *_ctx,
-                                   char **out_result,
-                                   char **out_error);
-  /**
+    int32_t (*visit_horizontal_rule)(const void *user_data,
+        const char *_ctx,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit custom elements (web components) or unknown tags.
    *
    * # Arguments
@@ -1214,141 +1214,141 @@ typedef struct HTMHtmHtmlVisitorVTable {
    * - `tag_name`: The custom element's tag name
    * - `html`: The raw HTML of this element
    */
-  int32_t (*visit_custom_element)(const void *user_data,
-                                  const char *_ctx,
-                                  const char *_tag_name,
-                                  const char *_html,
-                                  char **out_result,
-                                  char **out_error);
-  /**
+    int32_t (*visit_custom_element)(const void *user_data,
+        const char *_ctx,
+        const char *_tag_name,
+        const char *_html,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit definition list `<dl>`.
    */
-  int32_t (*visit_definition_list_start)(const void *user_data,
-                                         const char *_ctx,
-                                         char **out_result,
-                                         char **out_error);
-  /**
+    int32_t (*visit_definition_list_start)(const void *user_data,
+        const char *_ctx,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit definition term `<dt>`.
    */
-  int32_t (*visit_definition_term)(const void *user_data,
-                                   const char *_ctx,
-                                   const char *_text,
-                                   char **out_result,
-                                   char **out_error);
-  /**
+    int32_t (*visit_definition_term)(const void *user_data,
+        const char *_ctx,
+        const char *_text,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit definition description `<dd>`.
    */
-  int32_t (*visit_definition_description)(const void *user_data,
-                                          const char *_ctx,
-                                          const char *_text,
-                                          char **out_result,
-                                          char **out_error);
-  /**
+    int32_t (*visit_definition_description)(const void *user_data,
+        const char *_ctx,
+        const char *_text,
+        char **out_result,
+        char **out_error);
+    /**
    * Called after processing a definition list `</dl>`.
    */
-  int32_t (*visit_definition_list_end)(const void *user_data,
-                                       const char *_ctx,
-                                       const char *_output,
-                                       char **out_result,
-                                       char **out_error);
-  /**
+    int32_t (*visit_definition_list_end)(const void *user_data,
+        const char *_ctx,
+        const char *_output,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit form elements `<form>`.
    */
-  int32_t (*visit_form)(const void *user_data,
-                        const char *_ctx,
-                        const char *_action,
-                        const char *_method,
-                        char **out_result,
-                        char **out_error);
-  /**
+    int32_t (*visit_form)(const void *user_data,
+        const char *_ctx,
+        const char *_action,
+        const char *_method,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit input elements `<input>`.
    */
-  int32_t (*visit_input)(const void *user_data,
-                         const char *_ctx,
-                         const char *_input_type,
-                         const char *_name,
-                         const char *_value,
-                         char **out_result,
-                         char **out_error);
-  /**
+    int32_t (*visit_input)(const void *user_data,
+        const char *_ctx,
+        const char *_input_type,
+        const char *_name,
+        const char *_value,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit button elements `<button>`.
    */
-  int32_t (*visit_button)(const void *user_data,
-                          const char *_ctx,
-                          const char *_text,
-                          char **out_result,
-                          char **out_error);
-  /**
+    int32_t (*visit_button)(const void *user_data,
+        const char *_ctx,
+        const char *_text,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit audio elements `<audio>`.
    */
-  int32_t (*visit_audio)(const void *user_data,
-                         const char *_ctx,
-                         const char *_src,
-                         char **out_result,
-                         char **out_error);
-  /**
+    int32_t (*visit_audio)(const void *user_data,
+        const char *_ctx,
+        const char *_src,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit video elements `<video>`.
    */
-  int32_t (*visit_video)(const void *user_data,
-                         const char *_ctx,
-                         const char *_src,
-                         char **out_result,
-                         char **out_error);
-  /**
+    int32_t (*visit_video)(const void *user_data,
+        const char *_ctx,
+        const char *_src,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit iframe elements `<iframe>`.
    */
-  int32_t (*visit_iframe)(const void *user_data,
-                          const char *_ctx,
-                          const char *_src,
-                          char **out_result,
-                          char **out_error);
-  /**
+    int32_t (*visit_iframe)(const void *user_data,
+        const char *_ctx,
+        const char *_src,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit details elements `<details>`.
    */
-  int32_t (*visit_details)(const void *user_data,
-                           const char *_ctx,
-                           int32_t _open,
-                           char **out_result,
-                           char **out_error);
-  /**
+    int32_t (*visit_details)(const void *user_data,
+        const char *_ctx,
+        int32_t _open,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit summary elements `<summary>`.
    */
-  int32_t (*visit_summary)(const void *user_data,
-                           const char *_ctx,
-                           const char *_text,
-                           char **out_result,
-                           char **out_error);
-  /**
+    int32_t (*visit_summary)(const void *user_data,
+        const char *_ctx,
+        const char *_text,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit figure elements `<figure>`.
    */
-  int32_t (*visit_figure_start)(const void *user_data,
-                                const char *_ctx,
-                                char **out_result,
-                                char **out_error);
-  /**
+    int32_t (*visit_figure_start)(const void *user_data,
+        const char *_ctx,
+        char **out_result,
+        char **out_error);
+    /**
    * Visit figcaption elements `<figcaption>`.
    */
-  int32_t (*visit_figcaption)(const void *user_data,
-                              const char *_ctx,
-                              const char *_text,
-                              char **out_result,
-                              char **out_error);
-  /**
+    int32_t (*visit_figcaption)(const void *user_data,
+        const char *_ctx,
+        const char *_text,
+        char **out_result,
+        char **out_error);
+    /**
    * Called after processing a figure `</figure>`.
    */
-  int32_t (*visit_figure_end)(const void *user_data,
-                              const char *_ctx,
-                              const char *_output,
-                              char **out_result,
-                              char **out_error);
-  /**
+    int32_t (*visit_figure_end)(const void *user_data,
+        const char *_ctx,
+        const char *_output,
+        char **out_result,
+        char **out_error);
+    /**
    * Optional string destructor: called for strings returned by vtable callbacks.
    */
-  void (*free_string)(char*);
-  /**
+    void (*free_string)(char*);
+    /**
    * Optional destructor: called once with `user_data` when the bridge is dropped.
    */
-  void (*free_user_data)(void*);
+    void (*free_user_data)(void*);
 } HTMHtmHtmlVisitorVTable;
 
 /**
@@ -1383,8 +1383,8 @@ void htm_free_string(char *ptr);
  * out-params), or be null. The len and cap values must be unchanged since the call.
  */
 void htm_free_bytes(uint8_t *ptr,
-                    uintptr_t len,
-                    uintptr_t cap);
+    uintptr_t len,
+    uintptr_t cap);
 
 /**
  * Return the library version string. The pointer is static and must NOT be freed.
@@ -3123,12 +3123,12 @@ char *htm_node_context_attributes(const HTMNodeContext *this_);
  * freed with the appropriate free function.
  */
 HTMNodeContext *htm_node_context_with_owned_attributes(int32_t node_type,
-                                                       const char *tag_name,
-                                                       const char *attributes,
-                                                       uintptr_t depth,
-                                                       uintptr_t index_in_parent,
-                                                       const char *parent_tag,
-                                                       int32_t is_inline);
+    const char *tag_name,
+    const char *attributes,
+    uintptr_t depth,
+    uintptr_t index_in_parent,
+    const char *parent_tag,
+    int32_t is_inline);
 
 /**
  * Promote any borrowed fields into owned storage so the context can outlive `'a`.
@@ -3747,7 +3747,7 @@ char *htm_node_type_to_string(const HTMNodeType *ptr);
  * freed with `htm_conversion_result_free`.
  */
 HTMConversionResult *htm_convert(const char *html,
-                                 const HTMConversionOptions *options);
+    const HTMConversionOptions *options);
 
 /**
  * Attach a vtable visitor bridge to a `ConversionOptions` options struct.
@@ -3768,7 +3768,7 @@ HTMConversionResult *htm_convert(const char *html,
  * subsequent options-field bridge wrapper call.
  */
 void htm_options_set_visitor(HTMConversionOptions *options,
-                             struct HTMHtmVisitor *visitor);
+    struct HTMHtmVisitor *visitor);
 
 /**
  * Create a new visitor handle from a callbacks struct.
@@ -3814,7 +3814,7 @@ void htm_visitor_free(struct HTMHtmVisitor *visitor);
  * for any thread that calls methods on this bridge.
  */
 struct HTMHtmHtmlVisitorBridge *htm_htm_html_visitor_bridge_new(const struct HTMHtmHtmlVisitorVTable *vtable,
-                                                                const void *user_data);
+    const void *user_data);
 
 /**
  * Free a `HtmHtmlVisitorBridge` created by `htm_htm_html_visitor_bridge_new`.
