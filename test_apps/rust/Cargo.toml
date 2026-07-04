@@ -1,7 +1,7 @@
 
 [package]
 name = "html_to_markdown_rs-e2e-rust"
-version = "3.8.1"
+version = "3.8.2"
 edition = "2021"
 license = "MIT"
 publish = false
@@ -16,5 +16,5 @@ ignored = ["serde_json"]
 [workspace]
 
 [dependencies]
-html_to_markdown_rs = { package = "html-to-markdown-rs", version = "3.8.1", default-features = false, features = ["serde", "metadata", "visitor", "inline-images", "testkit"] }
+html_to_markdown_rs = { package = "html-to-markdown-rs", version = "3.8.2", default-features = false, features = ["serde", "metadata", "visitor", "inline-images", "testkit"] }
 serde_json = "1"
