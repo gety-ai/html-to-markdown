@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.30.17"
+alef_version = "0.31.0"
 languages = [
     "python",
     "node",
@@ -159,6 +159,21 @@ exclude = [
 "packages/r/R/version.R" = ["empty_file"]
 # serde serializer module path flagged as a false positive by the typos dictionary.
 "crates/html-to-markdown/src/visitor/types.rs" = ["typo"]
+# Generated stub annotates native binding objects as `native: Any` without importing
+# Any (harmless under `from __future__ import annotations`). Concrete path avoids colliding
+# with the default `**/options.py` key; ruff unions per-file-ignores across matching globs.
+"packages/python/html_to_markdown/options.py" = ["F821"]
+# Generated Jackson serializers reference the databind serializer package, a real
+# Java package path the typos dictionary misreads.
+"packages/kotlin-android/src/main/kotlin/**/*.kt" = ["typo"]
+# swift-bridge generated glue (RustBridge core + RustBridgeC header) is marked
+# `// swift-format-ignore-file`; its emitted trailing whitespace is not ours to reformat.
+"packages/swift/Sources/RustBridge*/**" = ["trailing-whitespace"]
+# Generated e2e visitor test nests single-quoted f-strings inside double-quoted dict
+# literals; quote style in generated test code is immaterial.
+"e2e/**/*.py" = ["Q000"]
+# Alef-generated agent skill docs emit tight lists rumdl wants blank-line-padded.
+"**/skills/**/SKILL.md" = ["MD032"]
 
 [[crates]]
 name = "html-to-markdown-rs"

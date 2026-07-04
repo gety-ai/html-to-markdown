@@ -9,7 +9,9 @@ keywords = ["converter", "html", "markdown"]
 categories = []
 
 [package.metadata.cargo-machete]
-ignored = ["rb-sys"]
+# async-trait / tokio are declared for feature parity but the generated Magnus
+# shim has no direct callsite (same rationale as the pyo3 crate).
+ignored = ["rb-sys", "async-trait", "tokio"]
 
 [lib]
 name = "html_to_markdown_rb"

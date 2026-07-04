@@ -8,6 +8,11 @@ readme = false
 keywords = ["converter", "html", "markdown"]
 categories = []
 
+[package.metadata.cargo-machete]
+# async-trait is declared for feature parity but the generated extendr shim has
+# no `#[async_trait]` callsite (same rationale as the pyo3 crate).
+ignored = ["async-trait"]
+
 [lib]
 crate-type = ["staticlib", "lib"]
 

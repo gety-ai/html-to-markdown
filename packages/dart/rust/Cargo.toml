@@ -7,7 +7,9 @@ license = "MIT"
 [package.metadata.cargo-machete]
 # Umbrella + sibling crates are pulled in so flutter_rust_bridge can resolve
 # every referenced type, but the generated Rust wrapper only `use`s a subset.
-ignored = ["html_to_markdown_rs"]
+# async-trait is declared for feature parity but the generated shim has no
+# `#[async_trait]` callsite (same rationale as the pyo3 crate).
+ignored = ["html_to_markdown_rs", "async-trait"]
 
 [lib]
 crate-type = ["cdylib", "staticlib"]
