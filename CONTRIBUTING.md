@@ -33,6 +33,13 @@ This will:
 1. Build Rust extension with maturin
 1. Install prek hooks for commit linting and code quality
 
+## Pre-commit hooks
+
+Install the git hooks with `task setup` (or `poly hooks install` directly). On
+every commit, poly runs lint, format, and file-safety checks plus `cargo clippy`;
+the commit-msg hook validates the message. Run all hooks manually with
+`poly hooks run pre-commit --all-files`.
+
 ## Development Workflow
 
 ### Running Tests
