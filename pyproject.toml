@@ -29,7 +29,6 @@ dev = [
     "pyyaml>=6.0.3",
     "uv-bump",
 ]
-doc = ["zensical"]
 
 [tool.setuptools]
 packages = []

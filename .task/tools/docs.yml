@@ -1,20 +1,28 @@
 version: "3"
 
+# Documentation build + lint + snippet workflows.
+# The docs site is an Astro Starlight project under docs-site/ that consumes the
+# shared @xberg-io/docs-theme. Snippet commands wrap `alef snippets` and target
+# the relocated docs-site/src/snippets tree.
+
 tasks:
   build:
     desc: Build documentation
     cmds:
-      - uv run --no-sync --group doc zensical build --clean
+      - pnpm --dir docs-site install --frozen-lockfile
+      - pnpm --dir docs-site build
 
   build:strict:
-    desc: Build documentation in strict mode (CI-equivalent)
+    desc: Build documentation (CI-equivalent; astro build fails on errors)
     cmds:
-      - uv run --no-sync --group doc zensical build --strict --clean
+      - pnpm --dir docs-site install --frozen-lockfile
+      - pnpm --dir docs-site build
 
   serve:
     desc: Serve documentation locally with live reload
     cmds:
-      - uv run --no-sync --group doc zensical serve
+      - pnpm --dir docs-site install
+      - pnpm --dir docs-site dev
 
   generate:
     desc: Generate API reference documentation using alef
@@ -25,41 +33,45 @@ tasks:
     desc: Validate API docs match generated output (CI mode)
     cmds:
       - alef docs
-      - git diff --exit-code -- docs/reference/
+      - git diff --exit-code -- docs-site/src/content/docs/reference/
 
   lint:links:
     desc: Check links with lychee
     cmds:
-      - lychee --offline --root-dir "$PWD/docs" --exclude-path "docs/overrides" docs/ README.md
+      - lychee --offline docs-site/src/content/docs README.md
 
   lint:prose:
     desc: Lint prose with textlint
     cmds:
-      - npx textlint 'docs/**/*.md'
+      - npx textlint 'docs-site/src/content/docs/**/*.{md,mdx}'
+
+  # Snippet commands target docs-site/src/snippets — the canonical hand-written
+  # snippets imported into Starlight tabs. The alef-emitted docs-site reference
+  # tree is validated separately via `alef docs`.
 
   snippets:validate:
-    desc: Validate all docs/snippets via `alef snippets` (syntax level)
+    desc: Validate all snippets via `alef snippets` (syntax level)
     cmds:
-      - alef snippets validate --snippets docs/snippets --level syntax --timeout 120 -j 4
+      - alef snippets validate --snippets docs-site/src/snippets --level syntax --timeout 120 -j 4
 
   snippets:validate:lang:
     desc: "Validate snippets for one language (set LANG=dart|kotlin|swift|...)"
     cmds:
-      - alef snippets validate --snippets docs/snippets --level syntax --languages {{.LANG}} --timeout 120 -j 4
+      - alef snippets validate --snippets docs-site/src/snippets --level syntax --languages {{.LANG}} --timeout 120 -j 4
     requires:
       vars: [LANG]
 
   snippets:list:
-    desc: List all discovered docs/snippets
+    desc: List all discovered snippets
     cmds:
-      - alef snippets list --snippets docs/snippets
+      - alef snippets list --snippets docs-site/src/snippets
 
   snippets:gaps:
     desc: Report snippet coverage gaps (missing variants, unreferenced files, etc.)
     cmds:
-      - alef snippets gaps --snippets docs/snippets --docs docs --required-languages rust,python,typescript,go,ruby,php,java,csharp,elixir,r,c,swift,dart,kotlin,zig
+      - alef snippets gaps --snippets docs-site/src/snippets --docs docs-site/src/content/docs --required-languages rust,python,typescript,go,ruby,php,java,csharp,elixir,r,c,swift,dart,kotlin,zig
 
   snippets:audit:
     desc: Run structural audit (frontmatter, fences, includes)
     cmds:
-      - alef snippets audit --snippets docs/snippets --docs docs
+      - alef snippets audit --snippets docs-site/src/snippets --docs docs-site/src/content/docs

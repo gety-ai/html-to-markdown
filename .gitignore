@@ -283,3 +283,8 @@ test_apps/**/test_output.log
 AGENTS.md
 CLAUDE.md
 # END ai-rulez
+
+# Astro Starlight docs-site build output
+docs-site/dist/
+docs-site/.astro/
+docs-site/node_modules/

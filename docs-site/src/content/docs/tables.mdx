@@ -1,0 +1,213 @@
+---
+title: Table Extraction
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+import { Content as Snip_rust_table_extraction_basic_extraction } from "../../snippets/rust/table-extraction/basic_extraction.md";
+import { Content as Snip_python_table_extraction_basic_extraction } from "../../snippets/python/table-extraction/basic_extraction.md";
+import { Content as Snip_typescript_table_extraction_basic_extraction } from "../../snippets/typescript/table-extraction/basic_extraction.md";
+import { Content as Snip_go_table_extraction_basic_extraction } from "../../snippets/go/table-extraction/basic_extraction.md";
+import { Content as Snip_ruby_table_extraction_basic_extraction } from "../../snippets/ruby/table-extraction/basic_extraction.md";
+import { Content as Snip_php_table_extraction_basic_extraction } from "../../snippets/php/table-extraction/basic_extraction.md";
+import { Content as Snip_java_table_extraction_basic_extraction } from "../../snippets/java/table-extraction/basic_extraction.md";
+import { Content as Snip_csharp_table_extraction_basic_extraction } from "../../snippets/csharp/table-extraction/basic_extraction.md";
+import { Content as Snip_elixir_table_extraction_basic_extraction } from "../../snippets/elixir/table-extraction/basic_extraction.md";
+import { Content as Snip_r_table_extraction_basic_extraction } from "../../snippets/r/table-extraction/basic_extraction.md";
+import { Content as Snip_c_table_extraction_basic_extraction } from "../../snippets/c/table-extraction/basic_extraction.md";
+import { Content as Snip_wasm_table_extraction_basic_extraction } from "../../snippets/wasm/table-extraction/basic_extraction.md";
+import { Content as Snip_swift_table_extraction_basic_extraction } from "../../snippets/swift/table-extraction/basic_extraction.md";
+import { Content as Snip_dart_table_extraction_basic_extraction } from "../../snippets/dart/table-extraction/basic_extraction.md";
+import { Content as Snip_kotlin_android_table_extraction_basic_extraction } from "../../snippets/kotlin_android/table-extraction/basic_extraction.md";
+import { Content as Snip_zig_table_extraction_basic_extraction } from "../../snippets/zig/table-extraction/basic_extraction.md";
+import { Content as Snip_feedback } from "../../snippets/feedback.md";
+
+
+Every call to `convert()` populates `result.tables` with one entry per `<table>` found in the input. Each entry has both a rendered Markdown string and a structured cell grid, so you can embed the Markdown in downstream documents or walk the grid for analysis without re-parsing.
+
+Table extraction runs on every call. There is no opt-in flag. Use JSON output with `--no-content` in the CLI, or ignore `result.content` in library code, when you only want table data.
+
+## TableData
+
+`result.tables` is a `Vec<TableData>` (or the equivalent list in each binding).
+
+| Field      | Type        | Description                                                                          |
+| ---------- | ----------- | ------------------------------------------------------------------------------------ |
+| `grid`     | `TableGrid` | Structured cell grid.                                                                |
+| `markdown` | `String`    | The Markdown rendering of this table, identical to what appears in `result.content`. |
+
+## TableGrid
+
+| Field   | Type            | Description                                                                                     |
+| ------- | --------------- | ----------------------------------------------------------------------------------------------- |
+| `rows`  | `u32`           | Number of rows in the table.                                                                    |
+| `cols`  | `u32`           | Number of columns in the table.                                                                 |
+| `cells` | `Vec<GridCell>` | Flat list of cells. May be shorter than `rows * cols` when cells span multiple rows or columns. |
+
+## GridCell
+
+| Field       | Type     | Description                                              |
+| ----------- | -------- | -------------------------------------------------------- |
+| `content`   | `String` | Cell text. Inline formatting is flattened to plain text. |
+| `row`       | `u32`    | 0-indexed row position.                                  |
+| `col`       | `u32`    | 0-indexed column position.                               |
+| `row_span`  | `u32`    | How many rows the cell occupies. Defaults to `1`.        |
+| `col_span`  | `u32`    | How many columns the cell occupies. Defaults to `1`.     |
+| `is_header` | `bool`   | `true` for `<th>`, `false` for `<td>`.                   |
+
+## Basic Extraction
+
+<Tabs syncKey="lang">
+<TabItem label="Rust">
+
+
+</TabItem>
+</Tabs>
+
+<Snip_rust_table_extraction_basic_extraction />
+
+<Tabs syncKey="lang">
+<TabItem label="Python">
+
+
+</TabItem>
+</Tabs>
+
+<Snip_python_table_extraction_basic_extraction />
+
+<Tabs syncKey="lang">
+<TabItem label="TypeScript">
+
+
+</TabItem>
+</Tabs>
+
+<Snip_typescript_table_extraction_basic_extraction />
+
+<Tabs syncKey="lang">
+<TabItem label="Go">
+
+
+</TabItem>
+</Tabs>
+
+<Snip_go_table_extraction_basic_extraction />
+
+<Tabs syncKey="lang">
+<TabItem label="Ruby">
+
+
+</TabItem>
+</Tabs>
+
+<Snip_ruby_table_extraction_basic_extraction />
+
+<Tabs syncKey="lang">
+<TabItem label="PHP">
+
+
+</TabItem>
+</Tabs>
+
+<Snip_php_table_extraction_basic_extraction />
+
+<Tabs syncKey="lang">
+<TabItem label="Java">
+
+
+</TabItem>
+</Tabs>
+
+<Snip_java_table_extraction_basic_extraction />
+
+<Tabs syncKey="lang">
+<TabItem label="C#">
+
+
+</TabItem>
+</Tabs>
+
+<Snip_csharp_table_extraction_basic_extraction />
+
+<Tabs syncKey="lang">
+<TabItem label="Elixir">
+
+
+</TabItem>
+</Tabs>
+
+<Snip_elixir_table_extraction_basic_extraction />
+
+<Tabs syncKey="lang">
+<TabItem label="R">
+
+
+</TabItem>
+</Tabs>
+
+<Snip_r_table_extraction_basic_extraction />
+
+<Tabs syncKey="lang">
+<TabItem label="C">
+
+
+</TabItem>
+</Tabs>
+
+<Snip_c_table_extraction_basic_extraction />
+
+<Tabs syncKey="lang">
+<TabItem label="WASM">
+
+
+</TabItem>
+</Tabs>
+
+<Snip_wasm_table_extraction_basic_extraction />
+
+<Tabs syncKey="lang">
+<TabItem label="Swift">
+
+
+</TabItem>
+</Tabs>
+
+<Snip_swift_table_extraction_basic_extraction />
+
+<Tabs syncKey="lang">
+<TabItem label="Dart">
+
+
+</TabItem>
+</Tabs>
+
+<Snip_dart_table_extraction_basic_extraction />
+
+<Tabs syncKey="lang">
+<TabItem label="Kotlin Android">
+
+
+</TabItem>
+</Tabs>
+
+<Snip_kotlin_android_table_extraction_basic_extraction />
+
+<Tabs syncKey="lang">
+<TabItem label="Zig">
+
+
+</TabItem>
+</Tabs>
+
+<Snip_zig_table_extraction_basic_extraction />
+
+## Relationship to `result.content`
+
+The Markdown in `TableData.markdown` is the same Markdown that appears inline inside `result.content`. The grid exists for code that needs cell-level access: headers vs body rows, span detection, or programmatic lookup by `(row, col)`.
+
+If the input has no tables, `result.tables` is an empty list. If the output format is `"plain"`, tables are still extracted and their grids are still populated; only the rendering in `result.content` changes.
+
+## Spans
+
+A cell with `row_span > 1` or `col_span > 1` appears once in `cells`, positioned at its top-left coordinates. Downstream code that iterates by `(row, col)` should respect the span or use the spans to reconstruct a dense grid.
+
+<Snip_feedback />
