@@ -4,8 +4,10 @@ title: Xberg Ecosystem
 
 html-to-markdown is a high-performance, CommonMark-compliant HTML → Markdown converter. It's part of the Xberg family — a set of open-source tools from the same team, each built on a fast Rust core. Explore the related projects:
 
-- **[Xberg](https://docs.xberg.io/)** — an open-source document intelligence framework with a Rust core and bindings for many languages.
-- **[Xberg Enterprise](https://enterprise.xberg.io/)** — managed document extraction for AI pipelines: a REST API, official SDKs (Python, TypeScript, Go, Dart), webhooks, and a no-signup sandbox.
-- **[liter-llm](https://docs.liter-llm.xberg.io/)** — a universal LLM API client for 140+ providers, with bindings across languages.
-- **[tree-sitter-language-pack](https://docs.tree-sitter-language-pack.xberg.io/)** — 300+ tree-sitter parsers with code intelligence and chunking.
-- **[Crawlberg](https://docs.crawlberg.xberg.io/)** — a high-performance web crawling engine with bindings for 11 languages.
+- **[Xberg](https://github.com/xberg-io/xberg)** — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
+- **[Xberg Enterprise](https://github.com/xberg-io/xberg-enterprise)** — managed extraction API with SDKs, dashboards, and observability.
+- **[crawlberg](https://github.com/xberg-io/crawlberg)** — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
+- **[html-to-markdown](https://github.com/xberg-io/html-to-markdown)** — fast, lossless HTML→Markdown engine.
+- **[liter-llm](https://github.com/xberg-io/liter-llm)** — universal LLM API client with native bindings for 14 languages and 143 providers.
+- **[tree-sitter-language-pack](https://github.com/xberg-io/tree-sitter-language-pack)** — tree-sitter grammars and code-intelligence primitives.
+- **[alef](https://github.com/xberg-io/alef)** — the polyglot binding generator that produces every per-language binding across the 5 polyglot repos.

@@ -74,6 +74,8 @@ export default defineConfig({
               { label: "Types", slug: "reference/types" },
               { label: "Configuration (generated)", slug: "reference/configuration" },
               { label: "Error types (generated)", slug: "reference/errors" },
+              { label: "CLI (generated)", slug: "reference/cli" },
+              { label: "MCP (generated)", slug: "reference/mcp" },
             ],
           },
           {
