@@ -36,7 +36,44 @@ export default defineConfig({
           "generated packages, identical output on every runtime.",
         githubUrl: "https://github.com/xberg-io/html-to-markdown",
         editBaseUrl: "https://github.com/xberg-io/html-to-markdown/edit/main/docs-site/",
-        plugins: [starlightLlmsTxt()],
+        plugins: [
+          starlightLlmsTxt({
+            customSets: [
+              {
+                label: "Get Started",
+                description: "Installation, first conversion, and the CLI.",
+                paths: ["installation", "usage", "cli"],
+              },
+              {
+                label: "Guides",
+                description: "Visitor pattern, table extraction, error handling, and AI coding assistants.",
+                paths: ["visitor", "tables", "errors", "guides/ai-coding-assistants"],
+              },
+              {
+                label: "Concepts",
+                description: "Architecture, the conversion pipeline, and the plugin system.",
+                paths: ["concepts/**"],
+              },
+              {
+                label: "Reference",
+                description: "Configuration, API reference, and per-language guides.",
+                paths: ["configuration", "api-reference", "language-guides", "reference/**"],
+              },
+              {
+                label: "More",
+                description: "Migration, contributing, and the ecosystem.",
+                paths: ["migration", "contributing", "ecosystem"],
+              },
+            ],
+            optionalLinks: [
+              {
+                label: "GitHub",
+                url: "https://github.com/xberg-io/html-to-markdown",
+                description: "Source code and issues",
+              },
+            ],
+          }),
+        ],
         sidebar: [
           { label: "Home", link: "/" },
           {
@@ -53,7 +90,7 @@ export default defineConfig({
               { label: "Visitor pattern", slug: "visitor" },
               { label: "Table extraction", slug: "tables" },
               { label: "Error handling", slug: "errors" },
-              { label: "AI Coding Assistants", slug: "agent-skills" },
+              { label: "AI Coding Assistants", slug: "guides/ai-coding-assistants" },
             ],
           },
           {

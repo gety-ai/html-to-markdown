@@ -6,8 +6,8 @@ description: >-
 template: splash
 hero:
   tagline: >-
-    Convert HTML to Markdown, Djot, or plain text. A single Rust core plus 15 generated
-    packages give identical output from Python, the browser, the CLI, and 13 more runtimes.
+    Turn messy, real-world HTML into clean Markdown, Djot, or plain text. Call one converter
+    from Python, the browser, the CLI, and 13 more runtimes — and get identical output everywhere.
   image:
     dark: ../../assets/hero-logo.svg
     light: ../../assets/hero-logo-light.svg
@@ -31,29 +31,28 @@ import { Card, CardGrid, LinkCard, Tabs, TabItem } from "@astrojs/starlight/comp
 ## Why html-to-markdown
 
 <CardGrid>
-	<Card title="Rust core" icon="setting">
-		Single-pass DOM walk written in Rust. The same code path runs from Python, the browser, and the
-		CLI — no per-language conversion logic.
+	<Card title="Handles messy, real-world HTML" icon="setting">
+		Unclosed tags, odd entities, nested tables, mixed encodings — you get clean output without losing
+		content.
 	</Card>
-	<Card title="16 language surfaces" icon="translate">
-		Rust plus generated packages for Python, TypeScript, Go, Ruby, PHP, Java, C#, Elixir, R, C,
-		WebAssembly, Swift, Dart, Kotlin Android, and Zig.
+	<Card title="Use it from your language, identical output" icon="translate">
+		One converter behind Python, TypeScript, Go, Ruby, Java, and 11 more runtimes. The same input
+		gives the same result everywhere.
 	</Card>
-	<Card title="Three output formats" icon="document">
-		Markdown (CommonMark) by default, plus Djot and plain text via `output_format`. The same options
-		apply to every format.
+	<Card title="Markdown, Djot, or plain text" icon="document">
+		Pick the output you need with a single option. Everything else works the same.
 	</Card>
-	<Card title="Metadata extraction" icon="magnifier">
-		Document title, Open Graph, Twitter Card, JSON-LD, links, and images in one pass. Enabled by
-		default — disable with `extract_metadata: false`.
+	<Card title="Get the metadata too" icon="magnifier">
+		Pull the title, Open Graph, Twitter Card, JSON-LD, links, and images in the same pass — on by
+		default.
 	</Card>
-	<Card title="Table extraction" icon="random">
-		HTML tables into `result.tables` with structured cells, row/column spans, and header flags,
-		alongside the rendered Markdown.
+	<Card title="Keep your tables structured" icon="random">
+		Get HTML tables back as structured rows and cells, spans and headers included, alongside the
+		rendered Markdown.
 	</Card>
-	<Card title="Visitor pattern" icon="laptop">
-		40 callbacks on the `HtmlVisitor` trait to skip, replace, or preserve nodes. Kotlin Android
-		excludes visitor support. Zero cost when unused.
+	<Card title="Customize the conversion" icon="laptop">
+		Hook into the conversion to skip, replace, or preserve any element — and pay nothing when you
+		don't.
 	</Card>
 </CardGrid>
 

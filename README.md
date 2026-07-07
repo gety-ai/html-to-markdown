@@ -79,13 +79,13 @@
   </a>
 </div>
 
-Fast, robust HTML → Markdown for 16 languages. A tiered converter that picks the safest, fastest path per input without losing content.
+Turn messy, real-world HTML into clean Markdown — from the language you already work in.
 
 ## What and Why?
 
-html-to-markdown converts real-world HTML — unclosed tags, CDATA, custom elements, malformed entities, nested tables, mixed encodings — into clean CommonMark (or Djot) without losing content, from one Rust core with native bindings for 16 languages.
+Feed html-to-markdown the HTML you actually have — unclosed tags, CDATA, custom elements, broken entities, nested tables, mixed encodings — and get back clean CommonMark (or Djot) without losing content. One `convert()` call does it, and it returns the same result whether you run it from Python, TypeScript, Go, Ruby, Java, or 11 more languages.
 
-It routes each input through three tiers: a single-pass byte scanner for clean HTML, a tolerant DOM walker for complex inputs, and an `html5ever` repair pass for malformed HTML — with byte-identical output across tiers, enforced by a 116-snapshot oracle and per-group performance gates in CI. The dispatcher is invisible: the same `convert()` call works regardless of which tier runs.
+You get more than the text: pull page metadata (Open Graph, Twitter, JSON-LD) and structured tables in the same pass, or hook into the conversion to reshape the output. It is fast enough for whole-corpus jobs, and the messy-input handling is automatic — you never choose a parsing strategy or tune anything to get correct output.
 
 ### Features
 

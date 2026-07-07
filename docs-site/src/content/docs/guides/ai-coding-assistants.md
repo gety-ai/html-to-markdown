@@ -2,7 +2,11 @@
 title: AI Coding Assistants
 ---
 
-Install the html-to-markdown plugin from the [`xberg-io/plugins`](https://github.com/xberg-io/plugins) marketplace. It ships the html-to-markdown agent skills and works with every major coding agent — expand your harness below.
+Give your coding agent working knowledge of html-to-markdown so it writes correct `convert()` calls, picks the right options, and reaches for the right binding — without you pasting docs into the chat.
+
+## What this plugin does
+
+The plugin packages html-to-markdown's usage patterns, options, and per-language APIs as agent skills. Once installed, your assistant can answer html-to-markdown questions and generate accurate code straight from your editor or terminal. It installs from the [`xberg-io/plugins`](https://github.com/xberg-io/plugins) marketplace and works with every major coding agent — pick yours below.
 
 ## Installing
 
