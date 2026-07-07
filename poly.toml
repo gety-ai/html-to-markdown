@@ -80,6 +80,74 @@ select = ["correctness", "security"]
 ignore = ["strict-assertions", "use-specific-assertions", "no-redundant-variable", "sensitive-parameter"]
 php_version = "8.2"
 
+[lint.typos.extend_words]
+ake = "ake"
+algoritmos = "algoritmos"
+arange = "arange"
+bre = "bre"
+caf = "caf"
+charater = "charater"
+chlidren = "chlidren"
+cliper = "cliper"
+cursos = "cursos"
+delocate = "delocate"
+docling = "docling"
+edn = "edn"
+ein = "ein"
+excepcional = "excepcional"
+execpt = "execpt"
+extention = "extention"
+faiure = "faiure"
+fith = "fith"
+flate = "flate"
+formated = "formated"
+headerr = "headerr"
+helo = "helo"
+hocr = "hocr"
+hom = "hom"
+inh = "inh"
+internacional = "internacional"
+ist = "ist"
+kreuzberg = "kreuzberg"
+layrnorm = "layrnorm"
+legt = "legt"
+markitdown = "markitdown"
+ment = "ment"
+mis = "mis"
+mmaped = "mmaped"
+multline = "multline"
+odf = "odf"
+onnx = "onnx"
+openwebui = "openwebui"
+opf = "opf"
+ove = "ove"
+pard = "pard"
+portait = "portait"
+programa = "programa"
+pymupdf = "pymupdf"
+relatie = "relatie"
+rumdl = "rumdl"
+seperator = "seperator"
+ser = "ser"
+similarily = "similarily"
+siz = "siz"
+specifing = "specifing"
+splitted = "splitted"
+substract = "substract"
+surrealdb = "surrealdb"
+tesseract = "tesseract"
+tha = "tha"
+thr = "thr"
+threed = "threed"
+ths = "ths"
+thw = "thw"
+traineddata = "traineddata"
+tre = "tre"
+unparseable = "unparseable"
+utiliza = "utiliza"
+webui = "webui"
+yor = "yor"
+
 [per-file-ignores]
 "**/api.py" = ["F401", "I001", "TC006", "UP035"]
 "**/*.pyi" = ["A002", "F401", "I001", "PYI033", "TC006", "UP035"]
@@ -224,7 +292,7 @@ php_version = "8.2"
 stages = ["pre-commit"]
 
 [hooks.builtin]
-polylint = { exclude = [
+lint = { exclude = [
     "**/*.freezed.dart",
     "**/*.g.dart",
     "**/*.jinja",
@@ -260,7 +328,7 @@ polylint = { exclude = [
     "**/Cargo.toml",
     "**/*_bridge_generated/**",
 ] }
-polyfmt = { exclude = [
+fmt = { exclude = [
     "**/*.freezed.dart",
     "**/*.g.dart",
     "**/*.jinja",

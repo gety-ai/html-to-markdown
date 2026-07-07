@@ -1,521 +1,519 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>HTML to Markdown | Live Demo</title>
-		<meta
-			name="description"
-			content="High-performance HTML to Markdown converter powered by Rust and WebAssembly. Try it live in your browser."
-		/>
-		<meta property="og:title" content="HTML to Markdown | Live Demo" />
-		<meta
-			property="og:description"
-			content="Convert HTML to Markdown in your browser. Rust core compiled to WebAssembly."
-		/>
-		<meta property="og:url" content="https://docs.html-to-markdown.xberg.io/demo/" />
-		<meta property="og:type" content="website" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HTML to Markdown | Live Demo</title>
+    <meta
+      name="description"
+      content="High-performance HTML to Markdown converter powered by Rust and WebAssembly. Try it live in your browser."
+    />
+    <meta property="og:title" content="HTML to Markdown | Live Demo" />
+    <meta
+      property="og:description"
+      content="Convert HTML to Markdown in your browser. Rust core compiled to WebAssembly."
+    />
+    <meta property="og:url" content="https://docs.html-to-markdown.xberg.io/demo/" />
+    <meta property="og:type" content="website" />
 
-		<!-- Google Fonts -->
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Sora:wght@100..800&family=Exo+2:ital,wght@0,100..900;1,100..900&family=JetBrains+Mono:wght@400;500&display=swap"
-			rel="stylesheet"
-		/>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@100..800&family=Exo+2:ital,wght@0,100..900;1,100..900&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
 
-		<style>
-			*,
-			*::before,
-			*::after {
-				margin: 0;
-				padding: 0;
-				box-sizing: border-box;
-			}
+    <style>
+    *,
+    *::before,
+    *::after {
+    	margin: 0;
+    	padding: 0;
+    	box-sizing: border-box;
+    }
 
-			:root {
-				--bg: #323040;
-				--surface: #26203a;
-				--surface-alt: #302d3f;
-				--cyan: #58fbda;
-				--purple: #da2ae0;
-				--text: #e6f6f3;
-				--text-dim: #a8a3b5;
-				--red: #ff456d;
-				--success: #58fbda;
-			}
+    :root {
+    	--bg: #323040;
+    	--surface: #26203a;
+    	--surface-alt: #302d3f;
+    	--cyan: #58fbda;
+    	--purple: #da2ae0;
+    	--text: #e6f6f3;
+    	--text-dim: #a8a3b5;
+    	--red: #ff456d;
+    	--success: #58fbda;
+    }
 
-			body {
-				font-family: "Exo 2", sans-serif;
-				background-color: var(--bg);
-				color: var(--text);
-				min-height: 100vh;
-				display: flex;
-				flex-direction: column;
-				position: relative;
-				overflow-x: hidden;
-				font-optical-sizing: auto;
-			}
+    body {
+    	font-family: "Exo 2", sans-serif;
+    	background-color: var(--bg);
+    	color: var(--text);
+    	min-height: 100vh;
+    	display: flex;
+    	flex-direction: column;
+    	position: relative;
+    	overflow-x: hidden;
+    	font-optical-sizing: auto;
+    }
 
-			/* Animated background blobs */
-			.blob-container {
-				pointer-events: none;
-				position: fixed;
-				inset: 0;
-				z-index: -1;
-			}
-			.blob {
-				position: absolute;
-				border-radius: 50%;
-				opacity: 0.4;
-				mix-blend-mode: screen;
-				filter: blur(80px);
-				animation: blob 7s infinite;
-			}
-			.blob-cyan {
-				width: 500px;
-				height: 500px;
-				background: var(--cyan);
-				top: -100px;
-				right: -100px;
-				animation-delay: 2s;
-			}
-			.blob-purple {
-				width: 500px;
-				height: 500px;
-				background: var(--purple);
-				top: 80px;
-				right: -60px;
-			}
-			@keyframes blob {
-				0% {
-					transform: translate(0, 0) scale(1);
-				}
-				33% {
-					transform: translate(30px, -50px) scale(1.1);
-				}
-				66% {
-					transform: translate(-20px, 20px) scale(0.9);
-				}
-				100% {
-					transform: translate(0, 0) scale(1);
-				}
-			}
+    /* Animated background blobs */
+    .blob-container {
+    	pointer-events: none;
+    	position: fixed;
+    	inset: 0;
+    	z-index: -1;
+    }
+    .blob {
+    	position: absolute;
+    	border-radius: 50%;
+    	opacity: 0.4;
+    	mix-blend-mode: screen;
+    	filter: blur(80px);
+    	animation: blob 7s infinite;
+    }
+    .blob-cyan {
+    	width: 500px;
+    	height: 500px;
+    	background: var(--cyan);
+    	top: -100px;
+    	right: -100px;
+    	animation-delay: 2s;
+    }
+    .blob-purple {
+    	width: 500px;
+    	height: 500px;
+    	background: var(--purple);
+    	top: 80px;
+    	right: -60px;
+    }
+    @keyframes blob {
+    	0% {
+    		transform: translate(0, 0) scale(1);
+    	}
+    	33% {
+    		transform: translate(30px, -50px) scale(1.1);
+    	}
+    	66% {
+    		transform: translate(-20px, 20px) scale(0.9);
+    	}
+    	100% {
+    		transform: translate(0, 0) scale(1);
+    	}
+    }
 
-			/* Header */
-			header {
-				width: 100%;
-				padding: 16px 24px;
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-			}
-			.header-brand {
-				font-family: "Sora", sans-serif;
-				font-size: 1.1rem;
-				font-weight: 600;
-				color: var(--text);
-				text-decoration: none;
-			}
-			.header-links {
-				display: flex;
-				align-items: center;
-				gap: 12px;
-			}
-			.header-links a {
-				display: flex;
-				align-items: center;
-				gap: 8px;
-				padding: 8px 16px;
-				border: 1px solid var(--cyan);
-				border-radius: 8px;
-				background: var(--surface);
-				color: white;
-				text-decoration: none;
-				font-family: "Sora", sans-serif;
-				font-size: 0.875rem;
-				transition: background 0.2s;
-			}
-			.header-links a:hover {
-				background: var(--bg);
-			}
-			.header-links a svg {
-				width: 20px;
-				height: 20px;
-				fill: currentColor;
-			}
+    /* Header */
+    header {
+    	width: 100%;
+    	padding: 16px 24px;
+    	display: flex;
+    	align-items: center;
+    	justify-content: space-between;
+    }
+    .header-brand {
+    	font-family: "Sora", sans-serif;
+    	font-size: 1.1rem;
+    	font-weight: 600;
+    	color: var(--text);
+    	text-decoration: none;
+    }
+    .header-links {
+    	display: flex;
+    	align-items: center;
+    	gap: 12px;
+    }
+    .header-links a {
+    	display: flex;
+    	align-items: center;
+    	gap: 8px;
+    	padding: 8px 16px;
+    	border: 1px solid var(--cyan);
+    	border-radius: 8px;
+    	background: var(--surface);
+    	color: white;
+    	text-decoration: none;
+    	font-family: "Sora", sans-serif;
+    	font-size: 0.875rem;
+    	transition: background 0.2s;
+    }
+    .header-links a:hover {
+    	background: var(--bg);
+    }
+    .header-links a svg {
+    	width: 20px;
+    	height: 20px;
+    	fill: currentColor;
+    }
 
-			/* Main */
-			main {
-				flex: 1;
-				width: 100%;
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-				padding: 20px 16px 40px;
-			}
+    /* Main */
+    main {
+    	flex: 1;
+    	width: 100%;
+    	display: flex;
+    	flex-direction: column;
+    	align-items: center;
+    	padding: 20px 16px 40px;
+    }
 
-			.hero-title {
-				font-family: "Sora", sans-serif;
-				font-size: clamp(2rem, 6vw, 4rem);
-				font-weight: 700;
-				color: var(--text);
-				text-align: center;
-				line-height: 1.2;
-				margin-bottom: 12px;
-			}
-			.hero-subtitle {
-				font-size: clamp(0.95rem, 2vw, 1.25rem);
-				font-weight: 300;
-				color: var(--text);
-				text-align: center;
-				margin-bottom: 40px;
-				max-width: 680px;
-			}
+    .hero-title {
+    	font-family: "Sora", sans-serif;
+    	font-size: clamp(2rem, 6vw, 4rem);
+    	font-weight: 700;
+    	color: var(--text);
+    	text-align: center;
+    	line-height: 1.2;
+    	margin-bottom: 12px;
+    }
+    .hero-subtitle {
+    	font-size: clamp(0.95rem, 2vw, 1.25rem);
+    	font-weight: 300;
+    	color: var(--text);
+    	text-align: center;
+    	margin-bottom: 40px;
+    	max-width: 680px;
+    }
 
-			/* Converter card with conic gradient border */
-			.converter-card {
-				position: relative;
-				width: 100%;
-				max-width: 1100px;
-				background: var(--bg);
-				border-radius: 22px;
-				padding: 24px;
-				display: flex;
-				flex-direction: column;
-				gap: 20px;
-			}
-			.converter-card::before {
-				content: "";
-				pointer-events: none;
-				position: absolute;
-				inset: 0;
-				z-index: 1;
-				border-radius: 22px;
-				padding: 2px;
-				background-image: conic-gradient(from 90deg, #58fbda, #da2ae0, #58fbda);
-				-webkit-mask:
-					linear-gradient(#fff 0 0) content-box,
-					linear-gradient(#fff 0 0);
-				mask:
-					linear-gradient(#fff 0 0) content-box,
-					linear-gradient(#fff 0 0);
-				-webkit-mask-composite: xor;
-				mask-composite: exclude;
-			}
+    /* Converter card with conic gradient border */
+    .converter-card {
+    	position: relative;
+    	width: 100%;
+    	max-width: 1100px;
+    	background: var(--bg);
+    	border-radius: 22px;
+    	padding: 24px;
+    	display: flex;
+    	flex-direction: column;
+    	gap: 20px;
+    }
+    .converter-card::before {
+    	content: "";
+    	pointer-events: none;
+    	position: absolute;
+    	inset: 0;
+    	z-index: 1;
+    	border-radius: 22px;
+    	padding: 2px;
+    	background-image: conic-gradient(from 90deg, #58fbda, #da2ae0, #58fbda);
+    	-webkit-mask:
+    		linear-gradient(#fff 0 0) content-box,
+    		linear-gradient(#fff 0 0);
+    	mask:
+    		linear-gradient(#fff 0 0) content-box,
+    		linear-gradient(#fff 0 0);
+    	-webkit-mask-composite: xor;
+    	mask-composite: exclude;
+    }
 
-			/* Panels grid */
-			.panels {
-				display: grid;
-				grid-template-columns: 1fr;
-				gap: 20px;
-				position: relative;
-				z-index: 2;
-			}
-			@media (min-width: 768px) {
-				.panels {
-					grid-template-columns: 1fr 1fr;
-				}
-			}
+    /* Panels grid */
+    .panels {
+    	display: grid;
+    	grid-template-columns: 1fr;
+    	gap: 20px;
+    	position: relative;
+    	z-index: 2;
+    }
+    @media (min-width: 768px) {
+    	.panels {
+    		grid-template-columns: 1fr 1fr;
+    	}
+    }
 
-			.panel {
-				display: flex;
-				flex-direction: column;
-				gap: 8px;
-			}
-			.panel-label {
-				font-family: "Sora", sans-serif;
-				font-size: 0.875rem;
-				font-weight: 600;
-				color: var(--text-dim);
-				text-transform: uppercase;
-				letter-spacing: 0.05em;
-			}
+    .panel {
+    	display: flex;
+    	flex-direction: column;
+    	gap: 8px;
+    }
+    .panel-label {
+    	font-family: "Sora", sans-serif;
+    	font-size: 0.875rem;
+    	font-weight: 600;
+    	color: var(--text-dim);
+    	text-transform: uppercase;
+    	letter-spacing: 0.05em;
+    }
 
-			textarea {
-				width: 100%;
-				min-height: 380px;
-				flex: 1;
-				padding: 16px;
-				border: 1px solid rgba(88, 251, 218, 0.15);
-				border-radius: 12px;
-				background: var(--surface);
-				color: var(--text);
-				font-family: "JetBrains Mono", monospace;
-				font-size: 0.8125rem;
-				line-height: 1.7;
-				resize: vertical;
-				transition: border-color 0.2s;
-			}
-			textarea:focus {
-				outline: none;
-				border-color: var(--cyan);
-			}
-			textarea::placeholder {
-				color: var(--text-dim);
-			}
+    textarea {
+    	width: 100%;
+    	min-height: 380px;
+    	flex: 1;
+    	padding: 16px;
+    	border: 1px solid rgba(88, 251, 218, 0.15);
+    	border-radius: 12px;
+    	background: var(--surface);
+    	color: var(--text);
+    	font-family: "JetBrains Mono", monospace;
+    	font-size: 0.8125rem;
+    	line-height: 1.7;
+    	resize: vertical;
+    	transition: border-color 0.2s;
+    }
+    textarea:focus {
+    	outline: none;
+    	border-color: var(--cyan);
+    }
+    textarea::placeholder {
+    	color: var(--text-dim);
+    }
 
-			/* Output area */
-			.output-wrapper {
-				display: flex;
-				flex-direction: column;
-				gap: 8px;
-				flex: 1;
-			}
-			.output-header {
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-			}
+    /* Output area */
+    .output-wrapper {
+    	display: flex;
+    	flex-direction: column;
+    	gap: 8px;
+    	flex: 1;
+    }
+    .output-header {
+    	display: flex;
+    	align-items: center;
+    	justify-content: space-between;
+    }
 
-			/* Tab switcher */
-			.tab-switcher {
-				position: relative;
-				display: inline-flex;
-				width: 200px;
-				height: 34px;
-				align-items: center;
-				border-radius: 16px;
-				border: 1px solid var(--cyan);
-				background: var(--surface);
-				padding: 3px;
-			}
-			.tab-indicator {
-				position: absolute;
-				left: 3px;
-				top: 3px;
-				bottom: 3px;
-				width: calc(50% - 3px);
-				border-radius: 12px;
-				background: var(--cyan);
-				transition: transform 0.3s ease-in-out;
-			}
-			.tab-indicator.json {
-				transform: translateX(100%);
-			}
-			.tab-btn {
-				position: relative;
-				z-index: 1;
-				flex: 1;
-				height: 100%;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				border: none;
-				background: none;
-				font-family: "Sora", sans-serif;
-				font-size: 0.8125rem;
-				font-weight: 500;
-				cursor: pointer;
-				transition: color 0.2s;
-			}
-			.tab-btn.active {
-				color: #323040;
-			}
-			.tab-btn:not(.active) {
-				color: var(--cyan);
-			}
+    /* Tab switcher */
+    .tab-switcher {
+    	position: relative;
+    	display: inline-flex;
+    	width: 200px;
+    	height: 34px;
+    	align-items: center;
+    	border-radius: 16px;
+    	border: 1px solid var(--cyan);
+    	background: var(--surface);
+    	padding: 3px;
+    }
+    .tab-indicator {
+    	position: absolute;
+    	left: 3px;
+    	top: 3px;
+    	bottom: 3px;
+    	width: calc(50% - 3px);
+    	border-radius: 12px;
+    	background: var(--cyan);
+    	transition: transform 0.3s ease-in-out;
+    }
+    .tab-indicator.json {
+    	transform: translateX(100%);
+    }
+    .tab-btn {
+    	position: relative;
+    	z-index: 1;
+    	flex: 1;
+    	height: 100%;
+    	display: flex;
+    	align-items: center;
+    	justify-content: center;
+    	border: none;
+    	background: none;
+    	font-family: "Sora", sans-serif;
+    	font-size: 0.8125rem;
+    	font-weight: 500;
+    	cursor: pointer;
+    	transition: color 0.2s;
+    }
+    .tab-btn.active {
+    	color: #323040;
+    }
+    .tab-btn:not(.active) {
+    	color: var(--cyan);
+    }
 
-			/* Copy button */
-			.btn-copy {
-				padding: 4px 12px;
-				border: 1px solid rgba(88, 251, 218, 0.3);
-				border-radius: 6px;
-				background: transparent;
-				color: var(--text-dim);
-				font-family: "Sora", sans-serif;
-				font-size: 0.75rem;
-				cursor: pointer;
-				transition: all 0.2s;
-			}
-			.btn-copy:hover {
-				border-color: var(--cyan);
-				color: var(--cyan);
-			}
-			.btn-copy.copied {
-				background: var(--cyan);
-				color: var(--bg);
-				border-color: var(--cyan);
-			}
+    /* Copy button */
+    .btn-copy {
+    	padding: 4px 12px;
+    	border: 1px solid rgba(88, 251, 218, 0.3);
+    	border-radius: 6px;
+    	background: transparent;
+    	color: var(--text-dim);
+    	font-family: "Sora", sans-serif;
+    	font-size: 0.75rem;
+    	cursor: pointer;
+    	transition: all 0.2s;
+    }
+    .btn-copy:hover {
+    	border-color: var(--cyan);
+    	color: var(--cyan);
+    }
+    .btn-copy.copied {
+    	background: var(--cyan);
+    	color: var(--bg);
+    	border-color: var(--cyan);
+    }
 
-			.output-content {
-				width: 100%;
-				min-height: 380px;
-				flex: 1;
-				padding: 16px;
-				border-radius: 12px;
-				background: var(--surface);
-				font-family: "JetBrains Mono", monospace;
-				font-size: 0.8125rem;
-				line-height: 1.7;
-				overflow: auto;
-				white-space: pre-wrap;
-				word-wrap: break-word;
-				border: 1px solid rgba(88, 251, 218, 0.15);
-			}
-			.output-content.json {
-				color: var(--cyan);
-			}
-			.output-content.hidden {
-				display: none;
-			}
+    .output-content {
+    	width: 100%;
+    	min-height: 380px;
+    	flex: 1;
+    	padding: 16px;
+    	border-radius: 12px;
+    	background: var(--surface);
+    	font-family: "JetBrains Mono", monospace;
+    	font-size: 0.8125rem;
+    	line-height: 1.7;
+    	overflow: auto;
+    	white-space: pre-wrap;
+    	word-wrap: break-word;
+    	border: 1px solid rgba(88, 251, 218, 0.15);
+    }
+    .output-content.json {
+    	color: var(--cyan);
+    }
+    .output-content.hidden {
+    	display: none;
+    }
 
-			/* JSON syntax highlighting */
-			.json-key {
-				color: var(--cyan);
-			}
-			.json-string {
-				color: var(--text);
-			}
-			.json-number {
-				color: var(--purple);
-			}
-			.json-bool {
-				color: var(--red);
-			}
-			.json-null {
-				color: var(--text-dim);
-			}
+    /* JSON syntax highlighting */
+    .json-key {
+    	color: var(--cyan);
+    }
+    .json-string {
+    	color: var(--text);
+    }
+    .json-number {
+    	color: var(--purple);
+    }
+    .json-bool {
+    	color: var(--red);
+    }
+    .json-null {
+    	color: var(--text-dim);
+    }
 
-			/* Status bar */
-			.status-bar {
-				position: relative;
-				z-index: 2;
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				gap: 12px;
-				padding: 0 4px;
-			}
-			.status-text {
-				font-size: 0.8125rem;
-				color: var(--text-dim);
-			}
-			.status-text.success {
-				color: var(--success);
-			}
-			.status-text.error {
-				color: var(--red);
-			}
-			.btn-clear {
-				padding: 6px 14px;
-				border: 1px solid rgba(88, 251, 218, 0.2);
-				border-radius: 8px;
-				background: transparent;
-				color: var(--text-dim);
-				font-family: "Sora", sans-serif;
-				font-size: 0.8125rem;
-				cursor: pointer;
-				transition: all 0.2s;
-			}
-			.btn-clear:hover {
-				border-color: var(--cyan);
-				color: var(--text);
-			}
+    /* Status bar */
+    .status-bar {
+    	position: relative;
+    	z-index: 2;
+    	display: flex;
+    	align-items: center;
+    	justify-content: space-between;
+    	gap: 12px;
+    	padding: 0 4px;
+    }
+    .status-text {
+    	font-size: 0.8125rem;
+    	color: var(--text-dim);
+    }
+    .status-text.success {
+    	color: var(--success);
+    }
+    .status-text.error {
+    	color: var(--red);
+    }
+    .btn-clear {
+    	padding: 6px 14px;
+    	border: 1px solid rgba(88, 251, 218, 0.2);
+    	border-radius: 8px;
+    	background: transparent;
+    	color: var(--text-dim);
+    	font-family: "Sora", sans-serif;
+    	font-size: 0.8125rem;
+    	cursor: pointer;
+    	transition: all 0.2s;
+    }
+    .btn-clear:hover {
+    	border-color: var(--cyan);
+    	color: var(--text);
+    }
 
-			/* Badges row */
-			.badges {
-				display: flex;
-				gap: 8px;
-				flex-wrap: wrap;
-				justify-content: center;
-				margin-top: 32px;
-				max-width: 1100px;
-			}
-			.badges a {
-				display: inline-flex;
-				align-items: center;
-				padding: 4px 8px;
-				border-radius: 6px;
-				background: rgba(88, 251, 218, 0.06);
-				transition: background 0.2s;
-			}
-			.badges a:hover {
-				background: rgba(88, 251, 218, 0.12);
-			}
-			.badges img {
-				height: 22px;
-				display: block;
-			}
+    /* Badges row */
+    .badges {
+    	display: flex;
+    	gap: 8px;
+    	flex-wrap: wrap;
+    	justify-content: center;
+    	margin-top: 32px;
+    	max-width: 1100px;
+    }
+    .badges a {
+    	display: inline-flex;
+    	align-items: center;
+    	padding: 4px 8px;
+    	border-radius: 6px;
+    	background: rgba(88, 251, 218, 0.06);
+    	transition: background 0.2s;
+    }
+    .badges a:hover {
+    	background: rgba(88, 251, 218, 0.12);
+    }
+    .badges img {
+    	height: 22px;
+    	display: block;
+    }
 
-			/* Footer */
-			footer {
-				padding: 10px 24px;
-				display: flex;
-				align-items: center;
-			}
-			footer a {
-				font-size: 0.875rem;
-				color: var(--cyan);
-				text-decoration: none;
-				font-weight: 400;
-				transition: opacity 0.2s;
-			}
-			footer a:hover {
-				text-decoration: underline;
-			}
+    /* Footer */
+    footer {
+    	padding: 10px 24px;
+    	display: flex;
+    	align-items: center;
+    }
+    footer a {
+    	font-size: 0.875rem;
+    	color: var(--cyan);
+    	text-decoration: none;
+    	font-weight: 400;
+    	transition: opacity 0.2s;
+    }
+    footer a:hover {
+    	text-decoration: underline;
+    }
 
-			/* Scrollbar */
-			textarea::-webkit-scrollbar,
-			.output-content::-webkit-scrollbar {
-				width: 6px;
-				height: 6px;
-			}
-			textarea::-webkit-scrollbar-track,
-			.output-content::-webkit-scrollbar-track {
-				background: transparent;
-			}
-			textarea::-webkit-scrollbar-thumb,
-			.output-content::-webkit-scrollbar-thumb {
-				background: rgba(88, 251, 218, 0.2);
-				border-radius: 3px;
-			}
-			textarea::-webkit-scrollbar-thumb:hover,
-			.output-content::-webkit-scrollbar-thumb:hover {
-				background: rgba(88, 251, 218, 0.4);
-			}
-		</style>
-	</head>
-	<body>
-		<!-- Animated Background Blobs -->
-		<div class="blob-container">
-			<div class="blob blob-cyan"></div>
-			<div class="blob blob-purple"></div>
-		</div>
+    /* Scrollbar */
+    textarea::-webkit-scrollbar,
+    .output-content::-webkit-scrollbar {
+    	width: 6px;
+    	height: 6px;
+    }
+    textarea::-webkit-scrollbar-track,
+    .output-content::-webkit-scrollbar-track {
+    	background: transparent;
+    }
+    textarea::-webkit-scrollbar-thumb,
+    .output-content::-webkit-scrollbar-thumb {
+    	background: rgba(88, 251, 218, 0.2);
+    	border-radius: 3px;
+    }
+    textarea::-webkit-scrollbar-thumb:hover,
+    .output-content::-webkit-scrollbar-thumb:hover {
+    	background: rgba(88, 251, 218, 0.4);
+    }
+    </style>
+  </head>
+  <body>
+    <!-- Animated Background Blobs -->
+    <div class="blob-container">
+      <div class="blob blob-cyan"></div>
+      <div class="blob blob-purple"></div>
+    </div>
 
-		<!-- Header -->
-		<header>
-			<a href="https://docs.html-to-markdown.xberg.io" class="header-brand">html-to-markdown</a>
-			<div class="header-links">
-				<a
-					href="https://github.com/xberg-io/html-to-markdown"
-					target="_blank"
-					rel="noopener"
-					aria-label="View on GitHub"
-				>
-					<svg viewBox="0 0 16 16">
-						<path
-							d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
-						/>
-					</svg>
-					<span>GitHub</span>
-				</a>
-			</div>
-		</header>
+    <!-- Header -->
+    <header>
+      <a href="https://docs.html-to-markdown.xberg.io" class="header-brand">html-to-markdown</a>
+      <div class="header-links">
+        <a
+          href="https://github.com/xberg-io/html-to-markdown"
+          target="_blank"
+          rel="noopener"
+          aria-label="View on GitHub"
+        >
+          <svg viewBox="0 0 16 16">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+          </svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </header>
 
-		<!-- Main -->
-		<main>
-			<h1 class="hero-title">Live Demo</h1>
-			<p class="hero-subtitle">
-				Paste HTML, get Markdown. Everything runs in your browser via WebAssembly -- no server, no upload.
-			</p>
+    <!-- Main -->
+    <main>
+      <h1 class="hero-title">Live Demo</h1>
+      <p class="hero-subtitle">
+        Paste HTML, get Markdown. Everything runs in your browser via WebAssembly -- no server, no upload.
+      </p>
 
-			<div class="converter-card">
-				<div class="panels">
-					<!-- Input panel -->
-					<div class="panel">
-						<label class="panel-label" for="htmlInput">HTML Input</label>
-						<textarea id="htmlInput" placeholder="Paste your HTML here..." spellcheck="false">
+      <div class="converter-card">
+        <div class="panels">
+          <!-- Input panel -->
+          <div class="panel">
+            <label class="panel-label" for="htmlInput">HTML Input</label>
+            <textarea id="htmlInput" placeholder="Paste your HTML here..." spellcheck="false">
 <h1>Welcome to HTML to Markdown</h1>
 <p>This is a <strong>powerful</strong> and <em>fast</em> converter built with <a href="https://www.rust-lang.org/">Rust</a> and compiled to WebAssembly.</p>
 
@@ -553,102 +551,101 @@
             <td>Yes</td>
         </tr>
     </tbody>
-</table></textarea
-						>
-					</div>
+</table></textarea>
+          </div>
 
-					<!-- Output panel -->
-					<div class="panel">
-						<div class="output-header">
-							<div class="tab-switcher">
-								<div id="tabIndicator" class="tab-indicator"></div>
-								<button id="tabMarkdown" class="tab-btn active" type="button">Markdown</button>
-								<button id="tabJson" class="tab-btn" type="button">JSON</button>
-							</div>
-							<button id="copyBtn" class="btn-copy" type="button">Copy</button>
-						</div>
-						<div class="output-wrapper">
-							<pre id="outputMarkdown" class="output-content"></pre>
-							<pre id="outputJson" class="output-content json hidden"></pre>
-						</div>
-					</div>
-				</div>
+          <!-- Output panel -->
+          <div class="panel">
+            <div class="output-header">
+              <div class="tab-switcher">
+                <div id="tabIndicator" class="tab-indicator"></div>
+                <button id="tabMarkdown" class="tab-btn active" type="button">Markdown</button>
+                <button id="tabJson" class="tab-btn" type="button">JSON</button>
+              </div>
+              <button id="copyBtn" class="btn-copy" type="button">Copy</button>
+            </div>
+            <div class="output-wrapper">
+              <pre id="outputMarkdown" class="output-content"></pre>
+              <pre id="outputJson" class="output-content json hidden"></pre>
+            </div>
+          </div>
+        </div>
 
-				<!-- Status bar -->
-				<div class="status-bar">
-					<span id="status" class="status-text">Loading WASM module...</span>
-					<button id="clearBtn" class="btn-clear" type="button">Clear</button>
-				</div>
-			</div>
+        <!-- Status bar -->
+        <div class="status-bar">
+          <span id="status" class="status-text">Loading WASM module...</span>
+          <button id="clearBtn" class="btn-clear" type="button">Clear</button>
+        </div>
+      </div>
 
-			<!-- Badges -->
-			<div class="badges">
-				<a href="https://crates.io/crates/html-to-markdown-rs" target="_blank" rel="noopener">
-					<img
-						src="https://img.shields.io/crates/v/html-to-markdown-rs?logo=rust&label=Crates.io"
-						alt="Crates.io"
-					/>
-				</a>
-				<a href="https://www.npmjs.com/package/@xberg-io/html-to-markdown" target="_blank" rel="noopener">
-					<img
-						src="https://img.shields.io/npm/v/@xberg-io/html-to-markdown?logo=npm&label=npm%20(Node)"
-						alt="npm (Node)"
-					/>
-				</a>
-				<a href="https://www.npmjs.com/package/@xberg-io/html-to-markdown-wasm" target="_blank" rel="noopener">
-					<img
-						src="https://img.shields.io/npm/v/@xberg-io/html-to-markdown-wasm?logo=npm&label=npm%20(WASM)"
-						alt="npm (WASM)"
-					/>
-				</a>
-				<a href="https://pypi.org/project/html-to-markdown/" target="_blank" rel="noopener">
-					<img src="https://img.shields.io/pypi/v/html-to-markdown?logo=pypi&label=PyPI" alt="PyPI" />
-				</a>
-				<a href="https://packagist.org/packages/xberg-io/html-to-markdown" target="_blank" rel="noopener">
-					<img
-						src="https://img.shields.io/packagist/v/xberg-io/html-to-markdown?logo=packagist&label=Packagist"
-						alt="Packagist"
-					/>
-				</a>
-				<a href="https://rubygems.org/gems/html-to-markdown" target="_blank" rel="noopener">
-					<img
-						src="https://img.shields.io/gem/v/html-to-markdown?logo=rubygems&label=RubyGems"
-						alt="RubyGems"
-					/>
-				</a>
-				<a href="https://hex.pm/packages/html_to_markdown" target="_blank" rel="noopener">
-					<img src="https://img.shields.io/hexpm/v/html_to_markdown?logo=elixir&label=Hex.pm" alt="Hex.pm" />
-				</a>
-				<a href="https://www.nuget.org/packages/XbergIo.HtmlToMarkdown/" target="_blank" rel="noopener">
-					<img
-						src="https://img.shields.io/nuget/v/XbergIo.HtmlToMarkdown?logo=nuget&label=NuGet"
-						alt="NuGet"
-					/>
-				</a>
-				<a
-					href="https://central.sonatype.com/artifact/io.xberg/html-to-markdown"
-					target="_blank"
-					rel="noopener"
-				>
-					<img
-						src="https://img.shields.io/maven-central/v/io.xberg/html-to-markdown?logo=apache-maven&label=Maven%20Central"
-						alt="Maven Central"
-					/>
-				</a>
-				<a
-					href="https://pkg.go.dev/github.com/xberg-io/html-to-markdown/packages/go/v3/htmltomarkdown"
-					target="_blank"
-					rel="noopener"
-				>
-					<img src="https://img.shields.io/badge/Go-pkg.dev-blue?logo=go&label=Go%20pkg" alt="Go pkg" />
-				</a>
-			</div>
-		</main>
+      <!-- Badges -->
+      <div class="badges">
+        <a href="https://crates.io/crates/html-to-markdown-rs" target="_blank" rel="noopener">
+          <img
+            src="https://img.shields.io/crates/v/html-to-markdown-rs?logo=rust&label=Crates.io"
+            alt="Crates.io"
+          />
+        </a>
+        <a href="https://www.npmjs.com/package/@xberg-io/html-to-markdown" target="_blank" rel="noopener">
+          <img
+            src="https://img.shields.io/npm/v/@xberg-io/html-to-markdown?logo=npm&label=npm%20(Node)"
+            alt="npm (Node)"
+          />
+        </a>
+        <a href="https://www.npmjs.com/package/@xberg-io/html-to-markdown-wasm" target="_blank" rel="noopener">
+          <img
+            src="https://img.shields.io/npm/v/@xberg-io/html-to-markdown-wasm?logo=npm&label=npm%20(WASM)"
+            alt="npm (WASM)"
+          />
+        </a>
+        <a href="https://pypi.org/project/html-to-markdown/" target="_blank" rel="noopener">
+          <img src="https://img.shields.io/pypi/v/html-to-markdown?logo=pypi&label=PyPI" alt="PyPI" />
+        </a>
+        <a href="https://packagist.org/packages/xberg-io/html-to-markdown" target="_blank" rel="noopener">
+          <img
+            src="https://img.shields.io/packagist/v/xberg-io/html-to-markdown?logo=packagist&label=Packagist"
+            alt="Packagist"
+          />
+        </a>
+        <a href="https://rubygems.org/gems/html-to-markdown" target="_blank" rel="noopener">
+          <img
+            src="https://img.shields.io/gem/v/html-to-markdown?logo=rubygems&label=RubyGems"
+            alt="RubyGems"
+          />
+        </a>
+        <a href="https://hex.pm/packages/html_to_markdown" target="_blank" rel="noopener">
+          <img src="https://img.shields.io/hexpm/v/html_to_markdown?logo=elixir&label=Hex.pm" alt="Hex.pm" />
+        </a>
+        <a href="https://www.nuget.org/packages/XbergIo.HtmlToMarkdown/" target="_blank" rel="noopener">
+          <img
+            src="https://img.shields.io/nuget/v/XbergIo.HtmlToMarkdown?logo=nuget&label=NuGet"
+            alt="NuGet"
+          />
+        </a>
+        <a
+          href="https://central.sonatype.com/artifact/io.xberg/html-to-markdown"
+          target="_blank"
+          rel="noopener"
+        >
+          <img
+            src="https://img.shields.io/maven-central/v/io.xberg/html-to-markdown?logo=apache-maven&label=Maven%20Central"
+            alt="Maven Central"
+          />
+        </a>
+        <a
+          href="https://pkg.go.dev/github.com/xberg-io/html-to-markdown/packages/go/v3/htmltomarkdown"
+          target="_blank"
+          rel="noopener"
+        >
+          <img src="https://img.shields.io/badge/Go-pkg.dev-blue?logo=go&label=Go%20pkg" alt="Go pkg" />
+        </a>
+      </div>
+    </main>
 
-		<footer>
-			<a href="https://xberg.io">xberg.io</a>
-		</footer>
+    <footer>
+      <a href="https://xberg.io">xberg.io</a>
+    </footer>
 
-		<script type="module" src="script.js"></script>
-	</body>
+    <script type="module" src="script.js"></script>
+  </body>
 </html>
