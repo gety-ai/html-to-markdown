@@ -19,8 +19,6 @@
 
 use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 /// Convert with `Tier1` + `extract_metadata: true`.
 /// `hocr_spatial_tables` must be disabled so the router can reach Tier-1.
 fn t1(html: &str) -> String {
@@ -48,8 +46,6 @@ fn t2(html: &str) -> String {
         .unwrap_or_default()
 }
 
-// ── 1. Title extraction ───────────────────────────────────────────────────────
-
 #[test]
 fn tier1_extracts_title() {
     let html = "<html><head><title>Hello</title></head><body><p>body</p></body></html>";
@@ -72,8 +68,6 @@ fn tier1_extracts_title_with_leading_trailing_whitespace() {
     );
 }
 
-// ── 2. `<meta name="...">` extraction ─────────────────────────────────────────
-
 #[test]
 fn tier1_extracts_meta_description() {
     let html = r#"<html><head><meta name="description" content="a desc"></head><body><p>x</p></body></html>"#;
@@ -92,8 +86,6 @@ fn tier1_extracts_meta_author() {
     let html = r#"<html><head><meta name="author" content="Jane Doe"></head><body><p>x</p></body></html>"#;
     assert_eq!(t1(html), t2(html), "meta author must be byte-identical");
 }
-
-// ── 3. Open Graph tag extraction ─────────────────────────────────────────────
 
 #[test]
 fn tier1_extracts_og_image() {
@@ -115,8 +107,6 @@ fn tier1_extracts_og_description() {
     assert_eq!(t1(html), t2(html), "og:description must be byte-identical");
 }
 
-// ── 4. Canonical URL and link relations ───────────────────────────────────────
-
 #[test]
 fn tier1_extracts_canonical_url() {
     let html =
@@ -131,15 +121,11 @@ fn tier1_extracts_link_author() {
     assert_eq!(t1(html), t2(html), "link-author must be byte-identical");
 }
 
-// ── 5. Base href extraction ───────────────────────────────────────────────────
-
 #[test]
 fn tier1_extracts_base_href() {
     let html = r#"<html><head><base href="https://example.com/"></head><body><p>x</p></body></html>"#;
     assert_eq!(t1(html), t2(html), "base-href must be byte-identical");
 }
-
-// ── 6. Multiple meta tags ─────────────────────────────────────────────────────
 
 #[test]
 fn tier1_extracts_multiple_meta_tags() {
@@ -151,8 +137,6 @@ fn tier1_extracts_multiple_meta_tags() {
     </head><body><p>content</p></body></html>"#;
     assert_eq!(t1(html), t2(html), "multiple meta tags must be byte-identical");
 }
-
-// ── 7. No `<head>` element ────────────────────────────────────────────────────
 
 #[test]
 fn tier1_no_head_element_produces_no_frontmatter() {
@@ -169,8 +153,6 @@ fn tier1_empty_head_produces_no_frontmatter() {
         "empty head must produce no frontmatter (byte-identical)"
     );
 }
-
-// ── 8. extract_metadata disabled ─────────────────────────────────────────────
 
 #[test]
 fn tier1_no_frontmatter_when_extract_metadata_false() {
@@ -194,22 +176,19 @@ fn tier1_no_frontmatter_when_extract_metadata_false() {
     );
 }
 
-// ── 9. YAML quoting for values with special chars ─────────────────────────────
-
 #[test]
 fn tier1_yaml_quotes_colon_in_value() {
-    // Values containing `:` must be quoted (YAML rule).
     let html = r#"<html><head><meta name="description" content="Key: Value"></head><body><p>x</p></body></html>"#;
     assert_eq!(t1(html), t2(html), "YAML-quoted colon value must be byte-identical");
 }
 
-// ── 10. Auto-routing respects extract_metadata now (no longer forces Tier-2) ──
+// ~keep ── 10. Auto-routing respects extract_metadata now (no longer forces Tier-2) ──
 
 #[test]
 fn auto_routing_with_extract_metadata_can_use_tier1() {
-    // With hocr_spatial_tables=false and no other Tier-2 signals, Auto should
-    // allow the classifier to pick Tier-1 when extract_metadata=true (M5 removes
-    // that guard).  The output must still match Tier-2.
+    // ~keep With hocr_spatial_tables=false and no other Tier-2 signals, Auto should
+    // ~keep allow the classifier to pick Tier-1 when extract_metadata=true (M5 removes
+    // ~keep that guard).  The output must still match Tier-2.
     let html = "<html><head><title>AutoTest</title></head><body><p>content</p></body></html>";
     let opts_auto = ConversionOptions {
         tier_strategy: TierStrategy::Auto,

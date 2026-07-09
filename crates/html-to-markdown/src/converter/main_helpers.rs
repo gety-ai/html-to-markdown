@@ -81,13 +81,10 @@ pub fn trim_line_end_whitespace(output: &mut String) {
     }
 }
 
-// has_inline_block_misnest and should_drop_for_preprocessing moved back to main.rs
-// due to DomContext circular dependency
-
 /// Check if HTML contains custom element tags.
 pub fn has_custom_element_tags(html: &str) -> bool {
-    // Custom elements must have a hyphen in their TAG NAME, not in attributes
-    // Look for patterns like <foo-bar> or </foo-bar>
+    // ~keep Custom elements must have a hyphen in their TAG NAME, not in attributes
+    // ~keep Look for patterns like <foo-bar> or </foo-bar>
     let bytes = html.as_bytes();
     let len = bytes.len();
     let mut i = 0;
@@ -99,7 +96,6 @@ pub fn has_custom_element_tags(html: &str) -> bool {
                 break;
             }
 
-            // Skip closing tag marker
             if bytes[i] == b'/' {
                 i += 1;
                 if i >= len {
@@ -107,17 +103,14 @@ pub fn has_custom_element_tags(html: &str) -> bool {
                 }
             }
 
-            // Skip whitespace
             while i < len && bytes[i].is_ascii_whitespace() {
                 i += 1;
             }
 
-            // Now we're at the start of a tag name - check if it contains a hyphen
             let tag_start = i;
             while i < len {
                 let ch = bytes[i];
                 if ch == b'>' || ch == b'/' || ch.is_ascii_whitespace() {
-                    // End of tag name
                     let tag_name = &bytes[tag_start..i];
                     if tag_name.contains(&b'-') {
                         return true;
@@ -167,8 +160,6 @@ pub fn expand_xml_self_closing_tags(input: &str) -> String {
     let bytes = input.as_bytes();
     let len = bytes.len();
     let mut output = String::with_capacity(len);
-    // `copy_start` tracks the beginning of a contiguous span of unmodified input
-    // that should be copied verbatim to `output`.
     let mut copy_start = 0usize;
     let mut i = 0;
 
@@ -178,28 +169,23 @@ pub fn expand_xml_self_closing_tags(input: &str) -> String {
             continue;
         }
 
-        // We are at `<`. Flush the unmodified span up to (but not including) this `<`.
         let tag_open = i;
         i += 1;
 
-        // Skip closing tags entirely — they must not be modified.
         if i < len && bytes[i] == b'/' {
-            // Scan to the matching `>`.
             while i < len && bytes[i] != b'>' {
                 i += 1;
             }
             if i < len {
-                i += 1; // consume `>`
+                i += 1;
             }
             continue;
         }
 
-        // Skip leading whitespace after `<` (unusual but tolerated).
         while i < len && bytes[i].is_ascii_whitespace() {
             i += 1;
         }
 
-        // Collect the tag name (byte-aligned; tag names are always ASCII).
         let name_start = i;
         while i < len {
             let ch = bytes[i];
@@ -210,18 +196,15 @@ pub fn expand_xml_self_closing_tags(input: &str) -> String {
         }
         let tag_name_bytes = &bytes[name_start..i];
 
-        // Empty tag name — emit verbatim and continue.
         if tag_name_bytes.is_empty() {
             continue;
         }
 
-        // Check whether this is a known HTML5 void element (case-insensitive).
         let tag_name_lower = tag_name_bytes.iter().map(u8::to_ascii_lowercase).collect::<Vec<_>>();
         let is_void = HTML5_VOID_ELEMENTS
             .iter()
             .any(|v| v.as_bytes() == tag_name_lower.as_slice());
 
-        // Scan the rest of the tag to find `/>` or `>`, skipping quoted attrs.
         let attrs_start = i;
         let mut in_single_quote = false;
         let mut in_double_quote = false;
@@ -254,15 +237,11 @@ pub fn expand_xml_self_closing_tags(input: &str) -> String {
         }
 
         if self_closing && !is_void {
-            // Flush unchanged input up to (not including) this tag.
             output.push_str(&input[copy_start..tag_open]);
 
             let tag_name_str = std::str::from_utf8(tag_name_bytes).unwrap_or("");
-            // attrs_part covers everything between the end of the tag name and `/>`,
-            // i.e. `&input[attrs_start..i]` (the `/` at `i` is the start of `/>`)
             let attrs_part = &input[attrs_start..i];
 
-            // Non-void: expand `<tag attrs/>` → `<tag attrs></tag>`.
             output.push('<');
             output.push_str(tag_name_str);
             output.push_str(attrs_part);
@@ -272,19 +251,17 @@ pub fn expand_xml_self_closing_tags(input: &str) -> String {
             output.push_str(tag_name_str);
             output.push('>');
 
-            i += 2; // consume `/>`
+            i += 2;
             copy_start = i;
         } else {
-            // Not a self-closing non-void tag: advance past `/>` or `>`.
             if i < len && bytes[i] == b'/' {
-                i += 2; // skip `/>`
+                i += 2;
             } else if i < len && bytes[i] == b'>' {
                 i += 1;
             }
         }
     }
 
-    // Flush the remaining unchanged tail.
     output.push_str(&input[copy_start..]);
     output
 }
@@ -304,8 +281,6 @@ pub fn repair_with_html5ever(input: &str) -> Option<String> {
     use html5ever::serialize::{SerializeOpts, serialize};
     use html5ever::tendril::TendrilSink;
 
-    // Expand XML-style self-closing on non-void elements before the HTML5 parse so
-    // that `<ac:parameter ... />` is not silently left open by the HTML5 parser.
     let expanded = expand_xml_self_closing_tags(input);
 
     let dom = html5ever::parse_document(RcDom::default(), Default::default())
@@ -330,18 +305,12 @@ pub fn format_metadata_frontmatter(metadata: &BTreeMap<String, String>) -> Strin
     result
 }
 
-// should_drop_for_preprocessing moved back to main.rs due to DomContext dependency
-
 /// Extract metadata from the head element.
 pub fn extract_head_metadata(
     node_handle: &tl::NodeHandle,
     parser: &tl::Parser,
     options: &ConversionOptions,
 ) -> BTreeMap<String, String> {
-    // The work stack keeps the `<head>` search on the heap for malformed
-    // documents whose unclosed elements form thousand-level DOM chains. Children
-    // are pushed in reverse so matching still returns the first non-empty
-    // `<head>` in document order.
     let mut work = vec![*node_handle];
     while let Some(handle) = work.pop() {
         let Some(tl::Node::Tag(tag)) = handle.get(parser) else {
@@ -349,7 +318,6 @@ pub fn extract_head_metadata(
         };
 
         if !tag.name().as_utf8_str().eq_ignore_ascii_case("head") {
-            // Queue children in reverse so they pop in document order.
             let children: Vec<_> = tag.children().top().iter().copied().collect();
             for child_handle in children.into_iter().rev() {
                 work.push(child_handle);
@@ -362,7 +330,6 @@ pub fn extract_head_metadata(
             let children = tag.children();
             for child_handle in children.top().iter() {
                 if let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) {
-                    // Look for meta tags
                     if child_tag.name().as_utf8_str().eq_ignore_ascii_case("meta")
                         && !options.strip_tags.iter().any(|t| t == "meta")
                         && !options.preserve_tags.iter().any(|t| t == "meta")
@@ -375,7 +342,6 @@ pub fn extract_head_metadata(
                             let content_str = content.as_utf8_str();
                             metadata.insert(format!("meta-{name_str}"), content_str.to_string());
                         }
-                        // Also check for property attribute (Open Graph, etc.)
                         if let (Some(property), Some(content)) = (
                             child_tag.attributes().get("property").flatten(),
                             child_tag.attributes().get("content").flatten(),
@@ -385,12 +351,10 @@ pub fn extract_head_metadata(
                             metadata.insert(format!("meta-{property_str}"), content_str.to_string());
                         }
                     }
-                    // Look for title tag
                     if child_tag.name().as_utf8_str().eq_ignore_ascii_case("title")
                         && !options.strip_tags.iter().any(|t| t == "title")
                         && !options.preserve_tags.iter().any(|t| t == "title")
                     {
-                        // Extract text content from title tag
                         let mut title_content = String::new();
                         let title_children = child_tag.children();
                         for title_child in title_children.top().iter() {
@@ -403,11 +367,9 @@ pub fn extract_head_metadata(
                             metadata.insert("title".to_string(), title_content);
                         }
                     }
-                    // Look for link tags with rel attribute (e.g., canonical)
                     if child_tag.name().as_utf8_str().eq_ignore_ascii_case("link") {
                         if let Some(rel_attr) = child_tag.attributes().get("rel").flatten() {
                             let rel_str = rel_attr.as_utf8_str();
-                            // Check for canonical link
                             if rel_str.contains("canonical") {
                                 if let Some(href_attr) = child_tag.attributes().get("href").flatten() {
                                     let href_str = href_attr.as_utf8_str();
@@ -416,11 +378,9 @@ pub fn extract_head_metadata(
                             }
                         }
                     }
-                    // Look for base tag with href attribute
                     if child_tag.name().as_utf8_str().eq_ignore_ascii_case("base") {
                         if let Some(href_attr) = child_tag.attributes().get("href").flatten() {
                             let href_str = href_attr.as_utf8_str();
-                            // Store as "base" which will be mapped to base_href in extract_document_metadata
                             metadata.insert("base".to_string(), href_str.to_string());
                         }
                     }
@@ -431,7 +391,6 @@ pub fn extract_head_metadata(
         if !metadata.is_empty() {
             return metadata;
         }
-        // Empty head carries no metadata: keep searching for a later one.
     }
 
     BTreeMap::new()

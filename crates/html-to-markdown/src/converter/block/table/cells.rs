@@ -107,7 +107,6 @@ pub fn collect_row_cell_widths(
     let mut cell_iter = cells.iter();
 
     loop {
-        // Skip columns that are filled by a rowspan from a previous row.
         while col < rowspan_tracker.len() {
             if let Some(Some(remaining)) = rowspan_tracker.get_mut(col) {
                 if *remaining > 0 {
@@ -127,13 +126,9 @@ pub fn collect_row_cell_widths(
         };
 
         let text = cell_text_content(cell_handle, parser, options, ctx, dom_ctx);
-        // Cap per-cell width: columns wider than MAX_CELL_WIDTH don't render
-        // legibly anyway, and uncapped widths from nested tables (even with
-        // skip_nested_tables) could still grow unbounded on edge cases (#406).
         const MAX_CELL_WIDTH: usize = 200;
         let width = text.chars().count().min(MAX_CELL_WIDTH);
 
-        // Grow the widths vec if needed.
         if col >= col_widths.len() {
             col_widths.resize(col + 1, 0);
         }
@@ -143,7 +138,6 @@ pub fn collect_row_cell_widths(
 
         let (colspan, rowspan) = get_colspan_rowspan(cell_handle, parser);
 
-        // Record rowspan for future rows.
         if rowspan > 1 {
             if col >= rowspan_tracker.len() {
                 rowspan_tracker.resize(col + 1, None);
@@ -205,8 +199,6 @@ pub fn convert_table_row(
 
     #[cfg(feature = "visitor")]
     let cell_contents: Vec<String> = if ctx.visitor.is_some() {
-        // Build the per-cell context once instead of cloning ctx per cell
-        // (mirrors the same hoist for the rendering path below).
         let collect_ctx = super::super::super::Context {
             in_table_cell: true,
             ..ctx.clone()
@@ -275,9 +267,9 @@ pub fn convert_table_row(
         }
     }
 
-    // Build the per-cell context once for the entire row.  Tier-2 hot-spot
-    // pass III: avoids cloning `Context` (which holds several Rc<HashSet> and
-    // optional collector handles) on every cell in wikipedia-class tables.
+    // ~keep Build the per-cell context once for the entire row.  Tier-2 hot-spot
+    // ~keep pass III: avoids cloning `Context` (which holds several Rc<HashSet> and
+    // ~keep optional collector handles) on every cell in wikipedia-class tables.
     let cell_ctx = super::super::super::Context {
         in_table_cell: true,
         ..ctx.clone()

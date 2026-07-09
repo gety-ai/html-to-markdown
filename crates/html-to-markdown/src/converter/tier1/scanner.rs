@@ -97,9 +97,9 @@ pub struct ScanOutput {
 pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailReason> {
     let bytes = html.as_bytes();
     let mut state = Tier1State::new(html.len());
-    // Phase DD: Tier-2 runs an html5ever roundtrip when custom-element
-    // tags are present in the source, which canonicalizes attribute
-    // entities.  Mirror that for byte-equality.
+    // ~keep Phase DD: Tier-2 runs an html5ever roundtrip when custom-element
+    // ~keep tags are present in the source, which canonicalizes attribute
+    // ~keep entities.  Mirror that for byte-equality.
     state.canonicalize_attr_entities = crate::converter::main_helpers::has_custom_element_tags(html);
     let mut pos = 0usize;
     let mut text_start = 0usize;
@@ -107,41 +107,37 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
     while pos < bytes.len() {
         match bytes[pos] {
             b'<' => {
-                // Flush pending text before we process this tag.
                 if text_start < pos {
                     flush_text(&mut state, &html[text_start..pos], text_start)?;
                 }
 
                 let next = bytes.get(pos + 1).copied().unwrap_or(0);
 
-                // `<!` — comment, DOCTYPE, or CDATA
                 if next == b'!' {
                     if html[pos..].starts_with("<![CDATA[") {
                         return Err(BailReason::Cdata { offset: pos });
                     }
-                    // Skip `<!-- ... -->` or `<!DOCTYPE ...>` etc.
                     pos = skip_bang(bytes, pos)?;
                     text_start = pos;
                     continue;
                 }
 
-                // `<?` — processing instruction.  Tier-2 handles these
-                // inconsistently depending on whether html5ever-repair
-                // ran (it rewrites bogus comments) and how tl chooses
-                // to parse the run.  Either way the byte shape
-                // downstream differs from the simple skip Tier-1 could
-                // perform, so bail and let the Tier-2 fallback produce
-                // the authoritative output.
+                // ~keep `<?` — processing instruction.  Tier-2 handles these
+                // ~keep inconsistently depending on whether html5ever-repair
+                // ~keep ran (it rewrites bogus comments) and how tl chooses
+                // ~keep to parse the run.  Either way the byte shape
+                // ~keep downstream differs from the simple skip Tier-1 could
+                // ~keep perform, so bail and let the Tier-2 fallback produce
+                // ~keep the authoritative output.
                 if next == b'?' {
                     return Err(BailReason::Classifier);
                 }
 
-                // `</` — closing tag
                 if next == b'/' {
                     let name_start = pos + 2;
                     let name_end = parse::scan_tag_name(bytes, name_start);
                     if name_end == name_start {
-                        // `</>` or similar — bail
+                        // ~keep `</>` or similar — bail
                         return Err(BailReason::LiteralLt { offset: pos });
                     }
                     let close_bracket =
@@ -155,10 +151,10 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     continue;
                 }
 
-                // Not a tag-name-start byte → literal `<` in text. Tier-2
-                // emits these verbatim (html5ever/astral-tl both parse a
-                // bare `<x` as a text node). Emit the `<` and continue so
-                // we don't bail on commonly-unescaped source like `x < 5`.
+                // ~keep Not a tag-name-start byte → literal `<` in text. Tier-2
+                // ~keep emits these verbatim (html5ever/astral-tl both parse a
+                // ~keep bare `<x` as a text node). Emit the `<` and continue so
+                // ~keep we don't bail on commonly-unescaped source like `x < 5`.
                 if !parse::is_tag_name_start(next) {
                     flush_text(&mut state, "<", pos)?;
                     pos += 1;
@@ -166,28 +162,26 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     continue;
                 }
 
-                // Opening tag
                 let name_start = pos + 1;
                 let name_end = parse::scan_tag_name(bytes, name_start);
                 let tag_name_bytes = &bytes[name_start..name_end];
 
-                // Lowercase the tag name into a stack buffer (max 32 bytes)
                 let mut name_buf = [0u8; MAX_TAG_NAME_BYTES];
                 let name_lower = lowercase_into(tag_name_bytes, &mut name_buf);
 
-                // Phase I: `<svg>` — emit as base64 data URI matching Tier-2's
-                // `handle_svg` output.  The entire subtree (open tag through
-                // `</svg>`) is consumed here; the scanner skips past it without
-                // pushing anything on the open-tag stack.
-                //
-                // `tl::parse` is called on just the SVG fragment to normalize
-                // attribute order via `serialize_element` (which sorts attrs
-                // alphabetically — raw source bytes differ, so slicing alone is
-                // not byte-identical with Tier-2 output).
+                // ~keep Phase I: `<svg>` — emit as base64 data URI matching Tier-2's
+                // ~keep `handle_svg` output.  The entire subtree (open tag through
+                // ~keep `</svg>`) is consumed here; the scanner skips past it without
+                // ~keep pushing anything on the open-tag stack.
+                // ~keep
+                // ~keep `tl::parse` is called on just the SVG fragment to normalize
+                // ~keep attribute order via `serialize_element` (which sorts attrs
+                // ~keep alphabetically — raw source bytes differ, so slicing alone is
+                // ~keep not byte-identical with Tier-2 output).
                 if name_lower == b"svg" {
                     let tag_open_start = pos;
                     let Some((close_pos, is_self_closing)) = parse::find_tag_close(bytes, name_end) else {
-                        // Unclosed SVG open tag — skip to end; Tier-2 handles it.
+                        // ~keep Unclosed SVG open tag — skip to end; Tier-2 handles it.
                         pos = bytes.len();
                         text_start = pos;
                         continue;
@@ -195,10 +189,10 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     let open_tag_end = close_pos + 1;
 
                     let svg_end = if is_self_closing {
-                        // `<svg ... />` — self-closing, no children.
+                        // ~keep `<svg ... />` — self-closing, no children.
                         open_tag_end
                     } else {
-                        // Find matching `</svg>` with depth tracking.
+                        // ~keep Find matching `</svg>` with depth tracking.
                         find_svg_close(bytes, open_tag_end).unwrap_or(bytes.len())
                     };
 
@@ -211,10 +205,10 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     continue;
                 }
 
-                // Phase N: `<template>` — inert script container; Tier-2 drops
-                // its content (see plain_text.rs SKIP_TAGS).  Skip the entire
-                // subtree without emitting anything.  Self-closing form is rare
-                // but handled.
+                // ~keep Phase N: `<template>` — inert script container; Tier-2 drops
+                // ~keep its content (see plain_text.rs SKIP_TAGS).  Skip the entire
+                // ~keep subtree without emitting anything.  Self-closing form is rare
+                // ~keep but handled.
                 if name_lower == b"template" {
                     let Some((close_pos, is_self_closing)) = parse::find_tag_close(bytes, name_end) else {
                         pos = bytes.len();
@@ -231,11 +225,11 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     continue;
                 }
 
-                // Resolve the tag spec.  Custom elements (names containing `-`)
-                // are not in the static TAGS table but are treated as generic
-                // block containers — Tier-2 emits their inner content as plain
-                // block text, which matches `TagKind::Block` behaviour.  All
-                // other unknown tags are still bailed immediately.
+                // ~keep Resolve the tag spec.  Custom elements (names containing `-`)
+                // ~keep are not in the static TAGS table but are treated as generic
+                // ~keep block containers — Tier-2 emits their inner content as plain
+                // ~keep block text, which matches `TagKind::Block` behaviour.  All
+                // ~keep other unknown tags are still bailed immediately.
                 let spec: &'static TagSpec = if name_lower.contains(&b'-') {
                     &CUSTOM_ELEMENT_BLOCK_SPEC
                 } else {
@@ -250,16 +244,16 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     }
                 };
 
-                // Raw-text "ignored" tags (`<script>`, `<style>`): their
-                // spec is `TagKind::Ignored` with `is_rawtext = true` (see
-                // tags.rs `rawtext_ignored`).  Prescan also strips their
-                // content (STRIP_CONTENT_TAGS); Tier-2 does the same.  Skip
-                // them inline so we don't bail to Tier-2 just because a page
-                // contains an empty `<script></script>` left over from
-                // prescan.  Other `RawText` kinds (textarea / title / xmp /
-                // iframe / noscript / noembed / noframes) keep their text
-                // content in Tier-2 and must continue to bail until Tier-1
-                // learns to emit it correctly.
+                // ~keep Raw-text "ignored" tags (`<script>`, `<style>`): their
+                // ~keep spec is `TagKind::Ignored` with `is_rawtext = true` (see
+                // ~keep tags.rs `rawtext_ignored`).  Prescan also strips their
+                // ~keep content (STRIP_CONTENT_TAGS); Tier-2 does the same.  Skip
+                // ~keep them inline so we don't bail to Tier-2 just because a page
+                // ~keep contains an empty `<script></script>` left over from
+                // ~keep prescan.  Other `RawText` kinds (textarea / title / xmp /
+                // ~keep iframe / noscript / noembed / noframes) keep their text
+                // ~keep content in Tier-2 and must continue to bail until Tier-1
+                // ~keep learns to emit it correctly.
                 if matches!(spec.kind, TagKind::Ignored) && spec.is_rawtext {
                     let open_end = match parse::find_tag_close(bytes, name_end) {
                         Some(close) => close.0 + 1,
@@ -267,14 +261,14 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     };
                     pos = find_raw_text_close(bytes, open_end, name_lower).unwrap_or(bytes.len());
                     text_start = pos;
-                    // Tier-2 observed behaviour (medium_python "walrus operator"
-                    // case): after walking through a `<style>` block whose
-                    // content emits nothing, the subsequent inline sibling
-                    // emission gets a separating space inserted (matching the
-                    // `<style></style><span>X</span>` → `" X"` pattern).
-                    // Mirror this here: when the output buffer's tail looks
-                    // like inline text content (no trailing whitespace, no
-                    // `<br>` sentinel), push a single space.
+                    // ~keep Tier-2 observed behaviour (medium_python "walrus operator"
+                    // ~keep case): after walking through a `<style>` block whose
+                    // ~keep content emits nothing, the subsequent inline sibling
+                    // ~keep emission gets a separating space inserted (matching the
+                    // ~keep `<style></style><span>X</span>` → `" X"` pattern).
+                    // ~keep Mirror this here: when the output buffer's tail looks
+                    // ~keep like inline text content (no trailing whitespace, no
+                    // ~keep `<br>` sentinel), push a single space.
                     if name_lower == b"style" {
                         let dest = state.cell_or_output_mut();
                         let ends_with_word = !dest.is_empty()
@@ -290,15 +284,15 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     continue;
                 }
 
-                // Non-rawtext `Ignored` tags (`<head>`, `<meta>`, `<link>`):
-                // Tier-2 does not emit any markdown from their bodies — head
-                // is consumed by metadata extraction; meta/link are void.
-                // Silent-skip them here so Tier-1 can be invoked on inputs
-                // that contain a `<head>` (the common case for full HTML
-                // documents) without bailing.  For non-void `<head>`, capture
-                // the content range on `state.head_range` so `tier1::run` can
-                // hand it to `head_metadata::extract_frontmatter` when
-                // metadata extraction is enabled.
+                // ~keep Non-rawtext `Ignored` tags (`<head>`, `<meta>`, `<link>`):
+                // ~keep Tier-2 does not emit any markdown from their bodies — head
+                // ~keep is consumed by metadata extraction; meta/link are void.
+                // ~keep Silent-skip them here so Tier-1 can be invoked on inputs
+                // ~keep that contain a `<head>` (the common case for full HTML
+                // ~keep documents) without bailing.  For non-void `<head>`, capture
+                // ~keep the content range on `state.head_range` so `tier1::run` can
+                // ~keep hand it to `head_metadata::extract_frontmatter` when
+                // ~keep metadata extraction is enabled.
                 if matches!(spec.kind, TagKind::Ignored) {
                     let open_end = match parse::find_tag_close(bytes, name_end) {
                         Some(close) => close.0 + 1,
@@ -309,8 +303,6 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                         text_start = pos;
                         continue;
                     }
-                    // Non-void: scan for matching close tag, record the
-                    // [open_end .. close_start] range as head content.
                     let (close_start, close_end) = match find_close_tag_range(bytes, open_end, name_lower) {
                         Some(pair) => pair,
                         None => (bytes.len(), bytes.len()),
@@ -323,15 +315,15 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     continue;
                 }
 
-                // Bail on unsupported tag kinds for M3c
+                // ~keep Bail on unsupported tag kinds for M3c
                 bail_unsupported(spec, pos)?;
 
-                // Phase D': mirror Tier-2's preprocessing pipeline <nav> /
-                // nav-hinted <header> / <footer> / <aside> / <form> strip.
-                // When the user's preprocessing options request the strip,
-                // jump past the matching close tag without pushing any frame.
-                // Matches Tier-2's should_drop_for_preprocessing
-                // (preprocessing_helpers.rs:115).
+                // ~keep Phase D': mirror Tier-2's preprocessing pipeline <nav> /
+                // ~keep nav-hinted <header> / <footer> / <aside> / <form> strip.
+                // ~keep When the user's preprocessing options request the strip,
+                // ~keep jump past the matching close tag without pushing any frame.
+                // ~keep Matches Tier-2's should_drop_for_preprocessing
+                // ~keep (preprocessing_helpers.rs:115).
                 if is_preprocessing_skip_candidate(name_lower) {
                     let close = parse::find_tag_close(bytes, name_end).ok_or(BailReason::LiteralLt { offset: pos })?;
                     let attrs_end = if close.1 { close.0.saturating_sub(1) } else { close.0 };
@@ -339,7 +331,6 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     if should_skip_preprocessing(name_lower, &skip_attrs, options) {
                         let open_end = close.0 + 1;
                         if close.1 {
-                            // Self-closing void — nothing to skip over.
                             pos = open_end;
                         } else {
                             pos = find_balanced_close(bytes, open_end, name_lower).unwrap_or(bytes.len());
@@ -347,39 +338,27 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                         text_start = pos;
                         continue;
                     }
-                    // Not skipped — fall through to the regular open path.
-                    // The regular path will call find_tag_close again (cheap)
-                    // and re-collect attrs only for kinds that need them;
-                    // nav/header/footer/aside/form are Block kind so attrs
-                    // won't be re-collected.
                 }
 
-                // Bail on <pre> when code_block_style is not Indented.
-                // Phase Q.4: Tier-1 supports Indented (4-space) and
-                // Backticks (`` ``` ``-fenced) code blocks via open_pre /
-                // close_pre.  Tildes still require Tier-2's fence emitter.
+                // ~keep Bail on <pre> when code_block_style is not Indented.
+                // ~keep Phase Q.4: Tier-1 supports Indented (4-space) and
+                // ~keep Backticks (`` ``` ``-fenced) code blocks via open_pre /
+                // ~keep close_pre.  Tildes still require Tier-2's fence emitter.
                 if matches!(spec.kind, TagKind::Pre)
                     && options.code_block_style == crate::options::CodeBlockStyle::Tildes
                 {
                     return Err(BailReason::Classifier);
                 }
 
-                // Find end of tag (handles quoted attribute values)
                 let close = parse::find_tag_close(bytes, name_end).ok_or(BailReason::LiteralLt { offset: pos })?;
 
-                // Collect attributes (from after name_end to before `>` / `/>`)
-                let attrs_end = if close.1 {
-                    // Self-closing `/>` — back up one past the `/`
-                    close.0.saturating_sub(1)
-                } else {
-                    close.0
-                };
-                // Most tag kinds (headings, paragraphs, emphasis, code, etc.) do
-                // not read attributes during emit.  Skip the allocation in the
-                // common case; only collect for the kinds whose emit paths
-                // actually consult attributes.  `<abbr>` is `TagKind::Inline`
-                // but its `title` attribute is read at open time to mirror
-                // Tier-2's `handle_abbr` — include it in the collect-set.
+                let attrs_end = if close.1 { close.0.saturating_sub(1) } else { close.0 };
+                // ~keep Most tag kinds (headings, paragraphs, emphasis, code, etc.) do
+                // ~keep not read attributes during emit.  Skip the allocation in the
+                // ~keep common case; only collect for the kinds whose emit paths
+                // ~keep actually consult attributes.  `<abbr>` is `TagKind::Inline`
+                // ~keep but its `title` attribute is read at open time to mirror
+                // ~keep Tier-2's `handle_abbr` — include it in the collect-set.
                 let needs_attrs = matches!(
                     spec.kind,
                     TagKind::Link
@@ -397,29 +376,26 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
 
                 pos = close.0 + 1;
 
-                // Void or self-closing: emit immediately, don't push stack
                 if spec.is_void || close.1 {
                     emit_void(&mut state, spec, &attrs, html, options)?;
                     text_start = pos;
                     continue;
                 }
 
-                // Non-void open tag: emit opening markdown + push stack frame
+                // ~keep Phase HH: nested tables are NO LONGER bailed here.  An inner
+                // ~keep table is opened with `inline_mode = true` (set inside
+                // ~keep `open_table`), and on `</table>` the rendered GFM markdown
+                // ~keep is written into the parent cell buffer rather than
+                // ~keep `state.output`.  The parent cell's newline-collapse step
+                // ~keep then flattens the inner table to a single inline run,
+                // ~keep matching Tier-2's behaviour.
 
-                // Phase HH: nested tables are NO LONGER bailed here.  An inner
-                // table is opened with `inline_mode = true` (set inside
-                // `open_table`), and on `</table>` the rendered GFM markdown
-                // is written into the parent cell buffer rather than
-                // `state.output`.  The parent cell's newline-collapse step
-                // then flattens the inner table to a single inline run,
-                // matching Tier-2's behaviour.
-
-                // M4: HTML5 implicit-close transitions.
-                // Run BEFORE the block-in-cell check so that structural table
-                // elements like `<tr>` correctly close any open `<td>`/`<th>`
-                // before the block check evaluates `in_table_cell()`.  Without
-                // this ordering, `<th>h1<tr>` would fire the bail even though
-                // `<tr>` is not a content element inside the cell.
+                // ~keep M4: HTML5 implicit-close transitions.
+                // ~keep Run BEFORE the block-in-cell check so that structural table
+                // ~keep elements like `<tr>` correctly close any open `<td>`/`<th>`
+                // ~keep before the block check evaluates `in_table_cell()`.  Without
+                // ~keep this ordering, `<th>h1<tr>` would fire the bail even though
+                // ~keep `<tr>` is not a content element inside the cell.
                 while let Some(top) = state.stack.last() {
                     if !spec_rules::should_close_for_new_tag(top.spec, spec) {
                         break;
@@ -427,20 +403,20 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     emit_close_for_implicit(&mut state, options)?;
                 }
 
-                // M9: Block-in-cell bail.
-                // Evaluated AFTER M4 implicit closes so that table-structural
-                // elements (e.g. a `<tr>` following an unclosed `<th>`) correctly
-                // collapse the cell state before the check runs.
-                //
-                // Allow `<p>`, `<div>/<section>/…` (TagKind::Block), `<ul>/<ol>`,
-                // and `<h1>-<h6>` inside cells — each has cell-aware open/close
-                // helpers that redirect their output to the cell accumulator and
-                // match Tier-2's `cell_text_content` normalisation
-                // (`text.replace('\n', " ")` when `br_in_tables` is false).
-                //
-                // All other block kinds (blockquote, pre, etc.) still bail because
-                // they produce multi-line content that would diverge from Tier-2's
-                // cell normalisation.
+                // ~keep M9: Block-in-cell bail.
+                // ~keep Evaluated AFTER M4 implicit closes so that table-structural
+                // ~keep elements (e.g. a `<tr>` following an unclosed `<th>`) correctly
+                // ~keep collapse the cell state before the check runs.
+                // ~keep
+                // ~keep Allow `<p>`, `<div>/<section>/…` (TagKind::Block), `<ul>/<ol>`,
+                // ~keep and `<h1>-<h6>` inside cells — each has cell-aware open/close
+                // ~keep helpers that redirect their output to the cell accumulator and
+                // ~keep match Tier-2's `cell_text_content` normalisation
+                // ~keep (`text.replace('\n', " ")` when `br_in_tables` is false).
+                // ~keep
+                // ~keep All other block kinds (blockquote, pre, etc.) still bail because
+                // ~keep they produce multi-line content that would diverge from Tier-2's
+                // ~keep cell normalisation.
                 if state.in_table_cell() && spec.is_block {
                     let inlineable = matches!(
                         spec.kind,
@@ -472,9 +448,9 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     let (href, title) = extract_link_attrs(&attrs)?;
                     state.link_stack.push((href, title));
                 }
-                // Mirror Tier-2's `semantic/attributes.rs::handle_abbr`:
-                // capture the abbreviation's `title` attribute and emit
-                // `" (title)"` after the abbr's text content at close time.
+                // ~keep Mirror Tier-2's `semantic/attributes.rs::handle_abbr`:
+                // ~keep capture the abbreviation's `title` attribute and emit
+                // ~keep `" (title)"` after the abbr's text content at close time.
                 if name_lower == b"abbr" {
                     let title = find_attr(&attrs, b"title")
                         .and_then(|b| std::str::from_utf8(b).ok())
@@ -486,14 +462,12 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
 
                 emit_open(&mut state, spec, &attrs)?;
 
-                // Record the content-start position AFTER emit_open so that
-                // close-side post-processing operates on the correct slice.
-                // When inside a table cell the position is in the cell buffer;
-                // otherwise it is in the main output buffer.
+                // ~keep Record the content-start position AFTER emit_open so that
+                // ~keep close-side post-processing operates on the correct slice.
+                // ~keep When inside a table cell the position is in the cell buffer;
+                // ~keep otherwise it is in the main output buffer.
                 let output_content_start = state.cell_or_output_mut().len();
 
-                // list_index is initialised to 0 for lists (counter starts at 0,
-                // incremented on each <li>).  For non-lists, unused.
                 let list_index = 0u16;
 
                 state.stack.push(OpenTag {
@@ -505,54 +479,51 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     name_range: name_start..name_end,
                 });
 
-                // Update escape context after pushing so the frame records the
-                // pre-tag ctx correctly.
                 apply_open_escape_ctx(&mut state, spec);
 
                 text_start = pos;
             }
             _ => {
-                // Batch ASCII fast-path: skip forward to the next `<` or `&`
-                // (the only two bytes that require special handling) in one
-                // memchr2 call instead of advancing one byte at a time.
-                // flush_text handles entity decoding and whitespace collapsing
-                // for whatever raw slice [text_start..pos] we hand it, so it
-                // is correct to jump pos all the way to the next special byte.
-                // This is safe across every context (<pre>, table cells, etc.)
-                // because:
-                //   • `<` still triggers the tag-dispatch path above.
-                //   • `&` is preserved in the slice passed to flush_text, which
-                //     entity-decodes it correctly regardless of context.
-                //   • Raw-text elements (script/style/textarea/…) bail before
-                //     reaching this arm, so we never skip inside them.
+                // ~keep Batch ASCII fast-path: skip forward to the next `<` or `&`
+                // ~keep (the only two bytes that require special handling) in one
+                // ~keep memchr2 call instead of advancing one byte at a time.
+                // ~keep flush_text handles entity decoding and whitespace collapsing
+                // ~keep for whatever raw slice [text_start..pos] we hand it, so it
+                // ~keep is correct to jump pos all the way to the next special byte.
+                // ~keep This is safe across every context (<pre>, table cells, etc.)
+                // ~keep because:
+                // ~keep   • `<` still triggers the tag-dispatch path above.
+                // ~keep   • `&` is preserved in the slice passed to flush_text, which
+                // ~keep     entity-decodes it correctly regardless of context.
+                // ~keep   • Raw-text elements (script/style/textarea/…) bail before
+                // ~keep     reaching this arm, so we never skip inside them.
                 match memchr2(b'<', b'&', &bytes[pos..]) {
                     Some(offset) if offset > 0 => pos += offset,
-                    Some(_) => pos += 1,       // next byte is already special; advance past current
-                    None => pos = bytes.len(), // no more special bytes; jump to end
+                    Some(_) => pos += 1,
+                    None => pos = bytes.len(),
                 }
             }
         }
     }
 
-    // Flush any trailing text after the last tag.
     if text_start < pos {
         flush_text(&mut state, &html[text_start..pos], text_start)?;
     }
 
-    // Phase N2: implicitly close all remaining open elements at EOF.
-    // HTML5 parsers (html5ever and tl) close every open element when input
-    // ends, so Tier-2 produces output even for malformed input like
-    // `<p>hello <b>world` (no `</b>`, no `</p>`).  Mirror that here by
-    // running emit_close_for_implicit on every remaining frame, regardless
-    // of whether it has an OptionalCloseRule.
-    //
-    // Before closing, trim trailing inline whitespace (spaces, tabs, newlines)
-    // from the output buffer.  In well-formed HTML the close tag arrives
-    // before the file's trailing newline; the inline close-marker emission
-    // (e.g. `**` for `</strong>`) lands flush against the content.  At EOF
-    // any trailing newline is between the implicit close and the file end,
-    // not inside the inline body, so we trim it before pushing the close
-    // marker to match Tier-2's `world**` instead of `world\n**`.
+    // ~keep Phase N2: implicitly close all remaining open elements at EOF.
+    // ~keep HTML5 parsers (html5ever and tl) close every open element when input
+    // ~keep ends, so Tier-2 produces output even for malformed input like
+    // ~keep `<p>hello <b>world` (no `</b>`, no `</p>`).  Mirror that here by
+    // ~keep running emit_close_for_implicit on every remaining frame, regardless
+    // ~keep of whether it has an OptionalCloseRule.
+    // ~keep
+    // ~keep Before closing, trim trailing inline whitespace (spaces, tabs, newlines)
+    // ~keep from the output buffer.  In well-formed HTML the close tag arrives
+    // ~keep before the file's trailing newline; the inline close-marker emission
+    // ~keep (e.g. `**` for `</strong>`) lands flush against the content.  At EOF
+    // ~keep any trailing newline is between the implicit close and the file end,
+    // ~keep not inside the inline body, so we trim it before pushing the close
+    // ~keep marker to match Tier-2's `world**` instead of `world\n**`.
     while !state.stack.is_empty() {
         let buf = &mut state.output;
         while matches!(buf.as_bytes().last(), Some(b' ' | b'\t' | b'\n' | b'\r')) {
@@ -561,17 +532,17 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
         emit_close_for_implicit(&mut state, options)?;
     }
 
-    // Collapse runs of 3+ consecutive newlines to exactly 2, matching Tier-2's
-    // `collapse_excess_blank_lines` post-processing step.
+    // ~keep Collapse runs of 3+ consecutive newlines to exactly 2, matching Tier-2's
+    // ~keep `collapse_excess_blank_lines` post-processing step.
     if state.output.contains("\n\n\n") {
         collapse_excess_blank_lines(&mut state.output);
     }
 
-    // Normalise trailing newlines to match Tier-2's final-output contract:
-    //   `format!("{}\n", output.trim_end_matches('\n'))`
-    // Tier-2 strips all trailing newlines and appends exactly one.  We mirror
-    // that here so paragraphs (which emit "\n\n") don't leave an extra blank
-    // line at the end.
+    // ~keep Normalise trailing newlines to match Tier-2's final-output contract:
+    // ~keep   `format!("{}\n", output.trim_end_matches('\n'))`
+    // ~keep Tier-2 strips all trailing newlines and appends exactly one.  We mirror
+    // ~keep that here so paragraphs (which emit "\n\n") don't leave an extra blank
+    // ~keep line at the end.
     if !state.output.is_empty() {
         let trimmed_end = state.output.trim_end_matches('\n');
         if trimmed_end.is_empty() {
@@ -589,7 +560,7 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
     })
 }
 
-// ── Bail guard ────────────────────────────────────────────────────────────────
+// ~keep ── Bail guard ────────────────────────────────────────────────────────────────
 
 /// Return `Err(BailReason::Classifier)` for tag kinds not supported in M9.
 ///
@@ -636,7 +607,7 @@ fn find_close_tag_range(bytes: &[u8], open_end: usize, tag_name: &[u8]) -> Optio
     None
 }
 
-// ── SVG helpers ───────────────────────────────────────────────────────────────
+// ~keep ── SVG helpers ───────────────────────────────────────────────────────────────
 
 /// Find the byte offset immediately after the matching `</svg>` close tag,
 /// starting from `open_end` (the byte after the `>` of the opening `<svg ...>`).
@@ -690,7 +661,6 @@ fn find_balanced_close(bytes: &[u8], open_end: usize, tag_name: &[u8]) -> Option
                     bytes.get(after),
                     Some(b'>' | b'/' | b' ' | b'\t' | b'\n' | b'\r') | None
                 ) {
-                    // Walk to end of the open tag to determine self-closing.
                     let mut j = after;
                     let mut in_q: Option<u8> = None;
                     let tag_end = loop {
@@ -714,7 +684,6 @@ fn find_balanced_close(bytes: &[u8], open_end: usize, tag_name: &[u8]) -> Option
                         }
                         j += 1;
                     };
-                    // Self-closing (`/>`) does not increment depth.
                     let is_self_closing = tag_end >= 2 && bytes[tag_end - 2] == b'/';
                     if !is_self_closing {
                         depth += 1;
@@ -747,9 +716,9 @@ fn emit_svg_from_slice(
     state: &mut Tier1State,
     options: &ConversionOptions,
 ) -> Result<(), BailReason> {
-    // CDATA inside SVG cannot be processed correctly without the prescan's
-    // entity-escaping transformation.  Bail to Tier-2 so it sees the
-    // prescan-normalized form (where `<![CDATA[` is escaped to `&lt;![CDATA[`).
+    // ~keep CDATA inside SVG cannot be processed correctly without the prescan's
+    // ~keep entity-escaping transformation.  Bail to Tier-2 so it sees the
+    // ~keep prescan-normalized form (where `<![CDATA[` is escaped to `&lt;![CDATA[`).
     if svg_slice.contains("<![CDATA[") {
         return Err(BailReason::Cdata {
             offset: svg_start_offset,
@@ -763,20 +732,20 @@ fn emit_svg_from_slice(
     use crate::converter::media::svg::serialize_element;
     use base64::{Engine as _, engine::general_purpose::STANDARD};
 
-    // Re-parse just the SVG fragment.  Wrap it in a minimal document so
-    // tl has proper context — the same pattern used by head_metadata.rs.
+    // ~keep Re-parse just the SVG fragment.  Wrap it in a minimal document so
+    // ~keep tl has proper context — the same pattern used by head_metadata.rs.
     let wrapped = format!("<html><body>{svg_slice}</body></html>");
     let dom = match tl::parse(&wrapped, tl::ParserOptions::default()) {
         Ok(d) => d,
         Err(_) => {
-            // Parse failure: emit nothing rather than bail — matches
-            // Tier-2's silent skip on serialization failure.
+            // ~keep Parse failure: emit nothing rather than bail — matches
+            // ~keep Tier-2's silent skip on serialization failure.
             return Ok(());
         }
     };
     let parser = dom.parser();
 
-    // Locate the first `<svg>` node in the parsed fragment.
+    // ~keep Locate the first `<svg>` node in the parsed fragment.
     let svg_handle = dom.nodes().iter().enumerate().find_map(|(i, node)| {
         if let tl::Node::Tag(tag) = node {
             if tag.name().as_utf8_str().as_ref().eq_ignore_ascii_case("svg") {
@@ -793,13 +762,12 @@ fn emit_svg_from_slice(
         return Ok(());
     };
 
-    // Extract title from a direct `<title>` child, mirroring Tier-2.
+    // ~keep Extract title from a direct `<title>` child, mirroring Tier-2.
     let title = if let Some(tl::Node::Tag(svg_tag)) = handle.get(parser) {
         let mut found = String::from("SVG Image");
         for child_handle in svg_tag.children().top().iter() {
             if let Some(tl::Node::Tag(child)) = child_handle.get(parser) {
                 if child.name().as_utf8_str().as_ref().eq_ignore_ascii_case("title") {
-                    // Collect text content of the <title> tag.
                     let mut text = String::new();
                     for grandchild in child.children().top().iter() {
                         if let Some(tl::Node::Raw(raw)) = grandchild.get(parser) {
@@ -846,21 +814,17 @@ fn find_raw_text_close(bytes: &[u8], open_end: usize, tag_name: &[u8]) -> Option
     let len = bytes.len();
     let mut idx = open_end;
     while idx < len {
-        // memchr to skip ahead to the next `<`.
         match memchr3(b'<', b'<', b'<', &bytes[idx..]) {
             Some(off) => idx += off,
             None => return None,
         }
-        // Need `</tag` to start a closing tag.
         if idx + 2 < len && bytes[idx + 1] == b'/' {
             let after_slash = idx + 2;
             if after_slash + tag_name.len() <= len
                 && bytes[after_slash..after_slash + tag_name.len()].eq_ignore_ascii_case(tag_name)
             {
                 let post_name = after_slash + tag_name.len();
-                // Tag name must be followed by `>` / whitespace / `/`.
                 if matches!(bytes.get(post_name), Some(b'>' | b'/' | b' ' | b'\t' | b'\n' | b'\r')) {
-                    // Walk to the closing `>`.
                     let mut j = post_name;
                     while j < len && bytes[j] != b'>' {
                         j += 1;
@@ -880,33 +844,31 @@ fn find_raw_text_close(bytes: &[u8], open_end: usize, tag_name: &[u8]) -> Option
 #[inline]
 const fn bail_unsupported(spec: &TagSpec, _offset: usize) -> Result<(), BailReason> {
     match spec.kind {
-        // Raw-text content tags are handled inline by the main scan loop
-        // (see find_raw_text_close).  They never reach this point in practice;
-        // listed here only to make the match exhaustive over TagKind::RawText.
+        // ~keep Raw-text content tags are handled inline by the main scan loop
+        // ~keep (see find_raw_text_close).  They never reach this point in practice;
+        // ~keep listed here only to make the match exhaustive over TagKind::RawText.
         TagKind::RawText(_) => Err(BailReason::Classifier),
 
-        // `Ignored` tags (head/meta/link/script/style) are now handled inline
-        // by the main scan loop (see the dispatch above `bail_unsupported`).
-        // The match arm is kept for exhaustiveness — it cannot fire in
-        // practice.
+        // ~keep `Ignored` tags (head/meta/link/script/style) are now handled inline
+        // ~keep by the main scan loop (see the dispatch above `bail_unsupported`).
+        // ~keep The match arm is kept for exhaustiveness — it cannot fire in
+        // ~keep practice.
         TagKind::Ignored => Err(BailReason::Classifier),
 
         _ => Ok(()),
     }
 }
 
-// ── Open-tag emission ─────────────────────────────────────────────────────────
-
 fn emit_open(
     state: &mut Tier1State,
     spec: &'static TagSpec,
     attrs: &[(&[u8], Option<&[u8]>)],
 ) -> Result<(), BailReason> {
-    // Phase V: when a block-level tag opens inside a link, bail.  Tier-2's
-    // link handler collapses block children (img alt, paragraph text) into
-    // an inline link label; replicating that in Tier-1 requires content
-    // capture similar to Phase R's summary buffer.  Until that lands, bail
-    // so Tier-2's fallback handles the collapse.
+    // ~keep Phase V: when a block-level tag opens inside a link, bail.  Tier-2's
+    // ~keep link handler collapses block children (img alt, paragraph text) into
+    // ~keep an inline link label; replicating that in Tier-1 requires content
+    // ~keep capture similar to Phase R's summary buffer.  Until that lands, bail
+    // ~keep so Tier-2's fallback handles the collapse.
     if matches!(
         spec.kind,
         TagKind::Block
@@ -931,15 +893,15 @@ fn emit_open(
         TagKind::DefinitionTerm => open_dt(state),
         TagKind::DefinitionDescription => open_dd(state),
         TagKind::Strong => {
-            // Inside a <summary> accumulation buffer, Tier-2 processes
-            // children with `in_strong: true` which suppresses nested
-            // strong markers.  Mirror that by not pushing `**` when inside
-            // a summary, so `<strong>b</strong>` inside `<summary>` emits
-            // just `b` instead of `**b**`.
-            // Phase FF-2: figcaption uses the same buffer stack but
-            // Tier-2 does NOT set in_strong for figcaption children, so
-            // emit `**` normally when the topmost wrap-buf is a
-            // figcaption (or there's no wrap-buf at all).
+            // ~keep Inside a <summary> accumulation buffer, Tier-2 processes
+            // ~keep children with `in_strong: true` which suppresses nested
+            // ~keep strong markers.  Mirror that by not pushing `**` when inside
+            // ~keep a summary, so `<strong>b</strong>` inside `<summary>` emits
+            // ~keep just `b` instead of `**b**`.
+            // ~keep Phase FF-2: figcaption uses the same buffer stack but
+            // ~keep Tier-2 does NOT set in_strong for figcaption children, so
+            // ~keep emit `**` normally when the topmost wrap-buf is a
+            // ~keep figcaption (or there's no wrap-buf at all).
             if !state.summary_at_top() {
                 state.cell_or_output_mut().push_str("**");
             }
@@ -948,27 +910,25 @@ fn emit_open(
             state.cell_or_output_mut().push('*');
         }
         TagKind::Strikethrough => {
-            // Tier-2's handle_strikethrough suppresses the `~~` wrapping
-            // when inside `<code>`/`<pre>` (in_code).  Mirror via EscapeCtx.
+            // ~keep Tier-2's handle_strikethrough suppresses the `~~` wrapping
+            // ~keep when inside `<code>`/`<pre>` (in_code).  Mirror via EscapeCtx.
             if !state.escape_ctx.contains(EscapeCtx::CODE) && !state.escape_ctx.contains(EscapeCtx::PRE) {
                 state.cell_or_output_mut().push_str("~~");
             }
         }
         TagKind::Inserted => {
-            // Tier-2's handle_inserted emits `==` markers unconditionally for
-            // <ins>.  Mirror Strikethrough's in-code/pre suppression for
-            // consistency (no `==` inside backtick spans / fenced blocks).
+            // ~keep Tier-2's handle_inserted emits `==` markers unconditionally for
+            // ~keep <ins>.  Mirror Strikethrough's in-code/pre suppression for
+            // ~keep consistency (no `==` inside backtick spans / fenced blocks).
             if !state.escape_ctx.contains(EscapeCtx::CODE) && !state.escape_ctx.contains(EscapeCtx::PRE) {
                 state.cell_or_output_mut().push_str("==");
             }
         }
-        // Phase CC: defer the open backtick marker — close_code does
-        // smart escaping based on the content (mirrors Tier-2's
-        // render_code_with_escaping at inline/code.rs:260).  Inside an
-        // outer <code> or <pre>, the inner code is transparent.
+        // ~keep Phase CC: defer the open backtick marker — close_code does
+        // ~keep smart escaping based on the content (mirrors Tier-2's
+        // ~keep render_code_with_escaping at inline/code.rs:260).  Inside an
+        // ~keep outer <code> or <pre>, the inner code is transparent.
         TagKind::Code if !state.escape_ctx.contains(EscapeCtx::PRE) && !state.escape_ctx.contains(EscapeCtx::CODE) => {}
-        // When inside <pre>, a nested <code class="language-X"> contributes
-        // the language tag for the enclosing fence.
         TagKind::Code if state.pre_lang.is_none() && state.escape_ctx.contains(EscapeCtx::PRE) => {
             if let Some(lang) = extract_language_from_class(attrs) {
                 state.pre_lang = Some(lang);
@@ -982,17 +942,17 @@ fn emit_open(
         TagKind::TableFoot => open_table_foot(state),
         TagKind::TableRow => open_table_row(state),
         TagKind::TableCell { is_header } => open_table_cell(state, attrs, is_header)?,
-        // Block containers: emit a leading blank-line separator when there's
-        // already preceding content.  Mirrors Tier-2's div/sectioning handlers
-        // (block/div.rs:88, semantic/sectioning.rs:71) which prefix block
-        // content with `\n\n` to separate from siblings.
-        //
-        // Inside a table cell, Tier-2's div.rs:60 treats a sibling-div as a
-        // "table continuation" and emits `"  \n"` (two-space + newline) when
-        // the cell already has non-`|`/non-`<br>` content.  After
-        // `close_table_cell`'s `replace('\n', ' ')` step, this becomes a 3-space
-        // run between sibling divs — matching Tier-2's lists_timeline cell
-        // layout `[link]   [other-link]`.  Without this, Tier-1 emits 1 space.
+        // ~keep Block containers: emit a leading blank-line separator when there's
+        // ~keep already preceding content.  Mirrors Tier-2's div/sectioning handlers
+        // ~keep (block/div.rs:88, semantic/sectioning.rs:71) which prefix block
+        // ~keep content with `\n\n` to separate from siblings.
+        // ~keep
+        // ~keep Inside a table cell, Tier-2's div.rs:60 treats a sibling-div as a
+        // ~keep "table continuation" and emits `"  \n"` (two-space + newline) when
+        // ~keep the cell already has non-`|`/non-`<br>` content.  After
+        // ~keep `close_table_cell`'s `replace('\n', ' ')` step, this becomes a 3-space
+        // ~keep run between sibling divs — matching Tier-2's lists_timeline cell
+        // ~keep layout `[link]   [other-link]`.  Without this, Tier-1 emits 1 space.
         TagKind::Block => {
             if state.in_table_cell() {
                 let cell_buf = state.cell_or_output_mut();
@@ -1001,8 +961,6 @@ fn emit_open(
                     && !cell_buf.ends_with("<br>")
                     && !cell_buf.ends_with("  \n")
                 {
-                    // Trim trailing horizontal whitespace, then append the
-                    // table-continuation line break.  Mirrors div.rs:75-85.
                     while cell_buf.ends_with(' ') || cell_buf.ends_with('\t') {
                         cell_buf.pop();
                     }
@@ -1012,31 +970,27 @@ fn emit_open(
                 state.ensure_blank_line();
             }
         }
-        // Summary: push accumulation buffer so children redirect into it (Phase R).
+        // ~keep Summary: push accumulation buffer so children redirect into it (Phase R).
         TagKind::Summary => open_summary(state),
-        // Figcaption: same buffer mechanism as summary (Phase FF-2); the
-        // wrap delimiter differs (`*…*` vs `**…**`) and is emitted by
-        // close_figcaption.
+        // ~keep Figcaption: same buffer mechanism as summary (Phase FF-2); the
+        // ~keep wrap delimiter differs (`*…*` vs `**…**`) and is emitted by
+        // ~keep close_figcaption.
         TagKind::Figcaption => open_figcaption(state),
-        // Button: no leading separator (matches Tier-2 handle_button which
-        // does nothing on open).  Close-side `\n\n` is emitted by close_button.
+        // ~keep Button: no leading separator (matches Tier-2 handle_button which
+        // ~keep does nothing on open).  Close-side `\n\n` is emitted by close_button.
         TagKind::Button => {}
         TagKind::Inline => {}
-        // All other kinds (LineBreak, Hr, Image, etc.) are void — they never
-        // reach emit_open because the void/self-closing branch fires first.
         _ => {}
     }
 
     Ok(())
 }
 
-// ── Per-TagKind open helpers ──────────────────────────────────────────────────
-
 fn open_paragraph(state: &mut Tier1State) {
-    // When inside a table cell, treat `<p>` as a transparent container.
-    // Tier-2's paragraph.rs emits `<br>` when `in_table_cell` and there is
-    // already cell content; we mirror that behaviour so the cell buffer stays
-    // on one logical line (no `\n` in cell output to collapse later).
+    // ~keep When inside a table cell, treat `<p>` as a transparent container.
+    // ~keep Tier-2's paragraph.rs emits `<br>` when `in_table_cell` and there is
+    // ~keep already cell content; we mirror that behaviour so the cell buffer stays
+    // ~keep on one logical line (no `\n` in cell output to collapse later).
     if state.in_table_cell() {
         let cell_buf = state.cell_or_output_mut();
         if !cell_buf.is_empty() && !cell_buf.ends_with("<br>") {
@@ -1044,23 +998,23 @@ fn open_paragraph(state: &mut Tier1State) {
         }
         return;
     }
-    // Mirrors Tier-2: when output is non-empty and doesn't already end
-    // with "\n\n", push "\n\n" (may produce three newlines total when
-    // output ends with a single "\n", e.g. right after a table row or
-    // an `<hr>`).
+    // ~keep Mirrors Tier-2: when output is non-empty and doesn't already end
+    // ~keep with "\n\n", push "\n\n" (may produce three newlines total when
+    // ~keep output ends with a single "\n", e.g. right after a table row or
+    // ~keep an `<hr>`).
     let dest = state.cell_or_output_mut();
-    // Phase EE: when the paragraph is the first child of a list-item
-    // (output ends with a freshly-emitted bullet like `- ` or `1. `),
-    // the paragraph content joins the bullet inline.  Tier-2's
-    // paragraph.rs achieves this by checking the parent and skipping
-    // the leading `\n\n` for the first block child.  Check BEFORE
-    // `trim_trailing_horizontal`, which would strip the trailing
-    // space from the bullet.
+    // ~keep Phase EE: when the paragraph is the first child of a list-item
+    // ~keep (output ends with a freshly-emitted bullet like `- ` or `1. `),
+    // ~keep the paragraph content joins the bullet inline.  Tier-2's
+    // ~keep paragraph.rs achieves this by checking the parent and skipping
+    // ~keep the leading `\n\n` for the first block child.  Check BEFORE
+    // ~keep `trim_trailing_horizontal`, which would strip the trailing
+    // ~keep space from the bullet.
     if dest.ends_with("- ") || dest.ends_with("* ") || dest.ends_with("+ ") || ends_with_ordered_marker(dest) {
         return;
     }
-    // Drop trailing horizontal whitespace from inter-tag preservation
-    // (Phase U-2) before the block separator.
+    // ~keep Drop trailing horizontal whitespace from inter-tag preservation
+    // ~keep (Phase U-2) before the block separator.
     crate::converter::tier1::state::trim_trailing_horizontal(dest);
     if !dest.is_empty() && !dest.ends_with("\n\n") {
         dest.push_str("\n\n");
@@ -1068,10 +1022,10 @@ fn open_paragraph(state: &mut Tier1State) {
 }
 
 fn open_heading(state: &mut Tier1State) {
-    // When inside a table cell, Tier-2 does NOT add a leading separator before
-    // the heading (`needs_leading_sep = false` when `in_table_cell`).  The
-    // heading text is emitted directly into the cell accumulator with no `#`
-    // prefix and no surrounding newlines.
+    // ~keep When inside a table cell, Tier-2 does NOT add a leading separator before
+    // ~keep the heading (`needs_leading_sep = false` when `in_table_cell`).  The
+    // ~keep heading text is emitted directly into the cell accumulator with no `#`
+    // ~keep prefix and no surrounding newlines.
     if state.in_table_cell() {
         return;
     }
@@ -1084,8 +1038,6 @@ fn open_blockquote(state: &mut Tier1State) {
 
 fn open_pre(state: &mut Tier1State, attrs: &[(&[u8], Option<&[u8]>)]) {
     state.ensure_blank_line();
-    // Capture language from <pre class="language-X">; nested <code class="...">
-    // can still override later if pre had no language hint.
     if let Some(lang) = extract_language_from_class(attrs) {
         state.pre_lang = Some(lang);
     }
@@ -1108,9 +1060,9 @@ fn extract_language_from_class(attrs: &[(&[u8], Option<&[u8]>)]) -> Option<Strin
 }
 
 fn open_list(state: &mut Tier1State, kind: ListKind) {
-    // When inside a table cell, mirror Tier-2's `add_list_leading_separator`:
-    // push `<br>` if there is already cell content (but not if it already ends
-    // with `|`, ` `, or `<br>`).  Do not touch `state.output`.
+    // ~keep When inside a table cell, mirror Tier-2's `add_list_leading_separator`:
+    // ~keep push `<br>` if there is already cell content (but not if it already ends
+    // ~keep with `|`, ` `, or `<br>`).  Do not touch `state.output`.
     if state.in_table_cell() {
         let cell_buf = state.cell_or_output_mut();
         if !cell_buf.is_empty() && !cell_buf.ends_with('|') && !cell_buf.ends_with(' ') && !cell_buf.ends_with("<br>") {
@@ -1122,17 +1074,14 @@ fn open_list(state: &mut Tier1State, kind: ListKind) {
         }
         return;
     }
-    // Lists at the top level need a blank line if there's preceding content.
-    // Inside a list item (`list_depth > 0`) just a newline is enough.
     let current_list_depth = state.list_depth;
     {
         let dest = state.cell_or_output_mut();
-        // Drop trailing horizontal whitespace from inter-tag preservation
-        // (Phase U-2) before the block separator.
+        // ~keep Drop trailing horizontal whitespace from inter-tag preservation
+        // ~keep (Phase U-2) before the block separator.
         crate::converter::tier1::state::trim_trailing_horizontal(dest);
         if !dest.is_empty() {
             if current_list_depth == 0 {
-                // Top-level list: ensure blank line before
                 if !dest.ends_with("\n\n") {
                     if dest.ends_with('\n') {
                         dest.push('\n');
@@ -1141,7 +1090,6 @@ fn open_list(state: &mut Tier1State, kind: ListKind) {
                     }
                 }
             } else {
-                // Nested list inside a list item: just newline
                 if !dest.ends_with('\n') {
                     dest.push('\n');
                 }
@@ -1160,28 +1108,23 @@ fn open_list(state: &mut Tier1State, kind: ListKind) {
 const TIER1_BULLETS: [u8; 3] = [b'-', b'*', b'+'];
 
 fn open_list_item(state: &mut Tier1State) {
-    // When inside a table cell, Tier-2 does NOT emit bullet/number prefixes
-    // for list items (see list/item.rs: `if !ctx.in_table_cell { ... bullet ... }`).
-    // The cell accumulator already receives the raw text; separators are handled
-    // by the `\n` → ` ` replacement at cell-close time.
+    // ~keep When inside a table cell, Tier-2 does NOT emit bullet/number prefixes
+    // ~keep for list items (see list/item.rs: `if !ctx.in_table_cell { ... bullet ... }`).
+    // ~keep The cell accumulator already receives the raw text; separators are handled
+    // ~keep by the `\n` → ` ` replacement at cell-close time.
     if state.in_table_cell() {
-        // For ordered lists we still need to increment the counter so that
-        // subsequent items get the right index if we ever exit the cell context.
         if find_parent_list_kind(&state.stack) == Some(ListKind::Ordered) {
             increment_ol_counter(&mut state.stack);
         }
         return;
     }
-    // Emit the list item marker.
     let parent_kind = find_parent_list_kind(&state.stack);
     let indent_depth = state.list_depth.saturating_sub(1);
     if parent_kind == Some(ListKind::Ordered) {
-        // Increment counter on parent ordered list frame
         let counter = increment_ol_counter(&mut state.stack);
         let start = find_ol_start(&state.stack);
         let index = start.saturating_sub(1) + counter;
         push_list_item_indent(&mut state.output, indent_depth);
-        // measured: write! is slower on this workload (Stage 5c)
         #[allow(clippy::format_push_string)]
         state.output.push_str(&format!("{index}. "));
     } else {
@@ -1193,7 +1136,7 @@ fn open_list_item(state: &mut Tier1State) {
 }
 
 fn open_link(state: &mut Tier1State) {
-    // Track link count inside tables for layout-table detection.
+    // ~keep Track link count inside tables for layout-table detection.
     if let Some(ts) = state.table_stack.last_mut() {
         ts.link_count += 1;
     }
@@ -1201,10 +1144,10 @@ fn open_link(state: &mut Tier1State) {
 }
 
 fn open_table(state: &mut Tier1State) {
-    // Phase HH: nested tables are no longer a bail; an inner table inherits
-    // `inline_mode = true` so its final GFM rendering writes into the parent
-    // cell buffer rather than `state.output`.  The parent cell's newline
-    // collapse then flattens the inner table to a single inline run.
+    // ~keep Phase HH: nested tables are no longer a bail; an inner table inherits
+    // ~keep `inline_mode = true` so its final GFM rendering writes into the parent
+    // ~keep cell buffer rather than `state.output`.  The parent cell's newline
+    // ~keep collapse then flattens the inner table to a single inline run.
     let inline_mode = !state.table_stack.is_empty();
     state.table_stack.push(crate::converter::tier1::state::TableState {
         inline_mode,
@@ -1221,7 +1164,6 @@ fn open_table_caption(state: &mut Tier1State) {
 
 fn open_table_head(state: &mut Tier1State) -> Result<(), BailReason> {
     if let Some(ts) = state.table_stack.last_mut() {
-        // thead after any body or foot section → section order violation.
         if ts.seen_tbody_close || ts.seen_tfoot {
             return Err(BailReason::TableSectionOrder);
         }
@@ -1232,7 +1174,6 @@ fn open_table_head(state: &mut Tier1State) -> Result<(), BailReason> {
 
 fn open_table_body(state: &mut Tier1State) -> Result<(), BailReason> {
     if let Some(ts) = state.table_stack.last_mut() {
-        // tbody after tfoot open → section order violation.
         if ts.seen_tfoot {
             return Err(BailReason::TableSectionOrder);
         }
@@ -1247,7 +1188,6 @@ fn open_table_foot(state: &mut Tier1State) {
 }
 
 fn open_table_row(state: &mut Tier1State) {
-    // Clear the in-progress row.
     if let Some(ts) = state.table_stack.last_mut() {
         ts.current_row.clear();
     }
@@ -1258,11 +1198,11 @@ fn open_table_cell(
     attrs: &[(&[u8], Option<&[u8]>)],
     is_header: bool,
 ) -> Result<(), BailReason> {
-    // rowspan: accepted but not expanded (lossy — a spanned cell renders once,
-    // matching mdream).  colspan: expanded by `close_table_cell` adding
-    // `(colspan - 1)` empty cells so Tier-2's column-count expectations are
-    // met (without this, infobox-style `<th colspan="2">` rows trigger Tier-2's
-    // layout-table fallback in close_table on what should be a normal GFM table).
+    // ~keep rowspan: accepted but not expanded (lossy — a spanned cell renders once,
+    // ~keep matching mdream).  colspan: expanded by `close_table_cell` adding
+    // ~keep `(colspan - 1)` empty cells so Tier-2's column-count expectations are
+    // ~keep met (without this, infobox-style `<th colspan="2">` rows trigger Tier-2's
+    // ~keep layout-table fallback in close_table on what should be a normal GFM table).
     let colspan = find_attr(attrs, b"colspan")
         .and_then(|b| std::str::from_utf8(b).ok())
         .and_then(|s| s.parse::<u16>().ok())
@@ -1303,25 +1243,25 @@ fn emit_void(
         }
 
         TagKind::LineBreak => {
-            // `<br>` outside any block context emits nothing (Tier-2 behaviour).
-            // Three context-dependent emissions:
-            //   - Inside a link (anywhere): one space.  Tier-2's
-            //     `normalize_link_label` (utility/content.rs ~145) collapses
-            //     whitespace runs in link labels, so multiple spaces or
-            //     `  \n` would normalize back to one space.
-            //   - Inside a table cell (not in a link): emit a single sentinel
-            //     `\u{0001}`.  `close_table_cell` collapses whitespace runs
-            //     before normalising the sentinel to three spaces — matches
-            //     Tier-2 walking `<br>` to `"  \n"` and `replace('\n', ' ')`
-            //     producing `"   "` (three spaces).
-            //   - Inside a regular block (paragraph, div, etc.): `"  \n"`.
+            // ~keep `<br>` outside any block context emits nothing (Tier-2 behaviour).
+            // ~keep Three context-dependent emissions:
+            // ~keep   - Inside a link (anywhere): one space.  Tier-2's
+            // ~keep     `normalize_link_label` (utility/content.rs ~145) collapses
+            // ~keep     whitespace runs in link labels, so multiple spaces or
+            // ~keep     `  \n` would normalize back to one space.
+            // ~keep   - Inside a table cell (not in a link): emit a single sentinel
+            // ~keep     `\u{0001}`.  `close_table_cell` collapses whitespace runs
+            // ~keep     before normalising the sentinel to three spaces — matches
+            // ~keep     Tier-2 walking `<br>` to `"  \n"` and `replace('\n', ' ')`
+            // ~keep     producing `"   "` (three spaces).
+            // ~keep   - Inside a regular block (paragraph, div, etc.): `"  \n"`.
             let in_link = state.stack.iter().any(|f| matches!(f.spec.kind, TagKind::Link));
             if in_link {
                 state.cell_or_output_mut().push(' ');
             } else if state.in_table_cell() {
                 state.cell_or_output_mut().push('\u{0001}');
             } else if state.stack.is_empty() {
-                // bare `<br>` at top level — Tier-2 emits nothing
+                // ~keep bare `<br>` at top level — Tier-2 emits nothing
             } else {
                 state.cell_or_output_mut().push_str("  \n");
             }
@@ -1332,13 +1272,13 @@ fn emit_void(
             let alt = find_attr(attrs, b"alt").unwrap_or_default();
             let title = find_attr(attrs, b"title");
 
-            // Phase DD: src gets entity-decoding (URL semantics).
-            // For alt/title:
-            //   • With custom-element tags → T2 ran html5ever roundtrip
-            //     and canonicalized entities; decode + re-encode the
-            //     special set to match.
-            //   • Without → T2 just yields tl's raw attribute bytes;
-            //     keep entities verbatim.
+            // ~keep Phase DD: src gets entity-decoding (URL semantics).
+            // ~keep For alt/title:
+            // ~keep   • With custom-element tags → T2 ran html5ever roundtrip
+            // ~keep     and canonicalized entities; decode + re-encode the
+            // ~keep     special set to match.
+            // ~keep   • Without → T2 just yields tl's raw attribute bytes;
+            // ~keep     keep entities verbatim.
             let src = decode_attr(src)?;
             let canonicalize = state.canonicalize_attr_entities;
             let alt_owned;
@@ -1361,22 +1301,19 @@ fn emit_void(
                     } else {
                         std::str::from_utf8(title_bytes).map_err(|_| BailReason::Classifier)?
                     };
-                    // measured: write! is slower on this workload (Stage 5c)
                     #[allow(clippy::format_push_string)]
                     dest.push_str(&format!("![{alt}]({src} \"{title_str}\")"));
                 } else {
-                    // measured: write! is slower on this workload (Stage 5c)
                     #[allow(clippy::format_push_string)]
                     dest.push_str(&format!("![{alt}]({src})"));
                 }
             } else {
-                // Strip to alt-text only — mirrors Tier-2 behaviour when the image
-                // is in a heading whose tag is not in `keep_inline_images_in`.
+                // ~keep Strip to alt-text only — mirrors Tier-2 behaviour when the image
+                // ~keep is in a heading whose tag is not in `keep_inline_images_in`.
                 dest.push_str(alt);
             }
         }
 
-        // Ignored void elements (meta, link, area, wbr, etc.) — drop silently
         TagKind::Ignored | TagKind::Inline | TagKind::Block => {}
 
         _ => {}
@@ -1427,7 +1364,7 @@ fn should_keep_image_as_markdown(html: &str, stack: &[OpenTag], options: &Conver
 #[cfg(feature = "inline-images")]
 fn keep_inline_image_for_ancestors(input: &[u8], stack: &[OpenTag], keep: &[String]) -> bool {
     if keep.is_empty() {
-        // No restriction — always emit markdown image (Tier-2 default).
+        // ~keep No restriction — always emit markdown image (Tier-2 default).
         return true;
     }
     for frame in stack.iter().rev() {
@@ -1438,13 +1375,12 @@ fn keep_inline_image_for_ancestors(input: &[u8], stack: &[OpenTag], keep: &[Stri
                     return true;
                 }
             }
-            // Found a heading ancestor but its name is not in the list.
             return false;
         }
     }
-    // No heading ancestor at all: no restriction applies — emit markdown image.
-    // This matches Tier-2 behaviour: the `keep_inline_images_in` guard only
-    // fires when `ctx.in_heading` is true.
+    // ~keep No heading ancestor at all: no restriction applies — emit markdown image.
+    // ~keep This matches Tier-2 behaviour: the `keep_inline_images_in` guard only
+    // ~keep fires when `ctx.in_heading` is true.
     true
 }
 
@@ -1454,15 +1390,12 @@ fn eq_ascii_ignore_case(a: &[u8], b: &[u8]) -> bool {
     a.eq_ignore_ascii_case(b)
 }
 
-// ── Close-tag emission ────────────────────────────────────────────────────────
-
 fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8], options: &ConversionOptions) -> Result<(), BailReason> {
-    // Lowercase the tag name to look it up in the spec table.
     let mut name_buf = [0u8; MAX_TAG_NAME_BYTES];
     let name_lower = lowercase_into(tag_name_bytes, &mut name_buf);
 
-    // Custom element close tags (e.g. `</x-foo>`) use the same static Block
-    // spec as their corresponding open tag.  All other unknown close tags bail.
+    // ~keep Custom element close tags (e.g. `</x-foo>`) use the same static Block
+    // ~keep spec as their corresponding open tag.  All other unknown close tags bail.
     let spec: &'static TagSpec = if name_lower.contains(&b'-') {
         &CUSTOM_ELEMENT_BLOCK_SPEC
     } else {
@@ -1477,26 +1410,19 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8], options: &Conversio
         }
     };
 
-    // M4: Before popping the matching frame, implicitly close any open optional-close
-    // elements at the top of the stack that would be auto-closed by their parent's
-    // close tag.  For example, `</ul>` with an open `<li>` on top → close the `<li>`
-    // first (HTML5 spec: li/dt/dd are implicitly closed when their parent closes).
     while let Some(top) = state.stack.last() {
         if kinds_match(&top.spec.kind, &spec.kind) {
-            // Found the matching frame — stop flushing optional-close children.
             break;
         }
         if top.spec.optional_close.is_some() {
-            // This top-of-stack element has an optional close rule; implicitly close it.
             emit_close_for_implicit(state, options)?;
         } else {
-            // Top element does not have optional close and doesn't match — genuine mismatch.
             break;
         }
     }
 
-    // Pop the matching frame from the open-tag stack.
-    // Tier-2 is lenient about mismatched tags; for M3c we bail.
+    // ~keep Pop the matching frame from the open-tag stack.
+    // ~keep Tier-2 is lenient about mismatched tags; for M3c we bail.
     let actual_depth = state.stack.len() as u8;
     let frame = pop_matching_frame(&mut state.stack, spec).ok_or_else(|| BailReason::DepthMismatch {
         tag: bytes_to_string(name_lower),
@@ -1504,7 +1430,6 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8], options: &Conversio
         actual: actual_depth,
     })?;
 
-    // Restore escape context
     state.escape_ctx = frame.prev_escape_ctx;
 
     match spec.kind {
@@ -1512,11 +1437,10 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8], options: &Conversio
         TagKind::Heading(n) => close_heading(state, &frame, n, false)?,
         TagKind::Blockquote => close_blockquote(state, &frame),
         TagKind::Pre => close_pre(state, &frame, options),
-        // Strong: suppress close marker when inside summary (see open strong guard).
+        // ~keep Strong: suppress close marker when inside summary (see open strong guard).
         TagKind::Strong if state.summary_at_top() => {}
         TagKind::Strong => close_inline_marker(state, &frame, "**"),
         TagKind::Emphasis => close_inline_marker(state, &frame, "*"),
-        // Strikethrough: also transparent inside <code>/<pre>; mirrors open guard.
         TagKind::Strikethrough
             if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) => {}
         TagKind::Strikethrough => close_inline_marker(state, &frame, "~~"),
@@ -1530,33 +1454,27 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8], options: &Conversio
         TagKind::ListItem => close_list_item(state, &frame),
         TagKind::DefinitionTerm => close_dt(state),
         TagKind::DefinitionDescription => close_dd(state),
-        TagKind::Hr => {
-            // Should not happen (hr is void), but handle gracefully.
-        }
+        TagKind::Hr => {}
         TagKind::Table => close_table(state)?,
         TagKind::TableHead => close_table_head(state),
         TagKind::TableBody => close_table_body(state),
-        TagKind::TableFoot => {
-            // tfoot close: no action needed beyond restoring the frame (done above).
-        }
+        TagKind::TableFoot => {}
         TagKind::TableRow => close_table_row(state),
         TagKind::TableCell { .. } => close_table_cell(state, false)?,
         TagKind::TableCaption => close_table_caption(state),
-        // Generic block container close: when it produced visible content,
-        // ensure a paragraph-break separator follows so the next sibling
-        // doesn't run together with this div's last byte.  Mirrors Tier-2's
-        // `div::handle` post-children block: `output.push_str("\n\n")` when
-        // `has_content` (see block/div.rs around line 124-130).
+        // ~keep Generic block container close: when it produced visible content,
+        // ~keep ensure a paragraph-break separator follows so the next sibling
+        // ~keep doesn't run together with this div's last byte.  Mirrors Tier-2's
+        // ~keep `div::handle` post-children block: `output.push_str("\n\n")` when
+        // ~keep `has_content` (see block/div.rs around line 124-130).
         TagKind::Block => close_block_container(state, &frame),
-        // Summary: pop accumulation buffer, trim, emit `**…**\n\n` (Phase R).
+        // ~keep Summary: pop accumulation buffer, trim, emit `**…**\n\n` (Phase R).
         TagKind::Summary => close_summary(state, &frame),
-        // Figcaption: pop accumulation buffer, trim, emit `*…*\n\n` (Phase FF-2).
+        // ~keep Figcaption: pop accumulation buffer, trim, emit `*…*\n\n` (Phase FF-2).
         TagKind::Figcaption => close_figcaption(state, &frame),
-        // Button (Phase T): emit `\n\n` when content was produced — mirrors
-        // Tier-2 `form/elements.rs:592-594`.  No leading separator on open.
+        // ~keep Button (Phase T): emit `\n\n` when content was produced — mirrors
+        // ~keep Tier-2 `form/elements.rs:592-594`.  No leading separator on open.
         TagKind::Button => close_button(state, &frame),
-        // Inline containers (span/etc.): no separator.  For `<abbr>` pop the
-        // title side-stack and emit ` (title)` after the abbr's text content.
         TagKind::Inline => {
             if name_lower == b"abbr" {
                 if let Some(Some(title)) = state.abbr_titles.pop() {
@@ -1567,9 +1485,7 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8], options: &Conversio
                 }
             }
         }
-        // Void-only kinds that never have open frames:
         TagKind::LineBreak | TagKind::Image => {}
-        // Explicitly no-op: all remaining known kinds not listed above.
         TagKind::RawText(_) | TagKind::Ignored => {}
     }
 
@@ -1590,12 +1506,11 @@ fn close_block_container(state: &mut Tier1State, frame: &OpenTag) {
     }
     let buf = state.cell_or_output_mut();
     if buf.len() <= frame.content_start {
-        // Empty block — no content emitted, no separator needed.
         return;
     }
-    // Drop trailing horizontal whitespace (left over from inter-tag whitespace
-    // preservation) before emitting the block separator.  Same rationale as
-    // `ensure_blank_line` (Phase U-2).
+    // ~keep Drop trailing horizontal whitespace (left over from inter-tag whitespace
+    // ~keep preservation) before emitting the block separator.  Same rationale as
+    // ~keep `ensure_blank_line` (Phase U-2).
     while buf.ends_with(' ') || buf.ends_with('\t') {
         buf.pop();
     }
@@ -1609,7 +1524,7 @@ fn close_block_container(state: &mut Tier1State, frame: &OpenTag) {
     }
 }
 
-// ── Summary strong-wrap (Phase R) ────────────────────────────────────────────
+// ~keep ── Summary strong-wrap (Phase R) ────────────────────────────────────────────
 
 /// Open a `<summary>` element.
 ///
@@ -1638,28 +1553,28 @@ fn open_summary(state: &mut Tier1State) {
 /// - trim
 /// - emit `**…**\n\n`
 fn close_summary(state: &mut Tier1State, _frame: &OpenTag) {
-    // Pop the buffer we pushed in open_summary.
+    // ~keep Pop the buffer we pushed in open_summary.
     let buf = match state.pop_summary_buf() {
         Some(b) => b,
-        None => return, // malformed nesting — nothing pushed
+        None => return,
     };
     let trimmed = buf.trim();
     if trimmed.is_empty() {
         return;
     }
-    // Acquire the parent destination.  Because we already popped the buffer
-    // above, cell_or_output_mut now returns the next-outer target — which may
-    // be the table cell buffer (when the summary was inside a <td>), an outer
-    // summary buffer, or the main output.
-    //
-    // Check whether we're emitting into a table cell BEFORE borrowing `dest`,
-    // so we can decide whether to add a leading separator without conflicting
-    // with the mutable borrow.
+    // ~keep Acquire the parent destination.  Because we already popped the buffer
+    // ~keep above, cell_or_output_mut now returns the next-outer target — which may
+    // ~keep be the table cell buffer (when the summary was inside a <td>), an outer
+    // ~keep summary buffer, or the main output.
+    // ~keep
+    // ~keep Check whether we're emitting into a table cell BEFORE borrowing `dest`,
+    // ~keep so we can decide whether to add a leading separator without conflicting
+    // ~keep with the mutable borrow.
     let writing_to_cell = state.in_table_cell();
     let dest = state.cell_or_output_mut();
-    // Ensure a blank-line separator before the summary block when there is
-    // preceding content and we're NOT writing to a table cell (cells are
-    // rendered to a single line; block separators would be collapsed anyway).
+    // ~keep Ensure a blank-line separator before the summary block when there is
+    // ~keep preceding content and we're NOT writing to a table cell (cells are
+    // ~keep rendered to a single line; block separators would be collapsed anyway).
     if !writing_to_cell && !dest.is_empty() && !dest.ends_with("\n\n") {
         if dest.ends_with('\n') {
             dest.push('\n');
@@ -1672,7 +1587,7 @@ fn close_summary(state: &mut Tier1State, _frame: &OpenTag) {
     dest.push_str("**\n\n");
 }
 
-// ── Figcaption italic-wrap (Phase FF-2) ──────────────────────────────────────
+// ~keep ── Figcaption italic-wrap (Phase FF-2) ──────────────────────────────────────
 
 /// Open a `<figcaption>` element.
 ///
@@ -1702,10 +1617,10 @@ fn close_figcaption(state: &mut Tier1State, _frame: &OpenTag) {
     }
     let writing_to_cell = state.in_table_cell();
     let dest = state.cell_or_output_mut();
-    // Phase FF-2: trim trailing horizontal whitespace introduced by
-    // Phase U-2's inter-tag-whitespace preservation, so the block
-    // separator (\n\n) doesn't sit after a stray space.  Tier-2 does
-    // not emit that space when the figcaption follows inline content.
+    // ~keep Phase FF-2: trim trailing horizontal whitespace introduced by
+    // ~keep Phase U-2's inter-tag-whitespace preservation, so the block
+    // ~keep separator (\n\n) doesn't sit after a stray space.  Tier-2 does
+    // ~keep not emit that space when the figcaption follows inline content.
     while dest.ends_with(' ') || dest.ends_with('\t') {
         dest.pop();
     }
@@ -1738,8 +1653,8 @@ fn close_button(state: &mut Tier1State, frame: &OpenTag) {
     if dest.len() <= frame.content_start {
         return;
     }
-    // Drop trailing horizontal whitespace from the inter-tag fix before the
-    // block separator (Phase U-2).
+    // ~keep Drop trailing horizontal whitespace from the inter-tag fix before the
+    // ~keep block separator (Phase U-2).
     while dest.ends_with(' ') || dest.ends_with('\t') {
         dest.pop();
     }
@@ -1767,17 +1682,16 @@ fn close_inline_marker(state: &mut Tier1State, frame: &OpenTag, marker: &str) {
             .bytes()
             .all(|b| matches!(b, b' ' | b'\t' | b'\n' | b'\r'));
     if body_is_empty {
-        // Truncate back to the position before the open marker was pushed.
         let open_marker_start = frame.content_start.saturating_sub(marker.len());
         buf.truncate(open_marker_start);
         return;
     }
 
-    // Mirror Tier-2's `chomp_inline` (utility/content.rs:31): leading/trailing
-    // whitespace (including Unicode whitespace like NBSP `\u{a0}`) inside the
-    // strong/emphasis markers gets pushed OUTSIDE them so `**\u{a0}X**` becomes
-    // `\u{a0}**X**`.  Required for byte-equality on Wikipedia fixtures with
-    // `<b><span>&nbsp;</span>X</b>` patterns.
+    // ~keep Mirror Tier-2's `chomp_inline` (utility/content.rs:31): leading/trailing
+    // ~keep whitespace (including Unicode whitespace like NBSP `\u{a0}`) inside the
+    // ~keep strong/emphasis markers gets pushed OUTSIDE them so `**\u{a0}X**` becomes
+    // ~keep `\u{a0}**X**`.  Required for byte-equality on Wikipedia fixtures with
+    // ~keep `<b><span>&nbsp;</span>X</b>` patterns.
     let content_str = &buf[frame.content_start..];
     let leading_len = content_str.len() - content_str.trim_start().len();
     if leading_len > 0 {
@@ -1789,8 +1703,6 @@ fn close_inline_marker(state: &mut Tier1State, frame: &OpenTag, marker: &str) {
 
     buf.push_str(marker);
 }
-
-// ── Implicit close-tag emission ───────────────────────────────────────────────
 
 /// Implicitly close the top-of-stack frame without a matching `</tag>` in the
 /// input.  Called by the M4 implicit-close loop when HTML5 optional-tag rules
@@ -1807,7 +1719,6 @@ fn emit_close_for_implicit(state: &mut Tier1State, options: &ConversionOptions) 
     })?;
     let spec = frame.spec;
 
-    // Restore escape context.
     state.escape_ctx = frame.prev_escape_ctx;
 
     match spec.kind {
@@ -1815,11 +1726,10 @@ fn emit_close_for_implicit(state: &mut Tier1State, options: &ConversionOptions) 
         TagKind::Heading(n) => close_heading(state, &frame, n, true)?,
         TagKind::Blockquote => close_blockquote(state, &frame),
         TagKind::Pre => close_pre(state, &frame, options),
-        // Strong: suppress close marker when inside summary (see open strong guard).
+        // ~keep Strong: suppress close marker when inside summary (see open strong guard).
         TagKind::Strong if state.summary_at_top() => {}
         TagKind::Strong => close_inline_marker(state, &frame, "**"),
         TagKind::Emphasis => close_inline_marker(state, &frame, "*"),
-        // Strikethrough: also transparent inside <code>/<pre>; mirrors open guard.
         TagKind::Strikethrough
             if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) => {}
         TagKind::Strikethrough => close_inline_marker(state, &frame, "~~"),
@@ -1835,15 +1745,13 @@ fn emit_close_for_implicit(state: &mut Tier1State, options: &ConversionOptions) 
         TagKind::DefinitionDescription => close_dd(state),
         TagKind::TableCell { .. } => close_table_cell(state, true)?,
         TagKind::TableRow => close_table_row(state),
-        // Summary: pop accumulation buffer, trim, emit `**…**\n\n` (Phase R).
+        // ~keep Summary: pop accumulation buffer, trim, emit `**…**\n\n` (Phase R).
         TagKind::Summary => close_summary(state, &frame),
-        // Figcaption: pop accumulation buffer, trim, emit `*…*\n\n` (Phase FF-2).
+        // ~keep Figcaption: pop accumulation buffer, trim, emit `*…*\n\n` (Phase FF-2).
         TagKind::Figcaption => close_figcaption(state, &frame),
-        // Button (Phase T): emit `\n\n` on EOF close just like explicit close.
+        // ~keep Button (Phase T): emit `\n\n` on EOF close just like explicit close.
         TagKind::Button => close_button(state, &frame),
-        // Generic block/inline: no closing marker.
         TagKind::Block | TagKind::Inline => {}
-        // Void-only kinds and other no-op kinds:
         TagKind::LineBreak
         | TagKind::Image
         | TagKind::Hr
@@ -1859,17 +1767,15 @@ fn emit_close_for_implicit(state: &mut Tier1State, options: &ConversionOptions) 
     Ok(())
 }
 
-// ── Per-TagKind close helpers ─────────────────────────────────────────────────
-
 fn close_paragraph(state: &mut Tier1State) {
-    // When inside a table cell, `<p>` is transparent — no block separators.
-    // Any inter-paragraph separators were already added as `<br>` at open time
-    // by `open_paragraph`; `close_paragraph` does nothing in this context.
+    // ~keep When inside a table cell, `<p>` is transparent — no block separators.
+    // ~keep Any inter-paragraph separators were already added as `<br>` at open time
+    // ~keep by `open_paragraph`; `close_paragraph` does nothing in this context.
     if state.in_table_cell() {
         return;
     }
-    // Tier-2 appends "\n\n" after paragraph content (always two newlines).
-    // Matching this precisely is required for byte-equal output.
+    // ~keep Tier-2 appends "\n\n" after paragraph content (always two newlines).
+    // ~keep Matching this precisely is required for byte-equal output.
     trim_trailing_inline_whitespace(state);
     state.cell_or_output_mut().push_str("\n\n");
 }
@@ -1880,13 +1786,12 @@ fn close_paragraph(state: &mut Tier1State) {
 /// closed headings have already had their content flushed through the normal
 /// path, so we just prepend the prefix unconditionally.
 fn close_heading(state: &mut Tier1State, frame: &OpenTag, n: u8, is_implicit: bool) -> Result<(), BailReason> {
-    // When inside a table cell, Tier-2 emits the heading text directly into
-    // the cell accumulator — no `#` prefix, no block separators.  The
-    // `frame.content_start` is a position in the CELL buffer (set by
-    // `cell_or_output_mut().len()` at emit_open time), so all position
-    // arithmetic must use the cell buffer, not `state.output`.
+    // ~keep When inside a table cell, Tier-2 emits the heading text directly into
+    // ~keep the cell accumulator — no `#` prefix, no block separators.  The
+    // ~keep `frame.content_start` is a position in the CELL buffer (set by
+    // ~keep `cell_or_output_mut().len()` at emit_open time), so all position
+    // ~keep arithmetic must use the cell buffer, not `state.output`.
     if state.in_table_cell() {
-        // Trim trailing inline whitespace from the cell buffer.
         let cell_buf = state.cell_or_output_mut();
         while cell_buf.ends_with(' ') || cell_buf.ends_with('\t') {
             cell_buf.pop();
@@ -1894,12 +1799,10 @@ fn close_heading(state: &mut Tier1State, frame: &OpenTag, n: u8, is_implicit: bo
         if !is_implicit {
             let content = &state.cell_or_output_mut()[frame.content_start..];
             if content.trim().is_empty() {
-                // Empty heading in a cell: roll back to content_start.
                 let len = frame.content_start;
                 state.cell_or_output_mut().truncate(len);
             }
         }
-        // No prefix, no trailing separator — just the raw text in the cell.
         return Ok(());
     }
 
@@ -1908,12 +1811,9 @@ fn close_heading(state: &mut Tier1State, frame: &OpenTag, n: u8, is_implicit: bo
     if !is_implicit {
         let content = &state.output[frame.content_start..];
         if content.trim().is_empty() {
-            // Empty heading: Tier-2 emits nothing. Roll back to before
-            // the heading's block separator was added.
+            // ~keep Empty heading: Tier-2 emits nothing. Roll back to before
+            // ~keep the heading's block separator was added.
             state.output.truncate(frame.content_start);
-            // Also trim any blank-line separator that ensure_blank_line
-            // added before the heading opened (frame.content_start is
-            // after emit_open, which may have pushed "\n\n").
             let trimmed_len = state.output.trim_end_matches('\n').len();
             if trimmed_len > 0 {
                 state.output.truncate(trimmed_len);
@@ -1925,11 +1825,11 @@ fn close_heading(state: &mut Tier1State, frame: &OpenTag, n: u8, is_implicit: bo
         }
     }
 
-    // Normalize whitespace in the heading body: Tier-2's heading.rs walks
-    // children with `convert_as_inline: true` which routes text through
-    // text-node normalization, folding `\n + indent` runs to a single space.
-    // Mirror that here so `<h3>Mozilla\n   sponsorship</h3>` emits
-    // `### Mozilla sponsorship` rather than `### Mozilla\n  sponsorship`.
+    // ~keep Normalize whitespace in the heading body: Tier-2's heading.rs walks
+    // ~keep children with `convert_as_inline: true` which routes text through
+    // ~keep text-node normalization, folding `\n + indent` runs to a single space.
+    // ~keep Mirror that here so `<h3>Mozilla\n   sponsorship</h3>` emits
+    // ~keep `### Mozilla sponsorship` rather than `### Mozilla\n  sponsorship`.
     if state.output[frame.content_start..].contains('\n') {
         let content = state.output[frame.content_start..].to_owned();
         let mut normalized = String::with_capacity(content.len());
@@ -1952,29 +1852,26 @@ fn close_heading(state: &mut Tier1State, frame: &OpenTag, n: u8, is_implicit: bo
 
     let prefix = heading_prefix(n);
     state.output.insert_str(frame.content_start, prefix);
-    // Tier-2 leaves a blank line ("\n\n") after a heading. A
-    // following paragraph's "\n\n" guard then finds it already and appends
-    // nothing, yielding the expected single blank line.
+    // ~keep Tier-2 leaves a blank line ("\n\n") after a heading. A
+    // ~keep following paragraph's "\n\n" guard then finds it already and appends
+    // ~keep nothing, yielding the expected single blank line.
     state.ensure_blank_line();
     Ok(())
 }
 
 fn close_blockquote(state: &mut Tier1State, frame: &OpenTag) {
-    // Phase GG follow-up: inside a table cell `frame.content_start` indexes
-    // into the cell buffer, not `state.output`.  Don't prefix `> ` — Tier-2
-    // also collapses blockquote inside cells to plain inline text.
+    // ~keep Phase GG follow-up: inside a table cell `frame.content_start` indexes
+    // ~keep into the cell buffer, not `state.output`.  Don't prefix `> ` — Tier-2
+    // ~keep also collapses blockquote inside cells to plain inline text.
     if state.in_table_cell() {
         return;
     }
-    // The blockquote content needs `> ` prefixed to every line.
-    // We inserted nothing on open; now we need to post-process the
-    // content from `frame.content_start` to the current output end.
     let content = state.output[frame.content_start..].to_owned();
     let prefixed = prefix_blockquote_lines(&content);
     state.output.truncate(frame.content_start);
-    // Mirror Tier-2 blockquote.rs: when the output ends with "\n\n"
-    // before the blockquote, remove one "\n" (heading-then-blockquote
-    // produces only a single newline separator, not a blank line).
+    // ~keep Mirror Tier-2 blockquote.rs: when the output ends with "\n\n"
+    // ~keep before the blockquote, remove one "\n" (heading-then-blockquote
+    // ~keep produces only a single newline separator, not a blank line).
     if state.output.ends_with("\n\n") {
         state.output.pop();
     }
@@ -1983,11 +1880,11 @@ fn close_blockquote(state: &mut Tier1State, frame: &OpenTag) {
 
 fn close_pre(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptions) {
     use crate::options::CodeBlockStyle;
-    // Phase GG follow-up: when `<pre>` opened inside a table cell, its content
-    // was accumulated into `current_cell` (the cell buffer), not `state.output`.
-    // The frame's `content_start` indexes into the cell buffer.  Don't emit a
-    // code fence — Tier-2 also collapses pre inside cells to plain inline text
-    // (the cell's `replace('\n', ' ')` step does the rest).
+    // ~keep Phase GG follow-up: when `<pre>` opened inside a table cell, its content
+    // ~keep was accumulated into `current_cell` (the cell buffer), not `state.output`.
+    // ~keep The frame's `content_start` indexes into the cell buffer.  Don't emit a
+    // ~keep code fence — Tier-2 also collapses pre inside cells to plain inline text
+    // ~keep (the cell's `replace('\n', ' ')` step does the rest).
     if state.in_table_cell() {
         return;
     }
@@ -2006,42 +1903,36 @@ fn close_pre(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOption
                 state.output.push_str(&options.code_language);
             }
             state.output.push('\n');
-            // Strip a single leading + trailing newline from raw so neither
-            // fence sits next to a blank line.  Tier-2 emits
-            // `\ncontent\n` (single newlines flanking content).
+            // ~keep Strip a single leading + trailing newline from raw so neither
+            // ~keep fence sits next to a blank line.  Tier-2 emits
+            // ~keep `\ncontent\n` (single newlines flanking content).
             let raw = raw.strip_prefix('\n').unwrap_or(&raw);
             let raw = raw.strip_suffix('\n').unwrap_or(raw);
             state.output.push_str(raw);
             state.output.push('\n');
             state.output.push_str("```\n");
         }
-        // Tildes are router-gated; this arm is unreachable in practice but
-        // kept exhaustive.
         CodeBlockStyle::Tildes => {
             let indented = indent_pre_lines(&raw);
             state.output.push_str(&indented);
         }
     }
-    // Reset for the next <pre>.
     state.pre_lang = None;
 }
 
 fn close_code(state: &mut Tier1State, frame: &OpenTag) {
-    // escape_ctx was already restored to prev (outer) context above.
-    // When inside <pre> or an outer <code>, this <code> is transparent —
-    // no backtick markers, content already emitted in place.
     if state.escape_ctx.contains(EscapeCtx::PRE) || state.escape_ctx.contains(EscapeCtx::CODE) {
         return;
     }
-    // Phase CC: smart backtick escaping (mirrors inline/code.rs:260).
-    // Open emitted nothing; content from `frame.content_start` to buf
-    // end is the raw code content.  Choose num_backticks + delimiter
-    // spaces from that slice, then truncate and re-emit wrapped.
+    // ~keep Phase CC: smart backtick escaping (mirrors inline/code.rs:260).
+    // ~keep Open emitted nothing; content from `frame.content_start` to buf
+    // ~keep end is the raw code content.  Choose num_backticks + delimiter
+    // ~keep spaces from that slice, then truncate and re-emit wrapped.
     let buf = state.cell_or_output_mut();
     let content_start = frame.content_start.min(buf.len());
     if content_start >= buf.len() {
-        // No content emitted between open and close — Tier-2 emits
-        // nothing for empty <code></code>.
+        // ~keep No content emitted between open and close — Tier-2 emits
+        // ~keep nothing for empty <code></code>.
         return;
     }
 
@@ -2081,9 +1972,6 @@ fn close_code(state: &mut Tier1State, frame: &OpenTag) {
         (needs_delimiter_spaces, num_backticks)
     };
 
-    // Splice in the open marker before the content.  Cheap path: build
-    // the wrap prefix/suffix as &str pieces and use String::insert_str.
-    // (We push the suffix at the end without an extra allocation.)
     let mut prefix = String::with_capacity(num_backticks + 1);
     for _ in 0..num_backticks {
         prefix.push('`');
@@ -2101,23 +1989,23 @@ fn close_code(state: &mut Tier1State, frame: &OpenTag) {
 }
 
 fn close_link(state: &mut Tier1State, frame: &OpenTag) {
-    // Close the link: `](href "title")` or `](href)`
-    // If no href, just emit the text as-is (Tier-2 behaviour: no link markup).
-    // Link state was pushed to state.link_stack at open; pop it now.
+    // ~keep Close the link: `](href "title")` or `](href)`
+    // ~keep If no href, just emit the text as-is (Tier-2 behaviour: no link markup).
+    // ~keep Link state was pushed to state.link_stack at open; pop it now.
     let (href, title) = state.link_stack.pop().unwrap_or((None, None));
     let dest = state.cell_or_output_mut();
-    // Trim trailing whitespace inside the link label so `[text  ](url)`
-    // collapses to `[text](url)` — matches Tier-2's normalize_link_label
-    // at utility/content.rs:145 (kimbrain.html and similar source HTML
-    // with whitespace before </a>).
+    // ~keep Trim trailing whitespace inside the link label so `[text  ](url)`
+    // ~keep collapses to `[text](url)` — matches Tier-2's normalize_link_label
+    // ~keep at utility/content.rs:145 (kimbrain.html and similar source HTML
+    // ~keep with whitespace before </a>).
     let trim_start = frame.content_start.min(dest.len());
     let trimmed_end = dest[trim_start..].trim_end_matches(|c: char| c.is_whitespace()).len();
     dest.truncate(trim_start + trimmed_end);
-    // Mirror Tier-2's `normalize_whitespace_cow` step inside
-    // `normalize_link_label` (utility/content.rs:144): any Unicode whitespace
-    // in the link label (notably NBSP `\u{00a0}`) collapses to a single ASCII
-    // space.  Tier-1 otherwise emits `[Designed\u{a0}by](url)` where Tier-2
-    // emits `[Designed by](url)`.
+    // ~keep Mirror Tier-2's `normalize_whitespace_cow` step inside
+    // ~keep `normalize_link_label` (utility/content.rs:144): any Unicode whitespace
+    // ~keep in the link label (notably NBSP `\u{00a0}`) collapses to a single ASCII
+    // ~keep space.  Tier-1 otherwise emits `[Designed\u{a0}by](url)` where Tier-2
+    // ~keep emits `[Designed by](url)`.
     if dest[trim_start..].contains('\u{00a0}') {
         let normalised: String = dest[trim_start..]
             .chars()
@@ -2126,9 +2014,9 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag) {
         dest.truncate(trim_start);
         dest.push_str(&normalised);
     }
-    // Wikipedia back-reference normalisation (Tier-2 `handlers/link.rs:208`):
-    // a label of exactly `^` paired with an `#anchor` href is rewritten to
-    // `↑` so it does not look like Markdown's footnote syntax.
+    // ~keep Wikipedia back-reference normalisation (Tier-2 `handlers/link.rs:208`):
+    // ~keep a label of exactly `^` paired with an `#anchor` href is rewritten to
+    // ~keep `↑` so it does not look like Markdown's footnote syntax.
     if let Some(href_str) = href.as_deref() {
         if href_str.starts_with('#') && dest.len() == trim_start + 1 && dest.as_bytes()[trim_start] == b'^' {
             dest.truncate(trim_start);
@@ -2137,12 +2025,12 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag) {
     }
     if let Some(href) = href {
         if let Some(title) = title {
-            // Tier-2 in production HTML fixtures HTML-encodes a literal `"`
-            // in the title attribute to `&quot;` (rather than the
-            // `replace('"', "\\\"")` shown in `inline/link.rs:482-484`).  The
-            // backslash-escape branch of link.rs appears unreachable in
-            // practice for the title attribute path on these fixtures.
-            // Mirror the observed fixture behaviour to match expected output.
+            // ~keep Tier-2 in production HTML fixtures HTML-encodes a literal `"`
+            // ~keep in the title attribute to `&quot;` (rather than the
+            // ~keep `replace('"', "\\\"")` shown in `inline/link.rs:482-484`).  The
+            // ~keep backslash-escape branch of link.rs appears unreachable in
+            // ~keep practice for the title attribute path on these fixtures.
+            // ~keep Mirror the observed fixture behaviour to match expected output.
             let escaped_title;
             let title_out: &str = if title.contains('"') {
                 escaped_title = title.replace('"', "&quot;");
@@ -2150,18 +2038,13 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag) {
             } else {
                 &title
             };
-            // measured: write! is slower on this workload (Stage 5c)
             #[allow(clippy::format_push_string)]
             dest.push_str(&format!("]({href} \"{title_out}\")"));
         } else {
-            // measured: write! is slower on this workload (Stage 5c)
             #[allow(clippy::format_push_string)]
             dest.push_str(&format!("]({href})"));
         }
     } else {
-        // No href: remove the `[` we emitted on open, keep just the text.
-        // Find and remove the opening `[` that corresponds to this link.
-        // content_start is relative to cell buffer when in a cell.
         if let Some(bracket_pos) = dest[..frame.content_start].rfind('[') {
             dest.remove(bracket_pos);
         }
@@ -2173,13 +2056,12 @@ fn close_list(state: &mut Tier1State, kind: ListKind) {
     if matches!(kind, ListKind::Unordered) {
         state.ul_depth = state.ul_depth.saturating_sub(1);
     }
-    // When inside a table cell, Tier-2 does NOT add a trailing newline after
-    // the list — the cell accumulator handles any separators via the
-    // `\n → space` replacement at cell-close time.
+    // ~keep When inside a table cell, Tier-2 does NOT add a trailing newline after
+    // ~keep the list — the cell accumulator handles any separators via the
+    // ~keep `\n → space` replacement at cell-close time.
     if state.in_table_cell() {
         return;
     }
-    // Ensure the list ends with exactly one newline before any following content.
     let dest = state.cell_or_output_mut();
     if !dest.ends_with('\n') {
         dest.push('\n');
@@ -2187,11 +2069,10 @@ fn close_list(state: &mut Tier1State, kind: ListKind) {
 }
 
 fn close_list_item(state: &mut Tier1State, frame: &OpenTag) {
-    // When inside a table cell, Tier-2 does NOT add a trailing newline after
-    // each list item (see list/item.rs: `if !ctx.in_table_cell { ... \n ... }`).
-    // Items are concatenated directly in the cell accumulator.
+    // ~keep When inside a table cell, Tier-2 does NOT add a trailing newline after
+    // ~keep each list item (see list/item.rs: `if !ctx.in_table_cell { ... \n ... }`).
+    // ~keep Items are concatenated directly in the cell accumulator.
     if state.in_table_cell() {
-        // Trim trailing inline whitespace from the cell buffer.
         let cell_buf = state.cell_or_output_mut();
         while cell_buf.ends_with(' ') || cell_buf.ends_with('\t') {
             cell_buf.pop();
@@ -2200,11 +2081,11 @@ fn close_list_item(state: &mut Tier1State, frame: &OpenTag) {
     }
     trim_trailing_inline_whitespace(state);
     let dest = state.cell_or_output_mut();
-    // Phase EE: loose-list separator.  When this item had block-level
-    // children (its content range contains a `\n\n` block separator),
-    // mirror Tier-2's `handle_li` ensure_trailing_blank_line behaviour
-    // so the next sibling `<li>` starts after a blank line.  Plain text
-    // items still get the tight `\n` terminator.
+    // ~keep Phase EE: loose-list separator.  When this item had block-level
+    // ~keep children (its content range contains a `\n\n` block separator),
+    // ~keep mirror Tier-2's `handle_li` ensure_trailing_blank_line behaviour
+    // ~keep so the next sibling `<li>` starts after a blank line.  Plain text
+    // ~keep items still get the tight `\n` terminator.
     let had_block_children = {
         let start = frame.content_start.min(dest.len());
         dest[start..].contains("\n\n")
@@ -2222,22 +2103,22 @@ fn close_list_item(state: &mut Tier1State, frame: &OpenTag) {
     }
 }
 
-// ── Definition-list helpers ───────────────────────────────────────────────────
-//
-// Tier-2 reference: crates/html-to-markdown/src/converter/list/definition.rs.
-// Tier-2 builds the full <dl> content in a buffer, trims it, then emits with
-// "\n\n" boundaries. <dt> emits trimmed term + "\n"; <dd> emits trimmed
-// description + "\n\n". Tier-1 streams the same shape by:
-//   - open_dl: ensure blank line; record content_start on the frame
-//   - close_dt: trim trailing whitespace, push "\n"
-//   - close_dd: trim trailing whitespace, push "\n\n"
-//   - close_dl: trim leading/trailing whitespace inside the dl range, then
-//               normalise the trailing separator to "\n\n"
-//
-// Bails on dl/dt/dd are removed (see bail_unsupported). Implicit close of an
-// open dt/dd when a sibling dt/dd opens is wired via OptionalCloseRule::
-// CloseSiblingDtDd in spec_rules.rs and runs the same close_dt/close_dd path
-// through emit_close_for_implicit.
+// ~keep ── Definition-list helpers ───────────────────────────────────────────────────
+// ~keep
+// ~keep Tier-2 reference: crates/html-to-markdown/src/converter/list/definition.rs.
+// ~keep Tier-2 builds the full <dl> content in a buffer, trims it, then emits with
+// ~keep "\n\n" boundaries. <dt> emits trimmed term + "\n"; <dd> emits trimmed
+// ~keep description + "\n\n". Tier-1 streams the same shape by:
+// ~keep   - open_dl: ensure blank line; record content_start on the frame
+// ~keep   - close_dt: trim trailing whitespace, push "\n"
+// ~keep   - close_dd: trim trailing whitespace, push "\n\n"
+// ~keep   - close_dl: trim leading/trailing whitespace inside the dl range, then
+// ~keep               normalise the trailing separator to "\n\n"
+// ~keep
+// ~keep Bails on dl/dt/dd are removed (see bail_unsupported). Implicit close of an
+// ~keep open dt/dd when a sibling dt/dd opens is wired via OptionalCloseRule::
+// ~keep CloseSiblingDtDd in spec_rules.rs and runs the same close_dt/close_dd path
+// ~keep through emit_close_for_implicit.
 
 fn open_dl(state: &mut Tier1State) {
     if state.in_table_cell() {
@@ -2246,15 +2127,9 @@ fn open_dl(state: &mut Tier1State) {
     state.ensure_blank_line();
 }
 
-const fn open_dt(_state: &mut Tier1State) {
-    // No marker; content streams into the current buffer. close_dt adds the
-    // trailing newline.
-}
+const fn open_dt(_state: &mut Tier1State) {}
 
-const fn open_dd(_state: &mut Tier1State) {
-    // No marker; content streams into the current buffer. close_dd adds the
-    // trailing paragraph separator.
-}
+const fn open_dd(_state: &mut Tier1State) {}
 
 fn close_dt(state: &mut Tier1State) {
     if state.in_table_cell() {
@@ -2277,7 +2152,6 @@ fn close_dd(state: &mut Tier1State) {
     if buf.is_empty() {
         return;
     }
-    // Normalise to exactly "\n\n" at the end.
     if buf.ends_with("\n\n") {
         return;
     }
@@ -2293,13 +2167,13 @@ fn close_dl(state: &mut Tier1State, frame: &OpenTag) {
         return;
     }
     let buf = state.cell_or_output_mut();
-    // Empty dl: emit nothing (matches Tier-2 which skips when trimmed content
-    // is empty).
+    // ~keep Empty dl: emit nothing (matches Tier-2 which skips when trimmed content
+    // ~keep is empty).
     if buf.len() <= frame.content_start {
         return;
     }
-    // Tier-2 trims the dl's accumulated content, so any trailing whitespace
-    // from the last dt/dd close should collapse to a single "\n\n" separator.
+    // ~keep Tier-2 trims the dl's accumulated content, so any trailing whitespace
+    // ~keep from the last dt/dd close should collapse to a single "\n\n" separator.
     while buf.len() > frame.content_start {
         let last = buf.as_bytes()[buf.len() - 1];
         if matches!(last, b' ' | b'\t' | b'\n' | b'\r') {
@@ -2315,58 +2189,58 @@ fn close_dl(state: &mut Tier1State, frame: &OpenTag) {
 }
 
 fn close_table(state: &mut Tier1State) -> Result<(), BailReason> {
-    // Pop the table state and (if safe) emit the GFM table to main output.
+    // ~keep Pop the table state and (if safe) emit the GFM table to main output.
     let Some(ts) = state.table_stack.pop() else {
         return Ok(());
     };
 
-    // Safety checks: ensure Tier-2 would also use the GFM path.
-    //
-    // Tier-2 uses the layout (non-GFM) path when ALL of these hold:
-    //   (a) no <th> anywhere in the table, AND
-    //   (b) no <caption>, AND
-    //   (c) looks_like_layout || is_blank || (row_count<=2 && link_count>=3)
-    //
-    // Where looks_like_layout covers nested tables (already bailed),
-    // colspan/rowspan (already bailed), and inconsistent column counts.
-    //
-    // If those conditions could apply to this table, we bail rather than
-    // emit a GFM table that Tier-2 would have rendered differently.
-    //
-    // When a <caption> is present, Tier-2 always takes the GFM path
-    // regardless of <th> presence (has_caption short-circuits the layout check).
+    // ~keep Safety checks: ensure Tier-2 would also use the GFM path.
+    // ~keep
+    // ~keep Tier-2 uses the layout (non-GFM) path when ALL of these hold:
+    // ~keep   (a) no <th> anywhere in the table, AND
+    // ~keep   (b) no <caption>, AND
+    // ~keep   (c) looks_like_layout || is_blank || (row_count<=2 && link_count>=3)
+    // ~keep
+    // ~keep Where looks_like_layout covers nested tables (already bailed),
+    // ~keep colspan/rowspan (already bailed), and inconsistent column counts.
+    // ~keep
+    // ~keep If those conditions could apply to this table, we bail rather than
+    // ~keep emit a GFM table that Tier-2 would have rendered differently.
+    // ~keep
+    // ~keep When a <caption> is present, Tier-2 always takes the GFM path
+    // ~keep regardless of <th> presence (has_caption short-circuits the layout check).
     let has_caption = ts.caption_text.is_some();
     if !ts.has_th && !has_caption {
-        // No <th> and no <caption>: check if Tier-2 would take the layout path.
+        // ~keep No <th> and no <caption>: check if Tier-2 would take the layout path.
         let row_count = ts.rows.len();
 
-        // Inconsistent column counts → layout table in Tier-2.
-        // Compare colspan-expanded column counts (sum of cell colspans per row)
-        // because Tier-2 computes column counts post-colspan expansion.
+        // ~keep Inconsistent column counts → layout table in Tier-2.
+        // ~keep Compare colspan-expanded column counts (sum of cell colspans per row)
+        // ~keep because Tier-2 computes column counts post-colspan expansion.
         let expanded_cols = |row: &Vec<(String, u16)>| -> usize { row.iter().map(|(_, c)| usize::from(*c)).sum() };
         let inconsistent_cols = {
             let first = ts.first_row_col_count.unwrap_or(0);
             ts.rows.iter().any(|r| expanded_cols(r) != first)
         };
 
-        // Link-heavy with few rows → layout table in Tier-2.
+        // ~keep Link-heavy with few rows → layout table in Tier-2.
         let link_heavy = row_count <= 2 && ts.link_count >= 3;
 
-        // Blank table → Tier-2 emits nothing (not a bail case).
+        // ~keep Blank table → Tier-2 emits nothing (not a bail case).
         let is_blank = ts.rows.is_empty() || ts.rows.iter().all(|r| r.iter().all(|(c, _)| c.trim().is_empty()));
 
         if inconsistent_cols || link_heavy || is_blank {
-            // Tier-2 would not emit a GFM table here.  Bail so the fallback
-            // produces the correct layout output.  Phase L's full layout
-            // emit deferred — needs more careful per-cell content tracking
-            // to mirror Tier-2's walker exactly.
+            // ~keep Tier-2 would not emit a GFM table here.  Bail so the fallback
+            // ~keep produces the correct layout output.  Phase L's full layout
+            // ~keep emit deferred — needs more careful per-cell content tracking
+            // ~keep to mirror Tier-2's walker exactly.
             return Err(BailReason::Classifier);
         }
     }
-    // Phase HH: a nested table writes its GFM rendering into the parent
-    // cell buffer; the parent's `close_table_cell` then collapses the
-    // resulting newlines to spaces.  An outer table writes to the main
-    // output buffer as before.
+    // ~keep Phase HH: a nested table writes its GFM rendering into the parent
+    // ~keep cell buffer; the parent's `close_table_cell` then collapses the
+    // ~keep resulting newlines to spaces.  An outer table writes to the main
+    // ~keep output buffer as before.
     if ts.inline_mode {
         if let Some(outer) = state.table_stack.last_mut() {
             outer.had_nested_table = true;
@@ -2409,15 +2283,14 @@ fn close_table_caption(state: &mut Tier1State) {
 }
 
 fn close_table_row(state: &mut Tier1State) {
-    // Commit current_row to rows (skip empty rows).
     let Some(ts) = state.table_stack.last_mut() else {
         return;
     };
     if ts.current_row.is_empty() {
         return;
     }
-    // Track first-row column count for consistency checking — use the
-    // colspan-expanded count so Tier-2's heuristic compares the same numbers.
+    // ~keep Track first-row column count for consistency checking — use the
+    // ~keep colspan-expanded count so Tier-2's heuristic compares the same numbers.
     let col_count: usize = ts.current_row.iter().map(|(_, c)| usize::from(*c)).sum();
     if ts.first_row_col_count.is_none() {
         ts.first_row_col_count = Some(col_count);
@@ -2436,52 +2309,49 @@ fn close_table_cell(state: &mut Tier1State, is_implicit: bool) -> Result<(), Bai
         return Ok(());
     };
     ts.in_cell = false;
-    // Trim the accumulated cell text (matches Tier-2 `text.trim()`).
+    // ~keep Trim the accumulated cell text (matches Tier-2 `text.trim()`).
     let cell_text_raw = ts.current_cell.trim().to_owned();
-    // Replace newlines with spaces — mirrors Tier-2's `cell_text_content`
-    // which calls `text.replace('\n', " ")` when `br_in_tables` is false.
+    // ~keep Replace newlines with spaces — mirrors Tier-2's `cell_text_content`
+    // ~keep which calls `text.replace('\n', " ")` when `br_in_tables` is false.
     let cell_text = if cell_text_raw.contains('\n') {
         cell_text_raw.replace('\n', " ")
     } else {
         cell_text_raw
     };
-    // Expand the `<br>` sentinel `\u{0001}` to three literal spaces — Tier-2
-    // emits `<br>` as `"  \n"` and the cell-level `replace('\n', ' ')` yields
-    // `"   "` (three spaces).  Using a sentinel keeps multi-space runs from
-    // inter-tag whitespace distinguishable from `<br>`-derived padding.
+    // ~keep Expand the `<br>` sentinel `\u{0001}` to three literal spaces — Tier-2
+    // ~keep emits `<br>` as `"  \n"` and the cell-level `replace('\n', ' ')` yields
+    // ~keep `"   "` (three spaces).  Using a sentinel keeps multi-space runs from
+    // ~keep inter-tag whitespace distinguishable from `<br>`-derived padding.
     let cell_text = if cell_text.contains('\u{0001}') {
         cell_text.replace('\u{0001}', "   ")
     } else {
         cell_text
     };
-    // Trim again after newline replacement (drops stray edge whitespace).
     let cell_text = cell_text.trim().to_owned();
-    // Bail if the cell contains a pipe: Tier-2 escapes `|` → `\|`
-    // which changes the cell width computation; Tier-1 does not
-    // implement pipe escaping.  Implicit closes skip this check because
-    // they are triggered during structural teardown, not fresh cell data.
-    //
-    // Phase HH exception: when a nested table emitted GFM markdown into
-    // this cell, the literal pipes are part of the inner table's
-    // rendering — Tier-2 does NOT escape them either.  `had_nested_table`
-    // gates the skip; reset it so subsequent cells in the same row are
-    // still pipe-checked.
+    // ~keep Bail if the cell contains a pipe: Tier-2 escapes `|` → `\|`
+    // ~keep which changes the cell width computation; Tier-1 does not
+    // ~keep implement pipe escaping.  Implicit closes skip this check because
+    // ~keep they are triggered during structural teardown, not fresh cell data.
+    // ~keep
+    // ~keep Phase HH exception: when a nested table emitted GFM markdown into
+    // ~keep this cell, the literal pipes are part of the inner table's
+    // ~keep rendering — Tier-2 does NOT escape them either.  `had_nested_table`
+    // ~keep gates the skip; reset it so subsequent cells in the same row are
+    // ~keep still pipe-checked.
     let allow_pipes = ts.had_nested_table;
     ts.had_nested_table = false;
     if !is_implicit && !allow_pipes && cell_text.contains('|') {
         return Err(BailReason::TableBlockChildInCell);
     }
-    // Phase L-prep: store (text, colspan) so emit_gfm_table can mirror
-    // Tier-2's `for _ in 0..colspan { output.push_str(" |") }` (cell.rs:248)
-    // and the layout-heuristic uses the colspan-expanded column count.
+    // ~keep Phase L-prep: store (text, colspan) so emit_gfm_table can mirror
+    // ~keep Tier-2's `for _ in 0..colspan { output.push_str(" |") }` (cell.rs:248)
+    // ~keep and the layout-heuristic uses the colspan-expanded column count.
     let colspan = ts.current_cell_colspan;
     ts.current_row.push((cell_text, colspan));
     ts.current_cell.clear();
     ts.current_cell_colspan = 1;
     Ok(())
 }
-
-// ── Text flushing ─────────────────────────────────────────────────────────────
 
 /// Flush a raw HTML text segment into the output (or current cell buffer),
 /// decoding entities and collapsing whitespace (unless inside `<pre>`).
@@ -2506,13 +2376,10 @@ fn ends_with_ordered_marker(s: &str) -> bool {
     if punct != b'.' && punct != b')' {
         return false;
     }
-    // Walk back over digits.
     let mut i = len - 2;
     while i > 0 && bytes[i - 1].is_ascii_digit() {
         i -= 1;
     }
-    // At least one digit and the start of digits is followed by a non-digit
-    // (or start of buffer).
     i < len - 2 && (i == 0 || !bytes[i - 1].is_ascii_digit())
 }
 
@@ -2556,43 +2423,39 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
         return Ok(());
     }
 
-    // Inside a table but outside a cell or caption: discard text (whitespace
-    // between structural tags like <table>...<tr> or <tr>...<td>).
-    // Tier-2 processes only tag children explicitly, ignoring text nodes at
-    // this level.  Caption content is the exception — Tier-2 walks caption
-    // children and accumulates their text into the caption output.
+    // ~keep Inside a table but outside a cell or caption: discard text (whitespace
+    // ~keep between structural tags like <table>...<tr> or <tr>...<td>).
+    // ~keep Tier-2 processes only tag children explicitly, ignoring text nodes at
+    // ~keep this level.  Caption content is the exception — Tier-2 walks caption
+    // ~keep children and accumulates their text into the caption output.
     if !state.table_stack.is_empty() && !state.in_table_cell() && !state.in_table_caption() {
         return Ok(());
     }
 
     let in_pre = state.escape_ctx.contains(EscapeCtx::PRE);
-    // Phase EE: inside `<code>` text is verbatim — Tier-2's handle_code
-    // walks children and pushes their text without normalize_whitespace,
-    // so `\n` and runs of spaces inside `<code>` survive into the
-    // wrapped span.  Treat as `in_pre` for the no-collapse path.
+    // ~keep Phase EE: inside `<code>` text is verbatim — Tier-2's handle_code
+    // ~keep walks children and pushes their text without normalize_whitespace,
+    // ~keep so `\n` and runs of spaces inside `<code>` survive into the
+    // ~keep wrapped span.  Treat as `in_pre` for the no-collapse path.
     let in_code = state.escape_ctx.contains(EscapeCtx::CODE);
 
-    // Phase NN: text containing Unicode whitespace (NBSP `\u{00A0}`, hair
-    // space `\u{200A}`, etc., or their entity forms) folds those to ASCII
-    // space — but only when the chunk has non-whitespace content.
-    // Mirrors Tier-2 `text_node.rs:124` and `:154` which run
-    // `normalize_whitespace_cow` on text outside `<code>`/`<pre>` (folding
-    // Unicode space chars).  The whitespace-only branch at `:80-112`
-    // preserves a pure-NBSP text node between inline siblings as-is (e.g.
-    // `<a>X</a>&nbsp;<a>Y</a>` keeps the NBSP).  Without this rule,
-    // `First<NBSP>appeared` reaches the buffer verbatim where Tier-2 outputs
-    // `First appeared`.
-    // Common Unicode-whitespace entity forms: named + numeric (decimal +
-    // hex).  Tier-2's `normalize_whitespace_cow` folds the decoded chars;
-    // Tier-1's flush_text runs BEFORE entity decode, so the patterns must
-    // be listed explicitly.
+    // ~keep Phase NN: text containing Unicode whitespace (NBSP `\u{00A0}`, hair
+    // ~keep space `\u{200A}`, etc., or their entity forms) folds those to ASCII
+    // ~keep space — but only when the chunk has non-whitespace content.
+    // ~keep Mirrors Tier-2 `text_node.rs:124` and `:154` which run
+    // ~keep `normalize_whitespace_cow` on text outside `<code>`/`<pre>` (folding
+    // ~keep Unicode space chars).  The whitespace-only branch at `:80-112`
+    // ~keep preserves a pure-NBSP text node between inline siblings as-is (e.g.
+    // ~keep `<a>X</a>&nbsp;<a>Y</a>` keeps the NBSP).  Without this rule,
+    // ~keep `First<NBSP>appeared` reaches the buffer verbatim where Tier-2 outputs
+    // ~keep `First appeared`.
+    // ~keep Common Unicode-whitespace entity forms: named + numeric (decimal +
+    // ~keep hex).  Tier-2's `normalize_whitespace_cow` folds the decoded chars;
+    // ~keep Tier-1's flush_text runs BEFORE entity decode, so the patterns must
+    // ~keep be listed explicitly.
     const UNICODE_WS_ENTITIES: &[&str] = &[
-        "&nbsp;", // U+00A0
-        "&#160;", "&#xa0;", "&#xA0;", "&ensp;", // U+2002
-        "&#8194;", "&#x2002;", "&emsp;", // U+2003
-        "&#8195;", "&#x2003;", "&thinsp;", // U+2009
-        "&#8201;", "&#x2009;", "&hairsp;", // U+200A
-        "&#8202;", "&#x200a;", "&#x200A;",
+        "&nbsp;", "&#160;", "&#xa0;", "&#xA0;", "&ensp;", "&#8194;", "&#x2002;", "&emsp;", "&#8195;", "&#x2003;",
+        "&thinsp;", "&#8201;", "&#x2009;", "&hairsp;", "&#8202;", "&#x200a;", "&#x200A;",
     ];
     let raw_owned_nbsp;
     let raw: &str = if !in_pre && !in_code {
@@ -2602,8 +2465,6 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
                 .chars()
                 .any(|c| c.is_whitespace() && c != ' ' && c != '\t' && c != '\n' && c != '\r');
         if has_ws_entity || has_unicode_ws_literal {
-            // Treat the chunk as logically whitespace-only when stripping
-            // the Unicode-ws entities leaves only whitespace characters.
             let mut stripped = raw.to_owned();
             for p in UNICODE_WS_ENTITIES {
                 if stripped.contains(p) {
@@ -2614,9 +2475,6 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
             if is_logically_whitespace {
                 raw
             } else {
-                // Fold all non-ASCII Unicode whitespace and known entities
-                // to ASCII space, leaving ASCII whitespace untouched (those
-                // are handled by the downstream collapse).
                 let mut after_entities = raw.to_owned();
                 for p in UNICODE_WS_ENTITIES {
                     if after_entities.contains(p) {
@@ -2641,33 +2499,33 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
         raw
     };
 
-    // Inter-block whitespace strip: in a block-edge context (output empty,
-    // ends with a newline, or ends with a list-item marker like "- " /
-    // "1. "), whitespace-only text between adjacent elements (the
-    // indentation in pretty-printed HTML) is not meaningful and must be
-    // discarded.  Tier-2's DOM walker gets this for free because the
-    // parser yields text nodes separately from tag nodes and the walker
-    // skips whitespace-only text at block-level boundaries.  Skipped when
-    // inside `<pre>` (verbatim) or inside a table cell (caller is
-    // accumulating cell text).
-    //
-    // We also treat "the current open frame is a link/emphasis frame whose
-    // body is still empty" as a block-edge: text appearing immediately
-    // after `<a>` → `[`, `<strong>` → `**`, etc. inherits leading
-    // whitespace from the source HTML's indentation and Tier-2 trims it
-    // when building the inline label.  This catches cases like
-    // `<a href>\n   <span>EN</span>\n</a>` where the whitespace after
-    // `<a>` would otherwise leak into the link label as `[ EN]`.
-    //
-    // Plain `<p>`/`<div>`/`<h1>` frames are NOT in this set — Tier-2 keeps
-    // the leading whitespace inside the very first paragraph of a document
-    // (it becomes the single space after `normalize_whitespace`).  Only
-    // post-content paragraphs see "\n\n" before them, which the
-    // `output.ends_with('\n')` check above already handles.
-    // Phase R-3: inside `<summary>`, any tag's body-start is also an inline
-    // frame edge.  Tier-2's handle_summary collects all children with
-    // text-normalization in effect; leading whitespace inside `<span>`,
-    // `<div>`, `<p>` (etc.) bodies gets stripped just like inside `<a>`.
+    // ~keep Inter-block whitespace strip: in a block-edge context (output empty,
+    // ~keep ends with a newline, or ends with a list-item marker like "- " /
+    // ~keep "1. "), whitespace-only text between adjacent elements (the
+    // ~keep indentation in pretty-printed HTML) is not meaningful and must be
+    // ~keep discarded.  Tier-2's DOM walker gets this for free because the
+    // ~keep parser yields text nodes separately from tag nodes and the walker
+    // ~keep skips whitespace-only text at block-level boundaries.  Skipped when
+    // ~keep inside `<pre>` (verbatim) or inside a table cell (caller is
+    // ~keep accumulating cell text).
+    // ~keep
+    // ~keep We also treat "the current open frame is a link/emphasis frame whose
+    // ~keep body is still empty" as a block-edge: text appearing immediately
+    // ~keep after `<a>` → `[`, `<strong>` → `**`, etc. inherits leading
+    // ~keep whitespace from the source HTML's indentation and Tier-2 trims it
+    // ~keep when building the inline label.  This catches cases like
+    // ~keep `<a href>\n   <span>EN</span>\n</a>` where the whitespace after
+    // ~keep `<a>` would otherwise leak into the link label as `[ EN]`.
+    // ~keep
+    // ~keep Plain `<p>`/`<div>`/`<h1>` frames are NOT in this set — Tier-2 keeps
+    // ~keep the leading whitespace inside the very first paragraph of a document
+    // ~keep (it becomes the single space after `normalize_whitespace`).  Only
+    // ~keep post-content paragraphs see "\n\n" before them, which the
+    // ~keep `output.ends_with('\n')` check above already handles.
+    // ~keep Phase R-3: inside `<summary>`, any tag's body-start is also an inline
+    // ~keep frame edge.  Tier-2's handle_summary collects all children with
+    // ~keep text-normalization in effect; leading whitespace inside `<span>`,
+    // ~keep `<div>`, `<p>` (etc.) bodies gets stripped just like inside `<a>`.
     let in_summary_snapshot = state.in_summary();
     let at_inline_frame_start = match state.stack.last() {
         Some(frame) => {
@@ -2686,12 +2544,12 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
         }
         None => false,
     };
-    // Determine whether the current active output position is at a "block
-    // edge" (empty or after a newline / list marker).  When inside a summary
-    // accumulation buffer, consult that buffer rather than state.output so
-    // that inter-element spaces inside the summary are preserved correctly.
-    // Snap the relevant properties to local booleans before releasing the
-    // borrow to avoid conflicts with subsequent state reads.
+    // ~keep Determine whether the current active output position is at a "block
+    // ~keep edge" (empty or after a newline / list marker).  When inside a summary
+    // ~keep accumulation buffer, consult that buffer rather than state.output so
+    // ~keep that inter-element spaces inside the summary are preserved correctly.
+    // ~keep Snap the relevant properties to local booleans before releasing the
+    // ~keep borrow to avoid conflicts with subsequent state reads.
     let (active_empty, active_ends_newline, active_ends_list_marker, active_ends_ordered) = {
         let buf: &str = state.cell_or_output_mut();
         (
@@ -2705,31 +2563,31 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
         active_empty || active_ends_newline || active_ends_list_marker || active_ends_ordered || at_inline_frame_start;
     let raw_is_whitespace = raw.bytes().all(|b| b == b' ' || b == b'\t' || b == b'\n' || b == b'\r');
     if !in_pre && is_block_edge && raw_is_whitespace {
-        // Drop block-edge whitespace anywhere — including inside table cells.
-        // A cell-open `<td>`/`<th>` produces a fresh empty buffer; the
-        // pretty-printer's inter-tag whitespace before the first child would
-        // otherwise leak as a leading space into the cell, breaking the
-        // 3-space gap heuristic (`  \n` from `<div>` open becomes 4 spaces
-        // instead of 3 after `replace('\n', ' ')`).
+        // ~keep Drop block-edge whitespace anywhere — including inside table cells.
+        // ~keep A cell-open `<td>`/`<th>` produces a fresh empty buffer; the
+        // ~keep pretty-printer's inter-tag whitespace before the first child would
+        // ~keep otherwise leak as a leading space into the cell, breaking the
+        // ~keep 3-space gap heuristic (`  \n` from `<div>` open becomes 4 spaces
+        // ~keep instead of 3 after `replace('\n', ' ')`).
         return Ok(());
     }
-    // Tier-2 text_node.rs:100-113 collapses whitespace-only text nodes
-    // between adjacent inline siblings to a single space — including
-    // inside table cells where the surrounding `<a>`/`<span>` siblings are
-    // inline.  Mirror that here so `<a>x</a>\n  <a>y</a>` inside a `<td>`
-    // emits `[x] [y]` (single space) instead of `[x]\n [y]` which the
-    // cell-close `replace('\n', ' ')` would turn into two spaces.  Skip
-    // when at a block edge (cell just opened) so the cell doesn't start
-    // with a stray space.
+    // ~keep Tier-2 text_node.rs:100-113 collapses whitespace-only text nodes
+    // ~keep between adjacent inline siblings to a single space — including
+    // ~keep inside table cells where the surrounding `<a>`/`<span>` siblings are
+    // ~keep inline.  Mirror that here so `<a>x</a>\n  <a>y</a>` inside a `<td>`
+    // ~keep emits `[x] [y]` (single space) instead of `[x]\n [y]` which the
+    // ~keep cell-close `replace('\n', ' ')` would turn into two spaces.  Skip
+    // ~keep when at a block edge (cell just opened) so the cell doesn't start
+    // ~keep with a stray space.
     if !in_pre && state.in_table_cell() && raw_is_whitespace && !is_block_edge {
-        // Tier-2's text_node.rs:80-98 drops whitespace text between non-inline
-        // siblings: when the parent is a list (`<ul>`/`<ol>`/`<dl>`), the
-        // inter-`<li>` whitespace returns without pushing because the next
-        // sibling `<li>` is a block, not inline.  Mirror that here so adjacent
-        // `<li>` siblings in a cell concatenate without separation
-        // (`[v](u1)[t](u2)` not `[v](u1) [t](u2)`).  For inline parents
-        // (`<span>`/`<a>`/`<td>` direct inline-sibling case), keep the
-        // single-space fold.
+        // ~keep Tier-2's text_node.rs:80-98 drops whitespace text between non-inline
+        // ~keep siblings: when the parent is a list (`<ul>`/`<ol>`/`<dl>`), the
+        // ~keep inter-`<li>` whitespace returns without pushing because the next
+        // ~keep sibling `<li>` is a block, not inline.  Mirror that here so adjacent
+        // ~keep `<li>` siblings in a cell concatenate without separation
+        // ~keep (`[v](u1)[t](u2)` not `[v](u1) [t](u2)`).  For inline parents
+        // ~keep (`<span>`/`<a>`/`<td>` direct inline-sibling case), keep the
+        // ~keep single-space fold.
         if matches!(state.stack.last().map(|f| f.spec.kind), Some(TagKind::List(_))) {
             return Ok(());
         }
@@ -2739,32 +2597,32 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
         }
         return Ok(());
     }
-    // Whitespace-only text outside any inline element (link / strong / em /
-    // code) and outside `<pre>` / table cells is structural indentation
-    // between block siblings (e.g. between `</div>` and the next `<div>`).
-    // Tier-2 emits a single ASCII space here when the surrounding context
-    // is inline, but otherwise the DOM walker treats it as a no-op.  For
-    // Tier-1's heuristic we collapse it to nothing — matches Tier-2 for
-    // the common block-between-blocks case and the inline cases are caught
-    // by the inline-frame check above.
-    //
-    // Exception (Phase U + U-2): when the output tail is inline content
-    // (text or `**`/`*`/`` ` ``/`)` close markers) AND we're NOT at a
-    // block edge, a whitespace-only text node between siblings must
-    // become a single space.  Without this `</strong> <em>` would emit
-    // `**a***b*` and `<span>Open Search Bar</span>\n<button>` would lose
-    // the space before the button's content.
-    //
-    // Phase U-2 dropped the original "horizontal whitespace only" guard:
-    // a newline-bearing whitespace run between two inline siblings still
-    // collapses to a single space in Tier-2.  The "what if next tag is a
-    // block?" regression is now handled later in `ensure_blank_line` and
-    // `close_block_container`, which trim trailing horizontal whitespace
-    // before emitting `\n\n`.
+    // ~keep Whitespace-only text outside any inline element (link / strong / em /
+    // ~keep code) and outside `<pre>` / table cells is structural indentation
+    // ~keep between block siblings (e.g. between `</div>` and the next `<div>`).
+    // ~keep Tier-2 emits a single ASCII space here when the surrounding context
+    // ~keep is inline, but otherwise the DOM walker treats it as a no-op.  For
+    // ~keep Tier-1's heuristic we collapse it to nothing — matches Tier-2 for
+    // ~keep the common block-between-blocks case and the inline cases are caught
+    // ~keep by the inline-frame check above.
+    // ~keep
+    // ~keep Exception (Phase U + U-2): when the output tail is inline content
+    // ~keep (text or `**`/`*`/`` ` ``/`)` close markers) AND we're NOT at a
+    // ~keep block edge, a whitespace-only text node between siblings must
+    // ~keep become a single space.  Without this `</strong> <em>` would emit
+    // ~keep `**a***b*` and `<span>Open Search Bar</span>\n<button>` would lose
+    // ~keep the space before the button's content.
+    // ~keep
+    // ~keep Phase U-2 dropped the original "horizontal whitespace only" guard:
+    // ~keep a newline-bearing whitespace run between two inline siblings still
+    // ~keep collapses to a single space in Tier-2.  The "what if next tag is a
+    // ~keep block?" regression is now handled later in `ensure_blank_line` and
+    // ~keep `close_block_container`, which trim trailing horizontal whitespace
+    // ~keep before emitting `\n\n`.
     if !in_pre && !state.in_table_cell() && raw_is_whitespace {
-        // When inside a <summary> accumulation buffer, treat the context as
-        // inline (like strong/emphasis): inter-element spaces must be
-        // preserved so `<span>a</span> <span>b</span>` collects "a b" not "ab".
+        // ~keep When inside a <summary> accumulation buffer, treat the context as
+        // ~keep inline (like strong/emphasis): inter-element spaces must be
+        // ~keep preserved so `<span>a</span> <span>b</span>` collects "a b" not "ab".
         let inside_inline = state.in_summary()
             || state.stack.iter().any(|frame| {
                 matches!(
@@ -2773,29 +2631,23 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
                 )
             });
         if !inside_inline {
-            // Use the active buffer (summary buf or main output) for the
-            // tail check so spaces between adjacent inline elements inside
-            // a summary are preserved correctly.
+            // ~keep Use the active buffer (summary buf or main output) for the
+            // ~keep tail check so spaces between adjacent inline elements inside
+            // ~keep a summary are preserved correctly.
             let active_tail: &str = state.cell_or_output_mut();
-            // Preserve a single space optimistically whenever the output
-            // tail is inline content (text or `**`/`*`/`` ` ``/`)`) even
-            // across newline-bearing whitespace.  Block-tag-open paths
-            // (`ensure_blank_line`, `close_block_container`, `close_button`,
-            // `open_paragraph`, `open_list`) all trim the trailing space
-            // before emitting their separator — so this is safe.
             if output_ends_with_inline_close_marker(active_tail) || output_ends_with_inline_text(active_tail) {
                 let dest = state.cell_or_output_mut();
                 dest.push(' ');
             }
             return Ok(());
         }
-        // Inside an inline frame (`<a>`/`<strong>`/`<em>`/`<code>`) or summary
-        // accumulation: a whitespace-only text node (often the indent run
-        // between two inline siblings like `</span>\n  <a>`) must collapse to
-        // a single ASCII space — Tier-2's text-node normalize_whitespace folds
-        // any `\n` + spaces run into one space.  Without this, Tier-1 falls
-        // through to `decode_and_collapse_into` which preserves the `\n` and
-        // emits `*[a](x)\n [b](y)*` where Tier-2 has `*[a](x) [b](y)*`.
+        // ~keep Inside an inline frame (`<a>`/`<strong>`/`<em>`/`<code>`) or summary
+        // ~keep accumulation: a whitespace-only text node (often the indent run
+        // ~keep between two inline siblings like `</span>\n  <a>`) must collapse to
+        // ~keep a single ASCII space — Tier-2's text-node normalize_whitespace folds
+        // ~keep any `\n` + spaces run into one space.  Without this, Tier-1 falls
+        // ~keep through to `decode_and_collapse_into` which preserves the `\n` and
+        // ~keep emits `*[a](x)\n [b](y)*` where Tier-2 has `*[a](x) [b](y)*`.
         let active_tail: &str = state.cell_or_output_mut();
         if !active_tail.is_empty() && !active_tail.ends_with(' ') && !active_tail.ends_with('\n') {
             let dest = state.cell_or_output_mut();
@@ -2803,15 +2655,15 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
         }
         return Ok(());
     }
-    // Even when the text is not entirely whitespace, strip its LEADING
-    // whitespace when:
-    //   - we're at the start of an open inline element's body (`<a>`,
-    //     `<strong>`, etc.), OR
-    //   - the output ends with a block separator (`\n\n`) or a list-item
-    //     marker — Tier-2's text-node `skip_prefix` logic does the same.
-    //
-    // Not when output is empty (first paragraph of a document keeps its
-    // leading whitespace per Tier-2's behaviour).
+    // ~keep Even when the text is not entirely whitespace, strip its LEADING
+    // ~keep whitespace when:
+    // ~keep   - we're at the start of an open inline element's body (`<a>`,
+    // ~keep     `<strong>`, etc.), OR
+    // ~keep   - the output ends with a block separator (`\n\n`) or a list-item
+    // ~keep     marker — Tier-2's text-node `skip_prefix` logic does the same.
+    // ~keep
+    // ~keep Not when output is empty (first paragraph of a document keeps its
+    // ~keep leading whitespace per Tier-2's behaviour).
     let block_separator_after = {
         let active: &str = state.cell_or_output_mut();
         active.ends_with("\n\n")
@@ -2841,36 +2693,36 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
         return Ok(());
     }
 
-    // Inside an `<a>` link frame, Tier-2's `normalize_link_label` replaces
-    // newlines with spaces before whitespace collapsing.  Mirror that here so
-    // text spanning `\n` inside an `<a>` (e.g. `<a>Skip to main\n  content</a>`)
-    // collapses to `[Skip to main content]` instead of leaking the newline.
-    // `<strong>`/`<em>` do NOT normalize newlines in Tier-2 — only links do.
-    //
-    // `<summary>` is treated the same as `<a>` here (Phase R-3): Tier-2's
-    // handle_summary collects children into a local content buffer and
-    // wraps in `**...**\n\n`; the surrounding text-normalization layer
-    // collapses internal newline runs to single spaces before emission.
-    // Without this, summary content with multi-line inline children leaks
-    // `\n  \n  ` between text runs.
+    // ~keep Inside an `<a>` link frame, Tier-2's `normalize_link_label` replaces
+    // ~keep newlines with spaces before whitespace collapsing.  Mirror that here so
+    // ~keep text spanning `\n` inside an `<a>` (e.g. `<a>Skip to main\n  content</a>`)
+    // ~keep collapses to `[Skip to main content]` instead of leaking the newline.
+    // ~keep `<strong>`/`<em>` do NOT normalize newlines in Tier-2 — only links do.
+    // ~keep
+    // ~keep `<summary>` is treated the same as `<a>` here (Phase R-3): Tier-2's
+    // ~keep handle_summary collects children into a local content buffer and
+    // ~keep wraps in `**...**\n\n`; the surrounding text-normalization layer
+    // ~keep collapses internal newline runs to single spaces before emission.
+    // ~keep Without this, summary content with multi-line inline children leaks
+    // ~keep `\n  \n  ` between text runs.
     let inside_inline = state.in_summary() || state.stack.iter().any(|frame| matches!(frame.spec.kind, TagKind::Link));
 
-    // Phase Y: text-node chomp.  Tier-2's text_node.rs runs `chomp()` on
-    // every text node and substitutes the leading and trailing whitespace
-    // runs with simpler stand-ins:
-    //   prefix → `" "` if the run had any leading whitespace, else `""`
-    //   suffix → `"\n\n"` if trailing run contained `\n\n`,
-    //          → `" "`   if trailing run had space/tab (folding any `\n`),
-    //          → `""`    if trailing run was `\n` only.
-    // Without this, Tier-1 keeps the literal `\n  ` in text like
-    // "The number of\n  " and emits `of\n ` while Tier-2 emits `of `,
-    // and likewise the leading whitespace case `</em>\n  baz` produces
-    // `*bar*\n baz` instead of `*bar* baz`.
-    //
-    // Applied only outside inline frames (which call
-    // `decode_and_collapse_into_inline` and handle `\n` collapse already),
-    // outside `<pre>` (verbatim), and outside table cells (which run
-    // `normalize_whitespace_cow` directly).
+    // ~keep Phase Y: text-node chomp.  Tier-2's text_node.rs runs `chomp()` on
+    // ~keep every text node and substitutes the leading and trailing whitespace
+    // ~keep runs with simpler stand-ins:
+    // ~keep   prefix → `" "` if the run had any leading whitespace, else `""`
+    // ~keep   suffix → `"\n\n"` if trailing run contained `\n\n`,
+    // ~keep          → `" "`   if trailing run had space/tab (folding any `\n`),
+    // ~keep          → `""`    if trailing run was `\n` only.
+    // ~keep Without this, Tier-1 keeps the literal `\n  ` in text like
+    // ~keep "The number of\n  " and emits `of\n ` while Tier-2 emits `of `,
+    // ~keep and likewise the leading whitespace case `</em>\n  baz` produces
+    // ~keep `*bar*\n baz` instead of `*bar* baz`.
+    // ~keep
+    // ~keep Applied only outside inline frames (which call
+    // ~keep `decode_and_collapse_into_inline` and handle `\n` collapse already),
+    // ~keep outside `<pre>` (verbatim), and outside table cells (which run
+    // ~keep `normalize_whitespace_cow` directly).
     let raw_owned;
     let raw = if !inside_inline && !state.in_table_cell() {
         let trim_chars: &[char] = &['\n', '\r', ' ', '\t'];
@@ -2881,13 +2733,11 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
         let trailing_len = raw.len() - trimmed_len;
         let trail_has_nl = trailing_len > 0 && raw.as_bytes()[trimmed_len..].iter().any(|&b| b == b'\n' || b == b'\r');
         if lead_has_nl || trail_has_nl {
-            // Slice safely: leading_len and trimmed_len are byte offsets
-            // produced by `trim_*_matches` on the same `raw`.
             let core_start = leading_len;
             let core_end = trimmed_len;
             if core_start >= core_end {
-                // Whitespace-only text node — already handled by the
-                // earlier whitespace-only branches; skip Phase Y here.
+                // ~keep Whitespace-only text node — already handled by the
+                // ~keep earlier whitespace-only branches; skip Phase Y here.
                 raw
             } else {
                 let core = &raw[core_start..core_end];
@@ -2900,8 +2750,6 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
                 } else if trail_has_nl {
                     ""
                 } else {
-                    // Pure space/tab trailing run; let the downstream
-                    // collapse handle it as before.
                     trailing
                 };
                 raw_owned = format!("{prefix}{core}{suffix}");
@@ -2918,13 +2766,7 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
     }
     let has_entities = raw.contains('&');
 
-    // Outside `<pre>`: collapse runs of space/tab into a single space, decode
-    // entities, write directly into the output (or cell) buffer.  Newlines preserved
-    // unless inside an inline frame (see above).
     if !has_entities {
-        // No entities. Quick check: does this text have collapsible whitespace?
-        // Use a fast memchr2/3 to find the first space/tab(/newline); if not
-        // found, we can take the hot path.
         let needle_present = if inside_inline {
             memchr3(b' ', b'\t', b'\n', raw.as_bytes()).is_some()
         } else {
@@ -2962,7 +2804,6 @@ fn decode_entities_into(out: &mut String, s: &str, base_offset: usize) -> Result
     let bytes = s.as_bytes();
     let mut i = 0;
     while i < bytes.len() {
-        // Fast path: use memchr to find next `&`.
         if let Some(pos) = memchr::memchr(b'&', &bytes[i..]) {
             let amp_pos = i + pos;
             if amp_pos > i {
@@ -3023,7 +2864,6 @@ fn decode_and_collapse_into_inner(
     while i < bytes.len() {
         let next_special = match (has_entities, collapse_newlines) {
             (true, true) => {
-                // Cold path: inline frame with entities. Find min of two memchr3 calls.
                 let s_pos = memchr3(b' ', b'\t', b'\n', &bytes[i..]).map(|pos| i + pos);
                 let e_pos = memchr::memchr(b'&', &bytes[i..]).map(|pos| i + pos);
                 match (s_pos, e_pos) {
@@ -3100,9 +2940,9 @@ fn decode_entity_at(
         if decode_entity_into(out, entity) {
             return Ok(end + 1);
         }
-        // Phase N3: entity name (`&name;`) not in Tier-1's decode table.
-        // Tier-2 and mdream pass these through verbatim instead of decoding.
-        // Push the raw `&name;` and advance past it.
+        // ~keep Phase N3: entity name (`&name;`) not in Tier-1's decode table.
+        // ~keep Tier-2 and mdream pass these through verbatim instead of decoding.
+        // ~keep Push the raw `&name;` and advance past it.
         out.push_str(&s[amp..=end]);
         return Ok(end + 1);
     }
@@ -3110,15 +2950,12 @@ fn decode_entity_at(
     Ok(amp + 1)
 }
 
-// ── Escape context management ─────────────────────────────────────────────────
-
 /// Apply the escape-context bits for an opening tag.
 ///
 /// The close path restores `state.escape_ctx` directly from `frame.prev_escape_ctx`
 /// so a symmetric `remove_open_escape_ctx` is not needed.
 #[inline]
 fn apply_open_escape_ctx(state: &mut Tier1State, spec: &TagSpec) {
-    // Handle <pre> specially: it sets both PRE and CODE bits.
     if spec.kind == TagKind::Pre {
         state.escape_ctx |= EscapeCtx::PRE | EscapeCtx::CODE;
         return;
@@ -3134,8 +2971,6 @@ fn apply_open_escape_ctx(state: &mut Tier1State, spec: &TagSpec) {
 
     state.escape_ctx |= bit;
 }
-
-// ── Attribute helpers ─────────────────────────────────────────────────────────
 
 /// Find an attribute value by (lowercase) key name.
 fn find_attr<'a>(attrs: &[(&'a [u8], Option<&'a [u8]>)], key: &[u8]) -> Option<&'a [u8]> {
@@ -3171,7 +3006,6 @@ fn should_skip_preprocessing(name_lower: &[u8], attrs: &[(&[u8], Option<&[u8]>)]
         return false;
     }
 
-    // Form removal — Standard and Aggressive when the flag is set.
     if options.preprocessing.remove_forms && name_lower == b"form" {
         return true;
     }
@@ -3180,15 +3014,14 @@ fn should_skip_preprocessing(name_lower: &[u8], attrs: &[(&[u8], Option<&[u8]>)]
         return false;
     }
 
-    // <nav> is unconditionally navigation.
     if name_lower == b"nav" {
         return true;
     }
 
-    // <header> / <footer> / <aside> — drop only when navigation hints present.
-    // (Aggressive would drop footer/aside unconditionally, but Aggressive routes
-    // through Tier-2 via the existing router gate so Tier-1 only needs the
-    // Standard-preset behaviour: nav-hint check.)
+    // ~keep <header> / <footer> / <aside> — drop only when navigation hints present.
+    // ~keep (Aggressive would drop footer/aside unconditionally, but Aggressive routes
+    // ~keep through Tier-2 via the existing router gate so Tier-1 only needs the
+    // ~keep Standard-preset behaviour: nav-hint check.)
     if matches!(name_lower, b"header" | b"footer" | b"aside") {
         return byte_attrs_have_navigation_hint(attrs);
     }
@@ -3200,7 +3033,6 @@ fn should_skip_preprocessing(name_lower: &[u8], attrs: &[(&[u8], Option<&[u8]>)]
 /// Tier-1 scanner where attributes are raw `&[u8]` slices rather than a
 /// parsed `tl::HTMLTag`.
 fn byte_attrs_have_navigation_hint(attrs: &[(&[u8], Option<&[u8]>)]) -> bool {
-    // role ∈ { "navigation", "menubar", "tablist", "toolbar" }
     if let Some(role) = find_attr(attrs, b"role") {
         let role_lc = role.to_ascii_lowercase();
         if matches!(role_lc.as_slice(), b"navigation" | b"menubar" | b"tablist" | b"toolbar") {
@@ -3208,7 +3040,6 @@ fn byte_attrs_have_navigation_hint(attrs: &[(&[u8], Option<&[u8]>)]) -> bool {
         }
     }
 
-    // aria-label contains "navigation", "menu", "contents", "table of contents", or "toc"
     if let Some(label) = find_attr(attrs, b"aria-label") {
         let label_lc = label.to_ascii_lowercase();
         const ARIA_SUBSTRINGS: &[&[u8]] = &[b"navigation", b"menu", b"contents", b"table of contents", b"toc"];
@@ -3220,8 +3051,6 @@ fn byte_attrs_have_navigation_hint(attrs: &[(&[u8], Option<&[u8]>)]) -> bool {
         }
     }
 
-    // class / id — tokenize (split on whitespace, normalise _:./→-, lowercase)
-    // and match against NAV_KEYWORDS.
     for attr_name in [b"class".as_slice(), b"id".as_slice()] {
         if let Some(value) = find_attr(attrs, attr_name) {
             if byte_value_has_nav_keyword(value) {
@@ -3239,25 +3068,20 @@ fn byte_attrs_have_navigation_hint(attrs: &[(&[u8], Option<&[u8]>)]) -> bool {
 /// Tokens are split on ASCII whitespace.  Each token is normalised by
 /// replacing `_`, `:`, `.`, `/` with `-` and lowercasing before comparison.
 fn byte_value_has_nav_keyword(value: &[u8]) -> bool {
-    // Iterate over whitespace-separated tokens without allocating a Vec.
     let mut start = 0;
     let len = value.len();
     loop {
-        // Skip leading whitespace.
         while start < len && value[start].is_ascii_whitespace() {
             start += 1;
         }
         if start >= len {
             break;
         }
-        // Find end of token.
         let mut end = start;
         while end < len && !value[end].is_ascii_whitespace() {
             end += 1;
         }
         let token_bytes = &value[start..end];
-        // Normalise: replace separator chars with `-`, lowercase.
-        // Use a stack buffer when small enough to avoid heap allocation.
         let mut buf = [0u8; 64];
         let normalised: &[u8] = if token_bytes.len() <= buf.len() {
             let n = token_bytes.len();
@@ -3269,12 +3093,10 @@ fn byte_value_has_nav_keyword(value: &[u8]) -> bool {
             }
             &buf[..n]
         } else {
-            // Token is longer than any NAV_KEYWORD — skip without heap alloc.
             start = end;
             continue;
         };
 
-        // Compare against each NAV_KEYWORD.
         if NAV_KEYWORDS.iter().any(|kw| kw.as_bytes() == normalised) {
             return true;
         }
@@ -3287,10 +3109,10 @@ fn byte_value_has_nav_keyword(value: &[u8]) -> bool {
 /// Extract `href` and `title` from the attribute list for a link.
 fn extract_link_attrs(attrs: &[(&[u8], Option<&[u8]>)]) -> Result<(Option<String>, Option<String>), BailReason> {
     let href = find_attr(attrs, b"href").map(decode_attr).transpose()?;
-    // Mirror Tier-2's `inline/link.rs:82` which captures the title attribute
-    // via tl::parse's `as_utf8_str()` — tl decodes numeric entities
-    // (`&#039;` → `'`) but preserves named entities (`&amp;`, `&quot;`,
-    // `&lt;`).  Use a partial-decode pass for titles to match.
+    // ~keep Mirror Tier-2's `inline/link.rs:82` which captures the title attribute
+    // ~keep via tl::parse's `as_utf8_str()` — tl decodes numeric entities
+    // ~keep (`&#039;` → `'`) but preserves named entities (`&amp;`, `&quot;`,
+    // ~keep `&lt;`).  Use a partial-decode pass for titles to match.
     let title = find_attr(attrs, b"title").map(decode_title_attr).transpose()?;
     Ok((href, title))
 }
@@ -3371,8 +3193,6 @@ fn decode_attr(bytes: &[u8]) -> Result<String, BailReason> {
         return Ok(s.to_owned());
     }
     let mut out = String::with_capacity(s.len());
-    // Attribute values do not carry a meaningful offset into the HTML source;
-    // use 0 as the base so the entity name is still reported.
     decode_entities_into(&mut out, s, 0)?;
     Ok(out)
 }
@@ -3403,8 +3223,6 @@ fn canonicalize_attr_entities(input: &str) -> std::borrow::Cow<'_, str> {
     }
     std::borrow::Cow::Owned(out)
 }
-
-// ── Stack helpers ─────────────────────────────────────────────────────────────
 
 /// Pop the topmost frame whose spec matches `spec`.
 /// Tier-2 is lenient about close tags; we are strict in M3c: only pop the
@@ -3472,8 +3290,6 @@ fn find_ol_start(stack: &[OpenTag]) -> u16 {
     1
 }
 
-// ── Formatting helpers ────────────────────────────────────────────────────────
-
 /// Return the ATX heading prefix for level `n` (1–6).
 ///
 /// Uses the `HEADING_PREFIXES` table — no allocation.
@@ -3503,7 +3319,6 @@ fn push_list_item_indent(out: &mut String, depth: u16) {
 /// lines that are between non-empty ones (Tier-2 behaviour for multi-paragraph
 /// blockquotes).
 fn prefix_blockquote_lines(content: &str) -> String {
-    // Trim trailing newline before splitting, so we don't produce a trailing `> `
     let content = content.trim_end_matches('\n');
     if content.is_empty() {
         return String::new();
@@ -3514,7 +3329,6 @@ fn prefix_blockquote_lines(content: &str) -> String {
 
     for (i, line) in lines.iter().enumerate() {
         if line.is_empty() {
-            // Between paragraphs inside a blockquote: emit `>`
             result.push('>');
         } else {
             result.push_str("> ");
@@ -3532,15 +3346,12 @@ fn prefix_blockquote_lines(content: &str) -> String {
 ///
 /// Mirrors Tier-2's `dedent_code_block` + 4-space indent logic.
 fn indent_pre_lines(raw: &str) -> String {
-    // Strip leading newline (the newline right after `<pre>`)
     let raw = raw.strip_prefix('\n').unwrap_or(raw);
-    // Strip trailing newline
     let raw = raw.trim_end_matches('\n');
     if raw.is_empty() {
         return String::new();
     }
 
-    // Dedent: find minimum leading whitespace among non-empty lines.
     let min_indent = raw
         .lines()
         .filter(|line| !line.trim().is_empty())
@@ -3551,18 +3362,18 @@ fn indent_pre_lines(raw: &str) -> String {
     let mut result = String::with_capacity(raw.len() + raw.lines().count() * 4);
     for line in raw.lines() {
         if line.trim().is_empty() {
-            // Empty / whitespace-only line: emit as a bare `\n` (no 4-space
-            // indent prefix).  Tier-2's `block/code.rs` also skips the indent
-            // for blank lines inside indented code blocks — without this,
-            // round-tripped CommonMark `    code\n    \n    code` would
-            // render with stray trailing spaces in the blank gap.
+            // ~keep Empty / whitespace-only line: emit as a bare `\n` (no 4-space
+            // ~keep indent prefix).  Tier-2's `block/code.rs` also skips the indent
+            // ~keep for blank lines inside indented code blocks — without this,
+            // ~keep round-tripped CommonMark `    code\n    \n    code` would
+            // ~keep render with stray trailing spaces in the blank gap.
         } else {
             result.push_str("    ");
-            // Convert char-count `min_indent` into a byte offset by walking
-            // `char_indices`.  Indexing `line[min_indent..]` directly panics
-            // when the leading whitespace contains multibyte characters such
-            // as `\u{a0}` (NBSP).  Mirrors Tier-2's `dedent_code_block`
-            // (text/processing.rs:38-50).
+            // ~keep Convert char-count `min_indent` into a byte offset by walking
+            // ~keep `char_indices`.  Indexing `line[min_indent..]` directly panics
+            // ~keep when the leading whitespace contains multibyte characters such
+            // ~keep as `\u{a0}` (NBSP).  Mirrors Tier-2's `dedent_code_block`
+            // ~keep (text/processing.rs:38-50).
             let mut remaining = min_indent;
             let mut cut = 0;
             for (idx, ch) in line.char_indices() {
@@ -3583,7 +3394,7 @@ fn indent_pre_lines(raw: &str) -> String {
     result
 }
 
-// ── GFM table emission ────────────────────────────────────────────────────────
+// ~keep ── GFM table emission ────────────────────────────────────────────────────────
 
 /// Emit a completed table as GFM markdown, appending to `state.output`.
 ///
@@ -3595,16 +3406,15 @@ fn indent_pre_lines(raw: &str) -> String {
 ///
 /// Never — empty-table guard returns early.
 fn emit_gfm_table(target: &mut String, ts: crate::converter::tier1::state::TableState) {
-    // Emit caption (if any) BEFORE the table body.
-    //
-    // Mirrors Tier-2 builder.rs caption handling: `*escaped_text*\n\n`.
-    // Tier-2 emits the caption as part of the table child loop, which runs
-    // before the rows are rendered, so the caption appears even when there
-    // are no table rows.  The caption text has already been trimmed and
-    // hyphen-escaped when `</caption>` was processed.
+    // ~keep Emit caption (if any) BEFORE the table body.
+    // ~keep
+    // ~keep Mirrors Tier-2 builder.rs caption handling: `*escaped_text*\n\n`.
+    // ~keep Tier-2 emits the caption as part of the table child loop, which runs
+    // ~keep before the rows are rendered, so the caption appears even when there
+    // ~keep are no table rows.  The caption text has already been trimmed and
+    // ~keep hyphen-escaped when `</caption>` was processed.
     if let Some(ref caption) = ts.caption_text {
         if !caption.is_empty() {
-            // Ensure the caption starts after any preceding content.
             if !target.is_empty() && !target.ends_with("\n\n") {
                 if target.ends_with('\n') {
                     target.push('\n');
@@ -3622,9 +3432,9 @@ fn emit_gfm_table(target: &mut String, ts: crate::converter::tier1::state::Table
         return;
     }
 
-    // Pre-table separator: mirrors Tier-2's `convert_table` logic exactly.
-    // Tier-2 (block/table/mod.rs): `if !output.is_empty() && !output.ends_with("\n\n")`
-    // — only adds separator when there is existing output (no leading blank lines).
+    // ~keep Pre-table separator: mirrors Tier-2's `convert_table` logic exactly.
+    // ~keep Tier-2 (block/table/mod.rs): `if !output.is_empty() && !output.ends_with("\n\n")`
+    // ~keep — only adds separator when there is existing output (no leading blank lines).
     if !target.is_empty() && !target.ends_with("\n\n") {
         if target.ends_with('\n') {
             target.push('\n');
@@ -3633,9 +3443,9 @@ fn emit_gfm_table(target: &mut String, ts: crate::converter::tier1::state::Table
         }
     }
 
-    // Pre-compute max column widths across ALL rows (mirrors Tier-2's pre-pass).
-    // Tier-2: separator dashes = max(col_content_char_count_across_all_rows, 3).
-    // col_count is the colspan-expanded column count (sum of colspans per row).
+    // ~keep Pre-compute max column widths across ALL rows (mirrors Tier-2's pre-pass).
+    // ~keep Tier-2: separator dashes = max(col_content_char_count_across_all_rows, 3).
+    // ~keep col_count is the colspan-expanded column count (sum of colspans per row).
     let col_count = ts
         .rows
         .iter()
@@ -3647,8 +3457,8 @@ fn emit_gfm_table(target: &mut String, ts: crate::converter::tier1::state::Table
         let mut col = 0usize;
         for (cell, span) in row {
             let w = cell.chars().count();
-            // Only the cell's anchor column owns the width — spanned columns
-            // contribute zero (matches Tier-2's per-cell pad calculation).
+            // ~keep Only the cell's anchor column owns the width — spanned columns
+            // ~keep contribute zero (matches Tier-2's per-cell pad calculation).
             if col < col_widths.len() && w > col_widths[col] {
                 col_widths[col] = w;
             }
@@ -3657,21 +3467,21 @@ fn emit_gfm_table(target: &mut String, ts: crate::converter::tier1::state::Table
     }
 
     for (row_index, row) in ts.rows.iter().enumerate() {
-        // Row: `|` then each cell as ` text |` (padded to col_width like Tier-2).
+        // ~keep Row: `|` then each cell as ` text |` (padded to col_width like Tier-2).
         target.push('|');
         let mut col = 0usize;
         for (cell, span) in row {
             target.push(' ');
             target.push_str(cell);
-            // Pad to column width (mirrors Tier-2 cell.rs padding logic).
+            // ~keep Pad to column width (mirrors Tier-2 cell.rs padding logic).
             let cell_len = cell.chars().count();
             let col_w = col_widths.get(col).copied().unwrap_or(0);
             for _ in cell_len..col_w {
                 target.push(' ');
             }
-            // Tier-2 (cell.rs:248): `for _ in 0..colspan { output.push_str(" |") }`.
-            // colspan trailing ` |` separators per cell — produces `| Header | | |`
-            // for `<th colspan="3">Header</th>` instead of `| Header |  |  |`.
+            // ~keep Tier-2 (cell.rs:248): `for _ in 0..colspan { output.push_str(" |") }`.
+            // ~keep colspan trailing ` |` separators per cell — produces `| Header | | |`
+            // ~keep for `<th colspan="3">Header</th>` instead of `| Header |  |  |`.
             for _ in 0..*span {
                 target.push_str(" |");
             }
@@ -3679,8 +3489,8 @@ fn emit_gfm_table(target: &mut String, ts: crate::converter::tier1::state::Table
         }
         target.push('\n');
 
-        // After row 0 (the header row), emit the separator row.
-        // Tier-2: col_widths.get(i).unwrap_or(0).max(MIN_SEPARATOR_DASHES).
+        // ~keep After row 0 (the header row), emit the separator row.
+        // ~keep Tier-2: col_widths.get(i).unwrap_or(0).max(MIN_SEPARATOR_DASHES).
         if row_index == 0 {
             target.push_str("| ");
             for i in 0..col_count.max(1) {
@@ -3720,8 +3530,6 @@ fn collapse_excess_blank_lines(output: &mut String) {
         }
     });
 }
-
-// ── HTML entity decoding ──────────────────────────────────────────────────────
 
 /// Decode a single HTML entity name (without `&` or `;`) directly into `out`.
 ///
@@ -3778,11 +3586,11 @@ fn decode_entity_into(out: &mut String, name: &str) -> bool {
         "pi" => "\u{03C0}",
         "sigma" => "\u{03C3}",
         "omega" => "\u{03C9}",
-        // Latin-1 Supplement (U+00A0–U+00FF) — html5ever's Tier-2 backend
-        // decodes the full HTML5 named entity table; mirror the Latin-1
-        // block here so Tier-1 byte-equality holds for accented Western
-        // text without bailing.  Entries already defined above (`nbsp`,
-        // `copy`, `reg`, `laquo`, `raquo`, `frac12`, etc.) are not repeated.
+        // ~keep Latin-1 Supplement (U+00A0–U+00FF) — html5ever's Tier-2 backend
+        // ~keep decodes the full HTML5 named entity table; mirror the Latin-1
+        // ~keep block here so Tier-1 byte-equality holds for accented Western
+        // ~keep text without bailing.  Entries already defined above (`nbsp`,
+        // ~keep `copy`, `reg`, `laquo`, `raquo`, `frac12`, etc.) are not repeated.
         "iexcl" => "\u{00A1}",
         "brvbar" => "\u{00A6}",
         "sect" => "\u{00A7}",
@@ -3892,18 +3700,14 @@ fn decode_numeric_entity_into(out: &mut String, name: &str) -> bool {
     }
 }
 
-// ── Comment / DOCTYPE skipping ────────────────────────────────────────────────
-
 /// Skip `<!--...-->`, `<!DOCTYPE...>`, or any `<!...>` construct.
 /// Returns the position immediately after the closing `>`.
 ///
 /// On failure returns `Err(BailReason::LiteralLt)`.
 fn skip_bang(bytes: &[u8], pos: usize) -> Result<usize, BailReason> {
-    // pos points at `<`, pos+1 is `!`
-    let start = pos + 2; // byte after `!`
+    let start = pos + 2;
 
     if bytes.get(start) == Some(&b'-') && bytes.get(start + 1) == Some(&b'-') {
-        // HTML comment: `<!-- ... -->`
         let comment_start = start + 2;
         let mut i = comment_start;
         while i + 2 < bytes.len() {
@@ -3912,11 +3716,10 @@ fn skip_bang(bytes: &[u8], pos: usize) -> Result<usize, BailReason> {
             }
             i += 1;
         }
-        // Unclosed comment — bail
+        // ~keep Unclosed comment — bail
         return Err(BailReason::LiteralLt { offset: pos });
     }
 
-    // DOCTYPE or similar `<!...>` — skip to `>`
     let mut i = start;
     while i < bytes.len() {
         if bytes[i] == b'>' {
@@ -3926,8 +3729,6 @@ fn skip_bang(bytes: &[u8], pos: usize) -> Result<usize, BailReason> {
     }
     Err(BailReason::LiteralLt { offset: pos })
 }
-
-// ── Misc helpers ──────────────────────────────────────────────────────────────
 
 /// Convert tag name bytes to lowercase in a fixed-size stack buffer.
 /// Returns a slice into `buf`.  If the name is longer than `buf`, it is

@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 
 fn convert(
@@ -87,7 +88,6 @@ fn test_graphic_element_with_xlink_href() {
     assert!(result.contains("| Image"), "Image column missing: {result}");
     assert!(result.contains("| Description"), "Description column missing: {result}");
     assert!(result.contains("A test image"), "test image text missing: {result}");
-    // graphic element handling may vary based on implementation
 }
 
 #[test]

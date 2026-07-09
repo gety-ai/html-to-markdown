@@ -292,8 +292,6 @@ impl ConversionOptions {
     }
 }
 
-// ── Builder ─────────────────────────────────────────────────────────────────
-
 /// Builder for [`ConversionOptions`].
 ///
 /// All fields start with default values. Call `.build()` to produce the final options.
@@ -325,13 +323,11 @@ macro_rules! builder_setter_into {
 
 #[cfg_attr(alef, alef(skip))]
 impl ConversionOptionsBuilder {
-    // Output control
     builder_setter!(output_format, OutputFormat);
     builder_setter!(include_document_structure, bool);
     builder_setter!(extract_metadata, bool);
     builder_setter!(extract_images, bool);
 
-    // Markdown formatting
     builder_setter!(heading_style, HeadingStyle);
     builder_setter!(list_indent_type, ListIndentType);
     builder_setter!(list_indent_width, usize);
@@ -349,19 +345,16 @@ impl ConversionOptionsBuilder {
     builder_setter_into!(sub_symbol, String);
     builder_setter_into!(sup_symbol, String);
 
-    // Escaping
     builder_setter!(escape_asterisks, bool);
     builder_setter!(escape_underscores, bool);
     builder_setter!(escape_misc, bool);
     builder_setter!(escape_ascii, bool);
 
-    // Whitespace / wrapping
     builder_setter!(whitespace_mode, WhitespaceMode);
     builder_setter!(strip_newlines, bool);
     builder_setter!(wrap, bool);
     builder_setter!(wrap_width, usize);
 
-    // Element handling
     builder_setter!(convert_as_inline, bool);
     builder_setter!(skip_images, bool);
     builder_setter!(url_escape_style, UrlEscapeStyle);
@@ -387,7 +380,6 @@ impl ConversionOptionsBuilder {
         self
     }
 
-    // Image extraction config
     builder_setter!(max_image_size, u64);
     builder_setter!(capture_svg, bool);
     builder_setter!(infer_dimensions, bool);
@@ -408,7 +400,6 @@ impl ConversionOptionsBuilder {
         self
     }
 
-    // Preprocessing
     /// Set the pre-processing options applied to the HTML before conversion.
     #[must_use]
     pub const fn preprocessing(mut self, preprocessing: PreprocessingOptions) -> Self {
@@ -416,13 +407,10 @@ impl ConversionOptionsBuilder {
         self
     }
 
-    // Encoding
     builder_setter_into!(encoding, String);
 
-    // Debug
     builder_setter!(debug, bool);
 
-    // Tier strategy
     builder_setter!(tier_strategy, TierStrategy);
 
     /// Build the final [`ConversionOptions`].
@@ -431,8 +419,6 @@ impl ConversionOptionsBuilder {
         self.0
     }
 }
-
-// ── ConversionOptionsUpdate (for binding crate compatibility) ────────────
 
 use crate::options::preprocessing::PreprocessingOptionsUpdate;
 
@@ -616,8 +602,6 @@ impl From<ConversionOptionsUpdate> for ConversionOptions {
         Self::from_update(update)
     }
 }
-
-// ── Tests ───────────────────────────────────────────────────────────────────
 
 #[cfg(all(test, any(feature = "serde", feature = "metadata")))]
 mod tests {

@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 fn convert(
     html: &str,
@@ -34,7 +35,6 @@ fn test_djot_strong() {
     let html = "<p>Text with <strong>strong</strong> word</p>";
     let result = convert(html, Some(djot_options())).unwrap();
     assert!(result.contains("*strong*"), "Expected *strong*, got: {result}");
-    // Should NOT have double asterisks
     assert!(
         !result.contains("**strong**"),
         "Should not have **strong**, got: {result}"
@@ -46,7 +46,6 @@ fn test_djot_bold() {
     let html = "<p>Text with <b>bold</b> word</p>";
     let result = convert(html, Some(djot_options())).unwrap();
     assert!(result.contains("*bold*"), "Expected *bold*, got: {result}");
-    // Should NOT have double asterisks
     assert!(
         !result.contains("**bold**"),
         "Should not have double asterisks, got: {result}"
@@ -55,7 +54,6 @@ fn test_djot_bold() {
 
 #[test]
 fn test_djot_options_debug() {
-    // Debug test to verify options are set correctly
     let options = djot_options();
     println!("Output format: {:?}", options.output_format);
     assert_eq!(options.output_format, OutputFormat::Djot);
@@ -123,7 +121,6 @@ fn test_djot_combined_formatting() {
 
 #[test]
 fn test_markdown_output_unchanged() {
-    // Verify Markdown output still works as expected
     let html = "<p><strong>Bold</strong> and <em>italic</em></p>";
     let result = convert(html, None).unwrap();
     assert!(

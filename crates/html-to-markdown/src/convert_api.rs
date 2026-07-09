@@ -48,9 +48,9 @@ use crate::{HtmlMetadata, MetadataConfig};
 ///
 /// Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 pub fn convert(html: &str, options: impl Into<Option<ConversionOptions>>) -> Result<ConversionResult> {
-    // Thin generic wrapper. Delegates to the non-generic `convert_inner` so the
-    // ~250-line body monomorphises exactly once instead of once per `Into` impl
-    // the caller picks. See xberg-io/html-to-markdown#398.
+    // ~keep Thin generic wrapper. Delegates to the non-generic `convert_inner` so the
+    // ~keep ~250-line body monomorphises exactly once instead of once per `Into` impl
+    // ~keep the caller picks. See xberg-io/html-to-markdown#398.
     convert_inner(html, options.into().unwrap_or_default())
 }
 
@@ -60,40 +60,40 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
     #[cfg(any(feature = "metadata", feature = "inline-images"))]
     use std::rc::Rc;
 
-    // Tier-1 dispatcher.
-    //
-    // `TierStrategy::Tier2` skips this block entirely and falls straight to
-    // the Tier-2 pipeline below.
-    //
-    // `TierStrategy::Auto` runs the prescan + classifier once.  If the
-    // classifier returns `RouterDecision::Tier1`, the scanner is invoked.  On
-    // success the result is returned immediately.  On bail the normalized input
-    // that was already produced is threaded to the Tier-2 pipeline via
-    // `precomputed_normalized` — no re-normalisation.
-    //
-    // `TierStrategy::Tier1` (testkit-only) bypasses the classifier and forces
-    // the scanner unconditionally, still with Tier-2 fallback on bail.
-    //
-    // `precomputed_normalized` carries the `Cow<str>` produced by
-    // `normalize_input` when the Tier-1 path ran it.  The Tier-2 entry point
-    // below uses it directly; the `Tier2` branch leaves it `None` and computes
-    // it there.
+    // ~keep Tier-1 dispatcher.
+    // ~keep
+    // ~keep `TierStrategy::Tier2` skips this block entirely and falls straight to
+    // ~keep the Tier-2 pipeline below.
+    // ~keep
+    // ~keep `TierStrategy::Auto` runs the prescan + classifier once.  If the
+    // ~keep classifier returns `RouterDecision::Tier1`, the scanner is invoked.  On
+    // ~keep success the result is returned immediately.  On bail the normalized input
+    // ~keep that was already produced is threaded to the Tier-2 pipeline via
+    // ~keep `precomputed_normalized` — no re-normalisation.
+    // ~keep
+    // ~keep `TierStrategy::Tier1` (testkit-only) bypasses the classifier and forces
+    // ~keep the scanner unconditionally, still with Tier-2 fallback on bail.
+    // ~keep
+    // ~keep `precomputed_normalized` carries the `Cow<str>` produced by
+    // ~keep `normalize_input` when the Tier-1 path ran it.  The Tier-2 entry point
+    // ~keep below uses it directly; the `Tier2` branch leaves it `None` and computes
+    // ~keep it there.
     let mut precomputed_normalized: Option<Cow<'_, str>> = None;
 
     match options.tier_strategy {
         crate::options::TierStrategy::Tier2 => {
-            // Skip Tier-1 entirely; fall through to the Tier-2 path below.
+            // ~keep Skip Tier-1 entirely; fall through to the Tier-2 path below.
         }
         crate::options::TierStrategy::Auto => {
-            // Phase C: skip the prescan pre-pass for the Tier-1 attempt.  The
-            // scanner now handles every construct prescan used to strip
-            // (script/style, head, meta/link, doctype, comments, self-closing
-            // void tags) inline, and bails cleanly on the constructs the
-            // router used to gate on (SVG, CDATA, custom elements, bare `<`).
-            // For routing we still consult the option-based gates in
-            // `classify`; we pass a default `PrescanReport` whose fields are
-            // all false because the scanner will detect any structural
-            // edge-case during its single walk.
+            // ~keep Phase C: skip the prescan pre-pass for the Tier-1 attempt.  The
+            // ~keep scanner now handles every construct prescan used to strip
+            // ~keep (script/style, head, meta/link, doctype, comments, self-closing
+            // ~keep void tags) inline, and bails cleanly on the constructs the
+            // ~keep router used to gate on (SVG, CDATA, custom elements, bare `<`).
+            // ~keep For routing we still consult the option-based gates in
+            // ~keep `classify`; we pass a default `PrescanReport` whose fields are
+            // ~keep all false because the scanner will detect any structural
+            // ~keep edge-case during its single walk.
             let normalized = normalize_input(html)?;
             let stub_report = crate::converter::prescan::PrescanReport::default();
             let decision = crate::converter::tier1::router::classify(&stub_report, &options);
@@ -112,23 +112,23 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
                         });
                     }
                     Err(_bail) => {
-                        // Tier-1 bailed — fall through to Tier-2 with the
-                        // already-normalized input.  Tier-2 runs its own
-                        // prescan internally via `convert_html_impl`.
+                        // ~keep Tier-1 bailed — fall through to Tier-2 with the
+                        // ~keep already-normalized input.  Tier-2 runs its own
+                        // ~keep prescan internally via `convert_html_impl`.
                         precomputed_normalized = Some(normalized);
                     }
                 }
             } else {
-                // RouterDecision::Tier2: fall through with the already-normalized input.
+                // ~keep RouterDecision::Tier2: fall through with the already-normalized input.
                 precomputed_normalized = Some(normalized);
             }
         }
         #[cfg(any(test, feature = "testkit"))]
         crate::options::TierStrategy::Tier1 => {
-            // Testkit path: bypass the classifier and force Tier-1, with
-            // Tier-2 fallback on bail.  Like the Auto path, skip the prescan
-            // pre-pass — the scanner handles every construct it would have
-            // stripped or bails cleanly.
+            // ~keep Testkit path: bypass the classifier and force Tier-1, with
+            // ~keep Tier-2 fallback on bail.  Like the Auto path, skip the prescan
+            // ~keep pre-pass — the scanner handles every construct it would have
+            // ~keep stripped or bails cleanly.
             let normalized = normalize_input(html)?;
             let stub_report = crate::converter::prescan::PrescanReport::default();
             match crate::converter::tier1::run(normalized.as_ref(), &stub_report, &options) {
@@ -159,7 +159,6 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
         None => normalize_input(html)?,
     };
 
-    // Fast path: plain text with no HTML tags — skip full parsing pipeline.
     if !options.wrap {
         if let Some(markdown) = fast_text_only(normalized_html.as_ref(), &options) {
             return Ok(ConversionResult {
@@ -169,7 +168,6 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
         }
     }
 
-    // Determine whether metadata / inline-image extraction is requested.
     #[cfg(feature = "metadata")]
     let wants_metadata = options.extract_metadata;
     #[cfg(not(feature = "metadata"))]
@@ -180,7 +178,6 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
     #[cfg(not(feature = "inline-images"))]
     let wants_images = false;
 
-    // Build optional collectors based on requested features.
     #[cfg(feature = "metadata")]
     let metadata_collector = if wants_metadata {
         Some(Rc::new(RefCell::new(crate::metadata::MetadataCollector::new(
@@ -200,7 +197,6 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
         None
     };
 
-    // Build optional structure collector when requested.
     let structure_collector: Option<std::rc::Rc<std::cell::RefCell<crate::types::StructureCollector>>> =
         if options.include_document_structure {
             Some(std::rc::Rc::new(std::cell::RefCell::new(
@@ -213,9 +209,9 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
     #[cfg(not(feature = "visitor"))]
     let visitor: Option<()> = None;
 
-    // Run the conversion pipeline.
-    // Pass structure_collector by value — convert_html_impl will consume it via Rc::try_unwrap
-    // to return the finished DocumentStructure. We must not hold a second Rc reference.
+    // ~keep Run the conversion pipeline.
+    // ~keep Pass structure_collector by value — convert_html_impl will consume it via Rc::try_unwrap
+    // ~keep to return the finished DocumentStructure. We must not hold a second Rc reference.
     let (markdown, document, tables) = {
         #[cfg(all(feature = "metadata", feature = "inline-images"))]
         {
@@ -269,7 +265,6 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
         markdown
     };
 
-    // Collect metadata if extracted.
     #[cfg(feature = "metadata")]
     let metadata = if let Some(collector) = metadata_collector {
         Rc::try_unwrap(collector)
@@ -280,7 +275,6 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
         HtmlMetadata::default()
     };
 
-    // Collect inline images if extracted.
     #[cfg(feature = "inline-images")]
     let (images, image_warnings) = if let Some(collector) = image_collector {
         let c = Rc::try_unwrap(collector)
@@ -291,7 +285,6 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
         (Vec::new(), Vec::new())
     };
 
-    // Map InlineImageWarnings → ProcessingWarnings.
     #[cfg(feature = "inline-images")]
     let warnings: Vec<crate::types::ProcessingWarning> = image_warnings
         .into_iter()
@@ -356,10 +349,6 @@ fn normalize_input(html: &str) -> Result<Cow<'_, str>> {
 fn fix_xhtml_self_closing(html: Cow<'_, str>) -> Cow<'_, str> {
     use std::sync::OnceLock;
     static RE: OnceLock<regex::Regex> = OnceLock::new();
-    // Match `<tag/>` (no whitespace, no attributes) where `tag` is a valid HTML
-    // tag name. Tag names per the HTML spec must start with a letter and may
-    // contain letters, digits, hyphens, underscores, colons (namespaces), and
-    // periods. The replacement inserts a single space before the `/`.
     let re = RE.get_or_init(|| {
         regex::Regex::new(r"<([a-zA-Z][a-zA-Z0-9_:.\-]*)/>").expect("XHTML self-closing regex is well-formed")
     });

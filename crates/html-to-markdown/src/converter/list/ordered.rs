@@ -15,7 +15,6 @@ use crate::options::ConversionOptions;
 use std::borrow::Cow;
 use tl;
 
-// Type aliases for Context and DomContext to avoid circular imports
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
 

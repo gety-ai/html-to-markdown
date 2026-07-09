@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 
 //! Regression test for issue #397: bare filenames such as

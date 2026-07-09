@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 
 //! Regression for #379: stack overflow on curl.se/changes.html.
@@ -5,9 +6,6 @@
 #[test]
 fn curl_changes_does_not_overflow_stack() {
     let html = include_str!("fixtures/regressions/curl_changes.html");
-    // Pin a lower bound on the fixture size so a future refetch that
-    // shrinks the file fails loudly rather than silently weakening
-    // coverage.
     assert!(
         html.len() >= 1_400_000,
         "fixture appears truncated: {} bytes",

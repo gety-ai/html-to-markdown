@@ -8,7 +8,6 @@ use std::borrow::Cow;
 #[cfg(feature = "visitor")]
 use std::collections::BTreeMap;
 
-// Forward declare DomContext from parent module to avoid circular imports
 pub use crate::converter::DomContext;
 
 /// Collect all attributes from an HTML tag as a `BTreeMap<String, String>`.

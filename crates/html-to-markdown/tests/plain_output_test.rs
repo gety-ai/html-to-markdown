@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 fn convert(
     html: &str,
@@ -147,7 +148,6 @@ fn test_plain_hr_becomes_blank_line() {
     let result = convert(html, Some(plain_options())).unwrap();
     assert!(result.contains("Above"));
     assert!(result.contains("Below"));
-    // Should have blank line between
     assert!(result.contains("\n\n"), "Expected blank line from <hr>, got: {result}");
 }
 
@@ -257,7 +257,6 @@ fn test_plain_ordered_list_custom_start() {
 fn test_plain_nested_lists() {
     let html = "<ul><li>Outer 1<ul><li>Inner A</li><li>Inner B</li></ul></li><li>Outer 2</li></ul>";
     let result = convert(html, Some(plain_options())).unwrap();
-    // The outer items should have `- ` prefix and inner items should also have `- ` prefix
     assert!(
         result.contains("- Outer 1"),
         "Expected '- Outer 1' in output, got: {result}"
@@ -290,12 +289,8 @@ fn test_plain_ordered_list_inside_unordered() {
     );
 }
 
-// Regression tests for issue #362 — UTF-8 mangling in plain-text post-process.
-
 #[test]
 fn test_plain_preserves_em_dash_after_markup() {
-    // Exact repro from issue #362: bytes-cast path split the 3-byte en-dash (U+2013)
-    // into three Latin-1 chars, producing "â<ctrl><ctrl>" corruption.
     let html = "<i>abc</i> \u{2013} def";
     let result = convert(html, Some(plain_options())).unwrap();
     assert_eq!(result, "abc \u{2013} def\n");
@@ -303,8 +298,6 @@ fn test_plain_preserves_em_dash_after_markup() {
 
 #[test]
 fn test_plain_preserves_cjk_emoji_mixed() {
-    // Exercises every multibyte class that the old bytes-cast path could corrupt:
-    // en-dash (U+2013, 3 bytes), CJK (U+4E16 世, 3 bytes), emoji (U+1F980 🦀, 4 bytes).
     let html = "<p>Hello <i>world</i> \u{2013} <strong>世界</strong> loves 🦀</p>";
     let result = convert(html, Some(plain_options())).unwrap();
     assert_eq!(result, "Hello world \u{2013} 世界 loves 🦀\n");
@@ -312,8 +305,6 @@ fn test_plain_preserves_cjk_emoji_mixed() {
 
 #[test]
 fn test_plain_collapses_trim_induced_newlines() {
-    // Whitespace-only lines between paragraphs must collapse to a single blank line after
-    // trailing-whitespace trim, not produce 3+ newlines that survive post-processing.
     let html = "<p>x</p>   \n   \n   \n<p>y</p>";
     let result = convert(html, Some(plain_options())).unwrap();
     assert_eq!(result, "x\n\ny\n");
@@ -321,7 +312,6 @@ fn test_plain_collapses_trim_induced_newlines() {
 
 #[test]
 fn test_plain_empty_whitespace_input() {
-    // All-whitespace content should produce an empty string, not a bare newline.
     let html = "<p>   </p>\n\n\n";
     let result = convert(html, Some(plain_options())).unwrap();
     assert_eq!(result, "");

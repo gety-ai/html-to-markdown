@@ -54,8 +54,8 @@ pub fn handle_subscript(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    // reason: serialize_node is only used when the visitor feature is active;
-    // other imports depend on feature-gated code paths.
+    // ~keep reason: serialize_node is only used when the visitor feature is active;
+    // ~keep other imports depend on feature-gated code paths.
     #[allow(unused_imports)]
     use crate::converter::{append_inline_suffix, chomp_inline, get_text_content, serialize_node, walk_node};
 
@@ -157,8 +157,8 @@ pub fn handle_superscript(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    // reason: serialize_node is only used when the visitor feature is active;
-    // other imports depend on feature-gated code paths.
+    // ~keep reason: serialize_node is only used when the visitor feature is active;
+    // ~keep other imports depend on feature-gated code paths.
     #[allow(unused_imports)]
     use crate::converter::{append_inline_suffix, chomp_inline, get_text_content, serialize_node, walk_node};
 
@@ -389,12 +389,10 @@ pub fn handle_span(
         _ => return,
     };
 
-    // Check if this is an OCR word span (class="ocrx_word")
     let is_hocr_word = tag.attributes().iter().any(|(name, value)| {
         name.as_ref() == "class" && value.as_ref().is_some_and(|v| v.as_ref().contains("ocrx_word"))
     });
 
-    // Add space before OCR words if needed
     if is_hocr_word
         && !output.is_empty()
         && !output.ends_with(' ')
@@ -404,7 +402,6 @@ pub fn handle_span(
         output.push(' ');
     }
 
-    // Handle whitespace normalization
     if !ctx.in_code
         && options.whitespace_mode == crate::options::WhitespaceMode::Normalized
         && output.ends_with('\n')
@@ -413,7 +410,6 @@ pub fn handle_span(
         output.pop();
     }
 
-    // Process children normally
     let children = tag.children();
     {
         for child_handle in children.top().iter() {

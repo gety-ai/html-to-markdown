@@ -38,7 +38,6 @@ fn test_definition_list_spacing_consistency() {
     assert!(markdown1.contains("[php]"));
     assert!(markdown1.contains("[closure]"));
     assert!(markdown1.contains("Add tags"));
-    // Ensure no Pandoc definition list colon prefix is introduced
     assert!(!markdown1.contains(":   "));
 }
 
@@ -57,6 +56,5 @@ fn test_definition_list_no_colon_prefix() {
 </dl>"#;
     let markdown = convert(html, None).expect("conversion should succeed");
     assert!(markdown.contains("If true, this widget may request the primary focus."));
-    // The dd content must not be prefixed with ": " (Pandoc definition list syntax)
     assert!(!markdown.contains(":   If true"));
 }

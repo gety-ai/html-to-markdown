@@ -10,7 +10,6 @@
 use crate::options::ConversionOptions;
 use tl::{NodeHandle, Parser};
 
-// Type aliases for Context and DomContext to avoid circular imports
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
 
@@ -67,11 +66,6 @@ pub fn handle(
 
     if let Some(node) = node_handle.get(parser) {
         if let tl::Node::Tag(tag) = node {
-            // `DomContext::children_of` returns the cached `Vec<NodeHandle>` built
-            // during the initial DOM walk in `build_dom_context`.  Falling back to
-            // a freshly collected Vec keeps this safe when the cache miss happens
-            // (e.g. dynamically synthesised handles in tests), but on the hot
-            // path every paragraph reuses the existing allocation.
             let id = node_handle.get_inner();
             let child_handles: std::borrow::Cow<'_, [tl::NodeHandle]> = match dom_ctx.children_of(id) {
                 Some(children) => std::borrow::Cow::Borrowed(children.as_slice()),
@@ -105,13 +99,8 @@ pub fn handle(
         output.push_str("\n\n");
     }
 
-    // Notify the structure collector if present and we produced non-empty top-level paragraph content.
     if has_content && !ctx.in_table_cell && !ctx.in_list_item && !ctx.convert_as_inline {
         if let Some(ref sc) = ctx.structure_collector {
-            // An inline element's whitespace-normalisation pop can remove a byte from the
-            // separator that was appended after `content_start_pos` was captured, leaving
-            // `content_start_pos` pointing at the interior of a multibyte character.
-            // Clamp to the nearest valid char boundary to avoid a slice panic (#380).
             let safe_start = crate::converter::utility::content::floor_char_boundary(output, content_start_pos);
             let text = output[safe_start..].trim();
             if !text.is_empty() {
@@ -142,7 +131,6 @@ fn is_empty_inline_element(node_handle: &NodeHandle, parser: &Parser, _dom_ctx: 
         match node {
             tl::Node::Tag(tag) => {
                 let tag_name = tag.name().as_utf8_str();
-                // Elements that are always empty or only contain attributes
                 matches!(tag_name.as_ref(), "br" | "hr" | "img" | "input" | "meta" | "link")
             }
             _ => false,

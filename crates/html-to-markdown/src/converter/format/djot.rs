@@ -12,7 +12,6 @@ impl FormatRenderer for DjotRenderer {
     }
 
     fn strong(&self, content: &str, _symbol: char) -> String {
-        // Djot always uses single asterisk for strong
         format!("*{content}*")
     }
 
@@ -29,12 +28,10 @@ impl FormatRenderer for DjotRenderer {
     }
 
     fn subscript(&self, content: &str, _custom_symbol: &str) -> String {
-        // Djot has native subscript support
         format!("~{content}~")
     }
 
     fn superscript(&self, content: &str, _custom_symbol: &str) -> String {
-        // Djot has native superscript support
         format!("^{content}^")
     }
 

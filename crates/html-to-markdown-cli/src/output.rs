@@ -1,4 +1,4 @@
-// reason: CLI application modules do not expose docs to users; doc coverage not required
+// ~keep reason: CLI application modules do not expose docs to users; doc coverage not required
 #![allow(missing_docs)]
 
 use crate::args::Cli;

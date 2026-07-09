@@ -82,10 +82,6 @@ pub fn escape_into(
     while i < bytes.len() {
         let b = bytes[i];
         let needs_misc = escape_misc && is_misc_escape(b);
-        // Numbered-list escape: `.` / `)` are escaped iff the previous input
-        // byte is an ASCII digit.  Read from `bytes`, not from `dest` — at
-        // this point in the loop the digit is still inside the pending run
-        // `bytes[run_start..i]` and has not been flushed.
         let needs_numbered = escape_misc && (b == b'.' || b == b')') && i > 0 && bytes[i - 1].is_ascii_digit();
         let needs_star = escape_asterisks && b == b'*';
         let needs_under = escape_underscores && b == b'_';
@@ -164,9 +160,6 @@ pub fn escape(
         return Cow::Borrowed(text);
     }
 
-    // Single-pass scan to determine whether any byte needs escaping.  Returns
-    // `Cow::Borrowed` immediately when the answer is no, avoiding the
-    // destination String allocation entirely for the common "clean" case.
     let needs_any = text.as_bytes().iter().any(|&b| {
         if escape_ascii {
             return is_ascii_punct(b);
@@ -279,11 +272,6 @@ pub fn normalize_whitespace(text: &str) -> String {
 /// `Cow::Borrowed` if text is already normalized, or `Cow::Owned` with normalized text
 #[must_use]
 pub fn normalize_whitespace_cow(text: &str) -> Cow<'_, str> {
-    // ASCII fast path: most real-world text is ASCII-only.  Walking bytes
-    // avoids `char` decoding and lets the loop be tight.  Any non-ASCII byte
-    // (>= 0x80) is a continuation byte for a multi-byte codepoint which
-    // could be a Unicode space; fall back to the char-aware path in that
-    // case.
     let bytes = text.as_bytes();
     let mut prev_was_space = false;
     for &b in bytes {

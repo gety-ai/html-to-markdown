@@ -24,13 +24,10 @@ const FIXTURE_NAMES: &[&str] = &[
 ];
 
 fn fixtures_dir() -> PathBuf {
-    // CARGO_MANIFEST_DIR is the crates/html-to-markdown directory.
-    // The workspace root is three levels up.
     let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    // crates/html-to-markdown → workspace root
     let workspace_root = manifest
-        .parent() // crates
-        .and_then(|p| p.parent()) // workspace root
+        .parent()
+        .and_then(|p| p.parent())
         .expect("could not resolve workspace root from CARGO_MANIFEST_DIR")
         .to_path_buf();
     workspace_root.join("tools/benchmark-harness/fixtures/real-world/wikipedia")
@@ -69,7 +66,6 @@ fn all_threads_produce_output_equal_to_serial_reference() {
         .map(|i| {
             let fixtures = Arc::clone(&fixtures);
             std::thread::spawn(move || {
-                // Cycle fixture index across threads.
                 let (html, reference) = &fixtures[i % fixtures.len()];
                 let output = convert(html, Some(default_opts()))
                     .unwrap_or_else(|e| panic!("thread {i} convert failed: {e}"))
@@ -85,7 +81,6 @@ fn all_threads_produce_output_equal_to_serial_reference() {
         })
         .collect();
 
-    // Join all handles; panic if any thread panicked.
     for handle in handles {
         handle.join().unwrap_or_else(|e| {
             std::panic::resume_unwind(e);
@@ -95,7 +90,6 @@ fn all_threads_produce_output_equal_to_serial_reference() {
 
 #[test]
 fn thread_count_and_fixture_count_are_as_expected() {
-    // Sanity-check the constants used by the main concurrency test.
     assert_eq!(THREAD_COUNT, 64, "thread count must be 64");
     assert_eq!(FIXTURE_NAMES.len(), 4, "fixture count must be 4");
 }

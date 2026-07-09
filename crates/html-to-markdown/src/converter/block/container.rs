@@ -11,7 +11,6 @@
 use crate::options::ConversionOptions;
 use tl::{NodeHandle, Parser};
 
-// Type aliases for Context and DomContext to avoid circular imports
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
 
@@ -110,5 +109,4 @@ pub const fn handle_noop(
     _depth: usize,
     _dom_ctx: &DomContext,
 ) {
-    // Intentionally empty: these elements produce no Markdown output
 }

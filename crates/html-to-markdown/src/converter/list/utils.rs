@@ -7,8 +7,6 @@ use crate::converter::main_helpers::{tag_name_eq, trim_trailing_whitespace};
 use crate::options::{ConversionOptions, ListIndentType};
 use tl;
 
-// Type aliases for Context and DomContext to avoid circular imports
-// These are imported from converter.rs and should be made accessible
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
 
@@ -284,9 +282,9 @@ pub fn process_list_children(
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
         let children = tag.children();
         {
-            // Build the per-list context once; only `list_counter` varies
-            // per iteration, so mutate that field in place instead of
-            // cloning ctx for every <li>.  Tier-2 hot-spot pass III.
+            // ~keep Build the per-list context once; only `list_counter` varies
+            // ~keep per iteration, so mutate that field in place instead of
+            // ~keep cloning ctx for every <li>.  Tier-2 hot-spot pass III.
             let mut list_ctx = Context {
                 in_ordered_list: is_ordered,
                 list_counter: if is_ordered { counter } else { 0 },

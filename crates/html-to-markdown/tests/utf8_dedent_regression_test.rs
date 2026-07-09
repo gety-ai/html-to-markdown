@@ -13,7 +13,6 @@ use html_to_markdown_rs::convert;
 /// boundary` panic.
 #[test]
 fn test_nbsp_indent() {
-    // Two NBSP chars as indent on each line
     let html = "<pre>\u{a0}\u{a0}line one\n\u{a0}\u{a0}line two</pre>";
     let result = convert(html, None);
     assert!(result.is_ok(), "panicked on NBSP indent: {:?}", result.err());
@@ -29,7 +28,6 @@ fn test_nbsp_indent() {
 /// was guaranteed to produce a panic on the NBSP line.
 #[test]
 fn test_mixed_tab_nbsp_indent() {
-    // Line 1: tab + content; line 2: NBSP + content
     let html = "<pre>\tascii_line\n\u{a0}nbsp_line</pre>";
     let result = convert(html, None);
     assert!(result.is_ok(), "panicked on mixed tab+NBSP indent: {:?}", result.err());
@@ -47,7 +45,6 @@ fn test_mixed_tab_nbsp_indent() {
 /// byte-offset slice — this exercises the `line.trim().is_empty()` branch.
 #[test]
 fn test_blank_lines_interleaved_with_multibyte_indent() {
-    // Two lines with NBSP indent, separated by a blank line
     let html = "<pre>\u{a0}first\n\n\u{a0}third</pre>";
     let result = convert(html, None);
     assert!(result.is_ok(), "panicked on blank-interleaved NBSP: {:?}", result.err());
@@ -64,8 +61,6 @@ fn test_blank_lines_interleaved_with_multibyte_indent() {
 /// converter must not panic regardless.
 #[test]
 fn test_latin1_supplement_chars_at_line_start() {
-    // é and ñ are NOT whitespace, so indent=0 and no slicing occurs — but
-    // the conversion must succeed without panic.
     let html = "<pre>éline\nñline</pre>";
     let result = convert(html, None);
     assert!(
@@ -97,13 +92,11 @@ fn test_cjk_chars_at_line_start() {
 /// actually removes the correct number of bytes rather than char-count bytes.
 #[test]
 fn test_nbsp_deep_indent_dedented_correctly() {
-    // Four NBSP chars of indent on every line; after dedent, result has no leading whitespace.
     let nbsp4 = "\u{a0}\u{a0}\u{a0}\u{a0}";
     let html = format!("<pre>{nbsp4}alpha\n{nbsp4}beta</pre>");
     let result = convert(&html, None);
     assert!(result.is_ok(), "panicked on deep NBSP dedent: {:?}", result.err());
     let md = result.unwrap().content.unwrap_or_default();
-    // After full dedent the visible text should be present
     assert!(md.contains("alpha"), "expected 'alpha' in output, got: {md:?}");
     assert!(md.contains("beta"), "expected 'beta' in output, got: {md:?}");
 }

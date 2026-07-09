@@ -13,7 +13,6 @@ use crate::text::decode_html_entities;
 use crate::text::escape;
 use tl::{NodeHandle, Parser};
 
-// Type aliases for Context and DomContext to avoid circular imports
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
 
@@ -41,9 +40,7 @@ pub fn handle(
         "script" => {
             handle_script(node_handle, parser, output, options, ctx);
         }
-        "style" => {
-            // Style elements are skipped - no output
-        }
+        "style" => {}
         "math" => {
             handle_math(node_handle, parser, output, options, ctx, dom_ctx);
         }
@@ -115,7 +112,6 @@ fn handle_head(
         }
     }
 
-    // If head contains body-like elements (malformed HTML), process them
     if has_body_like {
         for child_handle in children.top().iter() {
             walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);

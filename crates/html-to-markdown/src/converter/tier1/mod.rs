@@ -8,12 +8,12 @@
 //! head slice captured by the prescan and prepends YAML frontmatter to the
 //! scanner's output (matching Tier-2 behaviour byte-for-byte).
 
-// All submodules are declared `pub` here.  The `tier1` module itself lives
-// inside `pub(crate) mod converter`, so the effective visibility is already
-// crate-internal; `pub(crate)` would be redundant and triggers the
-// `clippy::redundant_pub_crate` lint.  The `tier1` module is only re-exported
-// from `lib.rs` under `#[cfg(any(test, feature = "testkit"))]`, so these
-// submodules remain invisible outside the crate in normal builds.
+// ~keep All submodules are declared `pub` here.  The `tier1` module itself lives
+// ~keep inside `pub(crate) mod converter`, so the effective visibility is already
+// ~keep crate-internal; `pub(crate)` would be redundant and triggers the
+// ~keep `clippy::redundant_pub_crate` lint.  The `tier1` module is only re-exported
+// ~keep from `lib.rs` under `#[cfg(any(test, feature = "testkit"))]`, so these
+// ~keep submodules remain invisible outside the crate in normal builds.
 pub mod bail;
 pub mod parse;
 pub mod router;
@@ -22,23 +22,23 @@ pub mod spec_rules;
 pub mod state;
 pub mod tags;
 
-// `lookup` is called by scanner.rs as `tier1::lookup(...)`.
+// ~keep `lookup` is called by scanner.rs as `tier1::lookup(...)`.
 pub use tags::lookup;
 
-// `BailReason` re-export for testkit/bench consumers who pattern-match on it.
-// Not needed by production code (convert_api.rs discards the bail value), so
-// gate it to avoid widening the non-testkit API surface.
+// ~keep `BailReason` re-export for testkit/bench consumers who pattern-match on it.
+// ~keep Not needed by production code (convert_api.rs discards the bail value), so
+// ~keep gate it to avoid widening the non-testkit API surface.
 #[cfg(any(test, feature = "testkit"))]
 pub use bail::BailReason;
 
-// Convenience re-exports for testkit consumers that import via
-// `html_to_markdown_rs::tier1::{ListKind, TagKind, …}` rather than the full
-// module path.
+// ~keep Convenience re-exports for testkit consumers that import via
+// ~keep `html_to_markdown_rs::tier1::{ListKind, TagKind, …}` rather than the full
+// ~keep module path.
 #[cfg(any(test, feature = "testkit"))]
 pub use tags::{ListKind, OptionalCloseRule, RawKind, TagKind, TagSpec};
 
-// `RouterDecision` is compared in production code (convert_api.rs line 82)
-// via the path `tier1::RouterDecision::Tier1`, so this re-export is ungated.
+// ~keep `RouterDecision` is compared in production code (convert_api.rs line 82)
+// ~keep via the path `tier1::RouterDecision::Tier1`, so this re-export is ungated.
 pub use router::RouterDecision;
 
 use crate::converter::prescan::PrescanReport;
@@ -58,9 +58,9 @@ use crate::options::ConversionOptions;
 pub fn run(html: &str, report: &PrescanReport, options: &ConversionOptions) -> Result<String, bail::BailReason> {
     let scanner::ScanOutput { body, head_range } = scanner::scan(html, options)?;
 
-    // Phase C: prefer the head range the scanner discovered during its single
-    // walk over `html`.  Fall back to the prescan's range when the caller
-    // pre-walked the input and produced one (legacy / Tier-2 fallback path).
+    // ~keep Phase C: prefer the head range the scanner discovered during its single
+    // ~keep walk over `html`.  Fall back to the prescan's range when the caller
+    // ~keep pre-walked the input and produced one (legacy / Tier-2 fallback path).
     let scanner_range_for_call;
     let head_range_ref = if head_range.is_some() {
         scanner_range_for_call = head_range;
@@ -69,17 +69,17 @@ pub fn run(html: &str, report: &PrescanReport, options: &ConversionOptions) -> R
         report.head_range.as_ref()
     };
 
-    // Prepend YAML frontmatter when metadata extraction is requested.
-    // `head_metadata::extract_frontmatter` re-parses only the head slice (cheap).
-    //
-    // The frontmatter returned by the shared Tier-2 formatter ends with a
-    // single `\n` after the closing `---`.  Tier-2's walker subsequently
-    // gets `\n\n` from the first paragraph's leading separator (collapse
-    // squashes the resulting `\n\n\n` to `\n\n`).  Tier-1 already trimmed
-    // its body to a single trailing `\n` and has no walker pass to add the
-    // separator, so insert one explicitly: emit `\n` between frontmatter
-    // (`...---\n`) and the body (`first-paragraph...`) to land on
-    // `...---\n\nfirst-paragraph...`.
+    // ~keep Prepend YAML frontmatter when metadata extraction is requested.
+    // ~keep `head_metadata::extract_frontmatter` re-parses only the head slice (cheap).
+    // ~keep
+    // ~keep The frontmatter returned by the shared Tier-2 formatter ends with a
+    // ~keep single `\n` after the closing `---`.  Tier-2's walker subsequently
+    // ~keep gets `\n\n` from the first paragraph's leading separator (collapse
+    // ~keep squashes the resulting `\n\n\n` to `\n\n`).  Tier-1 already trimmed
+    // ~keep its body to a single trailing `\n` and has no walker pass to add the
+    // ~keep separator, so insert one explicitly: emit `\n` between frontmatter
+    // ~keep (`...---\n`) and the body (`first-paragraph...`) to land on
+    // ~keep `...---\n\nfirst-paragraph...`.
     if let Some(frontmatter) = crate::converter::head_metadata::extract_frontmatter(html, head_range_ref, options) {
         let mut output = String::with_capacity(frontmatter.len() + body.len() + 1);
         output.push_str(&frontmatter);

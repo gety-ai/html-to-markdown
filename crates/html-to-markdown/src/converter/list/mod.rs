@@ -13,10 +13,6 @@ pub mod ordered;
 pub mod unordered;
 pub mod utils;
 
-// Re-export types from parent module for submodule access
-
-// Re-export utility function needed by table builder
-
 /// Dispatches list element handling to the appropriate handler.
 ///
 /// Returns `true` if the element was handled, `false` otherwise.

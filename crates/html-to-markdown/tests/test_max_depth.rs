@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 
 //! Tests for the `max_depth` recursion-safety option.
@@ -15,7 +16,6 @@ fn convert_with_options(html: &str, options: ConversionOptions) -> String {
 /// safety limit should be fully converted.
 #[test]
 fn test_max_depth_none_converts_reasonably_nested_content() {
-    // Build 32 levels of nesting around a leaf text node.
     let mut html = String::from("<p>deep</p>");
     for _ in 0..32 {
         html = format!("<div>{html}</div>");
@@ -38,13 +38,6 @@ fn test_max_depth_none_converts_reasonably_nested_content() {
 /// their text content is excluded from the output.
 #[test]
 fn test_max_depth_truncates_at_limit() {
-    // Depth counting (each handler passes depth+1 to its children):
-    // depth 0: outer <div>  — visited
-    //   depth 1: <p>        — visited, paragraph handler passes depth+1 to children
-    //     depth 2: "shallow" — visited (2 < 3), appears in output
-    //   depth 1: inner <div> — visited, div handler passes depth+1 to children
-    //     depth 2: <p>       — visited, paragraph handler passes depth+1 to children
-    //       depth 3: "deep"  — skipped (3 >= 3), absent from output
     let html = "<div><p>shallow</p><div><p>deep</p></div></div>";
 
     let options = ConversionOptions {

@@ -78,7 +78,6 @@ pub fn handle_visitor_element_start<'p>(
         crate::visitor::VisitResult::Custom(custom_output) => {
             output.push_str(&custom_output);
 
-            // For custom output, still call visit_element_end (except for tables)
             if !matches!(tag_name, "table") {
                 let element_content = &custom_output;
                 let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
@@ -107,20 +106,12 @@ pub fn handle_visitor_element_end(
     ctx: &crate::converter::Context,
     depth: usize,
 ) {
-    // Skip visitor callback for table elements
     if matches!(tag_name, "table") {
         return;
     }
 
     let node_ctx = state.build_node_ctx(tag_name, tag, depth);
 
-    // The saved `element_output_start` can become stale in two ways:
-    // 1. A child visitor returning Custom/Skip truncates `output`, making the
-    //    saved position point past the end of the now-shorter string.
-    // 2. Element handlers (e.g. div) trim trailing whitespace that was present
-    //    when the position was captured, then append new multi-byte content.
-    //    The old position can land inside a multi-byte character.
-    // Clamp to output length, then retreat to a valid char boundary.
     let safe_start = element_output_start.min(output.len());
     let safe_start = crate::converter::utility::content::floor_char_boundary(output, safe_start);
     let element_content = &output[safe_start..];

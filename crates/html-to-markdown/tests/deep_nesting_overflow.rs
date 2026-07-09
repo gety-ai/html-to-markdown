@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 
 //! Regression coverage for deeply nested and malformed markup. `tl` preserves

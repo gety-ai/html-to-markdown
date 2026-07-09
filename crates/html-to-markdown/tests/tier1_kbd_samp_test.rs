@@ -30,8 +30,6 @@ fn samp_emits_backticks() {
 
 #[test]
 fn kbd_inside_paragraph_with_surrounding_text() {
-    // Mirrors the github-markdown-complete fixture pattern around
-    // "add one to six <kbd>#</kbd> symbols".
     let out = tier1("<p>press <kbd>#</kbd> now</p>");
     assert!(out.contains("press `#` now"), "got: {out:?}");
 }

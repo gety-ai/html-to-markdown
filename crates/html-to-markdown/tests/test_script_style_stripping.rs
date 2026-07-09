@@ -1,10 +1,10 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 
 use html_to_markdown_rs::ConversionOptions;
 
 #[test]
 fn test_strip_simple_script_tag() {
-    // Simple script with plain JavaScript
     let html = r"<html>
 <head>
   <script>var x = 1; var y = 2;</script>
@@ -19,17 +19,14 @@ fn test_strip_simple_script_tag() {
 
     println!("Output:\n{result}");
 
-    // Should extract body content
     assert!(result.contains("Real content"), "Should contain body content");
 
-    // Script content should not appear in output
     assert!(!result.contains("var x"), "Script content should be removed");
     assert!(!result.contains("var y"), "Script content should be removed");
 }
 
 #[test]
 fn test_strip_script_with_html_like_content() {
-    // Critical test: script with HTML-like content that confuses parsers
     let html = r#"<html>
 <head>
   <script>
@@ -52,20 +49,17 @@ fn test_strip_script_with_html_like_content() {
 
     println!("Output:\n{result}");
 
-    // Should extract body content
     assert!(
         result.contains("Real article content"),
         "Should contain real body content"
     );
 
-    // Script content should NOT appear
     assert!(!result.contains("fake"), "Fake HTML from script should be removed");
     assert!(!result.contains("var data"), "Script variables should not appear");
 }
 
 #[test]
 fn test_strip_style_tag() {
-    // Style tags with CSS that has HTML-like syntax
     let html = r"<html>
 <head>
   <style>
@@ -83,17 +77,14 @@ fn test_strip_style_tag() {
 
     println!("Output:\n{result}");
 
-    // Should have body content
     assert!(result.contains("Paragraph content"), "Should contain paragraph");
 
-    // Style content should be removed
     assert!(!result.contains("content:"), "CSS should not appear in output");
     assert!(!result.contains("display:"), "CSS properties should not appear");
 }
 
 #[test]
 fn test_preserve_json_ld_script() {
-    // JSON-LD script tags should be preserved for metadata extraction
     let html = r#"<html>
 <head>
   <title>Article Title</title>
@@ -118,17 +109,14 @@ fn test_preserve_json_ld_script() {
     println!("Markdown:\n{markdown}");
     println!("Metadata: {:?}", metadata.document.title);
 
-    // Should extract both content and metadata
     assert!(markdown.contains("Article content"), "Should contain body content");
 
-    // Should have extracted metadata
     assert_eq!(
         metadata.document.title,
         Some("Article Title".to_string()),
         "Should extract title"
     );
 
-    // JSON-LD should be in structured data
     assert!(!metadata.structured_data.is_empty(), "Should extract JSON-LD");
     if let Some(schema) = metadata.structured_data.first() {
         assert!(
@@ -145,7 +133,6 @@ fn test_preserve_json_ld_script() {
 
 #[test]
 fn test_multiple_script_tags() {
-    // Multiple script tags with various content
     let html = r#"<html>
 <head>
   <script>console.log('script 1');</script>
@@ -170,11 +157,9 @@ fn test_multiple_script_tags() {
 
     println!("Markdown:\n{markdown}");
 
-    // Should have real content
     assert!(markdown.contains("Real Title"), "Should have h1");
     assert!(markdown.contains("Real paragraph"), "Should have paragraph");
 
-    // Should NOT have fake content from scripts
     assert!(
         !markdown.contains("Fake paragraph"),
         "Should not have fake HTML from script"
@@ -182,7 +167,6 @@ fn test_multiple_script_tags() {
     assert!(!markdown.contains("console.log"), "Should not have console.log");
     assert!(!markdown.contains("document.write"), "Should not have document.write");
 
-    // JSON-LD should be extracted in metadata
     assert!(
         !metadata.structured_data.is_empty(),
         "Should extract JSON-LD structured data"
@@ -191,7 +175,6 @@ fn test_multiple_script_tags() {
 
 #[test]
 fn test_reuters_like_structure() {
-    // Mimics Reuters structure with divs containing data-testid attributes
     let html = r#"<!DOCTYPE html>
 <html>
 <head>
@@ -228,7 +211,6 @@ fn test_reuters_like_structure() {
     println!("Markdown output:\n{markdown}");
     println!("Metadata title: {:?}", metadata.document.title);
 
-    // Should have extracted metadata
     assert_eq!(
         metadata.document.title,
         Some("Reuters Article".to_string()),
@@ -239,7 +221,6 @@ fn test_reuters_like_structure() {
         "Should extract OG title"
     );
 
-    // Should have article content
     assert!(markdown.contains("SAN FRANCISCO"), "Should contain first paragraph");
     assert!(
         markdown.contains("widespread power outage"),
@@ -250,7 +231,6 @@ fn test_reuters_like_structure() {
         "Should contain second paragraph"
     );
 
-    // Should NOT have fake content from script
     assert!(!markdown.contains("window.data"), "Should not have window.data");
     assert!(
         !markdown.contains("'<div data-testid"),
@@ -260,7 +240,6 @@ fn test_reuters_like_structure() {
 
 #[test]
 fn test_complex_nested_script_content() {
-    // Script with complex nested structures that might confuse parsers
     let html = r#"<html>
 <head>
   <script>
@@ -294,11 +273,9 @@ fn test_complex_nested_script_content() {
 
     println!("Output:\n{result}");
 
-    // Should have actual content
     assert!(result.contains("Main Content"), "Should have h2");
     assert!(result.contains("actual article"), "Should have paragraph");
 
-    // Should NOT have nested fake HTML from script
     assert!(
         !result.contains("Nested HTML in template"),
         "Should not have template content"
@@ -308,7 +285,6 @@ fn test_complex_nested_script_content() {
 
 #[test]
 fn test_case_insensitive_script_style_tags() {
-    // Test that script/style tags are matched case-insensitively
     let html = r"<html>
 <head>
   <SCRIPT>console.log('uppercase script');</SCRIPT>
@@ -325,10 +301,8 @@ fn test_case_insensitive_script_style_tags() {
 
     println!("Output:\n{result}");
 
-    // Should have content
     assert!(result.contains("Content"), "Should have content");
 
-    // Should not have script content regardless of case
     assert!(!result.contains("console.log"), "Should remove SCRIPT tag content");
     assert!(!result.contains("margin:"), "Should remove STYLE tag content");
     assert!(!result.contains("var x"), "Should remove ScRiPt tag content");
@@ -336,10 +310,8 @@ fn test_case_insensitive_script_style_tags() {
 
 #[test]
 fn test_performance_large_script() {
-    // Performance test: large script tag shouldn't cause issues
     let mut html = String::from(r"<html><head><script>");
 
-    // Add 1MB of fake content
     for _ in 0..10000 {
         html.push_str("var data = '<div>fake content</div>'; ");
     }
@@ -351,7 +323,6 @@ fn test_performance_large_script() {
     let options = ConversionOptions::default();
     let result = convert(&html, Some(options)).expect("Failed to convert");
 
-    // Should work and extract real content
     assert!(
         result.contains("Real content"),
         "Should extract body despite large script"
@@ -360,7 +331,6 @@ fn test_performance_large_script() {
 
 #[test]
 fn test_inline_script_attributes_not_affected() {
-    // Inline event handlers should not be affected by script stripping
     let html = r#"<html>
 <head>
   <script>console.log('bad');</script>
@@ -376,12 +346,9 @@ fn test_inline_script_attributes_not_affected() {
 
     println!("Output:\n{result}");
 
-    // Should have content and button
     assert!(result.contains("Click me"), "Should have button text");
     assert!(result.contains("Content"), "Should have paragraph");
 
-    // The onclick script inside the tag attribute might appear in output (that's okay)
-    // but the inline script tag content should be gone
     assert!(
         !result.contains("console.log('bad')"),
         "Should remove script tag content"

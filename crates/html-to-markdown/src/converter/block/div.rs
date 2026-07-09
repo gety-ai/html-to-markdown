@@ -10,7 +10,6 @@ use crate::converter::main_helpers::trim_trailing_whitespace;
 use crate::options::ConversionOptions;
 use tl::{NodeHandle, Parser};
 
-// Type aliases for Context and DomContext to avoid circular imports
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
 
@@ -43,7 +42,6 @@ pub fn handle(
         _ => return,
     };
 
-    // If inline conversion mode, just pass children through
     if ctx.convert_as_inline {
         let children = tag.children();
         {
@@ -71,7 +69,6 @@ pub fn handle(
         && !output.is_empty()
         && !output.ends_with("\n\n");
 
-    // Handle leading separators based on context
     if is_table_continuation {
         trim_trailing_whitespace(output);
         if options.br_in_tables {
@@ -90,7 +87,6 @@ pub fn handle(
         output.push_str("\n\n");
     }
 
-    // Process children
     let children = tag.children();
     {
         for child_handle in children.top().iter() {
@@ -107,7 +103,7 @@ pub fn handle(
         trim_trailing_whitespace(output);
 
         if ctx.in_table_cell {
-            // No trailing separator in table cells
+            // ~keep No trailing separator in table cells
         } else if ctx.in_list_item {
             if is_list_continuation {
                 if !output.ends_with('\n') {
@@ -122,7 +118,6 @@ pub fn handle(
             }
         } else if !ctx.in_list_item && !ctx.convert_as_inline {
             if output.ends_with("\n\n") {
-                // Already has proper spacing
             } else if output.ends_with('\n') {
                 output.push('\n');
             } else {

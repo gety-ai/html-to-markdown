@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 #![allow(clippy::significant_drop_tightening)]
 
@@ -742,10 +743,6 @@ fn test_no_double_visit_in_headings() {
     );
 }
 
-// ============================================================================
-// Integration tests: Visitor + Feature combinations
-// ============================================================================
-
 /// Test that visitor callbacks work correctly when `skip_images` option is enabled
 #[test]
 fn test_visitor_with_skip_images() {
@@ -768,7 +765,6 @@ fn test_visitor_with_skip_images() {
         <p>More text</p>
     "#;
 
-    // Test with skip_images enabled and visitor
     let options = ConversionOptions {
         skip_images: true,
         ..Default::default()
@@ -780,7 +776,6 @@ fn test_visitor_with_skip_images() {
         .content
         .unwrap_or_default();
 
-    // When skip_images is true, images should not appear in output
     assert!(
         !result.contains("!["),
         "skip_images should prevent image markdown in output, got: {result}"
@@ -790,10 +785,6 @@ fn test_visitor_with_skip_images() {
         "skip_images should prevent image src in output, got: {result}"
     );
 
-    // When skip_images is true, the conversion still happens correctly
-    // Images are filtered at the conversion level based on the option
-    // This verifies that skip_images option and visitor parameters work together
-    // without conflicts - both are optional and can be combined
     assert!(
         result.contains("Some text") && result.contains("More text"),
         "Other content should still be present in output, got: {result}"
@@ -824,7 +815,6 @@ fn test_convert_accepts_visitor_parameter() {
     let html = r#"<p>Visit <a href="https://example.com">our site</a> for more info.</p>"#;
     let visitor = Arc::new(Mutex::new(CountingVisitor::default()));
 
-    // Test using the main convert() function with visitor parameter
     let _result = convert(html, None, Some(visitor.clone())).expect("convert with visitor should work");
 
     let borrowed = visitor.lock().expect("visitor mutex poisoned");
@@ -868,7 +858,6 @@ fn test_convert_with_inline_images_accepts_visitor() {
         <p>Some content</p>
     "#;
 
-    // Verify visitor callbacks fire via convert_with_visitor
     let visitor = Arc::new(Mutex::new(ImageTrackingVisitor::default()));
     let markdown = convert(html, None, Some(visitor.clone()))
         .expect("convert should work")
@@ -881,7 +870,6 @@ fn test_convert_with_inline_images_accepts_visitor() {
         "Visitor should count 1 non-data-uri image"
     );
 
-    // Markdown should still be generated
     assert!(!markdown.is_empty(), "Should produce markdown output");
 }
 
@@ -923,7 +911,6 @@ fn test_visitor_and_metadata_both_work() {
         </html>
     "#;
 
-    // Verify visitor callbacks fire via convert_with_visitor
     let visitor = Arc::new(Mutex::new(MetadataAwareVisitor::default()));
     let markdown = convert(html, None, Some(visitor.clone()))
         .expect("convert should work")
@@ -944,7 +931,6 @@ fn test_visitor_and_metadata_both_work() {
     assert!(!markdown.is_empty(), "Should produce markdown output");
     drop(borrowed);
 
-    // Verify metadata extraction via convert()
     let result = html_to_markdown_rs::convert(html, None).expect("convert should work");
     let metadata = result.metadata;
 
@@ -1011,14 +997,12 @@ fn test_convert_with_all_features_and_visitor() {
         </html>
     "#;
 
-    // Verify visitor callbacks fire via convert_with_visitor
     let visitor = Arc::new(Mutex::new(ComprehensiveVisitor::default()));
     let markdown = convert(html, None, Some(visitor.clone()))
         .expect("convert should work")
         .content
         .unwrap_or_default();
 
-    // Verify all visitor callbacks were invoked
     let borrowed = visitor.lock().expect("visitor mutex poisoned");
     assert!(
         borrowed.headings >= 2,
@@ -1033,7 +1017,6 @@ fn test_convert_with_all_features_and_visitor() {
     assert_eq!(borrowed.links, 2, "Visitor should see 2 links, got {}", borrowed.links);
     drop(borrowed);
 
-    // Verify markdown was produced
     assert!(!markdown.is_empty(), "Should produce markdown output");
 }
 
@@ -1137,13 +1120,12 @@ fn test_issue_331_hyphenated_tags_xml_self_closing_visitor_events() {
 
     let events = visitor.lock().expect("visitor mutex poisoned").events.clone();
 
-    // Find the indices of start/end pairs for the two ac:parameter elements.
-    // With correct XML self-closing handling:
-    //   start(ac:parameter)[foo] → end(ac:parameter)[foo] → start(ac:parameter)[quux] → end(ac:parameter)[quux]
-    // With the bug (html5ever treats `/>` as open tag):
-    //   start(ac:parameter)[foo] → start(ac:parameter)[quux] → end(ac:parameter)[quux] → end(ac:parameter)[foo]
+    // ~keep Find the indices of start/end pairs for the two ac:parameter elements.
+    // ~keep With correct XML self-closing handling:
+    // ~keep   start(ac:parameter)[foo] → end(ac:parameter)[foo] → start(ac:parameter)[quux] → end(ac:parameter)[quux]
+    // ~keep With the bug (html5ever treats `/>` as open tag):
+    // ~keep   start(ac:parameter)[foo] → start(ac:parameter)[quux] → end(ac:parameter)[quux] → end(ac:parameter)[foo]
 
-    // Collect positions of start/end events for ac:parameter
     let ac_param_starts: Vec<usize> = events
         .iter()
         .enumerate()
@@ -1168,7 +1150,6 @@ fn test_issue_331_hyphenated_tags_xml_self_closing_visitor_events() {
         "expected exactly 2 ac:parameter end events, got: {events:?}"
     );
 
-    // Each start must come before the corresponding end: start[0] < end[0] < start[1] < end[1]
     assert!(
         ac_param_starts[0] < ac_param_ends[0],
         "first ac:parameter: start must precede end (got start@{}, end@{}); events: {events:?}",

@@ -9,8 +9,6 @@
 //!
 //! These elements have special formatting requirements for proper Markdown output.
 
-// Note: Context and DomContext are defined in converter.rs
-// walk_node is also defined there and must be called via the parent module
 use super::walk_node;
 
 /// Handles the `<hgroup>` element.
@@ -64,7 +62,6 @@ pub fn handle_dl(
     dom_ctx: &super::DomContext,
 ) {
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-        // In inline context, just process children inline
         if ctx.convert_as_inline {
             let children = tag.children();
             {
@@ -75,7 +72,6 @@ pub fn handle_dl(
             return;
         }
 
-        // Collect content from children
         let mut content = String::new();
         let children = tag.children();
         {
@@ -84,7 +80,6 @@ pub fn handle_dl(
             }
         }
 
-        // Output collected content with proper spacing
         let trimmed = content.trim();
         if !trimmed.is_empty() {
             if !output.is_empty() && !output.ends_with("\n\n") {
@@ -201,13 +196,11 @@ pub fn handle_menu(
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
         let content_start = output.len();
 
-        // Create options with menu-specific bullet style
         let menu_options = crate::options::ConversionOptions {
             bullets: "-".to_string(),
             ..options.clone()
         };
 
-        // Create context for list rendering
         let list_ctx = super::Context {
             in_ordered_list: false,
             list_counter: 0,
@@ -223,7 +216,6 @@ pub fn handle_menu(
             }
         }
 
-        // Ensure proper spacing after menu
         if !ctx.convert_as_inline && output.len() > content_start {
             if !output.ends_with("\n\n") {
                 if output.ends_with('\n') {
@@ -233,7 +225,6 @@ pub fn handle_menu(
                 }
             }
         } else if ctx.convert_as_inline {
-            // In inline mode, remove trailing newlines
             while output.ends_with('\n') {
                 output.pop();
             }

@@ -59,23 +59,20 @@ pub fn convert_html_impl(
     Option<crate::types::DocumentStructure>,
     Vec<crate::types::TableData>,
 )> {
-    // Strip script and style tags completely to prevent parser confusion from HTML-like content
-    // inside script/style elements. This preserves JSON-LD for metadata extraction.
     let stripped = strip_script_and_style_tags(html);
-    // Strip elements with the `hidden` attribute before parsing.
     let stripped = strip_hidden_elements(&stripped);
-    // Normalise bogus HTML comment endings (`--->`, `---->`, …) that cause the
-    // `tl` parser to silently discard all document content that follows them.
+    // ~keep Normalise bogus HTML comment endings (`--->`, `---->`, …) that cause the
+    // ~keep `tl` parser to silently discard all document content that follows them.
     let stripped = normalize_bogus_comment_endings(&stripped);
-    // Normalise closing tags whose `>` is on a subsequent line (JSX-style `</a\n>`).
-    // The `tl` parser does not handle such end-tags and leaves the element unclosed,
-    // causing all subsequent siblings to be absorbed as children.
+    // ~keep Normalise closing tags whose `>` is on a subsequent line (JSX-style `</a\n>`).
+    // ~keep The `tl` parser does not handle such end-tags and leaves the element unclosed,
+    // ~keep causing all subsequent siblings to be absorbed as children.
     let stripped = normalize_split_closing_tags(&stripped);
-    // Insert missing `</li>`, `</dt>`, `</dd>` close tags that the HTML5 spec
-    // says are implicitly added when a new list-item starts or the parent list
-    // closes.  Without this, `tl` nests each item inside the previous one,
-    // building a chain as deep as the number of items and causing a stack
-    // overflow on large changelogs with hundreds of unclosed `<li>` tags.
+    // ~keep Insert missing `</li>`, `</dt>`, `</dd>` close tags that the HTML5 spec
+    // ~keep says are implicitly added when a new list-item starts or the parent list
+    // ~keep closes.  Without this, `tl` nests each item inside the previous one,
+    // ~keep building a chain as deep as the number of items and causing a stack
+    // ~keep overflow on large changelogs with hundreds of unclosed `<li>` tags.
     let stripped = normalize_unclosed_list_items(&stripped);
     let mut preprocessed = preprocess_html(&stripped).into_owned();
     let mut preprocessed_len = preprocessed.len();
@@ -114,10 +111,8 @@ pub fn convert_html_impl(
 
     let mut dom_ctx = build_dom_context(&dom, parser, preprocessed_len);
 
-    // Check for inline-block misnesting and repair if needed
     if has_inline_block_misnest(&dom_ctx, parser) {
         if let Some(repaired_html) = repair_with_html5ever(&preprocessed) {
-            // Drop dom to release borrow on preprocessed
             drop(dom);
             let stripped = strip_script_and_style_tags(&repaired_html);
             let stripped = strip_hidden_elements(&stripped);
@@ -125,7 +120,6 @@ pub fn convert_html_impl(
             let stripped = normalize_split_closing_tags(&stripped);
             preprocessed = preprocess_html(&stripped).into_owned();
             preprocessed_len = preprocessed.len();
-            // Re-parse with repaired HTML
             dom = tl::parse(&preprocessed, parser_options)
                 .map_err(|_| crate::error::ConversionError::ParseError("Failed to parse repaired HTML".to_string()))?;
             parser = dom.parser();
@@ -134,8 +128,6 @@ pub fn convert_html_impl(
         }
     }
 
-    // Plain text output: run the full pipeline (for metadata + visitor callbacks),
-    // then return plain text instead of markdown.
     let is_plain_text = options.output_format == OutputFormat::Plain;
 
     let wants_frontmatter = options.extract_metadata && !options.convert_as_inline;
@@ -254,8 +246,6 @@ pub fn convert_html_impl(
         reference_collector.as_ref().map(std::rc::Rc::clone),
     );
 
-    // Pre-compute node IDs matching exclude_selectors so walk_node can skip them in O(1).
-    // Invalid or unsupported selectors are silently skipped.
     if !options.exclude_selectors.is_empty() {
         let mut excluded: HashSet<u32> = HashSet::new();
         for selector in &options.exclude_selectors {
@@ -277,11 +267,10 @@ pub fn convert_html_impl(
         return Err(crate::error::ConversionError::Visitor(err.clone()));
     }
 
-    // Drop ctx before unwrapping the structure collector Rc — ctx holds a cloned Rc
-    // reference to the same collector, and Rc::try_unwrap requires exactly one reference.
+    // ~keep Drop ctx before unwrapping the structure collector Rc — ctx holds a cloned Rc
+    // ~keep reference to the same collector, and Rc::try_unwrap requires exactly one reference.
     drop(ctx);
 
-    // Append reference-style link definitions if any were collected
     if let Some(rc) = reference_collector {
         if let Ok(collector) = std::rc::Rc::try_unwrap(rc) {
             let ref_section = collector.into_inner().finish();
@@ -294,8 +283,6 @@ pub fn convert_html_impl(
         }
     }
 
-    // If plain text was requested, discard the markdown output and return plain text.
-    // The full pipeline was still run above so that metadata + visitor callbacks fire.
     let output = if is_plain_text {
         extract_plain_text(&dom, parser, options)
     } else {
@@ -320,9 +307,6 @@ fn finish_structure_collector(
         None => (None, Vec::new()),
     }
 }
-
-// has_more_than_one_char moved to main_helpers
-// is_inline_element available from utility::content
 
 /// Recursively walk DOM nodes and convert to Markdown.
 #[allow(clippy::only_used_in_recursion)]
@@ -402,7 +386,6 @@ pub fn walk_node(
                 return;
             }
 
-            // Drop elements matching exclude_selectors, including all their descendants.
             if !ctx.excluded_node_ids.is_empty() && ctx.excluded_node_ids.contains(&node_handle.get_inner()) {
                 trim_trailing_whitespace(output);
                 return;
@@ -468,7 +451,6 @@ pub fn walk_node(
                     );
                 }
 
-                // All inline elements routed to inline dispatcher
                 "strong" | "b" | "em" | "i" | "mark" | "del" | "s" | "ins" | "u" | "small" | "sub" | "sup" | "kbd"
                 | "samp" | "var" | "dfn" | "abbr" | "ruby" | "rb" | "rt" | "rp" | "rtc" | "span" => {
                     crate::converter::inline::dispatch_inline_handler(
@@ -502,7 +484,6 @@ pub fn walk_node(
                     );
                 }
 
-                // Noop elements that produce no output
                 "wbr" | "thead" | "tbody" | "tfoot" | "tr" | "th" | "td" | "source" => {
                     crate::converter::block::container::handle_noop(
                         node_handle,
@@ -546,17 +527,17 @@ pub fn walk_node(
                     dom_ctx,
                 ),
                 "table" => {
-                    // Issue #406: during an outer table's width-measurement pre-pass,
-                    // skip the nested-table dispatch and fall back to descendant text
-                    // content.  Running the full table handler here would launch the
-                    // nested table's own measurement pre-pass on every descendant cell,
-                    // recursing combinatorially (393 nested layout tables × ~393 cells
-                    // each in the reported reproducer, unbounded at greater nesting depth).
-                    // The per-cell output cap (`MAX_CELL_WIDTH = 200`) bounded discarded
-                    // *output* but not measurement CPU.  Emitting descendant text keeps
-                    // the pre-pass linear in descendant character count, and the resulting
-                    // width still approximates the rendered cell content for separator-row
-                    // padding.
+                    // ~keep Issue #406: during an outer table's width-measurement pre-pass,
+                    // ~keep skip the nested-table dispatch and fall back to descendant text
+                    // ~keep content.  Running the full table handler here would launch the
+                    // ~keep nested table's own measurement pre-pass on every descendant cell,
+                    // ~keep recursing combinatorially (393 nested layout tables × ~393 cells
+                    // ~keep each in the reported reproducer, unbounded at greater nesting depth).
+                    // ~keep The per-cell output cap (`MAX_CELL_WIDTH = 200`) bounded discarded
+                    // ~keep *output* but not measurement CPU.  Emitting descendant text keeps
+                    // ~keep the pre-pass linear in descendant character count, and the resulting
+                    // ~keep width still approximates the rendered cell content for separator-row
+                    // ~keep padding.
                     if ctx.measure_width_only {
                         output.push_str(dom_ctx.text_content(*node_handle, parser).as_str());
                         return;
@@ -572,7 +553,6 @@ pub fn walk_node(
                     );
                 }
 
-                // List elements routed to list dispatcher
                 "ul" | "ol" | "li" | "dl" | "dt" | "dd" => {
                     crate::converter::list::dispatch_list_handler(
                         &tag_name,
@@ -587,7 +567,6 @@ pub fn walk_node(
                     );
                 }
 
-                // Sectioning elements routed to semantic dispatcher
                 "article" | "section" | "nav" | "aside" | "header" | "footer" | "main" => {
                     crate::converter::semantic::dispatch_semantic_handler(
                         &tag_name,
@@ -601,7 +580,6 @@ pub fn walk_node(
                     );
                 }
 
-                // Quote element routed to semantic dispatcher
                 "q" => {
                     crate::converter::semantic::dispatch_semantic_handler(
                         &tag_name,
@@ -615,7 +593,6 @@ pub fn walk_node(
                     );
                 }
 
-                // Figure elements routed to semantic dispatcher
                 "figure" | "figcaption" => {
                     crate::converter::semantic::dispatch_semantic_handler(
                         &tag_name,
@@ -629,7 +606,6 @@ pub fn walk_node(
                     );
                 }
 
-                // Semantic interactive elements routed to semantic dispatcher
                 "details" | "summary" | "dialog" | "menu" => {
                     crate::converter::semantic::dispatch_semantic_handler(
                         &tag_name,
@@ -643,7 +619,6 @@ pub fn walk_node(
                     );
                 }
 
-                // Media elements routed to media dispatcher
                 "audio" | "video" | "picture" | "iframe" | "svg" | "math" => {
                     crate::converter::media::dispatch_media_handler(
                         &tag_name,
@@ -657,7 +632,6 @@ pub fn walk_node(
                     );
                 }
 
-                // Form elements routed to form dispatcher
                 "form" | "fieldset" | "legend" | "label" | "input" | "textarea" | "select" | "option" | "optgroup"
                 | "button" | "progress" | "meter" | "output" | "datalist" => {
                     crate::converter::form::dispatch_form_handler(
@@ -672,7 +646,6 @@ pub fn walk_node(
                     );
                 }
 
-                // Metadata elements routed to metadata handler
                 "head" | "script" | "style" => {
                     crate::converter::metadata::handle(
                         &tag_name,

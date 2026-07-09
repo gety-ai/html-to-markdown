@@ -31,7 +31,7 @@ pub fn has_inline_block_misnest(dom_ctx: &DomContext, parser: &tl::Parser) -> bo
                 continue;
             };
 
-            // Table elements under <p>: tl misparsed an unclosed <p> in <td>.
+            // ~keep Table elements under <p>: tl misparsed an unclosed <p> in <td>.
             if matches!(info.name.as_str(), "td" | "tr" | "th") && has_p_ancestor(dom_ctx, parser, node_id) {
                 return true;
             }
@@ -40,7 +40,6 @@ pub fn has_inline_block_misnest(dom_ctx: &DomContext, parser: &tl::Parser) -> bo
                 continue;
             }
 
-            // Check if this block element or any ancestor is pre/code
             let mut check_parent = Some(node_id);
             let mut inside_preformatted = false;
             while let Some(check_id) = check_parent {
@@ -53,7 +52,6 @@ pub fn has_inline_block_misnest(dom_ctx: &DomContext, parser: &tl::Parser) -> bo
                 check_parent = dom_ctx.parent_of(check_id);
             }
 
-            // Skip misnesting check for elements inside pre/code blocks
             if inside_preformatted {
                 continue;
             }
@@ -121,56 +119,43 @@ pub fn should_drop_for_preprocessing(tag_name: &str, tag: &tl::HTMLTag, options:
 
     let preset = options.preprocessing.preset;
 
-    // Minimal preset: drop nothing here (scripts/styles handled in earlier pipeline stage).
     if preset == PreprocessingPreset::Minimal {
         return false;
     }
 
-    // Form removal — applies to both Standard and Aggressive when enabled.
     if options.preprocessing.remove_forms && tag_name == "form" {
         return true;
     }
 
     let is_aggressive = preset == PreprocessingPreset::Aggressive;
 
-    // Aggressive: drop <noscript> — its content is fallback for no-JS browsers.
+    // ~keep Aggressive: drop <noscript> — its content is fallback for no-JS browsers.
     if is_aggressive && tag_name == "noscript" {
         return true;
     }
 
-    // Navigation removal — only when the flag is enabled.
     if !options.preprocessing.remove_navigation {
         return false;
     }
 
     let has_nav_hint = element_has_navigation_hint(tag);
 
-    // <nav> is always navigation — drop in both Standard and Aggressive.
     if tag_name == "nav" {
         return true;
     }
 
     if tag_name == "header" {
-        // Drop <header> only with navigation hints (e.g. class="site-header",
-        // role="navigation"). A plain <header> often wraps article titles like
-        // <header><h1>Title</h1></header> — dropping it loses content.
         return has_nav_hint;
     }
 
     if tag_name == "footer" || tag_name == "aside" {
-        // Standard: drop only with navigation hints.
-        // Aggressive: drop unconditionally.
         return is_aggressive || has_nav_hint;
     }
 
-    // Aggressive: drop ANY element that has navigation hints in class/id/role.
-    // This catches <div class="sidebar">, <div class="menu">, <section class="navigation">,
-    // and similar non-semantic navigation containers.
     if is_aggressive && has_nav_hint {
         return true;
     }
 
-    // Aggressive: drop elements with noise-related roles.
     if is_aggressive {
         if element_has_noise_hint(tag) {
             return true;

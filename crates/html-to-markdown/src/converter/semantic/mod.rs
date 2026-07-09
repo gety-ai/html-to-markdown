@@ -29,18 +29,14 @@ pub mod figure;
 pub mod sectioning;
 pub mod summary;
 
-// Re-export types from parent module for submodule access
 pub use super::walk_node;
 pub use super::{Context, DomContext};
 
-// Re-export handler functions for direct use
 pub use attributes::handle as handle_attributes;
 pub use definition_list::handle as handle_definition_list;
 pub use figure::handle as handle_figure;
 pub use sectioning::handle as handle_sectioning;
 pub use summary::handle as handle_summary;
-
-// Re-exports are done via the dispatch function parameter types
 
 /// Dispatches semantic element handling to the appropriate handler.
 ///
@@ -82,27 +78,23 @@ pub fn dispatch_semantic_handler(
     dom_ctx: &super::DomContext,
 ) -> bool {
     match tag_name {
-        // Sectioning elements
         "article" | "section" | "nav" | "aside" | "header" | "footer" | "main" => {
             handle_sectioning(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx);
             true
         }
-        // Figure elements
         "figure" | "figcaption" => {
             handle_figure(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx);
             true
         }
-        // Summary and interactive elements
+        // ~keep Summary and interactive elements
         "details" | "summary" | "dialog" => {
             handle_summary(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx);
             true
         }
-        // Definition list and related elements
         "hgroup" | "dl" | "dt" | "dd" | "menu" => {
             handle_definition_list(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx);
             true
         }
-        // Semantic inline attributes
         "cite" | "q" | "abbr" | "dfn" | "time" | "data" => {
             handle_attributes(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx);
             true

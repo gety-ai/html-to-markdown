@@ -54,8 +54,6 @@ fn bare_and_some_wrapped_options_produce_identical_output() {
 
 #[test]
 fn non_default_options_take_effect_via_bare_form() {
-    // Underlined headings render `# H1` as `H1\n===`. Confirm the bare-options form
-    // actually threads through to the converter and is not silently dropped.
     let opts = ConversionOptions {
         heading_style: HeadingStyle::Underlined,
         ..ConversionOptions::default()

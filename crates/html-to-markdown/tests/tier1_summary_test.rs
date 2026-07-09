@@ -7,8 +7,6 @@
 
 use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 fn tier1(html: &str) -> String {
     let opts = ConversionOptions {
         tier_strategy: TierStrategy::Tier1,
@@ -36,8 +34,6 @@ fn assert_matches_tier2(html: &str) {
         "tier1 diverged from tier2\ninput: {html:?}\ntier1: {t1:?}\ntier2: {t2:?}"
     );
 }
-
-// ── Test cases ────────────────────────────────────────────────────────────────
 
 /// Test 1: bare `<summary>` with simple text content.
 #[test]

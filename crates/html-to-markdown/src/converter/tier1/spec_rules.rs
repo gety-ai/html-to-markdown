@@ -23,40 +23,27 @@ pub fn should_close_for_new_tag(open: &TagSpec, new: &TagSpec) -> bool {
     match open.optional_close {
         None => false,
 
-        // `<li>` closes any open `<li>` (same kind).
         Some(OptionalCloseRule::CloseSameKind) => {
             std::mem::discriminant(&open.kind) == std::mem::discriminant(&new.kind)
         }
 
-        // `<p>` closes when a block-level element opens next.
         Some(OptionalCloseRule::CloseOnBlockChild) => new.is_block,
 
-        // `<dt>`/`<dd>` close any open `<dt>`/`<dd>`.
         Some(OptionalCloseRule::CloseSiblingDtDd) => {
             matches!(new.kind, TagKind::DefinitionTerm | TagKind::DefinitionDescription)
         }
 
-        // `<tr>` closes any open `<tr>`.
         Some(OptionalCloseRule::CloseTableRow) => matches!(new.kind, TagKind::TableRow),
 
-        // `<td>`/`<th>` close any open `<td>`/`<th>`.
         Some(OptionalCloseRule::CloseTableCell) => matches!(new.kind, TagKind::TableCell { .. }),
 
-        // `<option>` closes on another `<option>` or `<optgroup>`.
-        // (Forms bail in M3c so this path is unreachable in practice.)
+        // ~keep `<option>` closes on another `<option>` or `<optgroup>`.
+        // ~keep (Forms bail in M3c so this path is unreachable in practice.)
         Some(OptionalCloseRule::CloseOption) => std::mem::discriminant(&open.kind) == std::mem::discriminant(&new.kind),
 
-        // `ImplicitTbody` is not a close rule — the scanner handles it
-        // separately by synthesising an implicit open.
         Some(OptionalCloseRule::ImplicitTbody) => false,
     }
 }
-
-// `implicit_open_before` (implicit tbody synthesis) was removed here.
-// The scanner handles the <tr>-inside-<table>-without-<tbody> case directly
-// via the table-state machinery in `open_table_row`; a separate function
-// returning a static name slice was never wired into the open-tag path and
-// added dead code with no path to exercise it.
 
 #[cfg(test)]
 mod tests {
@@ -71,8 +58,6 @@ mod tests {
 
     #[test]
     fn li_does_not_close_on_text_only() {
-        // Block (div) opening: li does not have CloseOnBlockChild — it only
-        // closes on same kind.
         let li = tags::lookup(b"li").unwrap();
         let div = tags::lookup(b"div").unwrap();
         assert!(!should_close_for_new_tag(li, div));
@@ -95,7 +80,6 @@ mod tests {
     #[test]
     fn p_closes_on_another_p() {
         let p = tags::lookup(b"p").unwrap();
-        // <p> is block-level so it triggers CloseOnBlockChild.
         assert!(should_close_for_new_tag(p, p));
     }
 

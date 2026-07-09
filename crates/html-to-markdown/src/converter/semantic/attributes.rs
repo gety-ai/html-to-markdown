@@ -12,9 +12,6 @@
 //! visual distinction in rendered Markdown. Some are formatted with emphasis
 //! or have their attributes included in the output.
 
-// Note: Context and DomContext are defined in converter.rs
-// walk_node is also defined there and must be called via the parent module
-
 use crate::converter::utility::content::chomp_inline;
 
 /// Handles the `<dfn>` element.
@@ -100,7 +97,6 @@ pub fn handle_abbr(
         if !trimmed.is_empty() {
             output.push_str(trimmed);
 
-            // Append title attribute if present
             if let Some(title) = tag.attributes().get("title").flatten().map(|v| v.as_utf8_str()) {
                 let trimmed_title = title.trim();
                 if !trimmed_title.is_empty() {

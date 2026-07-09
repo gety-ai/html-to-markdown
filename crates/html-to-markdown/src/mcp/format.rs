@@ -9,7 +9,6 @@ use crate::types::ConversionResult;
 pub fn format_conversion_result(result: &ConversionResult) -> String {
     let mut map = serde_json::Map::new();
 
-    // content
     map.insert(
         "content".into(),
         match &result.content {
@@ -18,25 +17,21 @@ pub fn format_conversion_result(result: &ConversionResult) -> String {
         },
     );
 
-    // tables
     let tables_val = serde_json::to_value(&result.tables).unwrap_or(serde_json::Value::Array(Vec::new()));
     map.insert("tables".into(), tables_val);
 
-    // document
     let doc_val = match &result.document {
         Some(doc) => serde_json::to_value(doc).unwrap_or(serde_json::Value::Null),
         None => serde_json::Value::Null,
     };
     map.insert("document".into(), doc_val);
 
-    // metadata (feature-gated)
     #[cfg(feature = "metadata")]
     {
         let meta_val = serde_json::to_value(&result.metadata).unwrap_or(serde_json::Value::Null);
         map.insert("metadata".into(), meta_val);
     }
 
-    // images — manual serialisation because InlineImage does not derive serde
     #[cfg(feature = "inline-images")]
     {
         use base64::Engine as _;
@@ -58,7 +53,6 @@ pub fn format_conversion_result(result: &ConversionResult) -> String {
         map.insert("images".into(), serde_json::Value::Array(images_arr));
     }
 
-    // warnings
     let warnings_val = serde_json::to_value(&result.warnings).unwrap_or(serde_json::Value::Array(Vec::new()));
     map.insert("warnings".into(), warnings_val);
 

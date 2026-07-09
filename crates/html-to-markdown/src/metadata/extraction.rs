@@ -27,8 +27,6 @@ pub(crate) fn extract_document_metadata(
             key = replaced_key.as_deref().unwrap_or(key);
         }
 
-        // Normalize to lowercase for case-insensitive matching (per HTML spec,
-        // meta name attributes are compared ASCII case-insensitively).
         let lower_key = key.to_ascii_lowercase();
 
         match lower_key.as_str() {
@@ -49,8 +47,6 @@ pub(crate) fn extract_document_metadata(
                 let tw_key = k.trim_start_matches("twitter-").replace('-', "_");
                 doc.twitter_card.insert(tw_key, value);
             }
-            // Dublin Core: DC.* and DCTERMS.* prefixes (dot becomes part of key after meta- strip).
-            // Map DC/DCTERMS fields to dedicated struct fields where applicable.
             k if k.starts_with("dc.") || k.starts_with("dc-") => {
                 let dc_field = k.trim_start_matches("dc.").trim_start_matches("dc-");
                 match dc_field {
@@ -109,7 +105,6 @@ pub(crate) fn extract_document_metadata(
                     }
                 }
             }
-            // All keyword-bearing meta tag variants
             "keywords" | "news_keywords" | "citation_keywords" | "subject" | "topic" | "category"
             | "classification" => {
                 if doc.keywords.is_empty() {
@@ -351,7 +346,6 @@ mod tests {
     #[test]
     fn test_dc_does_not_override_standard_fields() {
         let mut head_metadata = BTreeMap::new();
-        // Standard fields come first alphabetically in BTreeMap
         head_metadata.insert("description".to_string(), "Standard Description".to_string());
         head_metadata.insert("meta-DC.description".to_string(), "DC Description".to_string());
         head_metadata.insert("title".to_string(), "Standard Title".to_string());

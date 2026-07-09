@@ -19,8 +19,6 @@
 #[cfg(feature = "inline-images")]
 use html_to_markdown_rs::{ConversionOptions, convert};
 
-// ── Helpers (basic, no testkit) ───────────────────────────────────────────────
-
 /// Convert using `Auto` tier selection (exercising Tier-1 for simple inputs).
 #[cfg(feature = "inline-images")]
 fn auto(html: &str, keep: &[&str]) -> String {
@@ -34,12 +32,9 @@ fn auto(html: &str, keep: &[&str]) -> String {
         .unwrap_or_default()
 }
 
-// ── 1. Default (keep_inline_images_in empty) — image preserved ────────────────
-
 #[test]
 #[cfg(feature = "inline-images")]
 fn default_empty_list_preserves_image_in_paragraph() {
-    // With an empty keep list, images should always be emitted as markdown.
     let html = "<p><img src=\"x.png\" alt=\"A\"></p>";
     let result = auto(html, &[]);
     assert!(
@@ -48,12 +43,9 @@ fn default_empty_list_preserves_image_in_paragraph() {
     );
 }
 
-// ── 2. keep_inline_images_in=["a"] — image inside anchor preserved ────────────
-
 #[test]
 #[cfg(feature = "inline-images")]
 fn image_inside_matching_heading_ancestor_preserved() {
-    // <img> inside <h1> with "h1" in the keep list → image kept as markdown.
     let html = "<h1><img src=\"x.png\" alt=\"A\"></h1>";
     let result = auto(html, &["h1"]);
     assert!(
@@ -62,12 +54,9 @@ fn image_inside_matching_heading_ancestor_preserved() {
     );
 }
 
-// ── 3. keep_inline_images_in=["a"] — image in paragraph strips to alt ─────────
-
 #[test]
 #[cfg(feature = "inline-images")]
 fn image_in_heading_without_match_strips_to_alt() {
-    // <img> inside <h2> but keep list only has "h1" → alt-text only.
     let html = "<h2><img src=\"x.png\" alt=\"A\"></h2>";
     let result = auto(html, &["h1"]);
     assert!(
@@ -76,8 +65,6 @@ fn image_in_heading_without_match_strips_to_alt() {
     );
     assert!(result.contains('A'), "expected alt text in output, got: {result:?}");
 }
-
-// ── 4. keep_inline_images_in=["h1","h2"] — image in h1 preserved ──────────────
 
 #[test]
 #[cfg(feature = "inline-images")]
@@ -90,12 +77,9 @@ fn image_in_h1_preserved_with_h1_h2_keep_list() {
     );
 }
 
-// ── 5. Deep nesting: <h1><span><strong><img> with keep=["h1"] ─────────────────
-
 #[test]
 #[cfg(feature = "inline-images")]
 fn image_in_deeply_nested_heading_preserved() {
-    // Even with intermediate inline elements, heading ancestor should be found.
     let html = "<h1><span><strong><img src=\"x.png\" alt=\"A\"></strong></span></h1>";
     let result = auto(html, &["h1"]);
     assert!(
@@ -104,7 +88,7 @@ fn image_in_deeply_nested_heading_preserved() {
     );
 }
 
-// ── 6. Byte-equality with Tier-2 ─────────────────────────────────────────────
+// ~keep ── 6. Byte-equality with Tier-2 ─────────────────────────────────────────────
 
 #[cfg(feature = "testkit")]
 mod tier_parity {
@@ -134,7 +118,6 @@ mod tier_parity {
             .unwrap_or_default()
     }
 
-    // 6a. Default (empty keep list) — paragraph image
     #[test]
     #[cfg(feature = "inline-images")]
     fn parity_empty_keep_list_paragraph_image() {
@@ -142,7 +125,6 @@ mod tier_parity {
         assert_eq!(t1(html, &[]), t2(html, &[]), "empty keep list must be byte-identical");
     }
 
-    // 6b. Image inside matching heading ancestor
     #[test]
     #[cfg(feature = "inline-images")]
     fn parity_image_in_matching_heading() {
@@ -154,7 +136,6 @@ mod tier_parity {
         );
     }
 
-    // 6c. Image in paragraph (no heading ancestor) with non-empty keep list
     #[test]
     #[cfg(feature = "inline-images")]
     fn parity_image_in_paragraph_with_keep_list() {
@@ -166,7 +147,6 @@ mod tier_parity {
         );
     }
 
-    // 6d. Image in h1/h2 keep list
     #[test]
     #[cfg(feature = "inline-images")]
     fn parity_image_in_h1_with_h1_h2_keep_list() {
@@ -178,7 +158,6 @@ mod tier_parity {
         );
     }
 
-    // 6e. Deep nesting with heading ancestor
     #[test]
     #[cfg(feature = "inline-images")]
     fn parity_deeply_nested_heading_image() {
@@ -190,7 +169,6 @@ mod tier_parity {
         );
     }
 
-    // 6f. Image in non-matching heading strips to alt
     #[test]
     #[cfg(feature = "inline-images")]
     fn parity_image_in_non_matching_heading_strips_to_alt() {

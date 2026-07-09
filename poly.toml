@@ -34,6 +34,7 @@ exclude = [
     "crates/html-to-markdown-node/index.js",
     "**/Cargo.toml",
     "**/*_bridge_generated/**",
+    "docs-site/public/demo/html_to_markdown_wasm.js",
 ]
 
 [lint.markdown.rumdl]

@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 
 //! Regression test for issue #406 — severe table perf regression since 3.4.1.
@@ -43,12 +44,8 @@ fn large_table_converts_correctly() {
         .content
         .unwrap_or_default();
 
-    // First row must be headers
-    // Column padding means header cell is "| H0   |" not "| H0 |"; check prefix only.
     assert!(result.contains("| H0"), "header row missing");
-    // Separator row must exist
     assert!(result.contains("| ---"), "separator row missing");
-    // Data rows must be present
     assert!(result.contains("| R0C0"), "first data row missing");
     assert!(result.contains("| R499C7"), "last data row missing");
 }
@@ -143,7 +140,6 @@ fn visitor_hook_count_matches_table_row_count() {
     html_to_markdown_rs::convert(&html, Some(opts)).expect("conversion must not fail");
 
     let row_count = visitor.lock().unwrap().row_count;
-    // 1 header row + ROW_COUNT body rows
     assert_eq!(
         row_count,
         ROW_COUNT + 1,

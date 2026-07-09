@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 
 //! Regression test for issue #391: XHTML-style self-closing tags like `<td/>`
@@ -42,7 +43,6 @@ fn br_self_closing_still_renders_as_line_break() {
     let html = "<p>a<br/>b</p>";
     let result = convert(html, None).expect("conversion should succeed");
     let content = result.content.unwrap_or_default();
-    // Markdown line break is two spaces + newline.
     assert!(
         content.contains("a  \nb"),
         "<br/> should render as a markdown line break, got:\n{content:?}"

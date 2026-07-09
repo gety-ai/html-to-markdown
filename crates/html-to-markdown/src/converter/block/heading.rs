@@ -10,8 +10,6 @@ use crate::options::{ConversionOptions, HeadingStyle};
 use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
 
-// Type aliases for Context and DomContext to avoid circular imports
-// These are imported from converter.rs and should be made accessible
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
 
@@ -33,12 +31,10 @@ pub fn handle(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    // Import walk_node from parent converter module
     use crate::converter::walk_node;
 
     let level = tag_name.chars().last().and_then(|c| c.to_digit(10)).unwrap_or(1) as usize;
 
-    // Add spacing before heading if needed (similar to paragraph handling)
     let needs_leading_sep = !ctx.in_table_cell
         && !ctx.in_list_item
         && !ctx.convert_as_inline
@@ -123,9 +119,9 @@ pub fn handle(
             }
         }
 
-        // Notify the structure collector if present.
-        // Skip headings inside table cells — they are part of the table content,
-        // not standalone structural headings.
+        // ~keep Notify the structure collector if present.
+        // ~keep Skip headings inside table cells — they are part of the table content,
+        // ~keep not standalone structural headings.
         if !ctx.in_table_cell {
             if let Some(ref sc) = ctx.structure_collector {
                 if let Some(node) = node_handle.get(parser) {

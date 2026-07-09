@@ -19,14 +19,11 @@ fn tier1(html: &str) -> String {
     convert(html, Some(opts)).unwrap().content.unwrap_or_default()
 }
 
-// ── Preservation cases ────────────────────────────────────────────────────────
-
 /// `</strong> <a>` — the most common real-world case (kimbrain-class HTML).
 #[test]
 fn inter_tag_whitespace_strong_then_link() {
     let html = r#"<p><strong>a</strong> <a href="x">b</a></p>"#;
     let t1 = tier1(html);
-    // The space between `</strong>` and `<a>` must be preserved.
     assert!(t1.contains("**a** [b](x)"), "space missing: tier1={t1:?}");
 }
 
@@ -60,27 +57,22 @@ fn inter_tag_whitespace_multiple_spaces_collapse() {
     let html = "<p><strong>a</strong>   <em>b</em></p>";
     let t1 = tier1(html);
     assert!(t1.contains("**a** *b*"), "space missing or doubled: tier1={t1:?}");
-    // Must not have double-space.
     assert!(!t1.contains("**a**  *b*"), "double-space emitted: tier1={t1:?}");
 }
 
 /// `</strong> <em>` at the top level — no paragraph wrapper.
 #[test]
 fn inter_tag_whitespace_strong_then_em_in_paragraph() {
-    // With an explicit paragraph the space is preserved.
     let html = "<p><strong>bold</strong> <em>italic</em></p>";
     let t1 = tier1(html);
     assert!(t1.contains("**bold** *italic*"), "space missing: tier1={t1:?}");
 }
-
-// ── Counter-cases: block context must NOT preserve ────────────────────────────
 
 /// Whitespace between block-level siblings must not become a space.
 #[test]
 fn inter_tag_whitespace_between_paragraphs_not_preserved() {
     let html = "<p>a</p>\n<p>b</p>";
     let t1 = tier1(html);
-    // Must contain a blank-line separator between the two paragraphs, not a space.
     assert!(t1.contains("a\n\nb"), "expected blank-line separator, got {t1:?}");
     assert!(!t1.contains("a b"), "unexpected space between paragraphs: {t1:?}");
 }
@@ -93,9 +85,9 @@ fn inter_tag_whitespace_between_paragraphs_not_preserved() {
 fn inter_tag_whitespace_leading_inside_block_trimmed() {
     let html = "<div>  <strong>x</strong></div>";
     let t1 = tier1(html);
-    // Tier-1 trims the leading `  ` (existing behaviour).  The fix must not
-    // add a spurious leading space here (output tail before <strong> is `\n\n`
-    // or empty — a block edge, not an inline-close marker).
+    // ~keep Tier-1 trims the leading `  ` (existing behaviour).  The fix must not
+    // ~keep add a spurious leading space here (output tail before <strong> is `\n\n`
+    // ~keep or empty — a block edge, not an inline-close marker).
     assert!(!t1.starts_with(' '), "unexpected leading space: {t1:?}");
 }
 

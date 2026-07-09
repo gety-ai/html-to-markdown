@@ -78,7 +78,6 @@ pub fn handle_audio(
     };
     let src_opt: Option<&str> = if src.is_empty() { None } else { Some(src.as_ref()) };
 
-    // Dispatch the visitor callback when a visitor is attached.
     #[cfg(feature = "visitor")]
     if let Some(ref visitor_handle) = ctx.visitor {
         use crate::visitor::{NodeContext, NodeType, VisitResult};
@@ -188,7 +187,6 @@ pub fn handle_video(
     };
     let src_opt: Option<&str> = if src.is_empty() { None } else { Some(src.as_ref()) };
 
-    // Dispatch the visitor callback when a visitor is attached.
     #[cfg(feature = "visitor")]
     if let Some(ref visitor_handle) = ctx.visitor {
         use crate::visitor::{NodeContext, NodeType, VisitResult};
@@ -319,7 +317,6 @@ pub fn handle_iframe(
         .map_or(Cow::Borrowed(""), |v| v.as_utf8_str());
     let src_opt: Option<&str> = if src.is_empty() { None } else { Some(src.as_ref()) };
 
-    // Dispatch the visitor callback when a visitor is attached.
     #[cfg(feature = "visitor")]
     if let Some(ref visitor_handle) = ctx.visitor {
         use crate::visitor::{NodeContext, NodeType, VisitResult};

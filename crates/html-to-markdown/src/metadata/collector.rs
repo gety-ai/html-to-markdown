@@ -1,6 +1,6 @@
-// reason: MetadataCollector and its impl methods are only called when the metadata
-// feature is active. The struct/impl is compiled regardless to keep the module
-// structure consistent, but most methods are unused in non-metadata builds.
+// ~keep reason: MetadataCollector and its impl methods are only called when the metadata
+// ~keep feature is active. The struct/impl is compiled regardless to keep the module
+// ~keep structure consistent, but most methods are unused in non-metadata builds.
 #![allow(dead_code)]
 
 //! Metadata collector for single-pass extraction.

@@ -11,7 +11,6 @@ pub mod graphic;
 pub mod image;
 pub mod svg;
 
-// Re-export types from parent module for submodule access
 pub use super::{Context, DomContext};
 
 #[cfg(feature = "inline-images")]

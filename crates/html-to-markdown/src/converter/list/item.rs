@@ -15,7 +15,6 @@ use crate::options::ConversionOptions;
 use std::borrow::Cow;
 use tl;
 
-// Type aliases for Context and DomContext to avoid circular imports
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
 
@@ -269,9 +268,6 @@ pub fn handle_li(
             let last_line_start = output.rfind('\n').map_or(0, |pos| pos + 1);
             let last_line = &output[last_line_start..];
 
-            // Compute marker as Cow to keep static/owned cases zero-alloc
-            // where possible, and borrow text_content directly from the
-            // output buffer.  Both are passed as &str to visit_list_item.
             let (marker, text_start) = if is_task_list {
                 let task_marker = if task_checked { "- [x]" } else { "- [ ]" };
                 let text_start = last_line.find(task_marker).map_or(0, |pos| pos + task_marker.len());

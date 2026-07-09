@@ -18,8 +18,6 @@ use std::borrow::Cow;
 use std::collections::BTreeMap;
 use tl::{NodeHandle, Parser};
 
-// Type aliases for Context and DomContext to avoid circular imports
-// These are imported from converter.rs and should be made accessible
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
 
@@ -54,10 +52,9 @@ pub fn handle(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    // Import helper functions from parent converter module
     use crate::converter::block::heading::{heading_allows_inline_images, push_heading};
     use crate::converter::utility::content::normalized_tag_name;
-    // reason: serialize_node is only used when the visitor feature is active.
+    // ~keep reason: serialize_node is only used when the visitor feature is active.
     #[allow(unused_imports)]
     use crate::converter::utility::serialization::serialize_node;
     use crate::converter::{find_single_heading_child, get_text_content, walk_node};
@@ -70,24 +67,20 @@ pub fn handle(
         return;
     };
 
-    // Extract href and title attributes
     let href_attr = tag.attributes().get("href").flatten().map(|v| {
         let decoded = crate::text::decode_html_entities(&v.as_utf8_str());
         sanitize_markdown_url(&decoded).into_owned()
     });
-    // Hold title as a Cow borrowed from the tag's attribute bytes (Tier-2
-    // hot-spot pass III): avoids per-link String allocation when no entity
-    // decoding is needed.  Consumers below use `.as_deref()` (`Option<&str>`),
-    // which works the same for either Cow variant.
+    // ~keep Hold title as a Cow borrowed from the tag's attribute bytes (Tier-2
+    // ~keep hot-spot pass III): avoids per-link String allocation when no entity
+    // ~keep decoding is needed.  Consumers below use `.as_deref()` (`Option<&str>`),
+    // ~keep which works the same for either Cow variant.
     let title = tag.attributes().get("title").flatten().map(|v| v.as_utf8_str());
 
     if let Some(href) = href_attr {
-        // Hot-spot pass III: keep normalized text as owned-once + borrow trim
-        // result, instead of re-allocating via `trim().to_string()`.
         let raw_text_owned = crate::text::normalize_whitespace(&get_text_content(node_handle, parser, dom_ctx));
         let raw_text = raw_text_owned.trim();
 
-        // If we're already inside a link, just render the text content, don't create a nested link
         if ctx.in_link {
             let children = tag.children();
             for child_handle in children.top().iter() {
@@ -96,9 +89,9 @@ pub fn handle(
             return;
         }
 
-        // Check if this should be rendered as an autolink.
-        // GFM requires an absolute URI with a scheme (e.g. `https://…`, `mailto:…`);
-        // bare paths or filenames must use the full `[text](href)` form.
+        // ~keep Check if this should be rendered as an autolink.
+        // ~keep GFM requires an absolute URI with a scheme (e.g. `https://…`, `mailto:…`);
+        // ~keep bare paths or filenames must use the full `[text](href)` form.
         let is_autolink = options.autolinks
             && !options.default_title
             && !href.is_empty()
@@ -116,7 +109,6 @@ pub fn handle(
             return;
         }
 
-        // Check if link contains a single heading child element
         if let Some((heading_level, heading_handle)) = find_single_heading_child(*node_handle, parser) {
             if let Some(heading_node) = heading_handle.get(parser) {
                 if let tl::Node::Tag(heading_tag) = heading_node {
@@ -160,9 +152,6 @@ pub fn handle(
             }
         }
 
-        // Collect link label from children.  Reuse the `DomContext` children
-        // cache when present (built once during `record_node_hierarchy`)
-        // instead of re-collecting per `<a>` tag.
         let owned_children: Vec<tl::NodeHandle>;
         let children: &[tl::NodeHandle] = if let Some(c) = dom_ctx.children_of(node_handle.get_inner()) {
             c.as_slice()
@@ -225,7 +214,7 @@ pub fn handle(
             normalize_link_label(&content)
         };
 
-        // Apply fallback label strategies
+        // ~keep Apply fallback label strategies
         if label.is_empty() && saw_block {
             let fallback = crate::text::normalize_whitespace(&get_text_content(node_handle, parser, dom_ctx));
             label = normalize_link_label(&fallback);
@@ -239,10 +228,8 @@ pub fn handle(
             label.clone_from(&href);
         }
 
-        // Truncate label if it exceeds maximum length
         let escaped_label = escape_link_label(&label);
 
-        // Handle visitor callbacks if feature is enabled
         #[cfg(feature = "visitor")]
         let link_output = if let Some(ref visitor_handle) = ctx.visitor {
             use crate::visitor::{NodeContext, NodeType, VisitResult};
@@ -322,7 +309,6 @@ pub fn handle(
             output.push_str(&link_text);
         }
 
-        // Collect metadata if feature is enabled
         #[cfg(feature = "metadata")]
         if ctx.metadata_wants_links {
             if let Some(ref collector) = ctx.metadata_collector {
@@ -351,7 +337,6 @@ pub fn handle(
             }
         }
     } else {
-        // No href: just process children as inline content
         let children = tag.children();
         for child_handle in children.top().iter() {
             walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
@@ -392,7 +377,6 @@ pub fn percent_encode_url(url: &str) -> String {
     let mut encoded = String::with_capacity(url.len() * 2);
     for byte in url.bytes() {
         match byte {
-            // RFC 3986 unreserved characters plus slash
             b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' | b'/' => {
                 encoded.push(byte as char);
             }
@@ -509,8 +493,6 @@ mod tests {
         ConversionOptions::builder().url_escape_style(style).build()
     }
 
-    // ── has_uri_scheme ───────────────────────────────────────────────────────
-
     #[test]
     fn has_uri_scheme_accepts_http() {
         assert!(has_uri_scheme("http://example.com"));
@@ -547,16 +529,11 @@ mod tests {
 
     #[test]
     fn issue_397_filename_with_extension_is_not_autolinked() {
-        // <a href="foobar.png">foobar.png</a> must NOT become <foobar.png> — there's no scheme.
-        // The autolink check `is_autolink` is wired with `has_uri_scheme`; verify the helper.
         assert!(!has_uri_scheme("foobar.png"));
     }
 
-    // ── percent_encode_url ───────────────────────────────────────────────────
-
     #[test]
     fn percent_encode_url_leaves_unreserved_chars_unchanged() {
-        // Note: ':' and '/' are outside the strict unreserved set, but '/' is explicitly allowed
         let result = percent_encode_url("/path-to_file.html~");
         assert_eq!(result, "/path-to_file.html~");
     }
@@ -573,14 +550,11 @@ mod tests {
 
     #[test]
     fn percent_encode_url_full_issue_example() {
-        // Reproduces the exact example from GitHub issue #392
         assert_eq!(
             percent_encode_url("/file (1) <draft>.pdf"),
             "/file%20%281%29%20%3Cdraft%3E.pdf"
         );
     }
-
-    // ── append_markdown_link with Angle style (default) ──────────────────────
 
     #[test]
     fn append_markdown_link_angle_plain_url_unchanged() {
@@ -597,8 +571,6 @@ mod tests {
         append_markdown_link(&mut out, "file", "/file (1).pdf", None, "file", &options, None);
         assert_eq!(out, "[file](</file (1).pdf>)");
     }
-
-    // ── append_markdown_link with Percent style ───────────────────────────────
 
     #[test]
     fn append_markdown_link_percent_encodes_spaces() {

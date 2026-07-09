@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 
 use html_to_markdown_rs::{ConversionOptions, LinkStyle};
@@ -56,7 +57,6 @@ fn url_deduplication() {
         result.contains("[Second][1]"),
         "Expected second link reusing ref 1, got: {result}"
     );
-    // Should only have one definition
     let count = result.matches("[1]: https://example.com").count();
     assert_eq!(count, 1, "Expected exactly one definition, got: {result}");
 }
@@ -107,7 +107,6 @@ fn autolinks_unaffected() {
         ..Default::default()
     };
     let result = convert(html, Some(options));
-    // Autolinks should still render as <url>
     assert!(
         result.contains("<https://example.com>"),
         "Autolinks should not be affected by reference style, got: {result}"
@@ -128,7 +127,6 @@ fn default_inline_unchanged() {
 fn multiple_paragraphs_references_at_end() {
     let html = r#"<p><a href="https://a.com">A</a></p><p><a href="https://b.com">B</a></p>"#;
     let result = convert(html, Some(ref_options()));
-    // References should be at the very end
     let ref_section_start = result.find("[1]:").expect("Should have ref section");
     let content_end = result.find("[A][1]").expect("Should have inline ref");
     assert!(
@@ -141,7 +139,6 @@ fn multiple_paragraphs_references_at_end() {
 fn empty_href_no_reference() {
     let html = r#"<a href="">Empty</a>"#;
     let result = convert(html, Some(ref_options()));
-    // Empty href should not create a reference
     assert!(
         !result.contains("[1]:"),
         "Empty href should not create reference, got: {result}"

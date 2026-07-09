@@ -44,12 +44,10 @@ impl FormatRenderer for MarkdownRenderer {
     }
 
     fn span_with_attributes(&self, content: &str, _classes: &[&str], _id: Option<&str>) -> String {
-        // Markdown doesn't support span attributes, just return content
         content.to_string()
     }
 
     fn div_with_attributes(&self, content: &str, _classes: &[&str]) -> String {
-        // Markdown doesn't support div attributes, just return content
         content.to_string()
     }
 

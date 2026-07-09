@@ -141,7 +141,6 @@ pub mod config;
 pub mod extraction;
 pub mod types;
 
-// Re-export public types
 pub use collector::MetadataCollector;
 pub use config::{DEFAULT_MAX_STRUCTURED_DATA_SIZE, MetadataConfig, MetadataConfigUpdate};
 pub use types::{
@@ -149,7 +148,6 @@ pub use types::{
     StructuredData, StructuredDataType, TextDirection,
 };
 
-// Internal handle type for shared mutable access during tree traversal
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -168,9 +166,9 @@ use std::rc::Rc;
 ///
 /// let metadata = handle.take().finish();
 /// ```
-// reason: MetadataCollectorHandle is the pub(crate) API type for metadata collection;
-// it is only used when the metadata feature is active but must be declared regardless
-// to keep the type alias available for conditional compilation at call sites.
+// ~keep reason: MetadataCollectorHandle is the pub(crate) API type for metadata collection;
+// ~keep it is only used when the metadata feature is active but must be declared regardless
+// ~keep to keep the type alias available for conditional compilation at call sites.
 #[allow(dead_code)]
 pub(crate) type MetadataCollectorHandle = Rc<RefCell<MetadataCollector>>;
 

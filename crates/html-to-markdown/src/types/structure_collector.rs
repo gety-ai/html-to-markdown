@@ -64,8 +64,6 @@ impl StructureCollector {
         }
     }
 
-    // ── Public push methods ──────────────────────────────────────────────────
-
     /// Record a heading element.
     ///
     /// Creates a [`NodeContent::Group`] (which owns all subsequent sibling content until a
@@ -73,7 +71,6 @@ impl StructureCollector {
     ///
     /// Returns the index of the **heading** node (the group node is one before it).
     pub fn push_heading(&mut self, level: u8, text: &str, id: Option<&str>) -> u32 {
-        // Close any open groups at the same or deeper heading level.
         while let Some(&(open_level, _)) = self.section_stack.last() {
             if open_level >= level {
                 self.section_stack.pop();
@@ -82,10 +79,8 @@ impl StructureCollector {
             }
         }
 
-        // The group's parent is the surrounding open group or a container/list (if any).
         let group_parent = self.current_structural_parent();
 
-        // Create the Group node.
         let group_id = Self::generate_id("group", text, self.nodes.len() as u32);
         let group_idx = self.raw_push(DocumentNode {
             id: group_id,
@@ -104,7 +99,6 @@ impl StructureCollector {
         }
         self.section_stack.push((level, group_idx));
 
-        // Create the Heading node as a child of the new group.
         let heading_id = Self::generate_id("heading", text, self.nodes.len() as u32);
         let heading_idx = self.raw_push(DocumentNode {
             id: heading_id,
@@ -361,14 +355,9 @@ impl StructureCollector {
         (doc, self.tables)
     }
 
-    // ── Private helpers ──────────────────────────────────────────────────────
-
     /// The effective structural parent for a new node:
     /// list stack > container stack > section stack > None.
     fn current_structural_parent(&self) -> Option<u32> {
-        // List items: already handled explicitly in push_list_item.
-        // For non-list-item content, prefer the innermost container (blockquote),
-        // then innermost section group.
         if let Some(&q) = self.container_stack.last() {
             return Some(q);
         }
@@ -423,7 +412,6 @@ mod tests {
     fn test_heading_creates_group_and_heading() {
         let mut c = StructureCollector::new();
         let heading_idx = c.push_heading(1, "Title", None);
-        // Group is at index 0, Heading at index 1.
         assert_eq!(heading_idx, 1);
         assert_eq!(c.nodes.len(), 2);
 
@@ -447,9 +435,7 @@ mod tests {
         let mut c = StructureCollector::new();
         c.push_heading(1, "H1", None);
         c.push_heading(2, "H2", None);
-        // Now push another H1 — must close the H2 group.
         c.push_heading(1, "H1b", None);
-        // After the second H1 there should be 2 open groups gone and 1 new one.
         assert_eq!(c.section_stack.len(), 1);
         let (level, _) = c.section_stack[0];
         assert_eq!(level, 1);
@@ -461,7 +447,6 @@ mod tests {
         c.push_heading(1, "Title", None);
         let p_idx = c.push_paragraph("Some text");
         let para = &c.nodes[p_idx as usize];
-        // Parent should be the group node (index 0).
         assert_eq!(para.parent, Some(0));
     }
 
@@ -492,7 +477,7 @@ mod tests {
         c.push_paragraph("Text");
         let (doc, tables) = c.finish();
         assert_eq!(doc.source_format, Some("html".to_string()));
-        assert_eq!(doc.nodes.len(), 3); // Group + Heading + Paragraph
+        assert_eq!(doc.nodes.len(), 3);
         assert!(tables.is_empty());
     }
 }

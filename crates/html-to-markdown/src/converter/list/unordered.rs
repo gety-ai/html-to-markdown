@@ -15,7 +15,6 @@ use crate::options::ConversionOptions;
 use std::borrow::Cow;
 use tl;
 
-// Type aliases for Context and DomContext to avoid circular imports
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
 
@@ -38,7 +37,7 @@ pub fn handle_ul(
     let nested_depth = calculate_list_nesting_depth(ctx);
     let is_loose = is_loose_list(*node_handle, parser, dom_ctx);
 
-    // reason: `tag` is only used when the visitor feature is active (for attribute collection).
+    // ~keep reason: `tag` is only used when the visitor feature is active (for attribute collection).
     #[allow(unused_variables)]
     let tag = match node_handle.get(parser) {
         Some(tl::Node::Tag(t)) => t,

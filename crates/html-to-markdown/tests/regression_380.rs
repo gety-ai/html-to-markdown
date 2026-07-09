@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 
 //! Regression for #380: panic "byte index N is not a char boundary" when
@@ -106,9 +107,6 @@ fn figure_multibyte_caption_does_not_panic() {
 /// pop (single-\n guard) would move the boundary inside ■ (E2 96 A0).
 #[test]
 fn crafted_23_byte_boundary_does_not_panic() {
-    // "```\nprevious bl\n```\n\n" = 4 + 11 + 5 + 2 = 22 bytes — content_start_pos at 22,
-    // ■ then lands at bytes 22-24 which is fine.
-    // Try a slightly different approach: leading text that pushes the boundary.
     let html = "<p>12345678901</p>\
                 <p><span>■X</span></p>";
 

@@ -18,26 +18,21 @@ use std::path::Path;
 
 use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
 
-// ── Fixture paths (mirrors groups.toml) ──────────────────────────────────────
-
 const FIXTURES_ROOT: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../../tools/benchmark-harness/fixtures");
 
 /// All fixture relative paths from groups.toml.
 const FIXTURE_PATHS: &[&str] = &[
-    // mdream corpus
     "mdream/nuxt-example.html",
     "mdream/vuejs-docs.html",
     "mdream/wikipedia-small.html",
     "mdream/mdn-array.html",
     "mdream/react-learn.html",
     "mdream/github-markdown-complete.html",
-    // real-world / wikipedia
     "real-world/wikipedia/small_html.html",
     "real-world/wikipedia/lists_timeline.html",
     "real-world/wikipedia/tables_countries.html",
     "real-world/wikipedia/medium_python.html",
     "real-world/wikipedia/large_rust.html",
-    // real-world / gh-190
     "real-world/issues/gh-190/mitrade.html",
     "real-world/issues/gh-190/flex2025.html",
     "real-world/issues/gh-190/insight.html",
@@ -47,21 +42,16 @@ const FIXTURE_PATHS: &[&str] = &[
     "real-world/issues/gh-190/firsteigen.html",
     "real-world/issues/gh-190/sjsu.html",
     "real-world/issues/gh-190/kimbrain.html",
-    // real-world / other issues
     "real-world/issues/gh-121-hacker-news.html",
     "real-world/issues/gh-127-issue.html",
-    // synthetic / spec_rules
     "synthetic/optional_li.html",
     "synthetic/table_no_tbody.html",
-    // synthetic / adversarial
     "synthetic/bare_fragment.html",
     "synthetic/unescaped_lt.html",
     "synthetic/unclosed_p.html",
     "synthetic/unclosed_at_eof.html",
     "synthetic/cdata_in_svg.html",
 ];
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 fn tier2_output(html: &str) -> Option<String> {
     let opts = ConversionOptions {
@@ -90,8 +80,6 @@ fn force_tier1_output(html: &str) -> Option<String> {
         _ => None,
     }
 }
-
-// ── Oracle test ───────────────────────────────────────────────────────────────
 
 /// For each fixture, assert that `Tier1` output is byte-for-byte identical
 /// to `Tier2` output.
@@ -165,7 +153,7 @@ fn tier1_byte_equality_against_all_fixtures() {
     );
 }
 
-// ── Bail-survey test ──────────────────────────────────────────────────────────
+// ~keep ── Bail-survey test ──────────────────────────────────────────────────────────
 
 /// Survey how many fixtures Tier-1 handles natively vs bails on.
 ///
@@ -198,13 +186,13 @@ fn tier1_bail_survey() {
             continue;
         };
 
-        // When t1 == t2, Tier-1 either handled it correctly or bailed to Tier-2.
-        // Both are "ok". For the survey we just note equality.
+        // ~keep When t1 == t2, Tier-1 either handled it correctly or bailed to Tier-2.
+        // ~keep Both are "ok". For the survey we just note equality.
         if t1 == t2 {
             handled += 1;
         } else {
-            // t1 != t2 — Tier-1 produced diverging output without bailing.
-            // The byte_equality test catches this as a hard failure; here just count.
+            // ~keep t1 != t2 — Tier-1 produced diverging output without bailing.
+            // ~keep The byte_equality test catches this as a hard failure; here just count.
             eprintln!("DIVERGE {rel_path}");
             bailed += 1;
         }
@@ -212,8 +200,6 @@ fn tier1_bail_survey() {
 
     eprintln!("\ntier1_bail_survey: equal={handled} diverged={bailed} skipped={skipped}");
 }
-
-// ── Utilities ─────────────────────────────────────────────────────────────────
 
 fn first_diff(expected: &str, actual: &str) -> String {
     let exp: Vec<&str> = expected.lines().collect();

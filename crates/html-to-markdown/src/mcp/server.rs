@@ -27,8 +27,6 @@ use rmcp::transport::streamable_http_server::{StreamableHttpService, session::lo
 #[cfg_attr(alef, alef(skip))]
 #[derive(Clone)]
 pub struct HtmlToMarkdownMcp {
-    // Consumed by the `#[tool_router]` macro-generated dispatch code; not
-    // accessed directly in hand-written Rust, hence the allow.
     #[allow(dead_code)]
     tool_router: ToolRouter<Self>,
 }
@@ -65,14 +63,11 @@ impl HtmlToMarkdownMcp {
         use super::errors::map_conversion_error_to_mcp;
         use super::format::format_conversion_result;
 
-        // Build typed options from the config mirror (defaults when omitted).
         let opts: ConversionOptions = params.config.map(Into::into).unwrap_or_default();
 
         let html = params.html;
         let want_json = params.json;
 
-        // `convert` is synchronous and CPU-bound; run it on the blocking thread pool
-        // to avoid blocking the async runtime.
         let result = tokio::task::spawn_blocking(move || crate::convert(&html, opts))
             .await
             .map_err(|e| rmcp::ErrorData::internal_error(format!("Conversion task panicked: {e}"), None))?

@@ -188,13 +188,10 @@ mod tests {
             ..Default::default()
         };
 
-        // Serialize to JSON
         let json = serde_json::to_string(&options).expect("Failed to serialize");
 
-        // Deserialize back
         let deserialized: PreprocessingOptions = serde_json::from_str(&json).expect("Failed to deserialize");
 
-        // Verify values
         assert!(deserialized.enabled);
         assert_eq!(deserialized.preset, PreprocessingPreset::Aggressive);
         assert!(!deserialized.remove_navigation);

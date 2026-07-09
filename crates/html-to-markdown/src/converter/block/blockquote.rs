@@ -12,7 +12,6 @@ use crate::options::ConversionOptions;
 use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
 
-// Type aliases for Context and DomContext to avoid circular imports
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
 
@@ -131,7 +130,6 @@ pub fn handle(
             output.push_str("\n\n\n");
         } else if !output.is_empty() {
             if output.ends_with("\n\n") {
-                // Paragraph already added \n\n; blockquote needs just \n
                 output.truncate(output.len() - 1);
             } else if !output.ends_with('\n') {
                 output.push_str("\n\n");
@@ -155,8 +153,8 @@ pub fn handle(
             output.push_str(">\n\n");
         }
 
-        // Add trailing newlines only when appropriate for proper spacing
-        // (matching paragraph conditional logic for CommonMark compliance)
+        // ~keep Add trailing newlines only when appropriate for proper spacing
+        // ~keep (matching paragraph conditional logic for CommonMark compliance)
         if !ctx.convert_as_inline && !ctx.in_table_cell && !ctx.in_list_item {
             while output.ends_with('\n') {
                 output.truncate(output.len() - 1);

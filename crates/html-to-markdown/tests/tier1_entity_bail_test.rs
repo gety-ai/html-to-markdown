@@ -12,8 +12,6 @@ use html_to_markdown_rs::prescan::{self, PrescanReport};
 use html_to_markdown_rs::tier1::{self, BailReason};
 use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 /// Prescan `html` then run the Tier-1 scanner directly.
 fn tier1_run(html: &str) -> Result<String, BailReason> {
     let (cleaned, report) = prescan::run(html);
@@ -54,8 +52,6 @@ fn force_tier1(html: &str) -> String {
     };
     convert(html, Some(opts)).unwrap().content.unwrap_or_default()
 }
-
-// ── Entity decode tests ───────────────────────────────────────────────────────
 
 /// `&eacute;` (é, U+00E9) is in Tier-1's Latin-1 table and decodes inline.
 #[test]

@@ -104,7 +104,6 @@ pub fn extract_plain_text(dom: &tl::VDom, parser: &tl::Parser, options: &Convers
     let mut buf = String::with_capacity(1024);
     let mut list_ctx = ListContext::None;
 
-    // Pre-compute excluded node IDs from exclude_selectors.
     let excluded_node_ids: HashSet<u32> = if options.exclude_selectors.is_empty() {
         HashSet::new()
     } else {
@@ -188,7 +187,6 @@ fn walk_plain(
             } else {
                 let normalized = text::normalize_whitespace_cow(&decoded);
                 if !normalized.is_empty() {
-                    // Avoid leading space at start of a new line
                     if normalized.as_ref() == " " && buf.ends_with('\n') {
                         return;
                     }
@@ -197,7 +195,6 @@ fn walk_plain(
             }
         }
         tl::Node::Tag(tag) => {
-            // Drop elements matching exclude_selectors, including all their descendants.
             if !state.excluded_node_ids.is_empty() && state.excluded_node_ids.contains(&node_handle.get_inner()) {
                 return;
             }
@@ -205,18 +202,14 @@ fn walk_plain(
             let tag_name = tag.name().as_utf8_str().to_ascii_lowercase();
             let tag_str = tag_name.as_str();
 
-            // Skip invisible content
             if SKIP_TAGS.contains(&tag_str) {
                 return;
             }
 
-            // Apply preprocessing: drop nav/footer/aside/noise elements
-            // (shared logic with the markdown path).
             if should_drop_for_preprocessing(tag_str, tag, state.options) {
                 return;
             }
 
-            // --- visitor: element start ---
             #[cfg(feature = "visitor")]
             if let Some(visitor_handle) = state.visitor {
                 let node_ctx = NodeContext::with_lazy_attributes(
@@ -236,7 +229,6 @@ fn walk_plain(
                     VisitResult::Skip => return,
                     VisitResult::Custom(custom) => {
                         buf.push_str(&custom);
-                        // Still call visit_element_end with the custom content as context.
                         let end_result = visitor_handle
                             .lock()
                             .expect("visitor mutex poisoned")
@@ -259,8 +251,6 @@ fn walk_plain(
                 }
             }
 
-            // Record the buf position before this element's content so visit_element_end
-            // can truncate back to it for Custom/Skip results.
             #[cfg(feature = "visitor")]
             let element_output_start = buf.len();
 
@@ -322,7 +312,7 @@ fn walk_plain(
                             *next_index += 1;
                         }
                         ListContext::None => {
-                            // <li> outside a list — emit with bullet as fallback
+                            // ~keep <li> outside a list — emit with bullet as fallback
                             buf.push_str("- ");
                         }
                     }
@@ -335,12 +325,10 @@ fn walk_plain(
                     ensure_blank_line(buf);
                 }
                 _ => {
-                    // Inline elements and structural containers (html, body, etc.)
                     walk_children(tag, parser, buf, in_pre, list_ctx, &child_state);
                 }
             }
 
-            // --- visitor: element end ---
             #[cfg(feature = "visitor")]
             if let Some(visitor_handle) = state.visitor {
                 let node_ctx = NodeContext::with_lazy_attributes(
@@ -352,7 +340,6 @@ fn walk_plain(
                     None,
                     !is_block_level_element(tag_str),
                 );
-                // Clamp safe_start in case children truncated the buffer.
                 let safe_start = element_output_start.min(buf.len());
                 let element_content = &buf[safe_start..];
                 let result = visitor_handle
@@ -393,7 +380,6 @@ fn walk_children(
 
 /// Walk a `<table>` element, extracting cells as tab-separated, rows as newline-separated.
 fn walk_table(table_tag: &tl::HTMLTag, parser: &tl::Parser, buf: &mut String, state: &WalkState<'_>) {
-    // Collect all <tr> node handles from the table subtree.
     let mut row_handles = Vec::new();
     collect_descendant_handles(table_tag, parser, "tr", &mut row_handles);
 
@@ -405,7 +391,6 @@ fn walk_table(table_tag: &tl::HTMLTag, parser: &tl::Parser, buf: &mut String, st
             continue;
         };
 
-        // Collect direct <th>/<td> children
         let mut cell_handles = Vec::new();
         let row_children = row_tag.children();
         let row_top = row_children.top();
@@ -465,7 +450,6 @@ fn ensure_blank_line(buf: &mut String) {
     if buf.is_empty() {
         return;
     }
-    // Strip trailing horizontal whitespace
     while buf.ends_with(' ') || buf.ends_with('\t') {
         buf.pop();
     }
@@ -513,8 +497,6 @@ fn normalize_plain_output(buf: &mut String) {
             last_was_blank = false;
         }
     }
-    // Drop any trailing blank lines so non-empty output ends with exactly one '\n'
-    // (and empty-ish input — only blanks — collapses to an empty string).
     let keep = out.trim_end_matches('\n').len();
     out.truncate(keep);
     if !out.is_empty() {

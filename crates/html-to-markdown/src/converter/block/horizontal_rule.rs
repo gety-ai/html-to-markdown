@@ -9,7 +9,6 @@ use crate::converter::utility::siblings::get_previous_sibling_tag;
 use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
 
-// Type aliases for Context and DomContext to avoid circular imports
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
 
@@ -80,7 +79,6 @@ pub fn handle(
             .is_some_and(|line| line.trim_start().starts_with('>'));
         let needs_blank_line = !ctx.in_paragraph && !matches!(prev_tag, Some("blockquote")) && !last_line_is_blockquote;
 
-        // If previous element was a blockquote, it added \n\n; reduce to \n
         if matches!(prev_tag, Some("blockquote")) && output.ends_with("\n\n") {
             output.truncate(output.len() - 1);
         } else if ctx.in_paragraph || !needs_blank_line {

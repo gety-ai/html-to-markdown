@@ -41,7 +41,6 @@ pub fn handle_graphic(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    // Check source attributes in order: url, href, xlink:href, src
     let src = tag
         .attributes()
         .get("url")
@@ -51,7 +50,7 @@ pub fn handle_graphic(
         .or_else(|| tag.attributes().get("src").flatten())
         .map_or(Cow::Borrowed(""), |v| v.as_utf8_str());
 
-    // Use "alt" attribute, fallback to "filename"
+    // ~keep Use "alt" attribute, fallback to "filename"
     let alt = tag
         .attributes()
         .get("alt")
@@ -62,7 +61,6 @@ pub fn handle_graphic(
 
     let title = tag.attributes().get("title").flatten().map(|v| v.as_utf8_str());
 
-    // Collect metadata payload if metadata feature is enabled
     #[cfg(feature = "metadata")]
     #[allow(clippy::useless_let_if_seq)]
     let mut metadata_payload: Option<GraphicMetadataPayload> = None;
@@ -96,7 +94,6 @@ pub fn handle_graphic(
     let should_use_alt_text =
         !keep_as_markdown && (ctx.convert_as_inline || (ctx.in_heading && !ctx.heading_allow_inline_images));
 
-    // Generate graphic output with visitor integration
     #[cfg(feature = "visitor")]
     let graphic_output = if let Some(ref visitor_handle) = ctx.visitor {
         use crate::visitor::{NodeContext, NodeType, VisitResult};
@@ -165,7 +162,6 @@ pub fn handle_graphic(
         }
     }
 
-    // Add graphic to metadata collector
     #[cfg(feature = "metadata")]
     if ctx.metadata_wants_images {
         if let Some(ref collector) = ctx.metadata_collector {

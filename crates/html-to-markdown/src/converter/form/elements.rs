@@ -12,8 +12,6 @@
 //! In Markdown, forms are typically not fully representable, so the handlers
 //! extract and format the content in a readable manner.
 
-// Note: Context and DomContext are defined in converter.rs
-// walk_node is also defined there and must be called via the parent module
 use super::walk_node;
 use std::borrow::Cow;
 
@@ -94,7 +92,6 @@ pub fn handle_form(
             }
         }
 
-        // In inline context, just process children inline
         if ctx.convert_as_inline {
             let children = tag.children();
             {
@@ -105,7 +102,6 @@ pub fn handle_form(
             return;
         }
 
-        // Collect content
         let mut content = String::new();
         let children = tag.children();
         {
@@ -116,12 +112,10 @@ pub fn handle_form(
 
         let trimmed = content.trim();
         if !trimmed.is_empty() {
-            // Add spacing before if needed
             if !output.is_empty() && !output.ends_with("\n\n") {
                 output.push_str("\n\n");
             }
 
-            // Output content
             output.push_str(trimmed);
             output.push_str("\n\n");
         }
@@ -149,7 +143,6 @@ pub fn handle_fieldset(
     dom_ctx: &super::DomContext,
 ) {
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-        // In inline context, just process children inline
         if ctx.convert_as_inline {
             let children = tag.children();
             {
@@ -160,7 +153,6 @@ pub fn handle_fieldset(
             return;
         }
 
-        // Collect content
         let mut content = String::new();
         let children = tag.children();
         {
@@ -171,12 +163,10 @@ pub fn handle_fieldset(
 
         let trimmed = content.trim();
         if !trimmed.is_empty() {
-            // Add spacing before if needed
             if !output.is_empty() && !output.ends_with("\n\n") {
                 output.push_str("\n\n");
             }
 
-            // Output content
             output.push_str(trimmed);
             output.push_str("\n\n");
         }
@@ -206,7 +196,6 @@ pub fn handle_legend(
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
         let mut content = String::new();
 
-        // Set strong context for nested content
         let mut legend_ctx = ctx.clone();
         if !ctx.convert_as_inline {
             legend_ctx.in_strong = true;
@@ -354,7 +343,6 @@ pub fn handle_input(
             }
         }
     }
-    // Input elements have no text content; render nothing
 }
 
 /// Handles the `<textarea>` element.

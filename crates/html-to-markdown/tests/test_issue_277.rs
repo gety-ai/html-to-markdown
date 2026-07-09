@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 
 //! Regression test for issue #277: silent truncation on large HTML inputs.
@@ -18,8 +19,8 @@ fn convert(html: &str) -> String {
 /// would be silently truncated.
 #[test]
 fn test_no_truncation_after_repair_with_scripts() {
-    // Custom element triggers repair_with_html5ever
-    // Script content has an unbalanced literal `<script>` that confuses depth tracking
+    // ~keep Custom element triggers repair_with_html5ever
+    // ~keep Script content has an unbalanced literal `<script>` that confuses depth tracking
     let html = r"<html>
 <head>
 <script>
@@ -54,8 +55,8 @@ fn test_no_truncation_after_repair_with_scripts() {
 /// `find_closing_tag` returns None (unmatched script opening).
 #[test]
 fn test_preprocess_unmatched_script_preserves_remaining_content() {
-    // Even without custom elements, preprocess_html's unwrap_or fallback
-    // should not consume the entire rest of the document.
+    // ~keep Even without custom elements, preprocess_html's unwrap_or fallback
+    // ~keep should not consume the entire rest of the document.
     let html = r"<html><body>
 <p>Before</p>
 <script>var x = '<script>'; var y = '<script>';</script>

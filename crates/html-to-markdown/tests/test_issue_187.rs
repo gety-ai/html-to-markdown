@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(clippy::significant_drop_tightening)]
 
 //! Test to reproduce issue #187: `visit_div` is not executed
@@ -33,25 +34,6 @@ struct DocumentedButBrokenVisitor {
     skipped_elements: Vec<(String, String)>,
 }
 
-// NOTE: These methods will NEVER be called because they don't exist in HtmlVisitor trait!
-// impl DocumentedButBrokenVisitor {
-//     fn visit_div(&mut self, ctx: &NodeContext, _content: &str) -> VisitResult {
-//         // This will NEVER be called!
-//         let classes = ctx.attributes.get("class").map(|s| s.as_str()).unwrap_or("");
-//         if classes.contains("ad") || classes.contains("advertisement") {
-//             self.skipped_elements.push(("div".to_string(), classes.to_string()));
-//             return VisitResult::Skip;
-//         }
-//         VisitResult::Continue
-//     }
-//
-//     fn visit_script(&mut self, ctx: &NodeContext) -> VisitResult {
-//         // This will NEVER be called!
-//         self.skipped_elements.push(("script".to_string(), "".to_string()));
-//         VisitResult::Skip
-//     }
-// }
-
 /// This is the CORRECT way to filter divs, scripts, and styles
 #[derive(Debug, Default)]
 struct ContentFilter {
@@ -65,7 +47,6 @@ impl HtmlVisitor for ContentFilter {
 
         match tag_name {
             "div" => {
-                // Filter divs with unwanted classes
                 let classes = ctx.attributes().get("class").map_or("", std::string::String::as_str);
                 if classes.contains("ad")
                     || classes.contains("advertisement")
@@ -77,12 +58,10 @@ impl HtmlVisitor for ContentFilter {
                 }
             }
             "script" => {
-                // Always remove script tags
                 self.skipped_elements.push(("script".to_string(), String::new()));
                 return VisitResult::Skip;
             }
             "style" => {
-                // Always remove style tags
                 self.skipped_elements.push(("style".to_string(), String::new()));
                 return VisitResult::Skip;
             }
@@ -94,7 +73,6 @@ impl HtmlVisitor for ContentFilter {
 
     /// Still use specific methods for links and images
     fn visit_image(&mut self, ctx: &NodeContext, src: &str, _alt: &str, _title: Option<&str>) -> VisitResult {
-        // Remove tracking pixels (1x1 images)
         let width = ctx.attributes().get("width").map_or("", std::string::String::as_str);
         let height = ctx.attributes().get("height").map_or("", std::string::String::as_str);
 
@@ -104,7 +82,6 @@ impl HtmlVisitor for ContentFilter {
             return VisitResult::Skip;
         }
 
-        // Skip images with "tracking" or "analytics" in the URL
         if src.to_lowercase().contains("tracking") || src.to_lowercase().contains("analytics") {
             self.skipped_elements
                 .push(("img".to_string(), format!("tracking URL: {src}")));
@@ -115,9 +92,7 @@ impl HtmlVisitor for ContentFilter {
     }
 
     fn visit_link(&mut self, _ctx: &NodeContext, href: &str, text: &str, _title: Option<&str>) -> VisitResult {
-        // Remove links with utm_* tracking parameters
         if href.to_lowercase().contains("utm_") {
-            // Strip tracking params but keep the link
             if let Some(base_url) = href.split('?').next() {
                 return VisitResult::Custom(format!("[{text}]({base_url})"));
             }
@@ -171,33 +146,27 @@ fn test_issue_187_content_filter() {
         println!("- {tag}: {info}");
     }
 
-    // Verify that unwanted content was filtered out
     assert!(
         !result.contains("advertisement block that should be removed"),
         "Ad div should be removed"
     );
     assert!(!result.contains("console.log"), "Script tag should be removed");
 
-    // Verify that legitimate content remains
     assert!(result.contains("Blog Post Title"), "Heading should be preserved");
     assert!(result.contains("main content"), "Main content should be preserved");
     assert!(result.contains("Legitimate content"), "Content div should be preserved");
     assert!(result.contains("Article image"), "Legitimate image should be preserved");
 
-    // Verify tracking parameters were stripped from link
     assert!(
         result.contains("[our website](https://example.com/article)"),
         "Link tracking params should be stripped"
     );
 
-    // Verify skipped elements were tracked
     let borrowed = visitor.lock().expect("visitor mutex poisoned");
     assert!(
         borrowed.skipped_elements.iter().any(|(tag, _)| tag == "div"),
         "Should have skipped ad divs"
     );
-    // Note: script and style tags are stripped during preprocessing before the visitor sees them,
-    // so they won't appear in skipped_elements. Only the visitor can control div, img, etc.
     assert!(
         borrowed.skipped_elements.iter().any(|(tag, _)| tag == "img"),
         "Should have skipped tracking pixel"

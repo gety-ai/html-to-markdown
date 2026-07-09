@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 
 use html_to_markdown_rs::ConversionOptions;
@@ -54,7 +55,6 @@ fn test_commonmark_compliance() {
             continue;
         }
 
-        // Example 231: expects indented code blocks but we default to backtick-fenced
         if test.example == 231 {
             skipped += 1;
             continue;

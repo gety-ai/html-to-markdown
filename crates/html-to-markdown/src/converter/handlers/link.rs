@@ -66,8 +66,8 @@ pub fn handle_link(
             .trim()
             .to_string();
 
-        // GFM requires an absolute URI with a scheme (e.g. `https://…`, `mailto:…`);
-        // bare paths or filenames must use the full `[text](href)` form (issue #397).
+        // ~keep GFM requires an absolute URI with a scheme (e.g. `https://…`, `mailto:…`);
+        // ~keep bare paths or filenames must use the full `[text](href)` form (issue #397).
         let is_autolink = options.autolinks
             && !options.default_title
             && !href.is_empty()
@@ -128,7 +128,6 @@ pub fn handle_link(
             }
         }
 
-        // Reuse the DomContext children cache; only re-collect on cache miss.
         let owned_children: Vec<tl::NodeHandle>;
         let children: &[tl::NodeHandle] = if let Some(c) = dom_ctx.children_of(node_handle.get_inner()) {
             c.as_slice()
@@ -202,9 +201,6 @@ pub fn handle_link(
             label.clone_from(&href);
         }
 
-        // Normalize Wikipedia-style back-reference links: <a href="#cite_ref-N">^</a>
-        // These produce `[^](#cite_ref-N)` which is confusing (looks like a footnote).
-        // Convert to `[↑](#cite_ref-N)` to avoid ambiguity with markdown footnote syntax.
         if label == "^" && href.starts_with('#') {
             label = "↑".to_string();
         }

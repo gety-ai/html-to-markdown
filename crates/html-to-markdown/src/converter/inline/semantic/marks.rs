@@ -29,8 +29,8 @@ pub fn handle_mark(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    // reason: serialize_node is only used when the visitor feature is active;
-    // walk_node depends on feature-gated code paths.
+    // ~keep reason: serialize_node is only used when the visitor feature is active;
+    // ~keep walk_node depends on feature-gated code paths.
     #[allow(unused_imports)]
     use crate::converter::{get_text_content, serialize_node, walk_node};
 
@@ -88,7 +88,6 @@ pub fn handle_mark(
     }
 
     if ctx.convert_as_inline {
-        // In inline conversion context, just pass through children
         let children = tag.children();
         for child_handle in children.top().iter() {
             walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
@@ -149,8 +148,8 @@ pub fn handle_mark(
 ///
 /// Converts to `~~content~~` syntax. Suppresses formatting in code context.
 /// Supports visitor callbacks when the visitor feature is enabled.
-// reason: some parameters are only used when the visitor feature is active;
-// using cfg_attr here is equivalent but more verbose given the function signature.
+// ~keep reason: some parameters are only used when the visitor feature is active;
+// ~keep using cfg_attr here is equivalent but more verbose given the function signature.
 #[allow(unused_variables)]
 pub fn handle_strikethrough(
     tag_name: &str,
@@ -172,7 +171,6 @@ pub fn handle_strikethrough(
     };
 
     if ctx.in_code {
-        // Suppress strikethrough in code context, just process children
         let children = tag.children();
         for child_handle in children.top().iter() {
             walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);

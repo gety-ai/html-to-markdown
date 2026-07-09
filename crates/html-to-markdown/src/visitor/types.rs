@@ -284,7 +284,6 @@ impl<'a> AttributesSource<'a> {
 
 impl Clone for AttributesSource<'_> {
     fn clone(&self) -> Self {
-        // Materialize before cloning so the clone is self-contained (owned).
         Self {
             inner: AttributesInner::Owned(self.get().clone()),
         }

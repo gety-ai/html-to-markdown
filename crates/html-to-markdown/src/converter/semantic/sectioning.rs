@@ -12,9 +12,6 @@
 //! All these elements are treated as block-level containers.
 //! Their content is extracted and formatted with proper spacing.
 
-// Note: Context and DomContext are defined in converter.rs
-// walk_node is also defined there and must be called via the parent module
-
 /// Handles sectioning elements (article, section, nav, aside, header, footer, main).
 ///
 /// Sectioning elements are rendered as block-level containers. When in inline
@@ -42,7 +39,6 @@ pub fn handle(
     dom_ctx: &super::DomContext,
 ) {
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-        // In inline context, just process children inline
         if ctx.convert_as_inline {
             let children = tag.children();
             {
@@ -53,7 +49,6 @@ pub fn handle(
             return;
         }
 
-        // Collect content in a separate buffer
         let mut content = String::with_capacity(256);
         let children = tag.children();
         {
@@ -62,20 +57,16 @@ pub fn handle(
             }
         }
 
-        // Skip if content is empty
         if content.trim().is_empty() {
             return;
         }
 
-        // Add spacing before the content
         if !output.is_empty() && !output.ends_with("\n\n") {
             output.push_str("\n\n");
         }
 
-        // Append the content
         output.push_str(&content);
 
-        // Ensure proper spacing after the content
         if content.ends_with('\n') && !content.ends_with("\n\n") {
             output.push('\n');
         } else if !content.ends_with('\n') {

@@ -35,7 +35,6 @@ mod default_impl;
 mod traits;
 mod types;
 
-// Re-export all public items from submodules
 pub use default_impl::VisitorHandle;
 pub use traits::HtmlVisitor;
 pub use types::{EMPTY_ATTRS, NodeContext, NodeType, VisitResult};

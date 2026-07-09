@@ -92,59 +92,59 @@ pub fn classify(report: &PrescanReport, options: &ConversionOptions) -> RouterDe
         || !options.strip_tags.is_empty()
         || !options.preserve_tags.is_empty()
         || options.debug
-        // ── Style-option gates ────────────────────────────────────────────────
-        // output_format: Tier-1 only produces Markdown; other formats are Tier-2 only.
+        // ~keep ── Style-option gates ────────────────────────────────────────────────
+        // ~keep output_format: Tier-1 only produces Markdown; other formats are Tier-2 only.
         || options.output_format != OutputFormat::Markdown
-        // heading_style: Tier-1 hardcodes ATX; non-ATX headings differ.
+        // ~keep heading_style: Tier-1 hardcodes ATX; non-ATX headings differ.
         || options.heading_style != HeadingStyle::Atx
-        // code_block_style: Tier-1 supports Indented and Backticks (Phase Q.4).
-        // Tildes still require Tier-2's fence emission.
+        // ~keep code_block_style: Tier-1 supports Indented and Backticks (Phase Q.4).
+        // ~keep Tildes still require Tier-2's fence emission.
         || options.code_block_style == CodeBlockStyle::Tildes
-        // strong_em_symbol: Tier-1 hardcodes `*`/`**`.
+        // ~keep strong_em_symbol: Tier-1 hardcodes `*`/`**`.
         || options.strong_em_symbol != '*'
-        // bullets: Tier-1 hardcodes the cycle `"-*+"` (the default).  Any
-        // other configured value would diverge at nested depths.
+        // ~keep bullets: Tier-1 hardcodes the cycle `"-*+"` (the default).  Any
+        // ~keep other configured value would diverge at nested depths.
         || options.bullets != "-*+"
-        // list_indent_width: Tier-1 hardcodes 2-space indentation per depth level.
+        // ~keep list_indent_width: Tier-1 hardcodes 2-space indentation per depth level.
         || options.list_indent_width != 2
-        // list_indent_type: Tier-1 hardcodes spaces for list indentation.
+        // ~keep list_indent_type: Tier-1 hardcodes spaces for list indentation.
         || options.list_indent_type != ListIndentType::Spaces
-        // escape_*: Tier-1 does not perform any text escaping. If the caller
-        // requests escaping, Tier-2 must handle it.
+        // ~keep escape_*: Tier-1 does not perform any text escaping. If the caller
+        // ~keep requests escaping, Tier-2 must handle it.
         || options.escape_asterisks
         || options.escape_underscores
         || options.escape_misc
         || options.escape_ascii
-        // whitespace_mode: Tier-1 always normalizes whitespace (collapses runs).
+        // ~keep whitespace_mode: Tier-1 always normalizes whitespace (collapses runs).
         || options.whitespace_mode != WhitespaceMode::Normalized
-        // newline_style: Tier-1 emits `  \n` for `<br>` (two-space style).
+        // ~keep newline_style: Tier-1 emits `  \n` for `<br>` (two-space style).
         || options.newline_style != NewlineStyle::Spaces
-        // default_title: Tier-1 does not insert a default document title.
+        // ~keep default_title: Tier-1 does not insert a default document title.
         || options.default_title
-        // sub_symbol / sup_symbol: Tier-1 passes <sub>/<sup> content through
-        // as plain text (no wrapping symbol). Only safe when symbol is empty.
+        // ~keep sub_symbol / sup_symbol: Tier-1 passes <sub>/<sup> content through
+        // ~keep as plain text (no wrapping symbol). Only safe when symbol is empty.
         || !options.sub_symbol.is_empty()
         || !options.sup_symbol.is_empty()
-        // highlight_style: Tier-1 passes <mark> content through as plain text.
-        // This is byte-identical to Tier-2 only when style is None (no wrapping).
+        // ~keep highlight_style: Tier-1 passes <mark> content through as plain text.
+        // ~keep This is byte-identical to Tier-2 only when style is None (no wrapping).
         || options.highlight_style != HighlightStyle::None
-        // link_style: Tier-1 always emits inline `[text](href)` links; reference
-        // style (with a link-reference block at end of document) is Tier-2 only.
+        // ~keep link_style: Tier-1 always emits inline `[text](href)` links; reference
+        // ~keep style (with a link-reference block at end of document) is Tier-2 only.
         || options.link_style != LinkStyle::Inline
-        // url_escape_style: Tier-1 emits hrefs verbatim (no angle-bracket wrapping
-        // or percent-encoding). This matches Tier-2's Angle behaviour for URLs that
-        // contain no spaces, but diverges for Percent (which percent-encodes).
+        // ~keep url_escape_style: Tier-1 emits hrefs verbatim (no angle-bracket wrapping
+        // ~keep or percent-encoding). This matches Tier-2's Angle behaviour for URLs that
+        // ~keep contain no spaces, but diverges for Percent (which percent-encodes).
         || options.url_escape_style != UrlEscapeStyle::Angle
-        // compact_tables: Tier-1 always emits padded `| cell |` GFM tables.
-        // compact_tables=true would produce `|cell|`, which Tier-1 never does.
+        // ~keep compact_tables: Tier-1 always emits padded `| cell |` GFM tables.
+        // ~keep compact_tables=true would produce `|cell|`, which Tier-1 never does.
         || options.compact_tables
     {
         return RouterDecision::Tier2;
     }
 
-    // visitor: Tier-1 does not fire visitor callbacks. When a visitor is
-    // registered, route to Tier-2 so element_start/element_end and
-    // skip_subtree directives are honored.
+    // ~keep visitor: Tier-1 does not fire visitor callbacks. When a visitor is
+    // ~keep registered, route to Tier-2 so element_start/element_end and
+    // ~keep skip_subtree directives are honored.
     #[cfg(feature = "visitor")]
     if options.visitor.is_some() {
         return RouterDecision::Tier2;

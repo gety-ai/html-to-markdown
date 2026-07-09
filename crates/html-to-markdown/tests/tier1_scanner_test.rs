@@ -13,8 +13,6 @@
 
 use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 fn tier1(html: &str) -> String {
     let opts = ConversionOptions {
         tier_strategy: TierStrategy::Tier1,
@@ -42,8 +40,6 @@ fn assert_matches_tier2(html: &str) {
         "tier1 diverged from tier2 for input {html:?}\ntier1: {t1:?}\ntier2: {t2:?}"
     );
 }
-
-// ── Match tests ───────────────────────────────────────────────────────────────
 
 #[test]
 fn tier1_matches_tier2_simple_paragraph() {
@@ -203,34 +199,34 @@ fn tier1_matches_tier2_image_in_paragraph() {
     assert_matches_tier2("<p>before <img src=\"x.png\"> after</p>");
 }
 
-// ── Bail / fallback tests ─────────────────────────────────────────────────────
-//
-// These tests verify that when Tier-1 bails, the fallback to Tier-2 still
-// produces valid output.  The test just checks that `convert()` succeeds and
-// the result is non-empty (or matches Tier-2 directly).
+// ~keep ── Bail / fallback tests ─────────────────────────────────────────────────────
+// ~keep
+// ~keep These tests verify that when Tier-1 bails, the fallback to Tier-2 still
+// ~keep produces valid output.  The test just checks that `convert()` succeeds and
+// ~keep the result is non-empty (or matches Tier-2 directly).
 
 #[test]
 fn tier1_bails_on_table_falls_back_to_tier2() {
     let html = "<table><tr><td>cell</td></tr></table>";
-    // Tier1 will bail and fall back; result must equal Tier-2 output.
+    // ~keep Tier1 will bail and fall back; result must equal Tier-2 output.
     assert_matches_tier2(html);
 }
 
 #[test]
 fn tier1_bails_on_custom_element_falls_back_to_tier2() {
     let html = "<my-thing>content</my-thing>";
-    // Tier-1 bails on custom elements; fallback must succeed.
+    // ~keep Tier-1 bails on custom elements; fallback must succeed.
     let t2 = tier2(html);
-    // tier1() calls convert with Tier1; bail triggers Tier-2 fallback.
+    // ~keep tier1() calls convert with Tier1; bail triggers Tier-2 fallback.
     let result = tier1(html);
     assert_eq!(result, t2, "bail fallback must equal tier-2 output");
 }
 
 #[test]
 fn tier1_bails_on_cdata_falls_back_to_tier2() {
-    // CDATA causes bail; svg wrapper is needed for the prescan to detect it
-    // (prescan::run flags had_cdata; the router would normally force Tier-2,
-    // but Tier1 bypasses the router so the scanner sees it directly).
+    // ~keep CDATA causes bail; svg wrapper is needed for the prescan to detect it
+    // ~keep (prescan::run flags had_cdata; the router would normally force Tier-2,
+    // ~keep but Tier1 bypasses the router so the scanner sees it directly).
     let html = "<svg><![CDATA[data]]></svg>";
     let result = convert(
         html,
@@ -240,7 +236,7 @@ fn tier1_bails_on_cdata_falls_back_to_tier2() {
             ..ConversionOptions::default()
         }),
     );
-    // Should not error — bail falls through to Tier-2.
+    // ~keep Should not error — bail falls through to Tier-2.
     assert!(result.is_ok(), "expected Ok after bail, got: {:?}", result.err());
 }
 

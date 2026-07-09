@@ -35,7 +35,6 @@ fn make_visitor() -> Arc<Mutex<dyn HtmlVisitor>> {
 
 #[test]
 fn test_cyrillic_with_tabs_between_divs_and_visitor() {
-    // Exact reproduction from the issue
     let html = "<div><span>А</span></div>\t\t\t<div><span>По";
     let result = convert(html, None, Some(make_visitor()));
     assert!(result.is_ok(), "Should not panic: {result:?}");

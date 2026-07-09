@@ -49,7 +49,7 @@ pub enum BailReason {
         offset: usize,
     },
 
-    // ── Table-specific bail reasons ───────────────────────────────────────────
+    // ~keep ── Table-specific bail reasons ───────────────────────────────────────────
     /// A `<td>` or `<th>` had a `rowspan` or `colspan` attribute with a value
     /// other than 1 (absent attribute counts as 1).
     TableRowspanColspan,

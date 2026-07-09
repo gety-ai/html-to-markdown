@@ -37,7 +37,6 @@ pub fn handle_blockquote(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    // If in inline conversion mode, just process children inline
     if ctx.convert_as_inline {
         let children = tag.children();
         {
@@ -48,20 +47,17 @@ pub fn handle_blockquote(
         return;
     }
 
-    // Extract cite attribute if present
     let cite = tag
         .attributes()
         .get("cite")
         .flatten()
         .map(|v| v.as_utf8_str().to_string());
 
-    // Create context for nested blockquote processing
     let blockquote_ctx = Context {
         blockquote_depth: ctx.blockquote_depth + 1,
         ..ctx.clone()
     };
 
-    // Process blockquote content
     let mut content = String::with_capacity(256);
     let children = tag.children();
     {
@@ -80,7 +76,6 @@ pub fn handle_blockquote(
 
     let trimmed_content = content.trim();
 
-    // Handle visitor integration
     #[cfg(feature = "visitor")]
     if let Some(ref visitor) = ctx.visitor {
         use crate::visitor::{NodeContext, NodeType, VisitResult};
@@ -122,14 +117,11 @@ pub fn handle_blockquote(
         }
     }
 
-    // Output blockquote if content is not empty
     if !trimmed_content.is_empty() {
-        // Add proper spacing based on blockquote depth
         if ctx.blockquote_depth > 0 {
             output.push_str("\n\n\n");
         } else if !output.is_empty() {
             if output.ends_with("\n\n") {
-                // Paragraph already added \n\n; blockquote needs just \n
                 output.truncate(output.len() - 1);
             } else if !output.ends_with('\n') {
                 output.push_str("\n\n");
@@ -138,7 +130,6 @@ pub fn handle_blockquote(
             }
         }
 
-        // Add blockquote prefix to each line
         let prefix = "> ";
 
         for line in trimmed_content.lines() {
@@ -147,7 +138,6 @@ pub fn handle_blockquote(
             output.push('\n');
         }
 
-        // Add citation if present
         if let Some(url) = cite {
             output.push('\n');
             output.push_str("— <");
@@ -155,8 +145,8 @@ pub fn handle_blockquote(
             output.push_str(">\n\n");
         }
 
-        // Add trailing newlines only when appropriate for proper spacing
-        // (matching paragraph conditional logic for CommonMark compliance)
+        // ~keep Add trailing newlines only when appropriate for proper spacing
+        // ~keep (matching paragraph conditional logic for CommonMark compliance)
         if !ctx.convert_as_inline && !ctx.in_table_cell && !ctx.in_list_item {
             while output.ends_with('\n') {
                 output.truncate(output.len() - 1);

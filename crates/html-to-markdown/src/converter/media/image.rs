@@ -1,6 +1,6 @@
 //! Image element handling (img, data URIs, inline image collection).
 
-// reason: BTreeMap is only used when the metadata feature or visitor feature is active.
+// ~keep reason: BTreeMap is only used when the metadata feature or visitor feature is active.
 #[allow(unused_imports)]
 use std::collections::BTreeMap;
 

@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 
 //! Regression tests for issue #339: content after `<!-- ... --->` is silently dropped.
@@ -16,8 +17,6 @@ fn convert(html: &str) -> String {
         .content
         .unwrap_or_default()
 }
-
-// ── Basic reproduction ────────────────────────────────────────────────────────
 
 /// Content after `<!-- /// --->` must NOT be dropped (the exact input from the report).
 #[test]

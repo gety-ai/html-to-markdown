@@ -8,8 +8,6 @@
 //! These elements are treated as block-level content containers
 //! with special formatting for the summary element.
 
-// Note: Context and DomContext are defined in converter.rs
-// walk_node is also defined there and must be called via the parent module
 use super::walk_node;
 #[cfg(feature = "visitor")]
 use std::borrow::Cow;
@@ -83,7 +81,6 @@ pub fn handle_details(
             }
         }
 
-        // In inline context, just process children inline
         if ctx.convert_as_inline {
             let children = tag.children();
             {
@@ -94,7 +91,6 @@ pub fn handle_details(
             return;
         }
 
-        // Collect content
         let mut content = String::with_capacity(256);
         let children = tag.children();
         {
@@ -105,12 +101,10 @@ pub fn handle_details(
 
         let trimmed = content.trim();
         if !trimmed.is_empty() {
-            // Add spacing before if needed
             if !output.is_empty() && !output.ends_with("\n\n") {
                 output.push_str("\n\n");
             }
 
-            // Output content
             output.push_str(trimmed);
             output.push_str("\n\n");
         }
@@ -148,10 +142,10 @@ pub fn handle_summary(
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
         let mut content = String::with_capacity(64);
 
-        // Set strong context for nested content. Skip the clone entirely
-        // when the resulting Context would be byte-identical to ctx —
-        // either convert_as_inline (block path inactive) or already
-        // in_strong upstream.
+        // ~keep Set strong context for nested content. Skip the clone entirely
+        // ~keep when the resulting Context would be byte-identical to ctx —
+        // ~keep either convert_as_inline (block path inactive) or already
+        // ~keep in_strong upstream.
         let want_strong = !ctx.convert_as_inline;
         let summary_ctx_owned;
         let summary_ctx = if want_strong && !ctx.in_strong {
@@ -233,10 +227,8 @@ pub fn handle_summary(
         }
 
         if ctx.convert_as_inline {
-            // Inline mode: output without formatting
             output.push_str(trimmed);
         } else {
-            // Block mode: output with strong markers
             let mut symbol = String::with_capacity(2);
             symbol.push(options.strong_em_symbol);
             symbol.push(options.strong_em_symbol);
@@ -277,7 +269,6 @@ pub fn handle_dialog(
     dom_ctx: &super::DomContext,
 ) {
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-        // In inline context, just process children inline
         if ctx.convert_as_inline {
             let children = tag.children();
             {
@@ -288,7 +279,6 @@ pub fn handle_dialog(
             return;
         }
 
-        // Mark position before processing children
         let content_start = output.len();
 
         let children = tag.children();
@@ -298,12 +288,10 @@ pub fn handle_dialog(
             }
         }
 
-        // Remove trailing whitespace from dialog content
         while output.len() > content_start && (output.ends_with(' ') || output.ends_with('\t')) {
             output.pop();
         }
 
-        // Ensure proper spacing after dialog
         if output.len() > content_start && !output.ends_with("\n\n") {
             output.push_str("\n\n");
         }

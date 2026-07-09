@@ -9,7 +9,6 @@ use crate::options::{ConversionOptions, NewlineStyle};
 use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
 
-// Type aliases for Context and DomContext to avoid circular imports
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
 

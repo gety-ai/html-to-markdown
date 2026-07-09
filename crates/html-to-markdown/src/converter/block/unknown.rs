@@ -12,7 +12,6 @@ use crate::options::ConversionOptions;
 use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
 
-// Type aliases for Context and DomContext to avoid circular imports
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
 
@@ -111,7 +110,6 @@ pub fn handle(
         let start_idx = if output.is_char_boundary(len_before) {
             len_before
         } else {
-            // Find the nearest valid UTF-8 character boundary
             let capped = len_before.min(output.len());
             output
                 .char_indices()
@@ -123,11 +121,9 @@ pub fn handle(
 
         let added_content = output[start_idx..].to_string();
 
-        // Detect code blocks by markdown formatting
         let is_code_block =
             added_content.starts_with("    ") || added_content.starts_with("```") || added_content.starts_with("~~~");
 
-        // Remove empty content while preserving code blocks
         if added_content.trim().is_empty() && !is_code_block {
             output.truncate(start_idx);
             if !had_trailing_space && added_content.contains(' ') {

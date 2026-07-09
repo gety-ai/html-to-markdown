@@ -13,8 +13,6 @@ use crate::options::{ConversionOptions, OutputFormat};
 use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
 
-// Type aliases for Context and DomContext to avoid circular imports
-// These are imported from converter.rs and should be made accessible
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
 
@@ -40,8 +38,6 @@ pub fn handle(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    // Import helper functions from parent converter module
-
     match tag_name {
         "strong" | "b" => {
             handle_strong(node_handle, parser, output, options, ctx, depth, dom_ctx);
@@ -63,8 +59,8 @@ fn handle_strong(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    // reason: serialize_node is only used with the visitor feature; other imports depend
-    // on feature-gated code paths in this function.
+    // ~keep reason: serialize_node is only used with the visitor feature; other imports depend
+    // ~keep on feature-gated code paths in this function.
     #[allow(unused_imports)]
     use crate::converter::{append_inline_suffix, chomp_inline, get_text_content, serialize_node, walk_node};
 
@@ -76,7 +72,6 @@ fn handle_strong(
     };
 
     if ctx.in_code {
-        // Suppress formatting in code context, just process children
         let children = tag.children();
         for child_handle in children.top().iter() {
             walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
@@ -153,7 +148,6 @@ fn handle_strong(
                 if ctx.in_strong {
                     output.push_str(trimmed);
                 } else if options.output_format == OutputFormat::Djot {
-                    // Djot uses single asterisk for strong
                     output.push('*');
                     output.push_str(trimmed);
                     output.push('*');
@@ -179,7 +173,6 @@ fn handle_strong(
                 if ctx.in_strong {
                     output.push_str(trimmed);
                 } else if options.output_format == OutputFormat::Djot {
-                    // Djot uses single asterisk for strong
                     output.push('*');
                     output.push_str(trimmed);
                     output.push('*');
@@ -209,8 +202,8 @@ fn handle_emphasis(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    // reason: serialize_node is only used with the visitor feature; other imports depend
-    // on feature-gated code paths in this function.
+    // ~keep reason: serialize_node is only used with the visitor feature; other imports depend
+    // ~keep on feature-gated code paths in this function.
     #[allow(unused_imports)]
     use crate::converter::{append_inline_suffix, chomp_inline, get_text_content, serialize_node, walk_node};
 
@@ -222,7 +215,6 @@ fn handle_emphasis(
     };
 
     if ctx.in_code {
-        // Suppress formatting in code context, just process children
         let children = tag.children();
         for child_handle in children.top().iter() {
             walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
@@ -288,7 +280,6 @@ fn handle_emphasis(
             if !content.trim().is_empty() {
                 output.push_str(prefix);
                 if options.output_format == OutputFormat::Djot {
-                    // Djot uses underscore for emphasis
                     output.push('_');
                     output.push_str(trimmed);
                     output.push('_');
@@ -318,7 +309,6 @@ fn handle_emphasis(
             if !content.trim().is_empty() {
                 output.push_str(prefix);
                 if options.output_format == OutputFormat::Djot {
-                    // Djot uses underscore for emphasis
                     output.push('_');
                     output.push_str(trimmed);
                     output.push('_');

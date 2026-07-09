@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 
 //! Regression tests for issue #347: inconsistent URL escaping between `<a href>` and `<img src>`.
@@ -16,8 +17,6 @@ fn convert(html: &str) -> String {
         .unwrap_or_default()
 }
 
-// ── Link baseline — must keep working ────────────────────────────────────────
-
 /// `<a href>` with spaces in URL must be wrapped in angle brackets.
 #[test]
 fn test_link_href_with_spaces_uses_angle_brackets() {
@@ -34,15 +33,11 @@ fn test_link_href_with_spaces_uses_angle_brackets() {
 fn test_link_href_with_parens_uses_angle_brackets() {
     let html = r#"<a href="/path (1).jpg">link</a>"#;
     let result = convert(html);
-    // Unbalanced parens → angle-bracket wrap OR escape; spaces → angle-bracket wrap.
-    // The actual href "/path (1).jpg" has a space, so it must get angle-bracket wrapped.
     assert!(
         result.contains("](</path (1).jpg>)"),
         "link href with space+parens must be angle-bracket wrapped. Got:\n{result}"
     );
 }
-
-// ── Image bug — was broken, must now be fixed ─────────────────────────────────
 
 /// `<img src>` with spaces in URL must be wrapped in angle brackets (same as `<a href>`).
 #[test]
@@ -69,7 +64,6 @@ fn test_img_src_with_parens_uses_angle_brackets() {
 /// Newline in `<img src>` must be wrapped in angle brackets.
 #[test]
 fn test_img_src_with_newline_uses_angle_brackets() {
-    // Newlines in URLs are pathological but must not break the output.
     let html = "<img src=\"/img\npath.png\" alt=\"alt\">";
     let result = convert(html);
     assert!(
@@ -83,7 +77,6 @@ fn test_img_src_with_newline_uses_angle_brackets() {
 fn test_img_src_unbalanced_open_paren_is_escaped() {
     let html = r#"<img src="/img(path.png" alt="alt">"#;
     let result = convert(html);
-    // No space → escape unbalanced parens with backslash (same rule as links).
     assert!(
         result.contains(r"\(") || result.contains('<'),
         "img src with unbalanced paren must be escaped or angle-bracket wrapped. Got:\n{result}"
@@ -93,8 +86,6 @@ fn test_img_src_unbalanced_open_paren_is_escaped() {
         "img src with unbalanced paren must NOT be emitted raw. Got:\n{result}"
     );
 }
-
-// ── Cross-element consistency ─────────────────────────────────────────────────
 
 /// When both `<a href>` and `<img src>` use the same URL with spaces, both must be
 /// wrapped identically.
@@ -106,19 +97,15 @@ fn test_link_and_image_use_identical_url_escaping() {
 "#;
     let result = convert(html);
 
-    // The link must wrap the URL.
     assert!(
         result.contains("](</path (1).jpg>)"),
         "link href with space+parens must be angle-bracket wrapped. Got:\n{result}"
     );
-    // The image must also wrap the URL — it must emit `![img](</path (1).jpg>)`.
     assert!(
         result.contains("![img](</path (1).jpg>)"),
         "img src with space+parens must be angle-bracket wrapped (same as link). Got:\n{result}"
     );
 }
-
-// ── Normal (no-escaping-needed) images must keep working ──────────────────────
 
 /// Plain `<img src>` with no unsafe characters must continue to emit the URL verbatim.
 #[test]

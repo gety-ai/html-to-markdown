@@ -1,23 +1,23 @@
-// Vendored from markup5ever_rcdom v0.36.0+unofficial
-// Original source: https://github.com/servo/html5ever (rcdom/)
-// Copyright (c) 2014 The html5ever Project Developers
-// Licensed under MIT OR Apache-2.0 (see ATTRIBUTIONS.md)
-//
-// Vendored to:
-// - Remove unused xml5ever transitive dependency
-// - Eliminate pinned external dependency on "+unofficial" crate
-// - Gain full control over this small, critical module
-//
-// Changes from upstream:
-// - Replaced `extern crate markup5ever` / `extern crate tendril` with
-//   `use` imports through `html5ever` (edition 2024 compatibility)
-// - Added module-level clippy allows for vendored code style
+// ~keep Vendored from markup5ever_rcdom v0.36.0+unofficial
+// ~keep Original source: https://github.com/servo/html5ever (rcdom/)
+// ~keep Copyright (c) 2014 The html5ever Project Developers
+// ~keep Licensed under MIT OR Apache-2.0 (see ATTRIBUTIONS.md)
+// ~keep
+// ~keep Vendored to:
+// ~keep - Remove unused xml5ever transitive dependency
+// ~keep - Eliminate pinned external dependency on "+unofficial" crate
+// ~keep - Gain full control over this small, critical module
+// ~keep
+// ~keep Changes from upstream:
+// ~keep - Replaced `extern crate markup5ever` / `extern crate tendril` with
+// ~keep   `use` imports through `html5ever` (edition 2024 compatibility)
+// ~keep - Added module-level clippy allows for vendored code style
 
-// reason: this is vendored upstream code (markup5ever_rcdom v0.36.0) reproduced verbatim
-// to eliminate the pinned "+unofficial" crate dependency. The original code uses panics
-// and expect() calls as part of its internal invariant enforcement. All lints are
-// suppressed on this module to keep the diff from upstream minimal and make future
-// upstream syncs straightforward.
+// ~keep reason: this is vendored upstream code (markup5ever_rcdom v0.36.0) reproduced verbatim
+// ~keep to eliminate the pinned "+unofficial" crate dependency. The original code uses panics
+// ~keep and expect() calls as part of its internal invariant enforcement. All lints are
+// ~keep suppressed on this module to keep the diff from upstream minimal and make future
+// ~keep upstream syncs straightforward.
 #![allow(
     clippy::panic,
     clippy::expect_used,
@@ -72,7 +72,7 @@ pub enum NodeData {
     /// [dtd wiki]: https://en.wikipedia.org/wiki/Document_type_declaration
     Doctype {
         name: StrTendril,
-        // Fields required by html5ever's DOM model; not accessed during conversion.
+        // ~keep Fields required by html5ever's DOM model; not accessed during conversion.
         #[allow(dead_code)]
         public_id: StrTendril,
         #[allow(dead_code)]
@@ -162,7 +162,6 @@ pub type WeakHandle = Weak<Node>;
 /// Append a parentless node to another nodes' children
 fn append(new_parent: &Handle, child: Handle) {
     let previous_parent = child.parent.replace(Some(Rc::downgrade(new_parent)));
-    // Invariant: child cannot have existing parent
     assert!(previous_parent.is_none());
     new_parent.children.borrow_mut().push(child);
 }
@@ -290,7 +289,6 @@ impl TreeSink for RcDom {
     }
 
     fn append(&self, parent: &Handle, child: NodeOrText<Handle>) {
-        // Append to an existing Text node if we have one.
         if let NodeOrText::AppendText(text) = &child {
             if let Some(h) = parent.children.borrow().last() {
                 if append_to_existing_text(h, text) {
@@ -314,12 +312,10 @@ impl TreeSink for RcDom {
         let (parent, i) = get_parent_and_index(sibling).expect("append_before_sibling called on node without parent");
 
         let child = match (child, i) {
-            // No previous node.
             (NodeOrText::AppendText(text), 0) => Node::new(NodeData::Text {
                 contents: RefCell::new(text),
             }),
 
-            // Look for a text node before the insertion point.
             (NodeOrText::AppendText(text), i) => {
                 let children = parent.children.borrow();
                 let prev = &children[i - 1];
@@ -331,10 +327,6 @@ impl TreeSink for RcDom {
                 })
             }
 
-            // The tree builder promises we won't have a text node after
-            // the insertion point.
-
-            // Any other kind of node.
             (NodeOrText::AppendNode(node), _) => node,
         };
 

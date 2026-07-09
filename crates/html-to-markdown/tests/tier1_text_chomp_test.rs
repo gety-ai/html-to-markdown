@@ -49,8 +49,8 @@ fn trailing_newline_run_before_em() {
 
 #[test]
 fn newline_preserved_inside_em() {
-    // Inside an inline frame Tier-2 preserves the literal `\n`.  Tier-1
-    // must NOT apply the chomp when inside_inline is true.
+    // ~keep Inside an inline frame Tier-2 preserves the literal `\n`.  Tier-1
+    // ~keep must NOT apply the chomp when inside_inline is true.
     assert_matches("<p>foo<em>bar\n  baz</em></p>");
 }
 

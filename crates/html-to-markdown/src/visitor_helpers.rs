@@ -1,7 +1,7 @@
-// reason: visitor helper functions and types are part of the visitor API surface
-// (visitor feature gate). They are pub(crate) and available for use by the converter
-// and user code, but not all are exercised in every code path, producing dead_code
-// warnings. The allow is intentional — these are public API helpers, not dead code.
+// ~keep reason: visitor helper functions and types are part of the visitor API surface
+// ~keep (visitor feature gate). They are pub(crate) and available for use by the converter
+// ~keep and user code, but not all are exercised in every code path, producing dead_code
+// ~keep warnings. The allow is intentional — these are public API helpers, not dead code.
 #![allow(dead_code)]
 
 //! Helper functions for visitor pattern integration.
@@ -295,10 +295,6 @@ macro_rules! try_visitor {
                 return Ok(String::new());
             }
             $crate::visitor_helpers::VisitorDispatch::PreserveHtml => {
-                // Falls through to default conversion — full HTML preservation requires
-                // the node handle and parser context which aren't available in this macro.
-                // Callers that need PreserveHtml support should match on the dispatch
-                // result directly and call serialize_tag_to_html.
             }
         }
     }};

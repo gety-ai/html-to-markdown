@@ -12,8 +12,6 @@ use html_to_markdown_rs::options::{
 use html_to_markdown_rs::prescan;
 use html_to_markdown_rs::tier1::router::{RouterDecision, classify};
 
-// ── Helper ──────────────────────────────────────────────────────────────────
-
 /// Return the minimal `ConversionOptions` that do not hit any structural gate
 /// AND have all style options set to the values Tier-1 hardcodes, so that
 /// only the option under test can cause a Tier-2 route.
@@ -39,8 +37,6 @@ fn route(options: &ConversionOptions) -> RouterDecision {
     let (_cleaned, report) = prescan::run("<p>hello</p>");
     classify(&report, options)
 }
-
-// ── heading_style ────────────────────────────────────────────────────────────
 
 #[test]
 fn gate_heading_style_atx_allows_tier1() {
@@ -69,8 +65,6 @@ fn gate_heading_style_atx_closed_forces_tier2() {
     assert_eq!(route(&opts), RouterDecision::Tier2);
 }
 
-// ── code_block_style ─────────────────────────────────────────────────────────
-
 #[test]
 fn gate_code_block_style_indented_allows_tier1() {
     let opts = ConversionOptions {
@@ -82,8 +76,8 @@ fn gate_code_block_style_indented_allows_tier1() {
 
 #[test]
 fn gate_code_block_style_backticks_allows_tier1() {
-    // Phase Q.4 flipped the backtick router/scanner gates; Tier-1 now
-    // emits backtick-fenced code blocks natively.
+    // ~keep Phase Q.4 flipped the backtick router/scanner gates; Tier-1 now
+    // ~keep emits backtick-fenced code blocks natively.
     let opts = ConversionOptions {
         code_block_style: CodeBlockStyle::Backticks,
         ..base_opts()
@@ -99,8 +93,6 @@ fn gate_code_block_style_tildes_forces_tier2() {
     };
     assert_eq!(route(&opts), RouterDecision::Tier2);
 }
-
-// ── strong_em_symbol ─────────────────────────────────────────────────────────
 
 #[test]
 fn gate_strong_em_symbol_asterisk_allows_tier1() {
@@ -120,14 +112,12 @@ fn gate_strong_em_symbol_underscore_forces_tier2() {
     assert_eq!(route(&opts), RouterDecision::Tier2);
 }
 
-// ── bullets ──────────────────────────────────────────────────────────────────
-
 #[test]
 fn gate_bullets_single_dash_forces_tier2() {
-    // Tier-1 hardcodes the cycle `"-*+"` for nested-list bullets so it can
-    // match Tier-2 at every depth.  Any other bullets value — including a
-    // single `-` — would diverge at depth >= 2, so the router sends those
-    // configurations to Tier-2.  See router.rs comments on `bullets` gate.
+    // ~keep Tier-1 hardcodes the cycle `"-*+"` for nested-list bullets so it can
+    // ~keep match Tier-2 at every depth.  Any other bullets value — including a
+    // ~keep single `-` — would diverge at depth >= 2, so the router sends those
+    // ~keep configurations to Tier-2.  See router.rs comments on `bullets` gate.
     let opts = ConversionOptions {
         bullets: "-".to_string(),
         ..base_opts()
@@ -152,8 +142,6 @@ fn gate_bullets_plus_forces_tier2() {
     };
     assert_eq!(route(&opts), RouterDecision::Tier2);
 }
-
-// ── list_indent_width ────────────────────────────────────────────────────────
 
 #[test]
 fn gate_list_indent_width_2_allows_tier1() {
@@ -182,8 +170,6 @@ fn gate_list_indent_width_0_forces_tier2() {
     assert_eq!(route(&opts), RouterDecision::Tier2);
 }
 
-// ── list_indent_type ─────────────────────────────────────────────────────────
-
 #[test]
 fn gate_list_indent_type_spaces_allows_tier1() {
     let opts = ConversionOptions {
@@ -201,8 +187,6 @@ fn gate_list_indent_type_tabs_forces_tier2() {
     };
     assert_eq!(route(&opts), RouterDecision::Tier2);
 }
-
-// ── whitespace_mode ───────────────────────────────────────────────────────────
 
 #[test]
 fn gate_whitespace_mode_normalized_allows_tier1() {
@@ -222,8 +206,6 @@ fn gate_whitespace_mode_strict_forces_tier2() {
     assert_eq!(route(&opts), RouterDecision::Tier2);
 }
 
-// ── newline_style ─────────────────────────────────────────────────────────────
-
 #[test]
 fn gate_newline_style_spaces_allows_tier1() {
     let opts = ConversionOptions {
@@ -241,8 +223,6 @@ fn gate_newline_style_backslash_forces_tier2() {
     };
     assert_eq!(route(&opts), RouterDecision::Tier2);
 }
-
-// ── default_title ─────────────────────────────────────────────────────────────
 
 #[test]
 fn gate_default_title_false_allows_tier1() {
@@ -262,8 +242,6 @@ fn gate_default_title_true_forces_tier2() {
     assert_eq!(route(&opts), RouterDecision::Tier2);
 }
 
-// ── sub_symbol ────────────────────────────────────────────────────────────────
-
 #[test]
 fn gate_sub_symbol_empty_allows_tier1() {
     let opts = ConversionOptions {
@@ -282,8 +260,6 @@ fn gate_sub_symbol_nonempty_forces_tier2() {
     assert_eq!(route(&opts), RouterDecision::Tier2);
 }
 
-// ── sup_symbol ────────────────────────────────────────────────────────────────
-
 #[test]
 fn gate_sup_symbol_empty_allows_tier1() {
     let opts = ConversionOptions {
@@ -301,8 +277,6 @@ fn gate_sup_symbol_nonempty_forces_tier2() {
     };
     assert_eq!(route(&opts), RouterDecision::Tier2);
 }
-
-// ── highlight_style ───────────────────────────────────────────────────────────
 
 #[test]
 fn gate_highlight_style_none_allows_tier1() {
@@ -340,8 +314,6 @@ fn gate_highlight_style_bold_forces_tier2() {
     assert_eq!(route(&opts), RouterDecision::Tier2);
 }
 
-// ── output_format ─────────────────────────────────────────────────────────────
-
 #[test]
 fn gate_output_format_markdown_allows_tier1() {
     let opts = ConversionOptions {
@@ -368,8 +340,6 @@ fn gate_output_format_plain_forces_tier2() {
     };
     assert_eq!(route(&opts), RouterDecision::Tier2);
 }
-
-// ── escape flags ──────────────────────────────────────────────────────────────
 
 #[test]
 fn gate_escape_asterisks_false_allows_tier1() {
@@ -443,8 +413,6 @@ fn gate_escape_ascii_true_forces_tier2() {
     assert_eq!(route(&opts), RouterDecision::Tier2);
 }
 
-// ── link_style ────────────────────────────────────────────────────────────────
-
 #[test]
 fn gate_link_style_inline_allows_tier1() {
     let opts = ConversionOptions {
@@ -463,8 +431,6 @@ fn gate_link_style_reference_forces_tier2() {
     assert_eq!(route(&opts), RouterDecision::Tier2);
 }
 
-// ── url_escape_style ──────────────────────────────────────────────────────────
-
 #[test]
 fn gate_url_escape_style_angle_allows_tier1() {
     let opts = ConversionOptions {
@@ -482,8 +448,6 @@ fn gate_url_escape_style_percent_forces_tier2() {
     };
     assert_eq!(route(&opts), RouterDecision::Tier2);
 }
-
-// ── compact_tables ────────────────────────────────────────────────────────────
 
 #[test]
 fn gate_compact_tables_false_allows_tier1() {

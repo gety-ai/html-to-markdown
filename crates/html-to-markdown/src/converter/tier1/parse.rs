@@ -86,12 +86,10 @@ pub fn scan_attribute(bytes: &[u8], pos: usize) -> Option<(Range<usize>, Option<
     if pos >= bytes.len() {
         return None;
     }
-    // Stop at tag terminators
     if bytes[pos] == b'>' || (bytes[pos] == b'/' && bytes.get(pos + 1) == Some(&b'>')) {
         return None;
     }
 
-    // Key: scan until `=`, whitespace, `/`, or `>`
     let key_start = pos;
     let mut key_end = pos;
     while key_end < bytes.len() {
@@ -101,24 +99,20 @@ pub fn scan_attribute(bytes: &[u8], pos: usize) -> Option<(Range<usize>, Option<
         }
     }
     if key_end == key_start {
-        // Unexpected char — skip one byte to avoid infinite loop
         return None;
     }
 
     let after_key = skip_ws(bytes, key_end);
 
     if after_key >= bytes.len() || bytes[after_key] != b'=' {
-        // Boolean attribute (no `=`)
         return Some((key_start..key_end, None, after_key));
     }
 
-    // Skip `=`
     let after_eq = skip_ws(bytes, after_key + 1);
     if after_eq >= bytes.len() {
         return None;
     }
 
-    // Value: quoted or unquoted
     let (value_range, new_pos) = if let q @ (b'"' | b'\'') = bytes[after_eq] {
         let val_start = after_eq + 1;
         let mut val_end = val_start;
@@ -127,7 +121,6 @@ pub fn scan_attribute(bytes: &[u8], pos: usize) -> Option<(Range<usize>, Option<
         }
         (val_start..val_end, val_end + 1)
     } else {
-        // Unquoted value: ends at whitespace or `>`
         let val_start = after_eq;
         let mut val_end = val_start;
         while val_end < bytes.len() && !matches!(bytes[val_end], b' ' | b'\t' | b'\n' | b'\r' | b'>' | b'/') {
@@ -151,7 +144,6 @@ pub fn collect_attrs(bytes: &[u8], start: usize, end: usize) -> Vec<(&[u8], Opti
         match scan_attribute(bytes, pos) {
             Some((key_range, val_range, new_pos)) => {
                 if new_pos <= pos {
-                    // Avoid infinite loop
                     break;
                 }
                 let key = &bytes[key_range.start..key_range.end.min(end)];

@@ -58,7 +58,6 @@ pub fn handle_img(
 
     let title = tag.attributes().get("title").flatten().map(|v| v.as_utf8_str());
 
-    // Collect metadata payload if metadata feature is enabled
     #[cfg(feature = "metadata")]
     #[allow(clippy::useless_let_if_seq)]
     let mut metadata_payload: Option<ImageMetadataPayload> = None;
@@ -87,7 +86,6 @@ pub fn handle_img(
         metadata_payload = Some((attributes_map, width, height));
     }
 
-    // Handle inline data URI images
     #[cfg(feature = "inline-images")]
     if let Some(ref collector_ref) = ctx.inline_collector {
         if src.trim_start().starts_with("data:") {
@@ -119,7 +117,6 @@ pub fn handle_img(
     let should_use_alt_text =
         !keep_as_markdown && (ctx.convert_as_inline || (ctx.in_heading && !ctx.heading_allow_inline_images));
 
-    // Generate image output with visitor integration
     #[cfg(feature = "visitor")]
     let image_output = if let Some(ref visitor_handle) = ctx.visitor {
         use crate::visitor::{NodeContext, NodeType, VisitResult};
@@ -185,14 +182,12 @@ pub fn handle_img(
         ctx.reference_collector.as_ref(),
     ));
 
-    // Only output image if skip_images is not enabled
     if !options.skip_images {
         if let Some(img_text) = image_output {
             output.push_str(&img_text);
         }
     }
 
-    // Add image to metadata collector
     #[cfg(feature = "metadata")]
     if ctx.metadata_wants_images {
         if let Some(ref collector) = ctx.metadata_collector {

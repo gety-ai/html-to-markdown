@@ -19,7 +19,6 @@ use crate::text;
 #[cfg(feature = "visitor")]
 use crate::visitor::EMPTY_ATTRS;
 
-// Type aliases for Context to avoid circular imports
 type Context = crate::converter::Context;
 
 /// Process a raw text node during HTML to Markdown conversion.
@@ -84,9 +83,6 @@ pub fn process_text_node(
             if !output.ends_with("\n\n") {
                 if let Some(next_tag) = get_next_sibling_tag(node_handle, parser, dom_ctx) {
                     if is_inline_element(next_tag) {
-                        // Newlines between inline elements collapse to a single space
-                        // in HTML rendering (per CSS white-space: normal). Preserve
-                        // this word boundary so adjacent inline content doesn't merge.
                         if !output.ends_with(' ') && !output.ends_with('\n') {
                             output.push(' ');
                         }
@@ -116,11 +112,11 @@ pub fn process_text_node(
     let processed_text = if ctx.in_code || ctx.in_ruby {
         text.into_owned()
     } else if ctx.in_table_cell {
-        // Always escape * and _ in table cells to prevent unintended emphasis.
-        // When escape_misc is false the previous implementation appended a
-        // post-pass `String::replace('|', "\\|")`.  We fold the pipe escape
-        // into the misc set so the byte-loop handles it in the same walk,
-        // avoiding a second allocation.
+        // ~keep Always escape * and _ in table cells to prevent unintended emphasis.
+        // ~keep When escape_misc is false the previous implementation appended a
+        // ~keep post-pass `String::replace('|', "\\|")`.  We fold the pipe escape
+        // ~keep into the misc set so the byte-loop handles it in the same walk,
+        // ~keep avoiding a second allocation.
         let normalized_text = if options.whitespace_mode == crate::options::WhitespaceMode::Normalized {
             text::normalize_whitespace_cow(text.as_ref())
         } else {
@@ -130,8 +126,6 @@ pub fn process_text_node(
         let mut out = String::with_capacity(src.len());
         text::escape_into(&mut out, src, options.escape_misc, true, true, options.escape_ascii);
         if !options.escape_misc {
-            // `|` is part of the misc set, so it's already escaped when
-            // escape_misc is true.  Otherwise we need a targeted pass.
             if out.contains('|') {
                 out = out.replace('|', r"\|");
             }
@@ -182,10 +176,6 @@ pub fn process_text_node(
         if !suffix.is_empty() {
             final_text.push_str(suffix);
         } else if has_trailing_single_newline {
-            // Check if the "\n\n" at the end of the output buffer came from within
-            // the current block's content, not from a previous block's closing.
-            // Without this distinction, the second paragraph after a "\n\n" boundary
-            // would incorrectly suppress the trailing space before inline elements.
             let safe_start = ctx.block_content_start.min(output.len());
             let safe_start = crate::converter::utility::content::floor_char_boundary(output, safe_start);
             let current_block_output = &output[safe_start..];

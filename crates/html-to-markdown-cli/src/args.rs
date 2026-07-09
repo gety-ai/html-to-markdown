@@ -1,17 +1,16 @@
-// reason: CLI application modules do not expose docs to users; doc coverage not required
+// ~keep reason: CLI application modules do not expose docs to users; doc coverage not required
 #![allow(missing_docs)]
-// reason: the struct has many boolean flags reflecting the CLI surface — reducing them
-// would require breaking the flat Cli struct into nested groups, which complicates clap
+// ~keep reason: the struct has many boolean flags reflecting the CLI surface — reducing them
+// ~keep would require breaking the flat Cli struct into nested groups, which complicates clap
 #![allow(clippy::struct_excessive_bools)]
 
 use crate::validators::{
     CliCodeBlockStyle, CliHeadingStyle, CliHighlightStyle, CliLinkStyle, CliListIndentType, CliNewlineStyle,
     CliOutputFormat, CliPreprocessingPreset, CliWhitespaceMode, validate_bullets, validate_strong_em_symbol,
 };
-use clap::{Parser, ValueEnum};
-// `Subcommand` is only used by the mcp-gated `Commands` enum below.
 #[cfg(feature = "mcp")]
 use clap::Subcommand;
+use clap::{Parser, ValueEnum};
 use std::path::PathBuf;
 
 /// Optional top-level subcommands.
@@ -450,8 +449,8 @@ pub struct Cli {
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, ValueEnum)]
-// reason: clippy considers "PowerShell" to suffix-match "Shell" triggering enum_variant_names;
-// the enum name is the correct name for this type and renaming would be confusing
+// ~keep reason: clippy considers "PowerShell" to suffix-match "Shell" triggering enum_variant_names;
+// ~keep the enum name is the correct name for this type and renaming would be confusing
 #[allow(clippy::enum_variant_names)]
 pub enum Shell {
     Bash,

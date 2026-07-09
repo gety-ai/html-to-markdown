@@ -20,7 +20,6 @@ pub fn strip_script_and_style_tags(input: &str) -> Cow<'_, str> {
     let mut output: Option<String> = None;
     let mut svg_depth = 0usize;
 
-    // Fast-path: check if there are any < characters at all
     if !bytes.contains(&b'<') {
         return Cow::Borrowed(input);
     }
@@ -48,25 +47,20 @@ pub fn strip_script_and_style_tags(input: &str) -> Cow<'_, str> {
                 continue;
             }
 
-            // Check for </script or </style (closing tags first for safety)
+            // ~keep Check for </script or </style (closing tags first for safety)
             if bytes[idx + 1] == b'/' && idx + 2 < len {
-                // Match </script>
                 if idx + 9 <= len && eq_ascii_insensitive(&bytes[idx..idx + 9], b"</script>") {
                     idx += 9;
                     continue;
                 }
 
-                // Match </style>
                 if idx + 8 <= len && eq_ascii_insensitive(&bytes[idx..idx + 8], b"</style>") {
                     idx += 8;
                     continue;
                 }
             }
 
-            // Check for <script or <style (opening tags)
-            // Match <script (case insensitive)
             if idx + 7 < len && eq_ascii_insensitive(&bytes[idx..idx + 7], b"<script") {
-                // Check if this is actually "<script" followed by whitespace, >, or attribute
                 let after_tag = bytes[idx + 7];
                 if after_tag == b'>'
                     || after_tag == b' '
@@ -74,19 +68,16 @@ pub fn strip_script_and_style_tags(input: &str) -> Cow<'_, str> {
                     || after_tag == b'\n'
                     || after_tag == b'\r'
                 {
-                    // Find the opening tag end
                     let mut tag_end = idx + 7;
                     while tag_end < len && bytes[tag_end] != b'>' {
                         tag_end += 1;
                     }
 
                     if tag_end < len {
-                        tag_end += 1; // Include the '>'
+                        tag_end += 1;
 
-                        // Check if this is a JSON-LD script tag
                         let tag_content = &input[idx..tag_end];
                         if !is_json_ld_script_open_tag(tag_content) {
-                            // Find the closing </script> tag
                             let close_tag = find_closing_tag_bytes(bytes, tag_end, b"script");
                             if let Some(close_idx) = close_tag {
                                 let out = output.get_or_insert_with(|| String::with_capacity(len));
@@ -105,10 +96,7 @@ pub fn strip_script_and_style_tags(input: &str) -> Cow<'_, str> {
                         }
                     }
                 }
-            }
-            // Match <style (case insensitive)
-            else if idx + 6 < len && eq_ascii_insensitive(&bytes[idx..idx + 6], b"<style") {
-                // Check if this is actually "<style" followed by whitespace, >, or attribute
+            } else if idx + 6 < len && eq_ascii_insensitive(&bytes[idx..idx + 6], b"<style") {
                 let after_tag = bytes[idx + 6];
                 if after_tag == b'>'
                     || after_tag == b' '
@@ -116,16 +104,14 @@ pub fn strip_script_and_style_tags(input: &str) -> Cow<'_, str> {
                     || after_tag == b'\n'
                     || after_tag == b'\r'
                 {
-                    // Find the opening tag end
                     let mut tag_end = idx + 6;
                     while tag_end < len && bytes[tag_end] != b'>' {
                         tag_end += 1;
                     }
 
                     if tag_end < len {
-                        tag_end += 1; // Include the '>'
+                        tag_end += 1;
 
-                        // Find the closing </style> tag
                         let close_tag = find_closing_tag_bytes(bytes, tag_end, b"style");
                         if let Some(close_idx) = close_tag {
                             let out = output.get_or_insert_with(|| String::with_capacity(len));
@@ -167,16 +153,11 @@ pub fn find_closing_tag_bytes(bytes: &[u8], start: usize, tag: &[u8]) -> Option<
     let len = bytes.len();
     let tag_len = tag.len();
 
-    // Fast path: look for the closing tag pattern byte-by-byte
-    // We use a simple byte scan to find '</' then validate the tag name
     let mut idx = start;
 
-    // Limit search to prevent stack overflow on large files
-    // Look for closing tag within reasonable bounds
-    const MAX_SCAN: usize = 100_000_000; // 100MB limit per tag - prevents pathological cases
+    const MAX_SCAN: usize = 100_000_000;
 
     while idx < len && (idx - start) < MAX_SCAN {
-        // Optimization: skip forward to next '<' quickly using memchr
         if bytes[idx] != b'<' {
             if let Some(pos) = memchr::memchr(b'<', &bytes[idx..]) {
                 idx += pos;
@@ -185,20 +166,16 @@ pub fn find_closing_tag_bytes(bytes: &[u8], start: usize, tag: &[u8]) -> Option<
             }
         }
 
-        // Check for </ pattern
         if idx + 2 < len && bytes[idx + 1] == b'/' {
-            // Check if tag name matches
             if idx + 2 + tag_len <= len && eq_ascii_insensitive(&bytes[idx + 2..idx + 2 + tag_len], tag) {
-                // Ensure it's followed by > or whitespace
                 let after_tag = idx + 2 + tag_len;
                 if after_tag < len && (bytes[after_tag] == b'>' || bytes[after_tag].is_ascii_whitespace()) {
-                    // Find the >
                     let mut close_idx = after_tag;
                     while close_idx < len && bytes[close_idx] != b'>' {
                         close_idx += 1;
                     }
                     if close_idx < len {
-                        return Some(close_idx + 1); // Include the '>'
+                        return Some(close_idx + 1);
                     }
                 }
             }
@@ -245,9 +222,6 @@ pub fn normalize_bogus_comment_endings(input: &str) -> Cow<'_, str> {
     let bytes = input.as_bytes();
     let len = bytes.len();
 
-    // Fast path: the input must contain at least "<!--" and "--->".
-    // Without "<!--" there are no comments; without "---" there cannot be a
-    // bogus closing.
     if len < 7 || !bytes.windows(4).any(|w| w == b"<!--") {
         return Cow::Borrowed(input);
     }
@@ -257,22 +231,13 @@ pub fn normalize_bogus_comment_endings(input: &str) -> Cow<'_, str> {
     let mut output: Option<String> = None;
 
     while idx + 3 < len {
-        // Find the next comment opening.
         if !(bytes[idx] == b'<' && bytes[idx + 1] == b'!' && bytes[idx + 2] == b'-' && bytes[idx + 3] == b'-') {
             idx += 1;
             continue;
         }
 
-        // We are positioned at `<!--`.
-        idx += 4; // advance past `<!--`
+        idx += 4;
 
-        // Walk the comment body looking for the closing sequence.
-        // The HTML5 comment-end state machine:
-        //   COMMENT state: most chars append to body; `-` → COMMENT_END_DASH
-        //   COMMENT_END_DASH: `-` → COMMENT_END; other → COMMENT
-        //   COMMENT_END: `>` → done; `-` → stay in COMMENT_END (extra dash);
-        //                other → COMMENT
-        // We track consecutive dashes at the current position.
         let mut consecutive_dashes: usize = 0;
 
         while idx < len {
@@ -281,35 +246,22 @@ pub fn normalize_bogus_comment_endings(input: &str) -> Cow<'_, str> {
                 consecutive_dashes += 1;
                 idx += 1;
             } else if b == b'>' && consecutive_dashes >= 2 {
-                // We found a closing sequence.  `consecutive_dashes` is the
-                // total number of dashes before this `>`.  A well-formed close
-                // is exactly two (`-->`).  Any additional dashes are bogus.
                 if consecutive_dashes > 2 {
-                    // Rewrite: keep the comment body (without the extra dashes)
-                    // and replace the closing sequence with `-->`.
                     let out = output.get_or_insert_with(|| String::with_capacity(len));
-                    // Flush everything up to the start of the extra dashes.
-                    // The comment body ends `consecutive_dashes` bytes before
-                    // the current `idx` (which points at `>`).
                     let close_start = idx - consecutive_dashes;
                     out.push_str(&input[last..close_start]);
                     out.push_str("-->");
-                    idx += 1; // consume `>`
+                    idx += 1;
                     last = idx;
                 } else {
-                    // Normal `-->` — no rewrite needed.
-                    idx += 1; // consume `>`
+                    idx += 1;
                 }
                 break;
             } else {
-                // Any non-dash non-`>` character resets the dash count and
-                // returns us to the plain comment body state.
                 consecutive_dashes = 0;
                 idx += 1;
             }
         }
-        // If we reached end-of-input without finding a close, the comment is
-        // unclosed.  We leave the remainder as-is; the parser will handle it.
     }
 
     match output {
@@ -343,7 +295,6 @@ pub fn normalize_split_closing_tags(input: &str) -> Cow<'_, str> {
     let bytes = input.as_bytes();
     let len = bytes.len();
 
-    // Fast path: need both '</' and '\n' to have any candidates.
     if len < 4 || !bytes.contains(&b'\n') {
         return Cow::Borrowed(input);
     }
@@ -353,13 +304,12 @@ pub fn normalize_split_closing_tags(input: &str) -> Cow<'_, str> {
     let mut output: Option<String> = None;
 
     while idx + 2 < len {
-        // Look for `</`
         if bytes[idx] != b'<' || bytes[idx + 1] != b'/' {
             idx += 1;
             continue;
         }
 
-        // Scan tag name: ASCII letters, digits, hyphens (HTML5 allows hyphens in custom elements)
+        // ~keep Scan tag name: ASCII letters, digits, hyphens (HTML5 allows hyphens in custom elements)
         let name_start = idx + 2;
         let mut name_end = name_start;
         while name_end < len && (bytes[name_end].is_ascii_alphanumeric() || bytes[name_end] == b'-') {
@@ -367,13 +317,10 @@ pub fn normalize_split_closing_tags(input: &str) -> Cow<'_, str> {
         }
 
         if name_end == name_start {
-            // No tag name — not a closing tag we care about.
             idx += 1;
             continue;
         }
 
-        // After the tag name, skip any whitespace.  If there is a newline in
-        // that whitespace before the `>`, we need to rewrite.
         let ws_start = name_end;
         let mut ws_end = ws_start;
         let mut has_newline = false;
@@ -385,12 +332,10 @@ pub fn normalize_split_closing_tags(input: &str) -> Cow<'_, str> {
         }
 
         if !has_newline || ws_end >= len || bytes[ws_end] != b'>' {
-            // Either no whitespace newline, or the `>` is not the next char.
             idx += 1;
             continue;
         }
 
-        // We have `</tagname [whitespace-with-newline]>` — rewrite to `</tagname>`.
         let tag_name = &input[name_start..name_end];
         let out = output.get_or_insert_with(|| String::with_capacity(len));
         out.push_str(&input[last..idx]);
@@ -398,7 +343,7 @@ pub fn normalize_split_closing_tags(input: &str) -> Cow<'_, str> {
         out.push_str(tag_name);
         out.push('>');
 
-        idx = ws_end + 1; // advance past the `>`
+        idx = ws_end + 1;
         last = idx;
     }
 
@@ -488,8 +433,6 @@ pub fn preprocess_html(input: &str) -> Cow<'_, str> {
                             out.push_str(&input[last..idx]);
                             out.push_str(&input[idx..open_end]);
                             out.push_str("</");
-                            // `TAGS` contains only ASCII byte literals (`b"script"`, `b"style"`),
-                            // which are always valid UTF-8; `from_utf8` cannot fail here.
                             if let Ok(tag_str) = str::from_utf8(tag) {
                                 out.push_str(tag_str);
                             }
@@ -761,9 +704,6 @@ pub fn matches_end_tag_start(bytes: &[u8], start: usize, tag: &[u8]) -> bool {
 /// auto-closing block elements are intentionally left to the existing
 /// `has_inline_block_misnest` → `repair_with_html5ever` path.
 pub fn normalize_unclosed_list_items(input: &str) -> Cow<'_, str> {
-    // Fast-path: skip the scan entirely when there are no list-item tags.
-    // `<li`, `<dt`, and `<dd` share the first two bytes `<l`, `<d` — if
-    // neither byte sequence can appear there is nothing to do.
     let bytes = input.as_bytes();
     let len = bytes.len();
     if len < 4
@@ -774,31 +714,16 @@ pub fn normalize_unclosed_list_items(input: &str) -> Cow<'_, str> {
         return Cow::Borrowed(input);
     }
 
-    // `open_item` tracks the tag name of the currently-open list-item element
-    // (one of "li", "dt", "dd"), or `None` when no such element is open.
-    // We use a simple single-element stack because `<li>` cannot contain
-    // another `<li>` without an intervening `</li>` in well-formed HTML —
-    // the only nesting that is legal is inside a child `<ul>`/`<ol>`/`<dl>`.
-    // We therefore reset the stack on every `</ul>`, `</ol>`, `</dl>`.
     let mut open_item: Option<&'static str> = None;
-    // Depth of `<ul>` / `<ol>` / `<dl>` nesting.  We only track open
-    // list-item state for the innermost list (depth == 1 at the item level).
-    // When a nested list opens we push a "saved" state; when it closes we
-    // restore it.  We use a `Vec` because nesting can be arbitrary.
     let mut list_stack: Vec<Option<&'static str>> = Vec::new();
 
-    // Tracks whether the current scan position is inside a `<pre>` or
-    // `<code>` block, an HTML comment, or an attribute value — all of which
-    // must be passed through verbatim.
-    let mut in_pre_or_code: usize = 0; // nesting depth counter
+    let mut in_pre_or_code: usize = 0;
     let mut in_comment = false;
 
     let mut idx = 0usize;
     let mut last_flush = 0usize;
     let mut output: Option<String> = None;
 
-    // Helper: emit `close_tag` just before position `pos` by flushing the
-    // bytes up to `pos` and then appending the close tag.
     macro_rules! emit_close_before {
         ($pos:expr, $close_tag:expr) => {{
             let out = output.get_or_insert_with(|| String::with_capacity(len + 64));
@@ -811,7 +736,6 @@ pub fn normalize_unclosed_list_items(input: &str) -> Cow<'_, str> {
     while idx < len {
         let b = bytes[idx];
 
-        // ── HTML comment handling ─────────────────────────────────────────────
         if in_comment {
             if b == b'-' && idx + 2 < len && bytes[idx + 1] == b'-' && bytes[idx + 2] == b'>' {
                 in_comment = false;
@@ -828,13 +752,11 @@ pub fn normalize_unclosed_list_items(input: &str) -> Cow<'_, str> {
             continue;
         }
 
-        // ── Non-tag character ─────────────────────────────────────────────────
         if b != b'<' {
             idx += 1;
             continue;
         }
 
-        // ── We are at `<` ─────────────────────────────────────────────────────
         let tag_start = idx;
         idx += 1;
         if idx >= len {
@@ -849,12 +771,10 @@ pub fn normalize_unclosed_list_items(input: &str) -> Cow<'_, str> {
             }
         }
 
-        // Skip whitespace after `<` or `</`
         while idx < len && bytes[idx].is_ascii_whitespace() {
             idx += 1;
         }
 
-        // Collect tag name (ASCII alphanumeric + hyphens)
         let name_start = idx;
         while idx < len {
             let ch = bytes[idx];
@@ -868,7 +788,6 @@ pub fn normalize_unclosed_list_items(input: &str) -> Cow<'_, str> {
             continue;
         }
 
-        // Advance to the closing `>` of this tag (skip quoted attribute values)
         {
             let mut in_single_quote = false;
             let mut in_double_quote = false;
@@ -893,7 +812,6 @@ pub fn normalize_unclosed_list_items(input: &str) -> Cow<'_, str> {
             }
         }
 
-        // ── Classify the tag ─────────────────────────────────────────────────
         let tag_is_verbatim = name_bytes.eq_ignore_ascii_case(b"pre")
             || name_bytes.eq_ignore_ascii_case(b"code")
             || name_bytes.eq_ignore_ascii_case(b"script")
@@ -908,7 +826,6 @@ pub fn normalize_unclosed_list_items(input: &str) -> Cow<'_, str> {
             continue;
         }
 
-        // Inside verbatim blocks: pass through unchanged.
         if in_pre_or_code > 0 {
             continue;
         }
@@ -924,7 +841,6 @@ pub fn normalize_unclosed_list_items(input: &str) -> Cow<'_, str> {
 
         if is_close {
             if is_list_container {
-                // Closing a list: implicitly close any open list-item inside it.
                 if let Some(item) = open_item.take() {
                     let close_tag = match item {
                         "li" => "</li>",
@@ -934,19 +850,14 @@ pub fn normalize_unclosed_list_items(input: &str) -> Cow<'_, str> {
                     };
                     emit_close_before!(tag_start, close_tag);
                 }
-                // Restore the outer list's open-item state from the stack.
                 open_item = list_stack.pop().unwrap_or(None);
             } else if is_list_item {
-                // Explicit close: clear the open-item state.
                 open_item = None;
             }
         } else {
-            // Opening tag
             if is_list_container {
-                // Save the current open-item state and start fresh for the nested list.
                 list_stack.push(open_item.take());
             } else if is_list_item {
-                // Determine the tag name as a static str so we can store it.
                 let item_name: &'static str = if is_li {
                     "li"
                 } else if is_def_term {
@@ -956,8 +867,6 @@ pub fn normalize_unclosed_list_items(input: &str) -> Cow<'_, str> {
                 };
 
                 if let Some(prev_item) = open_item.replace(item_name) {
-                    // The previous list-item was not explicitly closed; insert its
-                    // closing tag immediately before this new opening tag.
                     let close_tag = match prev_item {
                         "li" => "</li>",
                         "dt" => "</dt>",
@@ -970,7 +879,6 @@ pub fn normalize_unclosed_list_items(input: &str) -> Cow<'_, str> {
         }
     }
 
-    // If a list-item was still open at the very end, close it.
     if let Some(item) = open_item.take() {
         let close_tag = match item {
             "li" => "</li>",
@@ -1009,16 +917,10 @@ pub fn normalize_unclosed_list_items(input: &str) -> Cow<'_, str> {
 /// # Returns
 /// * `Cow<str>` - Either the borrowed original URL or an owned sanitized version
 pub fn sanitize_markdown_url(url: &str) -> Cow<'_, str> {
-    // Pattern: ...[text](actual_url) or similar markdown-like syntax
-    // This handles malformed HTML where markdown syntax wasn't properly converted
-    // and prevents downstream URL parsing errors (e.g., bracketed "IPv6" hosts).
-
-    // Fast-path: we only care about markdown-like link syntax.
     let Some(mid) = url.find("](") else {
         return Cow::Borrowed(url);
     };
 
-    // Ensure there is an opening '[' before the "](..." sequence.
     if !url[..mid].contains('[') {
         return Cow::Borrowed(url);
     }
@@ -1054,11 +956,9 @@ pub fn strip_hidden_elements(input: &str) -> Cow<'_, str> {
 
     while idx < len {
         if bytes[idx] == b'<' && idx + 1 < len && bytes[idx + 1] != b'/' && bytes[idx + 1] != b'!' {
-            // Find the end of this opening tag
             if let Some(tag_end) = find_tag_end(bytes, idx + 1) {
                 let tag_slice = &input[idx..tag_end];
                 if tag_has_hidden_attribute(tag_slice) {
-                    // Extract the tag name
                     let name_start = idx + 1;
                     let mut name_end = name_start;
                     while name_end < len
@@ -1070,7 +970,6 @@ pub fn strip_hidden_elements(input: &str) -> Cow<'_, str> {
                     }
                     let tag_name = &bytes[name_start..name_end];
 
-                    // Check if it's a self-closing tag (e.g., <br hidden> or <br hidden/>)
                     let is_self_closing = tag_slice.ends_with("/>")
                         || tag_name.eq_ignore_ascii_case(b"br")
                         || tag_name.eq_ignore_ascii_case(b"hr")
@@ -1080,7 +979,6 @@ pub fn strip_hidden_elements(input: &str) -> Cow<'_, str> {
                     let remove_end = if is_self_closing {
                         tag_end
                     } else {
-                        // Find the closing tag
                         find_closing_tag_bytes(bytes, tag_end, tag_name).unwrap_or(tag_end)
                     };
 
@@ -1116,16 +1014,13 @@ fn tag_has_hidden_attribute(tag: &str) -> bool {
     let nlen = needle.len();
 
     let mut i = 0;
-    // Skip past the tag name
     while i < len && bytes[i] != b' ' && bytes[i] != b'\t' && bytes[i] != b'\n' && bytes[i] != b'>' {
         i += 1;
     }
 
     while i + nlen <= len {
         if bytes[i..i + nlen].eq_ignore_ascii_case(needle) {
-            // Check that the character before is whitespace (attribute boundary)
             let before_ok = i == 0 || bytes[i - 1].is_ascii_whitespace();
-            // Check that the character after is whitespace, '>', '=', or '/'
             let after = bytes.get(i + nlen).copied();
             let after_ok = matches!(after, None | Some(b' ' | b'\t' | b'\n' | b'\r' | b'>' | b'=' | b'/'));
             if before_ok && after_ok {
@@ -1144,13 +1039,10 @@ mod tests {
         sanitize_markdown_url,
     };
 
-    // ── normalize_bogus_comment_endings ───────────────────────────────────────
-
     #[test]
     fn normalize_bogus_comment_endings_leaves_well_formed_comment_unchanged() {
         let input = "<p>A</p><!-- foo --><p>B</p>";
         let result = normalize_bogus_comment_endings(input);
-        // Borrowed means unchanged
         assert_eq!(result.as_ref(), input);
     }
 
@@ -1195,8 +1087,6 @@ mod tests {
         assert_eq!(result.as_ref(), "");
     }
 
-    // ── normalize_split_closing_tags ──────────────────────────────────────────
-
     #[test]
     fn normalize_split_closing_tags_collapses_newline_before_close_bracket() {
         let input = "<a href=\"#x\">text</a\n>";
@@ -1227,11 +1117,10 @@ mod tests {
 
     #[test]
     fn normalize_split_closing_tags_does_not_collapse_inline_whitespace() {
-        // Only newlines trigger the normalisation; spaces alone must not.
         let input = "<a href=\"#x\">text</a >";
         let result = normalize_split_closing_tags(input);
-        // A space before > is actually valid HTML and tl handles it fine.
-        // We must not touch it to avoid over-normalising.
+        // ~keep A space before > is actually valid HTML and tl handles it fine.
+        // ~keep We must not touch it to avoid over-normalising.
         assert_eq!(result.as_ref(), input);
     }
 
@@ -1240,8 +1129,6 @@ mod tests {
         let result = normalize_split_closing_tags("");
         assert_eq!(result.as_ref(), "");
     }
-
-    // ── sanitize_markdown_url ─────────────────────────────────────────────────
 
     #[test]
     fn sanitize_markdown_url_extracts_scheme_relative_markdown_like_url() {
@@ -1263,8 +1150,6 @@ mod tests {
         let sanitized = sanitize_markdown_url(input);
         assert_eq!(sanitized, input);
     }
-
-    // ── normalize_unclosed_list_items ─────────────────────────────────────────
 
     #[test]
     fn normalize_unclosed_list_items_leaves_well_formed_list_unchanged() {
@@ -1291,13 +1176,11 @@ mod tests {
     fn normalize_unclosed_list_items_does_not_modify_input_without_list_items() {
         let input = "<p>Hello</p><div>World</div>";
         let result = normalize_unclosed_list_items(input);
-        // Fast-path: no list-item tags → Borrowed
         assert!(matches!(result, std::borrow::Cow::Borrowed(_)));
     }
 
     #[test]
     fn normalize_unclosed_list_items_handles_nested_list_correctly() {
-        // Nested ul: the inner li items should not close prematurely via the outer li
         let input = "<ul><li>Outer<ul><li>Inner A<li>Inner B</ul><li>Outer B</ul>";
         let result = normalize_unclosed_list_items(input);
         assert_eq!(
@@ -1318,7 +1201,6 @@ mod tests {
 
     #[test]
     fn normalize_unclosed_list_items_does_not_touch_content_in_pre() {
-        // Content inside <pre> must be passed through verbatim even if it looks like a tag.
         let input = "<ul><li>A<pre><li>not-a-list-item</pre><li>B</ul>";
         let result = normalize_unclosed_list_items(input);
         assert_eq!(

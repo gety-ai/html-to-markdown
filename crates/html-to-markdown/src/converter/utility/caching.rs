@@ -42,7 +42,6 @@ pub fn build_dom_context(dom: &tl::VDom, parser: &tl::Parser, input_len: usize) 
 /// scaled proportionally to input size (1KB = 1 slot).
 pub fn text_cache_capacity_for_input(input_len: usize) -> NonZeroUsize {
     const TEXT_CACHE_CAPACITY: usize = 256;
-    // `clamp(32, TEXT_CACHE_CAPACITY)` guarantees `target >= 32 > 0`, so `new` always returns Some.
     let target = (input_len / 1024).clamp(32, TEXT_CACHE_CAPACITY);
     NonZeroUsize::new(target).unwrap_or(NonZeroUsize::MIN)
 }
@@ -56,9 +55,6 @@ pub fn record_node_hierarchy(
     parser: &tl::Parser,
     ctx: &mut DomContext,
 ) {
-    // The work stack keeps hierarchy recording on the heap for DOM chains
-    // created by unclosed elements. Each node writes only its own map entries;
-    // the same parent/child maps result from any traversal order.
     let mut work = vec![(node_handle, parent)];
     while let Some((node_handle, parent)) = work.pop() {
         let id = node_handle.get_inner();

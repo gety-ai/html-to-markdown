@@ -10,7 +10,6 @@ use phf::phf_map;
 /// own variant so the scanner / emit dispatch can branch cleanly.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TagKind {
-    // Block-level structural
     /// Generic block container (`<div>`, `<section>`, etc.).
     Block,
     /// Paragraph (`<p>`).
@@ -24,7 +23,6 @@ pub enum TagKind {
     /// Code-block container.
     Pre,
 
-    // Inline formatting
     /// Generic inline container (`<span>`, etc.).
     Inline,
     /// Bold/strong emphasis (`<strong>`, `<b>`).
@@ -48,7 +46,6 @@ pub enum TagKind {
     /// `<img>` — embedded image.
     Image,
 
-    // List structures
     /// Ordered or unordered list container.
     List(ListKind),
     /// List item (`<li>`).
@@ -58,7 +55,6 @@ pub enum TagKind {
     /// Definition description (`<dd>`).
     DefinitionDescription,
 
-    // Tables
     /// Table root (`<table>`).
     Table,
     /// Table header section (`<thead>`).
@@ -77,7 +73,6 @@ pub enum TagKind {
     /// Table caption (`<caption>`).
     TableCaption,
 
-    // Semantic containers
     /// `<summary>` — disclosure summary; content collected into a buffer and
     /// emitted as `**…**\n\n` (strong-wrap).
     Summary,
@@ -90,11 +85,9 @@ pub enum TagKind {
     /// separator; mirror with close-only block-separator semantics.
     Button,
 
-    // Raw-text containers (scanner must skip their contents)
     /// Raw-text container whose content the scanner skips until the matching close tag.
     RawText(RawKind),
 
-    // Special / ignored
     /// Explicitly drop (e.g. `<script>`, `<style>`).
     Ignored,
 }
@@ -184,8 +177,6 @@ pub enum OptionalCloseRule {
 pub fn lookup(tag_name_lower: &[u8]) -> Option<&'static TagSpec> {
     TAGS.get(tag_name_lower)
 }
-
-// ── Convenience constructors (reduce repetition in the static table) ──────────
 
 const fn block(kind: TagKind) -> TagSpec {
     TagSpec {
@@ -277,10 +268,7 @@ const fn ignored_void() -> TagSpec {
     }
 }
 
-// ── Static lookup table ───────────────────────────────────────────────────────
-
 static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
-    // ── Document structure ────────────────────────────────────────────────────
     b"html"    => block(TagKind::Block),
     b"head"    => ignored_block(),
     b"body"    => block(TagKind::Block),
@@ -288,7 +276,6 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
     b"link"    => ignored_void(),
     b"base"    => void_block(TagKind::Block),
 
-    // ── Block structural ─────────────────────────────────────────────────────
     b"div"     => block(TagKind::Block),
     b"section" => block(TagKind::Block),
     b"article" => block(TagKind::Block),
@@ -304,10 +291,8 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
     b"figure"  => block(TagKind::Block),
     b"figcaption" => block(TagKind::Figcaption),
 
-    // ── Paragraph ────────────────────────────────────────────────────────────
     b"p" => block_opt(TagKind::Paragraph, OptionalCloseRule::CloseOnBlockChild),
 
-    // ── Headings ─────────────────────────────────────────────────────────────
     b"h1" => block(TagKind::Heading(1)),
     b"h2" => block(TagKind::Heading(2)),
     b"h3" => block(TagKind::Heading(3)),
@@ -315,16 +300,12 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
     b"h5" => block(TagKind::Heading(5)),
     b"h6" => block(TagKind::Heading(6)),
 
-    // ── Blockquote ───────────────────────────────────────────────────────────
     b"blockquote" => block(TagKind::Blockquote),
 
-    // ── Horizontal rule ──────────────────────────────────────────────────────
     b"hr" => void_block(TagKind::Hr),
 
-    // ── Preformatted / code block ─────────────────────────────────────────────
     b"pre" => block(TagKind::Pre),
 
-    // ── Line break ───────────────────────────────────────────────────────────
     b"br" => TagSpec {
         kind: TagKind::LineBreak,
         is_void: true,
@@ -333,7 +314,6 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
         is_rawtext: false,
     },
 
-    // ── Inline emphasis ───────────────────────────────────────────────────────
     b"strong" => inline(TagKind::Strong),
     b"b"      => inline(TagKind::Strong),
     b"em"     => inline(TagKind::Emphasis),
@@ -344,7 +324,6 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
     b"u"      => inline(TagKind::Inline),
     b"ins"    => inline(TagKind::Inserted),
 
-    // ── Inline marks ──────────────────────────────────────────────────────────
     b"mark"   => inline(TagKind::Inline),
     b"small"  => inline(TagKind::Inline),
     b"sub"    => inline(TagKind::Inline),
@@ -363,11 +342,9 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
     b"time"   => inline(TagKind::Inline),
     b"data"   => inline(TagKind::Inline),
 
-    // ── Links / images ────────────────────────────────────────────────────────
     b"a"   => inline(TagKind::Link),
     b"img" => void_inline(TagKind::Image),
 
-    // ── Lists ─────────────────────────────────────────────────────────────────
     b"ul" => block(TagKind::List(ListKind::Unordered)),
     b"ol" => block(TagKind::List(ListKind::Ordered)),
     b"dl" => block(TagKind::List(ListKind::Definition)),
@@ -375,7 +352,6 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
     b"dt" => block_opt(TagKind::DefinitionTerm, OptionalCloseRule::CloseSiblingDtDd),
     b"dd" => block_opt(TagKind::DefinitionDescription, OptionalCloseRule::CloseSiblingDtDd),
 
-    // ── Tables ────────────────────────────────────────────────────────────────
     b"table"    => block(TagKind::Table),
     b"thead"    => block(TagKind::TableHead),
     b"tbody"    => block(TagKind::TableBody),
@@ -387,7 +363,6 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
     b"colgroup" => block(TagKind::Block),
     b"col"      => void_block(TagKind::Block),
 
-    // ── Raw-text containers ───────────────────────────────────────────────────
     b"script"   => rawtext_ignored(),
     b"style"    => rawtext_ignored(),
     b"title"    => rawtext_block(TagKind::RawText(RawKind::Title)),
@@ -398,7 +373,6 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
     b"noembed"  => rawtext_block(TagKind::RawText(RawKind::NoEmbed)),
     b"noframes" => rawtext_block(TagKind::RawText(RawKind::NoFrames)),
 
-    // ── Forms ─────────────────────────────────────────────────────────────────
     b"form"      => block(TagKind::Block),
     b"fieldset"  => block(TagKind::Block),
     b"legend"    => block(TagKind::Block),
@@ -413,27 +387,22 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
         is_rawtext: false,
     },
     b"optgroup"  => inline(TagKind::Inline),
-    // <button>: Tier-2 form/elements.rs:592-594 emits `\n\n` after content in
-    // block mode but no leading separator.  TagKind::Button gives us
-    // close-only block-separator semantics — distinct from Block which also
-    // emits a leading `\n\n` on open.
+    // ~keep <button>: Tier-2 form/elements.rs:592-594 emits `\n\n` after content in
+    // ~keep block mode but no leading separator.  TagKind::Button gives us
+    // ~keep close-only block-separator semantics — distinct from Block which also
+    // ~keep emits a leading `\n\n` on open.
     b"button"    => block(TagKind::Button),
     b"progress"  => inline(TagKind::Inline),
     b"meter"     => inline(TagKind::Inline),
     b"output"    => inline(TagKind::Inline),
     b"datalist"  => inline(TagKind::Inline),
 
-    // ── Media / embedded ──────────────────────────────────────────────────────
     b"audio"   => block(TagKind::Block),
     b"video"   => block(TagKind::Block),
     b"picture" => inline(TagKind::Inline),
     b"canvas"  => inline(TagKind::Inline),
     b"map"     => inline(TagKind::Inline),
 
-    // ── Other void elements (HTML5 spec) ─────────────────────────────────────
-    // https://html.spec.whatwg.org/multipage/syntax.html#void-elements
-    // Void list: area, base, br, col, embed, hr, img, input, link, meta, source, track, wbr
-    // Plus historical: keygen, param
     b"area"   => void_inline(TagKind::Inline),
     b"embed"  => void_inline(TagKind::Inline),
     b"source" => void_inline(TagKind::Inline),
@@ -442,12 +411,11 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
     b"keygen" => void_inline(TagKind::Inline),
     b"param"  => void_inline(TagKind::Inline),
 
-    // ── Misc block wrappers ───────────────────────────────────────────────────
     b"hgroup"    => block(TagKind::Block),
     b"menu"      => block(TagKind::Block),
     b"search"    => block(TagKind::Block),
-    // `<center>` is a legacy HTML element that acts as a block container.
-    // Tier-2 emits its inner content as plain block text (no centering markup
-    // in Markdown), so a generic `Block` spec matches Tier-2 byte-for-byte.
+    // ~keep `<center>` is a legacy HTML element that acts as a block container.
+    // ~keep Tier-2 emits its inner content as plain block text (no centering markup
+    // ~keep in Markdown), so a generic `Block` spec matches Tier-2 byte-for-byte.
     b"center"    => block(TagKind::Block),
 };

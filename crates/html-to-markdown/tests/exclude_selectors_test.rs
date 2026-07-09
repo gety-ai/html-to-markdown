@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 
 use html_to_markdown_rs::ConversionOptions;
@@ -74,14 +75,11 @@ fn test_exclude_selectors_empty_list_is_noop() {
 fn test_exclude_selectors_invalid_selector_is_skipped() {
     let html = r"<body><p>Visible text</p></body>";
 
-    // An empty string or garbled selector should not panic or error — just be ignored.
     let options = ConversionOptions {
         exclude_selectors: vec![String::new(), "p".to_string()],
         ..Default::default()
     };
 
-    // Should not return an error; whether the paragraph is excluded depends on the
-    // selector, but it must not panic.
     let _ = convert(html, Some(options));
 }
 

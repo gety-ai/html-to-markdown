@@ -309,7 +309,6 @@ mod tests {
             ..ConvertConfig::default()
         };
         let opts: ConversionOptions = config.into();
-        // HeadingStyle::parse falls back to Underlined for unknown input.
         assert_eq!(opts.heading_style, HeadingStyle::Underlined);
     }
 
@@ -323,7 +322,6 @@ mod tests {
         let opts: ConversionOptions = config.into();
         assert!(opts.wrap);
         assert_eq!(opts.wrap_width, 100);
-        // Untouched fields retain defaults.
         assert!(opts.autolinks);
         assert_eq!(opts.bullets, "-*+");
         assert_eq!(opts.heading_style, HeadingStyle::Atx);
@@ -362,7 +360,6 @@ mod tests {
         let opts: ConversionOptions = config.into();
         assert_eq!(opts.preprocessing.preset, PreprocessingPreset::Aggressive);
         assert!(!opts.preprocessing.remove_forms);
-        // Untouched preprocessing fields retain defaults.
         assert!(opts.preprocessing.enabled);
         assert!(opts.preprocessing.remove_navigation);
     }
@@ -379,7 +376,6 @@ mod tests {
 
     #[test]
     fn test_unknown_top_level_field_is_rejected() {
-        // deny_unknown_fields on ConvertConfig rejects typos in option names.
         let result: Result<ConvertConfig, _> = serde_json::from_str(r#"{"unknown_field_xyz": true}"#);
         assert!(result.is_err());
     }
@@ -389,7 +385,6 @@ mod tests {
         let schema = schemars::schema_for!(ConvertHtmlParams);
         let json = serde_json::to_value(&schema).unwrap();
         let text = serde_json::to_string(&json).unwrap();
-        // The generated schema must surface the typed options (proves discoverability).
         assert!(text.contains("heading_style"), "schema must expose heading_style");
         assert!(text.contains("output_format"), "schema must expose output_format");
         assert!(text.contains("preprocessing"), "schema must expose preprocessing");

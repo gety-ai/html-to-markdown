@@ -161,7 +161,7 @@ pub fn cell_text_content(
 /// applies `escape_misc` / `escape_ascii` per options, and escapes `|` (pipe)
 /// when `escape_misc` is not already handling it.
 fn escape_cell_text(text: &str, options: &crate::options::ConversionOptions) -> String {
-    // Always escape * and _ in table cells to prevent unintended emphasis.
+    // ~keep Always escape * and _ in table cells to prevent unintended emphasis.
     let escaped = crate::text::escape(text, options.escape_misc, true, true, options.escape_ascii);
     if options.escape_misc {
         escaped.into_owned()
@@ -191,8 +191,6 @@ pub fn convert_table_cell(
     parser: &tl::Parser,
     output: &mut String,
     options: &crate::options::ConversionOptions,
-    // Caller passes a context with `in_table_cell = true` already set, so we
-    // avoid cloning it per cell (hot path on wikipedia-class tables).
     cell_ctx: &super::super::super::Context,
     _tag_name: &str,
     dom_ctx: &super::super::super::DomContext,
@@ -224,12 +222,8 @@ pub fn convert_table_cell(
 
     let text = text.trim();
     let text_for_output: Cow<str> = if options.br_in_tables || !text.contains('\n') {
-        // When br_in_tables is enabled, markdown line breaks from <br> HTML tags
-        // are already properly formatted, just pass them through unchanged.
-        // Also, if no newlines present, just use the trimmed slice.
         Cow::Borrowed(text)
     } else {
-        // Only allocate if we need to replace newlines
         Cow::Owned(text.replace('\n', " "))
     };
 

@@ -1,7 +1,7 @@
-// reason: CLI application modules do not expose docs to users; doc coverage not required
+// ~keep reason: CLI application modules do not expose docs to users; doc coverage not required
 #![allow(missing_docs)]
-// reason: enum names repeat the type name intentionally for clap ValueEnum derivation
-// (e.g. CliHeadingStyle::Atx mirrors HeadingStyle::Atx one-to-one)
+// ~keep reason: enum names repeat the type name intentionally for clap ValueEnum derivation
+// ~keep (e.g. CliHeadingStyle::Atx mirrors HeadingStyle::Atx one-to-one)
 #![allow(clippy::enum_variant_names)]
 
 use clap::ValueEnum;

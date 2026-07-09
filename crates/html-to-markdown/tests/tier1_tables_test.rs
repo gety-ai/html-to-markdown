@@ -16,8 +16,6 @@ use html_to_markdown_rs::prescan;
 use html_to_markdown_rs::tier1::{self, BailReason};
 use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 fn tier1_run(html: &str) -> Result<String, BailReason> {
     let (cleaned, report) = prescan::run(html);
     let opts = ConversionOptions {
@@ -56,7 +54,7 @@ fn assert_matches_tier2(html: &str) {
     );
 }
 
-// ── Positive tests (Tier-1 handles, byte-equal to Tier-2) ────────────────────
+// ~keep ── Positive tests (Tier-1 handles, byte-equal to Tier-2) ────────────────────
 
 /// Test 1: simple 2x2 table with explicit `<thead>` and `<tbody>`.
 #[test]
@@ -170,8 +168,8 @@ fn test_pipe_in_cell_text_not_escaped() {
         <tr><th>A</th><th>B</th></tr>\
         <tr><td>x | y</td><td>z</td></tr>\
     </table>";
-    // Tier-2 escapes pipes: output contains `\|`. Tier-1 bails on this
-    // table (cell contains '|') and falls back to Tier-2, so results match.
+    // ~keep Tier-2 escapes pipes: output contains `\|`. Tier-1 bails on this
+    // ~keep table (cell contains '|') and falls back to Tier-2, so results match.
     assert_matches_tier2(html);
 }
 
@@ -257,7 +255,7 @@ fn test_single_column_table() {
     assert!(out.contains("two"), "second data row missing: {out:?}");
 }
 
-// ── Bail tests ────────────────────────────────────────────────────────────────
+// ~keep ── Bail tests ────────────────────────────────────────────────────────────────
 
 /// Test 14: `<td rowspan="2">` — Phase F: handled natively (no bail).
 #[test]
@@ -266,7 +264,7 @@ fn test_rowspan_handled_natively() {
         <tr><th>A</th><th>B</th></tr>\
         <tr><td rowspan=\"2\">span</td><td>x</td></tr>\
     </table>";
-    // Tier-1 must not bail; content appears once (rowspan is lossy).
+    // ~keep Tier-1 must not bail; content appears once (rowspan is lossy).
     tier1_run(html).expect("Tier-1 should not bail on rowspan");
 }
 
@@ -282,7 +280,7 @@ fn test_colspan_handled_natively() {
         <tr><th>A</th><th>B</th><th>C</th></tr>\
         <tr><td colspan=\"3\">wide</td></tr>\
     </table>";
-    // Tier-1 must not bail (even though output is lossy vs Tier-2).
+    // ~keep Tier-1 must not bail (even though output is lossy vs Tier-2).
     tier1_run(html).expect("Tier-1 should not bail on colspan");
 }
 
@@ -293,7 +291,7 @@ fn test_paragraph_in_cell_handled_natively() {
         <tr><th>H</th></tr>\
         <tr><td><p>x</p></td></tr>\
     </table>";
-    // Tier-1 must not bail; output must match Tier-2.
+    // ~keep Tier-1 must not bail; output must match Tier-2.
     let t1 = tier1_run(html).expect("Tier-1 should not bail on <p> in cell");
     assert_eq!(t1, tier2(html));
 }
@@ -343,7 +341,7 @@ fn test_caption_handled_natively() {
         <tr><th>H</th></tr>\
         <tr><td>D</td></tr>\
     </table>";
-    // Tier-1 must succeed and produce byte-equal output to Tier-2.
+    // ~keep Tier-1 must succeed and produce byte-equal output to Tier-2.
     let t1 = tier1_run(html).expect("Tier-1 should not bail on <caption>");
     assert_eq!(t1, tier2(html), "caption output must match Tier-2");
 }
@@ -378,8 +376,6 @@ fn test_bail_section_order_thead_after_tbody() {
     );
     assert_eq!(tier1(html), tier2(html));
 }
-
-// ── Byte-equality cross-checks ────────────────────────────────────────────────
 
 #[test]
 fn byte_eq_simple_2x2() {
@@ -416,8 +412,8 @@ fn byte_eq_implicit_tbody() {
 
 #[test]
 fn byte_eq_explicit_tr_close() {
-    // Use explicit close tags — implicit-close with bare <tr> diverges
-    // between Tier-1 (proper HTML5 implicit close) and tl parser behavior.
+    // ~keep Use explicit close tags — implicit-close with bare <tr> diverges
+    // ~keep between Tier-1 (proper HTML5 implicit close) and tl parser behavior.
     assert_matches_tier2(
         "<table>        <tr><th>Col1</th><th>Col2</th></tr>        <tr><td>A</td><td>B</td></tr>        </table>",
     );
@@ -518,8 +514,8 @@ fn tier1_colspan_does_not_panic() {
         <tr><th>A</th><th>B</th><th>C</th></tr>\
         <tr><td colspan=\"3\">wide</td></tr>\
     </table>";
-    // Just assert it doesn't panic — byte equality with Tier-2 is not guaranteed
-    // because Tier-2 pads to colspan count and Tier-1 emits the cell once.
+    // ~keep Just assert it doesn't panic — byte equality with Tier-2 is not guaranteed
+    // ~keep because Tier-2 pads to colspan count and Tier-1 emits the cell once.
     let _ = tier1(html);
 }
 
@@ -531,10 +527,10 @@ fn byte_eq_block_child_bail_fallback() {
 
 #[test]
 fn byte_eq_nested_table_bail_fallback() {
-    // Post-#406: Tier-1 and Tier-2 separator-row dash counts diverge on the
-    // nested-table fallback (Tier-2 skips nested-table rendering during the
-    // measurement pre-pass to avoid the O(N²) explosion; Tier-1 still inlines
-    // and measures the full rendered text).  Outer row content stays equal.
+    // ~keep Post-#406: Tier-1 and Tier-2 separator-row dash counts diverge on the
+    // ~keep nested-table fallback (Tier-2 skips nested-table rendering during the
+    // ~keep measurement pre-pass to avoid the O(N²) explosion; Tier-1 still inlines
+    // ~keep and measures the full rendered text).  Outer row content stays equal.
     let html = "<table><tr><th>H</th></tr>\
         <tr><td><table><tr><td>inner</td></tr></table></td></tr></table>";
     let t1 = tier1(html);

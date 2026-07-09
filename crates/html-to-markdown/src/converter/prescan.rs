@@ -23,7 +23,7 @@ pub struct PrescanReport {
     pub has_svg: bool,
 }
 
-// Tags that are stripped of their content by the prescan.
+// ~keep Tags that are stripped of their content by the prescan.
 const STRIP_CONTENT_TAGS: [&[u8]; 2] = [b"script", b"style"];
 
 const SVG_TAG: &[u8] = b"svg";
@@ -59,7 +59,6 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
 
     let mut svg_depth = 0usize;
 
-    // Head-range tracking: byte index in the *output* buffer after `<head…>` closes.
     let mut head_open_end: Option<usize> = None;
 
     while idx < len {
@@ -68,20 +67,12 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
             continue;
         }
 
-        // ── `<![CDATA[` detection (signal only; cleaning falls through) ─────────
-        // The `<` in `<![CDATA[` will be processed by the is_valid_tag check below
-        // (it is NOT a valid tag: `!` followed by `[` fails the validity test), so
-        // it gets escaped to `&lt;` — exactly what the original preprocess_html did.
-        // We only set the signal here without `continue`.
         if bytes[idx..].starts_with(CDATA_START) {
             report.had_cdata = true;
-            // Fall through to is_valid_tag / escape logic below.
         }
 
-        // ── Empty-comment normalisation: `<!---->` → `<!-- -->` ───────────────
         if bytes[idx..].starts_with(EMPTY_COMMENT) {
             let out = output.get_or_insert_with(|| String::with_capacity(html.len()));
-            // flush output position accounting for bytes emitted into `output`
             out.push_str(&html[last..idx]);
             out.push_str("<!-- -->");
             idx += EMPTY_COMMENT.len();
@@ -89,7 +80,6 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
             continue;
         }
 
-        // ── Self-closing normalisation: `<br/>` → `<br>` etc. ────────────────
         {
             let mut replaced = false;
             for (pattern, replacement) in &SELF_CLOSING {
@@ -108,7 +98,7 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
             }
         }
 
-        // ── SVG open / close ──────────────────────────────────────────────────
+        // ~keep ── SVG open / close ──────────────────────────────────────────────────
         if matches_tag_start(bytes, idx + 1, SVG_TAG) {
             if let Some(open_end) = find_tag_end(bytes, idx + 1 + SVG_TAG.len()) {
                 svg_depth += 1;
@@ -126,9 +116,8 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
             }
         }
 
-        // ── Operations only outside SVG ───────────────────────────────────────
+        // ~keep ── Operations only outside SVG ───────────────────────────────────────
         if svg_depth == 0 {
-            // ── `<script>` / `<style>` content stripping ──────────────────────
             let mut handled = false;
             for tag in &STRIP_CONTENT_TAGS {
                 if matches_tag_start(bytes, idx + 1, tag) {
@@ -153,7 +142,6 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
                 continue;
             }
 
-            // ── DOCTYPE stripping ─────────────────────────────────────────────
             if idx + 2 < len && bytes[idx + 1] == b'!' {
                 let mut cursor = idx + 2;
                 while cursor < len && bytes[cursor].is_ascii_whitespace() {
@@ -171,11 +159,8 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
                 }
             }
 
-            // ── Signal: `<head>` / `</head>` ─────────────────────────────────
             if matches_tag_start(bytes, idx + 1, HEAD_TAG) {
                 if let Some(open_end) = find_tag_end(bytes, idx + 1 + HEAD_TAG.len()) {
-                    // Record output position after the `<head…>` close-bracket.
-                    // We need to compute the offset in the *output* buffer.
                     let flushed_so_far = if let Some(ref out) = output {
                         out.len() + (open_end - last)
                     } else {
@@ -188,7 +173,6 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
             } else if matches_end_tag_start(bytes, idx + 1, HEAD_TAG) {
                 if let Some(close_end) = find_tag_end(bytes, idx + 2 + HEAD_TAG.len()) {
                     if let Some(start) = head_open_end.take() {
-                        // The `</head>` tag itself starts at the current output position.
                         let flushed_so_far = if let Some(ref out) = output {
                             out.len() + (idx - last)
                         } else {
@@ -201,12 +185,11 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
                 }
             }
 
-            // ── Signal: custom elements (tag name contains `-`) ───────────────
-            // Only fires for open tags, not close tags.
+            // ~keep ── Signal: custom elements (tag name contains `-`) ───────────────
+            // ~keep Only fires for open tags, not close tags.
             {
                 let tag_start = idx + 1;
                 if tag_start < len && (bytes[tag_start].is_ascii_alphabetic()) {
-                    // Find the end of the tag name.
                     let name_end = {
                         let mut e = tag_start;
                         while e < len && (bytes[e].is_ascii_alphanumeric() || bytes[e] == b'-' || bytes[e] == b'_') {
@@ -222,7 +205,6 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
             }
         }
 
-        // ── Validity check (applies at all depths) ────────────────────────────
         let is_valid_tag = if idx + 1 < len {
             match bytes[idx + 1] {
                 b'!' => {
@@ -253,7 +235,6 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
         idx += 1;
     }
 
-    // If `<head>` was opened but `</head>` was never seen, record to EOF.
     if let Some(start) = head_open_end.take() {
         let end = if let Some(ref out) = output {
             out.len() + (len - last)
@@ -274,8 +255,6 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
 
     (cow, report)
 }
-
-// ── Private helpers (mirrors of the ones in converter.rs) ──────────────────
 
 fn matches_tag_start(bytes: &[u8], mut start: usize, tag: &[u8]) -> bool {
     if start >= bytes.len() || start + tag.len() > bytes.len() {

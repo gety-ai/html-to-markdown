@@ -153,7 +153,6 @@ pub fn handle_pre(
     let language: Option<String> = {
         let mut lang: Option<String> = None;
 
-        // First, try to extract language from <pre> tag's class attribute
         if let Some(class_attr) = tag.attributes().get("class") {
             if let Some(class_bytes) = class_attr {
                 let class_str = class_bytes.as_utf8_str();
@@ -169,7 +168,6 @@ pub fn handle_pre(
             }
         }
 
-        // If not found on <pre>, try to extract from nested <code> tag's class attribute
         if lang.is_none() {
             let children = tag.children();
             for child_handle in children.top().iter() {
@@ -223,7 +221,6 @@ pub fn handle_pre(
         let processed_content = if options.whitespace_mode == crate::options::WhitespaceMode::Strict {
             content
         } else {
-            // Always dedent code blocks to remove common leading whitespace
             let mut core_text = dedent_code_block(core);
 
             if is_whitespace_only {

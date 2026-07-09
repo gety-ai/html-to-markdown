@@ -12,7 +12,6 @@ use crate::options::{CodeBlockStyle, ConversionOptions, WhitespaceMode};
 use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
 
-// Type aliases for Context and DomContext to avoid circular imports
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
 
@@ -118,9 +117,7 @@ pub fn handle_pre(
                             VisitResult::Custom(custom) => {
                                 output.push_str(&custom);
                             }
-                            VisitResult::Skip => {
-                                // Skip code block
-                            }
+                            VisitResult::Skip => {}
                             VisitResult::PreserveHtml => {
                                 format_code_block(output, options, ctx, &processed_content, language.as_deref());
                             }
@@ -148,7 +145,6 @@ pub fn handle_pre(
 fn extract_language_from_pre(node_handle: &NodeHandle, parser: &Parser) -> Option<String> {
     if let Some(node) = node_handle.get(parser) {
         if let tl::Node::Tag(tag) = node {
-            // First, try to extract language from <pre> tag's class attribute
             if let Some(class_attr) = tag.attributes().get("class") {
                 if let Some(class_bytes) = class_attr {
                     let class_str = class_bytes.as_utf8_str();
@@ -162,7 +158,6 @@ fn extract_language_from_pre(node_handle: &NodeHandle, parser: &Parser) -> Optio
                 }
             }
 
-            // If not found on <pre>, try to extract from nested <code> tag's class attribute
             let children = tag.children();
             for child_handle in children.top().iter() {
                 if let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) {
@@ -206,9 +201,6 @@ fn format_code_block(
                 }
             }
 
-            // Stream indented lines directly into `output` instead of building
-            // an intermediate `Vec<String>` + join.  Saves N+1 allocations per
-            // `<pre>` block where N is the line count.
             let mut first = true;
             for line in content.lines() {
                 if !first {
@@ -244,10 +236,6 @@ fn format_code_block(
                 output.push_str(&options.code_language);
             }
             output.push('\n');
-            // Strip a single trailing newline so the closing fence sits
-            // directly after the last line of code with no blank line.
-            // A double-newline after the fence separates it from the next
-            // block element (matches what Indented style produces above).
             output.push_str(content.trim_end_matches('\n'));
             output.push('\n');
             output.push_str(fence);
@@ -263,7 +251,6 @@ fn dedent_code_block(content: &str) -> String {
         return String::new();
     }
 
-    // Find minimum indentation of non-empty lines
     let min_indent = lines
         .iter()
         .filter(|line| !line.trim().is_empty())

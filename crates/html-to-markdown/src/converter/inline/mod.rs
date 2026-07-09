@@ -30,11 +30,6 @@ pub mod link;
 pub mod ruby;
 pub mod semantic;
 
-// Re-export types from parent module for submodule access
-
-// Re-export handler functions for internal use by dispatcher (crate-private)
-// pub(crate) use ruby::handle as handle_ruby;
-
 /// Dispatches inline element handling to the appropriate handler.
 ///
 /// This function routes inline HTML elements to their specialized handlers
@@ -113,32 +108,26 @@ pub fn dispatch_inline_handler(
     dom_ctx: &crate::converter::DomContext,
 ) -> bool {
     match tag_name {
-        // Emphasis elements: strong, b (bold) and em, i (italic)
         "strong" | "b" | "em" | "i" => {
             emphasis::handle(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx);
             true
         }
-        // Link elements: a (anchor)
         "a" => {
             link::handle(node_handle, parser, output, options, ctx, depth, dom_ctx);
             true
         }
-        // Code elements: code, kbd (keyboard input), samp (sample output)
         "code" | "kbd" | "samp" => {
             code::handle(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx);
             true
         }
-        // Semantic elements: mark, del, s, ins, u, small, sub, sup, var, dfn, abbr, span
         "mark" | "del" | "s" | "ins" | "u" | "small" | "sub" | "sup" | "var" | "dfn" | "abbr" | "span" => {
             semantic::handle(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx);
             true
         }
-        // Ruby annotation elements: ruby, rb, rt, rp, rtc
         "ruby" | "rb" | "rt" | "rp" | "rtc" => {
             ruby::handle(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx);
             true
         }
-        // Unknown element - not handled by inline dispatcher
         _ => false,
     }
 }
@@ -220,7 +209,6 @@ mod tests {
 
     #[test]
     fn test_unknown_tags_not_routed() {
-        // These should fall through to default handling
         let unknown_tags = vec!["div", "p", "section", "article", "table"];
         for tag in unknown_tags {
             assert!(matches!(

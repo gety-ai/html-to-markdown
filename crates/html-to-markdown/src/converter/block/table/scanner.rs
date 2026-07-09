@@ -71,9 +71,6 @@ fn scan_table_node(
     is_root: bool,
     scan: &mut TableScan,
 ) {
-    // The work stack keeps table scans on the heap for deeply nested table
-    // content. Every scan field is an order-independent accumulator; `row_counts`
-    // is later read through its length and distinct value count.
     let mut work = vec![(*node_handle, is_root)];
     while let Some((node_handle, is_root)) = work.pop() {
         let Some(node) = node_handle.get(parser) else {
@@ -98,12 +95,11 @@ fn scan_table_node(
                     "caption" => scan.has_caption = true,
                     "th" => scan.has_header = true,
                     "img" | "graphic"
-                        // Images with src or alt attributes count as content
-                        if (tag.attributes().get("src").is_some() || tag.attributes().get("alt").is_some()) => {
-                            scan.has_text = true;
-                        }
+                        if (tag.attributes().get("src").is_some() || tag.attributes().get("alt").is_some()) =>
+                    {
+                        scan.has_text = true;
+                    }
                     "cell" => {
-                        // Check if cell has role="head" attribute
                         if let Some(role) = tag.attributes().get("role") {
                             if let Some(role_val) = role {
                                 let role_str = role_val.as_utf8_str();
@@ -118,10 +114,10 @@ fn scan_table_node(
                         let mut cell_count = 0;
                         for child in tag.children().top().iter() {
                             if let Some(tl::Node::Tag(cell_tag)) = child.get(parser) {
-                                let cell_name: Cow<'_, str> = dom_ctx
-                                    .tag_info(child.get_inner(), parser).map_or_else(|| {
-                                        normalized_tag_name(cell_tag.name().as_utf8_str()).into_owned().into()
-                                    }, |info| Cow::Borrowed(info.name.as_str()));
+                                let cell_name: Cow<'_, str> = dom_ctx.tag_info(child.get_inner(), parser).map_or_else(
+                                    || normalized_tag_name(cell_tag.name().as_utf8_str()).into_owned().into(),
+                                    |info| Cow::Borrowed(info.name.as_str()),
+                                );
                                 if matches!(cell_name.as_ref(), "td" | "th" | "cell") {
                                     cell_count += super::cell::get_colspan(child, parser);
                                     let attrs = cell_tag.attributes();

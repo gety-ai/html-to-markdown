@@ -16,8 +16,6 @@ use crate::text;
 use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
 
-// Type aliases for Context and DomContext to avoid circular imports
-// These are imported from converter.rs and should be made accessible
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
 
@@ -43,8 +41,6 @@ pub fn handle(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    // Import helper functions from parent converter module
-
     match tag_name {
         "code" => {
             handle_code(node_handle, parser, output, options, ctx, depth, dom_ctx);
@@ -75,8 +71,8 @@ fn handle_code(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    // reason: serialize_node is only used with the visitor feature; walk_node usage
-    // depends on the feature-gated code path below.
+    // ~keep reason: serialize_node is only used with the visitor feature; walk_node usage
+    // ~keep depends on the feature-gated code path below.
     #[allow(unused_imports)]
     use crate::converter::{serialize_node, walk_node};
 
@@ -87,9 +83,6 @@ fn handle_code(
         _ => return,
     };
 
-    // Nested code detection: if already in code, just process children.
-    // The Context clone (which bumps multiple Rc<HashSet> handles) is
-    // unnecessary in this branch because ctx.in_code is already true.
     if ctx.in_code {
         let children = tag.children();
         for child_handle in children.top().iter() {
@@ -197,7 +190,6 @@ fn handle_kbd_samp(
         _ => return,
     };
 
-    // Skip the Context clone when already inside <code>.
     let mut content = String::with_capacity(32);
     let children = tag.children();
     if ctx.in_code {
@@ -222,7 +214,6 @@ fn handle_kbd_samp(
         }
     }
 
-    // Normalize whitespace for kbd/samp (unlike code, which preserves it)
     let normalized = text::normalize_whitespace(&content);
     let (prefix, suffix, trimmed) = chomp_inline(&normalized);
 

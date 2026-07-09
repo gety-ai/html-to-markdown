@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 
 fn convert(
@@ -34,11 +35,11 @@ fn normalize_newlines(input: &str) -> String {
 
 #[test]
 fn split_closing_tag_does_not_merge_nested_list() {
-    // Regression: tl parser mishandles </tag\n> (closing bracket on next line).
-    // The <a> element absorbs the nested <ul> because the closing </a\n> isn't
-    // recognised, so all nested items end up inside the link text.
-    // Note: the `>` closing the opening <a> and the `>` closing </a are on
-    // separate lines (JSX-style formatting). tl must still parse this correctly.
+    // ~keep Regression: tl parser mishandles </tag\n> (closing bracket on next line).
+    // ~keep The <a> element absorbs the nested <ul> because the closing </a\n> isn't
+    // ~keep recognised, so all nested items end up inside the link text.
+    // ~keep Note: the `>` closing the opening <a> and the `>` closing </a are on
+    // ~keep separate lines (JSX-style formatting). tl must still parse this correctly.
     let html = r##"<ul>
   <li>
     <a href="#beyond"
@@ -64,8 +65,6 @@ fn split_closing_tag_does_not_merge_nested_list() {
         ..Default::default()
     };
     let result = convert(html, Some(opts)).expect("conversion should succeed");
-    // The nested list items must appear on their own lines, not merged into the
-    // parent link text.
     assert!(
         result.contains("Child"),
         "nested item 'Child' should be present: got {result:?}"
@@ -78,7 +77,6 @@ fn split_closing_tag_does_not_merge_nested_list() {
         result.contains("Deep child"),
         "deep nested item should be present: got {result:?}"
     );
-    // None of the nested items should appear inside the link text of the parent item.
     assert!(
         !result.contains("triads * [") && !result.contains("triads - [Child"),
         "nested items must not be merged into parent link text: got {result:?}"

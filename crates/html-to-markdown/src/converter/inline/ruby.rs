@@ -14,7 +14,6 @@
 use crate::options::ConversionOptions;
 use tl::{NodeHandle, Parser};
 
-// Type aliases for Context and DomContext to avoid circular imports
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
 
@@ -55,7 +54,6 @@ pub fn handle(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    // Import helper functions from parent converter module
     use crate::converter::{normalized_tag_name, walk_node};
 
     let Some(node) = node_handle.get(parser) else { return };
@@ -67,10 +65,8 @@ pub fn handle(
 
     match tag_name {
         "ruby" => {
-            // Clone context for ruby children processing
             let ruby_ctx = ctx.clone();
 
-            // Scan child elements to determine rendering mode
             let tag_sequence: Vec<String> = tag
                 .children()
                 .top()
@@ -78,7 +74,6 @@ pub fn handle(
                 .filter_map(|child_handle| {
                     if let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) {
                         let tag_name = normalized_tag_name(child_tag.name().as_utf8_str());
-                        // Only track rb, rt, rtc tags to determine structure
                         if matches!(tag_name.as_ref(), "rb" | "rt" | "rtc") {
                             Some(tag_name.into_owned())
                         } else {
@@ -90,14 +85,11 @@ pub fn handle(
                 })
                 .collect();
 
-            // Detect presence of ruby text container
             let has_rtc = tag_sequence.iter().any(|tag| tag == "rtc");
 
-            // Detect interleaved mode: rb followed immediately by rt
             let is_interleaved = tag_sequence.windows(2).any(|w| w[0] == "rb" && w[1] == "rt");
 
             if is_interleaved && !has_rtc {
-                // Interleaved rendering: process rb/rt pairs inline
                 let mut current_base = String::new();
                 let children = tag.children();
                 {
@@ -107,7 +99,6 @@ pub fn handle(
                                 tl::Node::Tag(child_tag) => {
                                     let tag_name = normalized_tag_name(child_tag.name().as_utf8_str());
                                     if tag_name == "rt" {
-                                        // Process rt (ruby text/annotation)
                                         let mut annotation = String::new();
                                         walk_node(
                                             child_handle,
@@ -118,15 +109,12 @@ pub fn handle(
                                             depth,
                                             dom_ctx,
                                         );
-                                        // Output any pending base text
                                         if !current_base.is_empty() {
                                             output.push_str(current_base.trim());
                                             current_base.clear();
                                         }
-                                        // Output annotation text
                                         output.push_str(annotation.trim());
                                     } else if tag_name == "rb" {
-                                        // Process rb (ruby base)
                                         if !current_base.is_empty() {
                                             output.push_str(current_base.trim());
                                             current_base.clear();
@@ -141,7 +129,6 @@ pub fn handle(
                                             dom_ctx,
                                         );
                                     } else if tag_name != "rp" {
-                                        // Skip rp, process other elements into current_base
                                         walk_node(
                                             child_handle,
                                             parser,
@@ -154,7 +141,6 @@ pub fn handle(
                                     }
                                 }
                                 tl::Node::Raw(_) => {
-                                    // Process raw text nodes
                                     walk_node(
                                         child_handle,
                                         parser,
@@ -170,12 +156,10 @@ pub fn handle(
                         }
                     }
                 }
-                // Flush remaining base text
                 if !current_base.is_empty() {
                     output.push_str(current_base.trim());
                 }
             } else {
-                // Grouped rendering: collect all bases, then annotations
                 let mut base_text = String::new();
                 let mut rt_annotations = Vec::new();
                 let mut rtc_content = String::new();
@@ -188,7 +172,6 @@ pub fn handle(
                                 tl::Node::Tag(child_tag) => {
                                     let tag_name = normalized_tag_name(child_tag.name().as_utf8_str());
                                     if tag_name == "rt" {
-                                        // Collect rt annotations
                                         let mut annotation = String::new();
                                         walk_node(
                                             child_handle,
@@ -201,7 +184,6 @@ pub fn handle(
                                         );
                                         rt_annotations.push(annotation);
                                     } else if tag_name == "rtc" {
-                                        // Collect rtc (ruby text container) content
                                         walk_node(
                                             child_handle,
                                             parser,
@@ -212,7 +194,6 @@ pub fn handle(
                                             dom_ctx,
                                         );
                                     } else if tag_name != "rp" {
-                                        // Collect base text (skip rp elements)
                                         walk_node(
                                             child_handle,
                                             parser,
@@ -225,7 +206,6 @@ pub fn handle(
                                     }
                                 }
                                 tl::Node::Raw(_) => {
-                                    // Collect raw text into base
                                     walk_node(child_handle, parser, &mut base_text, options, &ruby_ctx, depth, dom_ctx);
                                 }
                                 _ => {}
@@ -234,15 +214,12 @@ pub fn handle(
                     }
                 }
 
-                // Output base text
                 let trimmed_base = base_text.trim();
                 output.push_str(trimmed_base);
 
-                // Output rt annotations in parentheses if present
                 if !rt_annotations.is_empty() {
                     let rt_text = rt_annotations.iter().map(|s| s.trim()).collect::<Vec<_>>().join("");
                     if !rt_text.is_empty() {
-                        // Wrap in parentheses only if we have rtc content and multiple annotations
                         if has_rtc && !rtc_content.trim().is_empty() && rt_annotations.len() > 1 {
                             output.push('(');
                             output.push_str(&rt_text);
@@ -253,7 +230,6 @@ pub fn handle(
                     }
                 }
 
-                // Output rtc content after rt annotations
                 if !rtc_content.trim().is_empty() {
                     output.push_str(rtc_content.trim());
                 }
@@ -261,8 +237,6 @@ pub fn handle(
         }
 
         "rb" => {
-            // Ruby base text element (typically used within ruby)
-            // When standalone, just extract and output the text
             let mut text = String::new();
             let children = tag.children();
             {
@@ -274,8 +248,6 @@ pub fn handle(
         }
 
         "rt" => {
-            // Ruby text/annotation element
-            // When standalone (outside ruby context), wrap annotation in parentheses
             let mut text = String::new();
             let children = tag.children();
             {
@@ -285,11 +257,9 @@ pub fn handle(
             }
             let trimmed = text.trim();
 
-            // Check if output already ends with opening paren (interleaved mode)
             if output.ends_with('(') {
                 output.push_str(trimmed);
             } else {
-                // Otherwise wrap annotation in parentheses
                 output.push('(');
                 output.push_str(trimmed);
                 output.push(')');
@@ -297,8 +267,8 @@ pub fn handle(
         }
 
         "rp" => {
-            // Ruby parenthesis element (fallback for non-ruby-supporting browsers)
-            // In Markdown output, generally skip these as annotations are in parentheses
+            // ~keep Ruby parenthesis element (fallback for non-ruby-supporting browsers)
+            // ~keep In Markdown output, generally skip these as annotations are in parentheses
             let mut content = String::new();
             let children = tag.children();
             {
@@ -307,15 +277,12 @@ pub fn handle(
                 }
             }
             let trimmed = content.trim();
-            // Only output non-empty rp content
             if !trimmed.is_empty() {
                 output.push_str(trimmed);
             }
         }
 
         "rtc" => {
-            // Ruby text container element
-            // When standalone, just process children normally
             let children = tag.children();
             {
                 for child_handle in children.top().iter() {
@@ -325,7 +292,7 @@ pub fn handle(
         }
 
         _ => {
-            // Fallback for unknown ruby-related tags: process children normally
+            // ~keep Fallback for unknown ruby-related tags: process children normally
             let children = tag.children();
             {
                 for child_handle in children.top().iter() {

@@ -1,5 +1,5 @@
-// reason: visitor dispatch helper is pub(crate) API surface; used via the visitor feature
-// gate and may not be exercised by all code paths.
+// ~keep reason: visitor dispatch helper is pub(crate) API surface; used via the visitor feature
+// ~keep gate and may not be exercised by all code paths.
 #![allow(dead_code)]
 
 //! Visitor callback dispatch and result handling.

@@ -19,9 +19,6 @@ pub mod layout;
 pub mod scanner;
 pub(super) mod utils;
 
-// Re-export types from parent module for submodule access
-
-// Re-export for use in converter.rs
 pub use caption::handle_caption;
 
 /// Dispatches table element handling to the main `convert_table` function.
@@ -94,9 +91,6 @@ pub fn handle_table_with_context(
     let mut table_output = String::new();
     builder::handle_table(node_handle, parser, &mut table_output, options, ctx, dom_ctx, depth);
 
-    // Feed the table into the structure collector when document structure extraction is enabled.
-    // Use push_table_data so that ConversionResult.tables is populated with both the grid and
-    // the markdown rendering that was just generated above.
     if let Some(ref sc) = ctx.structure_collector {
         if let Some(grid) = collect_table_grid(node_handle, parser, options, ctx, dom_ctx) {
             sc.borrow_mut().push_table_data(grid, table_output.trim().to_string());

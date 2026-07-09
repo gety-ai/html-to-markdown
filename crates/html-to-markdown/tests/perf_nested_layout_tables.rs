@@ -37,9 +37,6 @@ fn nested_layout_cells(depth: usize, breadth: usize) -> String {
 
 #[test]
 fn nested_layout_tables_convert_within_wall_clock_budget() {
-    // depth=4, breadth=4 → 4^4 = 256 leaf cells across 341 nested tables.
-    // Pre-#406 this took >30s on release builds.  Post-fix it completes in
-    // under a second; the 10s budget leaves slack for noisy CI runners.
     let html = format!(
         "<html><body><table><tr><td>{}</td></tr></table></body></html>",
         nested_layout_cells(4, 4)
@@ -64,10 +61,6 @@ fn nested_layout_tables_convert_within_wall_clock_budget() {
 
 #[test]
 fn nested_layout_tables_render_within_outer_cell_width_cap() {
-    // Deeper nesting (5 levels × 3 breadth) to stress the pre-pass beyond what
-    // the previous cap-only approach handled.  Without skipping nested-table
-    // dispatch during measurement, this would explode CPU even though the
-    // per-cell output cap kept the final string size bounded.
     let html = format!(
         "<html><body><table><tr><td>{}</td></tr></table></body></html>",
         nested_layout_cells(5, 3)

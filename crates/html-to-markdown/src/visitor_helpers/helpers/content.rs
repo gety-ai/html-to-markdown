@@ -1,5 +1,5 @@
-// reason: visitor API helper methods are pub(crate) surface; not all are called in every
-// build configuration but they are part of the intentional visitor API contract.
+// ~keep reason: visitor API helper methods are pub(crate) surface; not all are called in every
+// ~keep build configuration but they are part of the intentional visitor API contract.
 #![allow(dead_code)]
 
 //! Content extraction and result handling.

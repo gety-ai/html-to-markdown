@@ -315,7 +315,6 @@ mod serde_impls {
     impl_deserialize_from_parse!(UrlEscapeStyle, UrlEscapeStyle::parse);
     impl_deserialize_from_parse!(OutputFormat, OutputFormat::parse);
 
-    // Serialize implementations that convert enum variants to their string representations
     impl Serialize for HeadingStyle {
         fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
         where
@@ -445,7 +444,6 @@ mod tests {
 
     #[test]
     fn test_enum_serialization() {
-        // Test that enums serialize to lowercase strings
         let heading = HeadingStyle::AtxClosed;
         let json = serde_json::to_string(&heading).expect("Failed to serialize");
         assert_eq!(json, r#""atxclosed""#);
@@ -461,7 +459,6 @@ mod tests {
 
     #[test]
     fn test_enum_deserialization() {
-        // Test that enums deserialize from strings (case insensitive)
         let heading: HeadingStyle = serde_json::from_str(r#""atxclosed""#).expect("Failed");
         assert_eq!(heading, HeadingStyle::AtxClosed);
 

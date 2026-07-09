@@ -340,7 +340,6 @@ impl Tier1State {
         if out.is_empty() {
             return;
         }
-        // Drop any trailing horizontal whitespace before deciding the separator.
         while out.ends_with(' ') || out.ends_with('\t') {
             out.pop();
         }
@@ -350,7 +349,6 @@ impl Tier1State {
         if out.ends_with('\n') {
             out.push('\n');
         } else if out.is_empty() {
-            // Output was entirely trailing whitespace before the trim — nothing to separate.
         } else {
             out.push_str("\n\n");
         }

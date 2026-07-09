@@ -33,7 +33,7 @@ fn strike_emits_tildes() {
 
 #[test]
 fn del_inside_code_no_tildes() {
-    // Tier-2's handle_strikethrough suppresses wrapping inside <code>.
+    // ~keep Tier-2's handle_strikethrough suppresses wrapping inside <code>.
     let out = tier1("<p><code>raw <del>x</del> y</code></p>");
     assert!(!out.contains("~~"), "no tildes inside code: {out:?}");
 }

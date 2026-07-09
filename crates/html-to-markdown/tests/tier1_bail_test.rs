@@ -11,8 +11,6 @@ use html_to_markdown_rs::prescan::{self, PrescanReport};
 use html_to_markdown_rs::tier1::{self, BailReason};
 use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 /// Prescan `html` then run the Tier-1 scanner directly.  Returns the
 /// `BailReason` or the successful Markdown string.
 fn tier1_run(html: &str) -> Result<String, BailReason> {
@@ -66,17 +64,16 @@ fn force_tier1(html: &str) -> String {
     convert(html, Some(opts)).unwrap().content.unwrap_or_default()
 }
 
-// ── Tripwire 1: lenient literal `<` handling ──────────────────────────────────
-//
-// Tier-1 used to bail with `BailReason::LiteralLt` on any `<` not followed by
-// a tag-name-start byte. The scanner now emits the bare `<` as text and
-// continues, matching Tier-2's html5ever / astral-tl behaviour (both parse
-// `<x` where x is whitespace/digit as a text node). Document the new
-// behaviour with byte-equality assertions against Tier-2.
+// ~keep ── Tripwire 1: lenient literal `<` handling ──────────────────────────────────
+// ~keep
+// ~keep Tier-1 used to bail with `BailReason::LiteralLt` on any `<` not followed by
+// ~keep a tag-name-start byte. The scanner now emits the bare `<` as text and
+// ~keep continues, matching Tier-2's html5ever / astral-tl behaviour (both parse
+// ~keep `<x` where x is whitespace/digit as a text node). Document the new
+// ~keep behaviour with byte-equality assertions against Tier-2.
 
 #[test]
 fn lenient_literal_lt_in_text() {
-    // `<` followed by whitespace — emit verbatim.
     let html = "<p>a < b</p>";
     assert!(tier1_raw(html).is_ok());
     assert_eq!(force_tier1(html), tier2(html));
@@ -84,17 +81,14 @@ fn lenient_literal_lt_in_text() {
 
 #[test]
 fn lenient_literal_lt_numeric() {
-    // `<` followed by digit — emit verbatim.
     let html = "<p>3 < 5</p>";
     assert!(tier1_raw(html).is_ok());
     assert_eq!(force_tier1(html), tier2(html));
 }
 
-// ── Tripwire 2: Cdata ─────────────────────────────────────────────────────────
-
 #[test]
 fn scanner_bails_on_cdata_direct() {
-    // Call tier1::run without prescanning so `<![CDATA[` survives to the scanner.
+    // ~keep Call tier1::run without prescanning so `<![CDATA[` survives to the scanner.
     let html = "<p><![CDATA[data]]></p>";
     let err = tier1_raw(html).unwrap_err();
     assert!(matches!(err, BailReason::Cdata { .. }), "expected Cdata, got {err:?}");
@@ -102,12 +96,12 @@ fn scanner_bails_on_cdata_direct() {
 
 #[test]
 fn svg_with_cdata_handled_natively_via_prescan() {
-    // After prescanning, CDATA inside SVG is escaped to `&lt;![CDATA[...]` so
-    // the scanner no longer sees raw CDATA.  Phase I teaches Tier-1 to emit
-    // `<svg>` elements as base64 data URIs, so this input is now handled
-    // natively (no bail).  The final output from Tier-1 must match Tier-2.
+    // ~keep After prescanning, CDATA inside SVG is escaped to `&lt;![CDATA[...]` so
+    // ~keep the scanner no longer sees raw CDATA.  Phase I teaches Tier-1 to emit
+    // ~keep `<svg>` elements as base64 data URIs, so this input is now handled
+    // ~keep natively (no bail).  The final output from Tier-1 must match Tier-2.
     let html = "<svg><![CDATA[xxx]]></svg><p>x</p>";
-    // tier1_run prescans first — CDATA is escaped, then SVG is emitted as base64.
+    // ~keep tier1_run prescans first — CDATA is escaped, then SVG is emitted as base64.
     assert!(
         tier1_run(html).is_ok(),
         "expected success: SVG with CDATA handled after prescan"
@@ -115,17 +109,17 @@ fn svg_with_cdata_handled_natively_via_prescan() {
     assert_eq!(force_tier1(html), tier2(html));
 }
 
-// ── Custom-element block passthrough (Phase E) ───────────────────────────────
-//
-// Custom elements (tag names containing `-`) are now handled natively by
-// Tier-1 as generic block containers rather than bailed immediately.
-// Tier-2 emits their inner content as plain block text; Tier-1's Block
-// dispatch produces byte-identical output.
+// ~keep ── Custom-element block passthrough (Phase E) ───────────────────────────────
+// ~keep
+// ~keep Custom elements (tag names containing `-`) are now handled natively by
+// ~keep Tier-1 as generic block containers rather than bailed immediately.
+// ~keep Tier-2 emits their inner content as plain block text; Tier-1's Block
+// ~keep dispatch produces byte-identical output.
 
 #[test]
 fn custom_element_handled_natively() {
-    // Tier-1 should NOT bail — it handles <my-thing> as a Block container
-    // and emits the inner content as-is.
+    // ~keep Tier-1 should NOT bail — it handles <my-thing> as a Block container
+    // ~keep and emits the inner content as-is.
     let html = "<my-thing>x</my-thing>";
     let result = tier1_run(html);
     assert!(result.is_ok(), "expected success, got bail: {:?}", result.unwrap_err());
@@ -134,7 +128,7 @@ fn custom_element_handled_natively() {
 
 #[test]
 fn custom_element_content_matches_tier2() {
-    // Verify a range of custom-element patterns all produce Tier-2-identical output.
+    // ~keep Verify a range of custom-element patterns all produce Tier-2-identical output.
     for html in &[
         "<data-widget>content</data-widget>",
         "<x-button>click</x-button>",
@@ -150,8 +144,8 @@ fn custom_element_content_matches_tier2() {
 
 #[test]
 fn bails_on_custom_element_fallback_matches_tier2() {
-    // This test verifies that even when Tier-1 handles custom elements natively
-    // (no bail), the output is identical to Tier-2.  Kept for regression coverage.
+    // ~keep This test verifies that even when Tier-1 handles custom elements natively
+    // ~keep (no bail), the output is identical to Tier-2.  Kept for regression coverage.
     for html in &[
         "<x-button>click</x-button>",
         "<ui-card><p>hi</p></ui-card>",
@@ -161,12 +155,12 @@ fn bails_on_custom_element_fallback_matches_tier2() {
     }
 }
 
-// ── Tripwire 4: EOF implicit-close (was: EofWithOpenBlock) ───────────────────
-//
-// Phase N2: the scanner now closes every remaining open frame at EOF instead
-// of bailing, mirroring the HTML5 parser's behaviour.  Trailing whitespace is
-// trimmed from the output buffer before each implicit close so inline markers
-// like `</strong>` land flush against the content (no `world\n**`).
+// ~keep ── Tripwire 4: EOF implicit-close (was: EofWithOpenBlock) ───────────────────
+// ~keep
+// ~keep Phase N2: the scanner now closes every remaining open frame at EOF instead
+// ~keep of bailing, mirroring the HTML5 parser's behaviour.  Trailing whitespace is
+// ~keep trimmed from the output buffer before each implicit close so inline markers
+// ~keep like `</strong>` land flush against the content (no `world\n**`).
 
 #[test]
 fn handles_eof_with_open_block_inline() {
@@ -187,8 +181,8 @@ fn handles_eof_with_single_unclosed_div() {
 
 #[test]
 fn handles_eof_nested_open_inline() {
-    // Three levels open: ul > li > strong. Phase N2: scanner closes all
-    // three at EOF instead of bailing.
+    // ~keep Three levels open: ul > li > strong. Phase N2: scanner closes all
+    // ~keep three at EOF instead of bailing.
     let html = "<ul><li>item <strong>bold";
     assert!(
         tier1_run(html).is_ok(),
@@ -197,11 +191,8 @@ fn handles_eof_nested_open_inline() {
     assert_eq!(force_tier1(html), tier2(html));
 }
 
-// ── Tripwire 5: DepthMismatch ─────────────────────────────────────────────────
-
 #[test]
 fn bails_on_depth_mismatch_close_without_open() {
-    // Close tag with nothing open → DepthMismatch.
     let html = "</p>orphan close";
     let err = tier1_run(html).unwrap_err();
     assert!(
@@ -213,7 +204,6 @@ fn bails_on_depth_mismatch_close_without_open() {
 
 #[test]
 fn bails_on_depth_mismatch_wrong_close() {
-    // Open <p> but close </div> — stack mismatch.
     let html = "<p>text</div>";
     let err = tier1_run(html).unwrap_err();
     assert!(
@@ -233,12 +223,10 @@ fn depth_mismatch_contains_tag_name() {
     }
 }
 
-// ── Classifier tripwire (Unsupported tag kinds) ───────────────────────────────
-
 #[test]
 fn table_now_handled_by_tier1() {
-    // M9: simple tables are now handled by Tier-1 (no longer bail).
-    // Tier-1 output must be byte-identical to Tier-2.
+    // ~keep M9: simple tables are now handled by Tier-1 (no longer bail).
+    // ~keep Tier-1 output must be byte-identical to Tier-2.
     let html = "<table><tr><td>a</td></tr></table>";
     let result = tier1_run(html);
     assert!(result.is_ok(), "expected success, got {result:?}");
@@ -247,9 +235,9 @@ fn table_now_handled_by_tier1() {
 
 #[test]
 fn handles_definition_list_inline() {
-    // Phase K: scanner emits <dl>/<dt>/<dd> natively, matching Tier-2's
-    // plain-block format (no Pandoc colon syntax). dt → trimmed + "\n";
-    // dd → trimmed + "\n\n"; dl wrapper trims and ensures "\n\n" boundaries.
+    // ~keep Phase K: scanner emits <dl>/<dt>/<dd> natively, matching Tier-2's
+    // ~keep plain-block format (no Pandoc colon syntax). dt → trimmed + "\n";
+    // ~keep dd → trimmed + "\n\n"; dl wrapper trims and ensures "\n\n" boundaries.
     let html = "<dl><dt>key</dt><dd>value</dd></dl>";
     assert!(tier1_run(html).is_ok(), "Tier-1 should handle dl inline (no bail)");
     assert_eq!(force_tier1(html), tier2(html));
@@ -257,11 +245,11 @@ fn handles_definition_list_inline() {
 
 #[test]
 fn handles_link_text_across_newline() {
-    // Phase Q.3: text inside an `<a>` that spans a newline (e.g. pretty-printed
-    // HTML wrapping link text across lines) must collapse the newline to a
-    // single space, matching Tier-2's `normalize_link_label`.  Tier-1's
-    // text-handler previously preserved the newline verbatim, producing
-    // `[Skip to main\n  content](...)` instead of `[Skip to main content](...)`.
+    // ~keep Phase Q.3: text inside an `<a>` that spans a newline (e.g. pretty-printed
+    // ~keep HTML wrapping link text across lines) must collapse the newline to a
+    // ~keep single space, matching Tier-2's `normalize_link_label`.  Tier-1's
+    // ~keep text-handler previously preserved the newline verbatim, producing
+    // ~keep `[Skip to main\n  content](...)` instead of `[Skip to main content](...)`.
     let html = "<a href=\"#main-content\">Skip to main\n  content</a>";
     assert!(tier1_run(html).is_ok());
     assert_eq!(force_tier1(html), tier2(html));
@@ -269,8 +257,8 @@ fn handles_link_text_across_newline() {
 
 #[test]
 fn handles_strong_text_across_newline() {
-    // Q.3 sanity: `<strong>` does NOT normalize newlines (only `<a>` does).
-    // Tier-2 keeps the literal newline in strong text.
+    // ~keep Q.3 sanity: `<strong>` does NOT normalize newlines (only `<a>` does).
+    // ~keep Tier-2 keeps the literal newline in strong text.
     let html = "<p><strong>bold\ntext</strong></p>";
     assert!(tier1_run(html).is_ok());
     assert_eq!(force_tier1(html), tier2(html));
@@ -278,10 +266,10 @@ fn handles_strong_text_across_newline() {
 
 #[test]
 fn handles_script_inline() {
-    // Phase B: scanner skips `<script>` content inline by jumping to the
-    // matching close tag.  Prescan also pre-strips script content
-    // (defence-in-depth).  Either way Tier-1 produces the same bytes as
-    // Tier-2 with no bail.
+    // ~keep Phase B: scanner skips `<script>` content inline by jumping to the
+    // ~keep matching close tag.  Prescan also pre-strips script content
+    // ~keep (defence-in-depth).  Either way Tier-1 produces the same bytes as
+    // ~keep Tier-2 with no bail.
     let html = "<script>var x = 1;</script><p>ok</p>";
     assert!(tier1_run(html).is_ok(), "Tier-1 should handle script inline (no bail)");
     assert_eq!(force_tier1(html), tier2(html));
@@ -289,9 +277,9 @@ fn handles_script_inline() {
 
 #[test]
 fn bails_on_textarea() {
-    // textarea's text content is preserved by Tier-2 (the DOM walker emits
-    // its text node).  Tier-1 must therefore bail to Tier-2 rather than
-    // silent-skipping — see the Phase B narrowing in scanner.rs.
+    // ~keep textarea's text content is preserved by Tier-2 (the DOM walker emits
+    // ~keep its text node).  Tier-1 must therefore bail to Tier-2 rather than
+    // ~keep silent-skipping — see the Phase B narrowing in scanner.rs.
     let html = "<textarea>some text</textarea>";
     let err = tier1_run(html).unwrap_err();
     assert!(
@@ -301,27 +289,25 @@ fn bails_on_textarea() {
     assert_eq!(force_tier1(html), tier2(html));
 }
 
-// ── Auto routing tests ────────────────────────────────────────────────────────
-
 #[test]
 fn auto_routes_through_tier1_for_clean_paragraph() {
-    // Clean paragraph with no complex constructs → Auto picks Tier-1 when
-    // extract_metadata=false and hocr_spatial_tables=false.
-    // Both tiers must produce identical output.
+    // ~keep Clean paragraph with no complex constructs → Auto picks Tier-1 when
+    // ~keep extract_metadata=false and hocr_spatial_tables=false.
+    // ~keep Both tiers must produce identical output.
     let html = "<p>Hello <strong>world</strong></p>";
     assert_eq!(auto(html), tier2(html));
 }
 
 #[test]
 fn auto_routes_correctly_for_complex_input() {
-    // M9: tables are handled by Tier-1. Auto, Tier1, and Tier2
-    // must all produce byte-identical output for a simple table.
+    // ~keep M9: tables are handled by Tier-1. Auto, Tier1, and Tier2
+    // ~keep must all produce byte-identical output for a simple table.
     let html = "<table><tr><td>cell</td></tr></table>";
     assert_eq!(auto(html), tier2(html));
     assert_eq!(force_tier1(html), tier2(html));
 }
 
-// ── BailReason Display ────────────────────────────────────────────────────────
+// ~keep ── BailReason Display ────────────────────────────────────────────────────────
 
 #[test]
 fn bail_reason_display_is_non_empty() {
@@ -365,11 +351,10 @@ fn bail_reason_display_contains_contextual_info() {
     assert!(s3.contains('5'), "Display should contain open_count: {s3}");
 }
 
-// ── Phase D': preprocessing skip (nav / nav-hinted block elements) ────────────
+// ~keep ── Phase D': preprocessing skip (nav / nav-hinted block elements) ────────────
 
 #[test]
 fn nav_subtree_skipped() {
-    // <nav> is unconditionally dropped by default preprocessing options.
     let html = "<nav>content</nav>";
     assert_eq!(force_tier1(html), tier2(html));
     assert_eq!(force_tier1(html), "");
@@ -377,7 +362,6 @@ fn nav_subtree_skipped() {
 
 #[test]
 fn header_with_nav_hint_skipped() {
-    // <header class="site-header"> matches NAV_KEYWORDS["site-header"] → dropped.
     let html = "<header class=\"site-header\">content</header>";
     assert_eq!(force_tier1(html), tier2(html));
     assert_eq!(force_tier1(html), "");
@@ -385,11 +369,7 @@ fn header_with_nav_hint_skipped() {
 
 #[test]
 fn header_without_nav_hint_kept() {
-    // Plain <header> with no nav hint must be preserved.
     let html = "<header><h1>Title</h1></header>";
-    // Both paths produce identical output; the trailing-newline count is
-    // determined by the converter's paragraph-spacing rules — assert equality
-    // between paths, not a hardcoded string.
     assert_eq!(force_tier1(html), tier2(html));
     assert!(
         !force_tier1(html).is_empty(),
@@ -399,7 +379,6 @@ fn header_without_nav_hint_kept() {
 
 #[test]
 fn aside_with_role_navigation_skipped() {
-    // <aside role="navigation"> carries the explicit ARIA navigation role → dropped.
     let html = "<aside role=\"navigation\">content</aside>";
     assert_eq!(force_tier1(html), tier2(html));
     assert_eq!(force_tier1(html), "");

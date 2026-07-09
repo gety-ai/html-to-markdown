@@ -37,7 +37,6 @@ pub fn extract_frontmatter(
 
     let head_range = head_range?;
 
-    // Guard: the head range must be within the html slice bounds.
     if head_range.end > html.len() {
         return None;
     }
@@ -47,24 +46,24 @@ pub fn extract_frontmatter(
         return None;
     }
 
-    // Wrap the extracted head content in a minimal HTML document so that
-    // `tl::parse` has the correct context.  The wrapper tags are never
-    // accessed during extraction — we only walk the direct children of
-    // the synthesised `<head>` tag.
+    // ~keep Wrap the extracted head content in a minimal HTML document so that
+    // ~keep `tl::parse` has the correct context.  The wrapper tags are never
+    // ~keep accessed during extraction — we only walk the direct children of
+    // ~keep the synthesised `<head>` tag.
     let wrapped = format!("<html><head>{head_content}</head></html>");
 
-    // SAFETY: we are re-parsing a small (head-only) slice of the same
-    // already-cleaned HTML.  `tl::parse` is infallible for well-formed
-    // UTF-8; any parse errors are silently ignored (empty metadata).
+    // ~keep SAFETY: we are re-parsing a small (head-only) slice of the same
+    // ~keep already-cleaned HTML.  `tl::parse` is infallible for well-formed
+    // ~keep UTF-8; any parse errors are silently ignored (empty metadata).
     let dom = match tl::parse(&wrapped, tl::ParserOptions::default()) {
         Ok(d) => d,
         Err(_) => return None,
     };
 
     let parser = dom.parser();
-    // Delegate to the canonical Tier-2 extractor so the two tiers agree on
-    // key names / casing / value normalisation byte-for-byte.  Walk the
-    // synthesised wrapper's children to find the `<head>` node first.
+    // ~keep Delegate to the canonical Tier-2 extractor so the two tiers agree on
+    // ~keep key names / casing / value normalisation byte-for-byte.  Walk the
+    // ~keep synthesised wrapper's children to find the `<head>` node first.
     let mut metadata = BTreeMap::new();
     for child_handle in dom.children() {
         let m = extract_head_metadata(child_handle, parser, options);
@@ -81,7 +80,7 @@ pub fn extract_frontmatter(
     Some(format_metadata_frontmatter(&metadata))
 }
 
-// ── Internal helpers (byte-equivalent to the Tier-2 implementations) ─────────
+// ~keep ── Internal helpers (byte-equivalent to the Tier-2 implementations) ─────────
 
 /// Walk the DOM and extract metadata from the `<head>` element's children.
 ///
@@ -90,7 +89,6 @@ pub fn extract_frontmatter(
 fn extract_metadata_from_dom(dom: &tl::VDom, parser: &tl::Parser) -> BTreeMap<String, String> {
     let mut metadata = BTreeMap::new();
 
-    // Find the <head> node by walking the DOM children.
     let head_handle = dom
         .children()
         .iter()
@@ -239,10 +237,10 @@ fn extract_link(tag: &tl::HTMLTag, metadata: &mut BTreeMap<String, String>) {
     }
 }
 
-// `format_metadata_frontmatter` is re-exported from
-// `crate::converter::main_helpers` so Tier-1 and Tier-2 share the exact same
-// formatter and produce byte-identical YAML frontmatter for the same metadata
-// map.
+// ~keep `format_metadata_frontmatter` is re-exported from
+// ~keep `crate::converter::main_helpers` so Tier-1 and Tier-2 share the exact same
+// ~keep formatter and produce byte-identical YAML frontmatter for the same metadata
+// ~keep map.
 
 /// ASCII-lowercase a `Cow<str>` tag name without allocation when already lower.
 fn normalize_tag_name(raw: Cow<'_, str>) -> Cow<'_, str> {

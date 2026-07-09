@@ -1,3 +1,4 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
 #![allow(missing_docs)]
 
 //! Regression test for issue #348: custom `HtmlVisitor` returning `VisitResult::Custom`
@@ -86,7 +87,6 @@ fn test_visitor_skip_end_result_honoured_for_plain_output() {
         .expect("conversion must not fail")
         .content
         .expect("content must be present");
-    // "drop this" should be absent because the span was skipped
     assert!(!output.contains("drop this"), "got: {output:?}");
     assert!(output.contains("keep"), "got: {output:?}");
 }

@@ -160,7 +160,6 @@ pub fn handle_table(
             && !table_scan.has_caption
             && (looks_like_layout || is_blank_table || (row_count <= 2 && link_count >= 3))
         {
-            // Skip truly blank tables (no text, no links, no images)
             if is_blank_table && link_count == 0 {
                 return;
             }
@@ -183,8 +182,8 @@ pub fn handle_table(
                         "tr" | "row" => append_layout_row(child_handle, parser, output, options, ctx, dom_ctx),
                         "colgroup" | "col" => {}
                         _ => {
-                            // Handle non-table-structure elements (like <a>, <img>, etc.) that may be
-                            // direct children of layout tables (e.g., Blogger table wrappers)
+                            // ~keep Handle non-table-structure elements (like <a>, <img>, etc.) that may be
+                            // ~keep direct children of layout tables (e.g., Blogger table wrappers)
                             super::super::super::walk_node(
                                 child_handle,
                                 parser,
@@ -210,19 +209,15 @@ pub fn handle_table(
         let mut rowspan_tracker = vec![None; total_cols];
         let mut row_cells = Vec::new();
 
-        // Pre-pass: compute per-column max content widths for aligned padding.
-        // Uses a rowspan tracker so spanned columns are skipped just as they
-        // are in the render pass, keeping column indices correctly aligned.
-        // Skipped entirely when compact_tables is true — passing an empty slice
-        // to convert_table_row disables all padding and reduces separator dashes
-        // to the GFM minimum (---).
+        // ~keep Pre-pass: compute per-column max content widths for aligned padding.
+        // ~keep Uses a rowspan tracker so spanned columns are skipped just as they
+        // ~keep are in the render pass, keeping column indices correctly aligned.
+        // ~keep Skipped entirely when compact_tables is true — passing an empty slice
+        // ~keep to convert_table_row disables all padding and reduces separator dashes
+        // ~keep to the GFM minimum (---).
         let col_widths: Vec<usize> = if options.compact_tables {
             Vec::new()
         } else {
-            // Skip visitor-hook Mutex acquisitions during the pre-pass.
-            // The pre-pass only measures cell text widths; it never uses visitor
-            // results. Acquiring Arc<Mutex<>> per tag costs ~25 k lock roundtrips
-            // on a 1000x10 table — pure overhead that regressed in 7f6178f25.
             let prepass_ctx = super::super::super::Context {
                 skip_visitor_hooks: true,
                 measure_width_only: true,
@@ -373,8 +368,6 @@ pub fn handle_table(
                         "colgroup" | "col" => {}
 
                         _ => {
-                            // Handle non-table-structure elements (like <a>, <img>, etc.) that may be
-                            // direct children of tables without proper structure (e.g., Blogger table wrappers)
                             super::super::super::walk_node(
                                 child_handle,
                                 parser,
@@ -463,9 +456,9 @@ mod tests {
     /// must stay well under 10 KB.
     #[test]
     fn deeply_nested_layout_tables_do_not_produce_runaway_output() {
-        // Build a 5-level-deep nested layout table.
-        // Each cell contains another complete table, mirroring the structure
-        // seen in email digests that triggered the regression.
+        // ~keep Build a 5-level-deep nested layout table.
+        // ~keep Each cell contains another complete table, mirroring the structure
+        // ~keep seen in email digests that triggered the regression.
         let inner = "<table><tr><td>leaf</td></tr></table>";
         let level1 = format!("<table><tr><td>{inner}</td></tr></table>");
         let level2 = format!("<table><tr><td>{level1}</td></tr></table>");

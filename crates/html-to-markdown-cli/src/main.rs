@@ -1,4 +1,4 @@
-// reason: CLI application modules do not expose docs to users; doc coverage not required
+// ~keep reason: CLI application modules do not expose docs to users; doc coverage not required
 #![allow(missing_docs)]
 
 mod args;
@@ -119,7 +119,6 @@ fn read_input(cli: &Cli) -> Result<String, Box<dyn std::error::Error>> {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
 
-    // Dispatch MCP subcommand before any convert-from-file logic.
     #[cfg(feature = "mcp")]
     if let Some(args::Commands::Mcp { transport, host, port }) = &cli.command {
         return run_mcp(transport, host, *port);
@@ -139,8 +138,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let options = build_conversion_options(&cli);
     let output_path = cli.output.clone();
 
-    // Wrap conversion in catch_unwind so an unexpected panic produces a clean error
-    // message rather than a Rust backtrace, and no partial output is written.
     let conversion_result = panic::catch_unwind(panic::AssertUnwindSafe(|| perform_conversion(&html, options, &cli)));
 
     let output_content = match conversion_result {

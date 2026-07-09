@@ -9,7 +9,7 @@ fn cleaned(html: &str) -> String {
     prescan::run(html).0.into_owned()
 }
 
-// ── head_range ────────────────────────────────────────────────────────────────
+// ~keep ── head_range ────────────────────────────────────────────────────────────────
 
 #[test]
 fn detects_head_range() {
@@ -18,7 +18,6 @@ fn detects_head_range() {
     let range = r.head_range.expect("should have head_range");
     let (cow, _) = prescan::run(html);
     let buf = cow.as_ref();
-    // The range should slice to the head *contents* — between `<head>` and `</head>`.
     let head_contents = &buf[range];
     assert!(
         head_contents.contains("<title>x</title>"),
@@ -37,7 +36,6 @@ fn empty_head_yields_empty_range() {
     let html = "<head></head><body>z</body>";
     let (cow, r) = prescan::run(html);
     let range = r.head_range.expect("should detect empty head");
-    // start == end: zero-length range
     assert_eq!(
         range.start,
         range.end,
@@ -48,14 +46,11 @@ fn empty_head_yields_empty_range() {
 
 #[test]
 fn unclosed_head_yields_range_to_eof() {
-    // `</head>` is missing — range should extend to end of cleaned buffer.
     let html = "<head><meta charset=\"utf-8\">";
     let (cow, r) = prescan::run(html);
     let range = r.head_range.expect("should detect <head> without close");
     assert_eq!(range.end, cow.as_ref().len(), "unclosed head range end should be EOF");
 }
-
-// ── had_custom_elements ───────────────────────────────────────────────────────
 
 #[test]
 fn custom_elements_flagged() {
@@ -78,8 +73,6 @@ fn x_foo_custom_element_flagged() {
     assert!(r.had_custom_elements);
 }
 
-// ── had_cdata ─────────────────────────────────────────────────────────────────
-
 #[test]
 fn cdata_flagged() {
     let r = report("<svg><![CDATA[raw content]]></svg>");
@@ -92,11 +85,8 @@ fn no_cdata_clean() {
     assert!(!r.had_cdata);
 }
 
-// ── had_unescaped_lt ──────────────────────────────────────────────────────────
-
 #[test]
 fn unescaped_lt_flagged() {
-    // `< b` has a space after `<` — not a valid tag start.
     let r = report("<p>a < b</p>");
     assert!(
         r.had_unescaped_lt,
@@ -115,12 +105,9 @@ fn unescaped_lt_clean() {
 
 #[test]
 fn unescaped_lt_at_eof() {
-    // `<` at the very end of input with nothing after it.
     let r = report("<p>text<");
     assert!(r.had_unescaped_lt, "<p>text< should set had_unescaped_lt");
 }
-
-// ── has_script_or_style ───────────────────────────────────────────────────────
 
 #[test]
 fn script_flag() {
@@ -140,7 +127,7 @@ fn no_script_or_style_clean() {
     assert!(!r.has_script_or_style);
 }
 
-// ── has_svg ───────────────────────────────────────────────────────────────────
+// ~keep ── has_svg ───────────────────────────────────────────────────────────────────
 
 #[test]
 fn svg_flag() {
@@ -153,8 +140,6 @@ fn no_svg_clean() {
     let r = report("<div><p>text</p></div>");
     assert!(!r.has_svg);
 }
-
-// ── cleaning behaviour (regression guard) ────────────────────────────────────
 
 #[test]
 fn empty_comment_normalised() {
@@ -187,10 +172,8 @@ fn doctype_removed() {
 
 #[test]
 fn cow_borrowed_when_no_change() {
-    // Input that requires zero transformations should return Borrowed.
     let html = "<p>hello world</p>";
     let (cow, _) = prescan::run(html);
-    // Verify the pointer identity — Borrowed means the same underlying string data.
     assert!(
         matches!(cow, std::borrow::Cow::Borrowed(_)),
         "no-op input should return Cow::Borrowed"

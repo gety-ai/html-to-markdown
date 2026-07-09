@@ -1,4 +1,4 @@
-// reason: CLI application modules do not expose docs to users; doc coverage not required
+// ~keep reason: CLI application modules do not expose docs to users; doc coverage not required
 #![allow(missing_docs)]
 
 use crate::args::Cli;
@@ -78,10 +78,8 @@ pub fn perform_conversion(
     cli: &Cli,
 ) -> Result<String, Box<dyn std::error::Error>> {
     let output_content = if cli.json {
-        // --json path: serialize full ConversionResult fields
         let result = convert(html, Some(options)).map_err(|e| format!("Error converting HTML: {e}"))?;
 
-        // Emit warnings to stderr if requested
         if cli.show_warnings {
             for warning in &result.warnings {
                 eprintln!("Warning [{:?}]: {}", warning.kind, warning.message);
@@ -96,10 +94,9 @@ pub fn perform_conversion(
             ),
         );
 
-        // Build JSON output manually to handle feature-gated fields
         let mut json_output = serde_json::Map::new();
 
-        // content field — null when --no-content
+        // ~keep content field — null when --no-content
         if cli.no_content {
             json_output.insert("content".into(), serde_json::Value::Null);
         } else {
@@ -109,23 +106,19 @@ pub fn perform_conversion(
             );
         }
 
-        // tables field — always present
         let tables_json = serde_json::to_value(&result.tables).map_err(|e| format!("Error serializing tables: {e}"))?;
         json_output.insert("tables".into(), tables_json);
 
-        // document field — present when --include-structure was set
         let document_json = match &result.document {
             Some(doc) => serde_json::to_value(doc).map_err(|e| format!("Error serializing document: {e}"))?,
             None => serde_json::Value::Null,
         };
         json_output.insert("document".into(), document_json);
 
-        // metadata field — populated via the metadata feature
         let metadata_json =
             serde_json::to_value(&result.metadata).map_err(|e| format!("Error serializing metadata: {e}"))?;
         json_output.insert("metadata".into(), metadata_json);
 
-        // images field — serialized manually since InlineImage doesn't derive serde
         let images_arr: Vec<serde_json::Value> = result
             .images
             .iter()
@@ -143,7 +136,6 @@ pub fn perform_conversion(
             .collect();
         json_output.insert("images".into(), serde_json::Value::Array(images_arr));
 
-        // warnings field — always present
         let warnings_json =
             serde_json::to_value(&result.warnings).map_err(|e| format!("Error serializing warnings: {e}"))?;
         json_output.insert("warnings".into(), warnings_json);
@@ -151,10 +143,8 @@ pub fn perform_conversion(
         serde_json::to_string_pretty(&serde_json::Value::Object(json_output))
             .map_err(|e| format!("Error serializing JSON output: {e}"))?
     } else {
-        // Plain markdown path
         let result = convert(html, Some(options)).map_err(|e| format!("Error converting HTML: {e}"))?;
 
-        // Emit warnings to stderr if requested
         if cli.show_warnings {
             for warning in &result.warnings {
                 eprintln!("Warning [{:?}]: {}", warning.kind, warning.message);

@@ -5,8 +5,6 @@
 
 use html_to_markdown_rs::tier1::tags::{ListKind, OptionalCloseRule, RawKind, TagKind, lookup};
 
-// ── Void elements ─────────────────────────────────────────────────────────────
-
 #[test]
 fn br_is_void() {
     let spec = lookup(b"br").expect("br must be in table");
@@ -79,8 +77,6 @@ fn col_is_void() {
     assert!(spec.is_void, "col must be void");
 }
 
-// ── Block elements ────────────────────────────────────────────────────────────
-
 #[test]
 fn div_is_block() {
     let spec = lookup(b"div").expect("div must be in table");
@@ -117,8 +113,6 @@ fn table_is_block() {
     assert!(spec.is_block, "table must be block");
 }
 
-// ── Heading levels ────────────────────────────────────────────────────────────
-
 #[test]
 fn heading_levels_1_through_6() {
     for n in 1u8..=6 {
@@ -127,8 +121,6 @@ fn heading_levels_1_through_6() {
         assert_eq!(spec.kind, TagKind::Heading(n), "{tag} must be Heading({n})");
     }
 }
-
-// ── List kinds ────────────────────────────────────────────────────────────────
 
 #[test]
 fn ul_is_unordered_list() {
@@ -147,8 +139,6 @@ fn dl_is_definition_list() {
     let spec = lookup(b"dl").expect("dl must be in table");
     assert_eq!(spec.kind, TagKind::List(ListKind::Definition));
 }
-
-// ── Optional-close rules ──────────────────────────────────────────────────────
 
 #[test]
 fn li_has_close_same_kind() {
@@ -230,8 +220,6 @@ fn option_has_close_option() {
     );
 }
 
-// ── Raw-text containers ────────────────────────────────────────────────────────
-
 #[test]
 fn script_is_rawtext_and_ignored() {
     let spec = lookup(b"script").expect("script must be in table");
@@ -279,8 +267,6 @@ fn xmp_is_rawtext() {
     );
 }
 
-// ── Unknown tags ──────────────────────────────────────────────────────────────
-
 #[test]
 fn unknown_tag_returns_none() {
     assert!(lookup(b"unknown-thing").is_none(), "unknown-thing must return None");
@@ -296,16 +282,8 @@ fn completely_made_up_tag_returns_none() {
     assert!(lookup(b"xberg-element").is_none(), "xberg-element must return None");
 }
 
-// ── Case-sensitivity contract ─────────────────────────────────────────────────
-//
-// The table keys are all ASCII-lowercase.  Callers MUST lowercase the tag
-// name before calling `lookup()`; uppercase or mixed-case names will return
-// `None` even if the lowercase equivalent is in the table.
-
 #[test]
 fn uppercase_tag_returns_none_caller_must_lowercase() {
-    // The contract requires callers to lowercase first.  This test documents
-    // that the table does NOT handle mixed-case on its own.
     assert!(
         lookup(b"DIV").is_none(),
         "DIV (uppercase) must return None — caller is responsible for lowercasing"
@@ -320,8 +298,6 @@ fn uppercase_tag_returns_none_caller_must_lowercase() {
 fn lowercase_div_found() {
     assert!(lookup(b"div").is_some(), "lowercase div must be found");
 }
-
-// ── TagKind details ────────────────────────────────────────────────────────────
 
 #[test]
 fn strong_kind() {
@@ -401,8 +377,6 @@ fn hr_kind() {
     assert!(spec.is_void);
     assert!(spec.is_block);
 }
-
-// ── Golden test: at least 50 standard HTML tags resolve successfully ──────────
 
 #[test]
 fn golden_at_least_50_tags_found() {
@@ -495,8 +469,6 @@ fn golden_at_least_50_tags_found() {
     );
 }
 
-// ── Non-block inline elements do not carry is_block=true ─────────────────────
-
 #[test]
 fn inline_elements_are_not_block() {
     let inline_tags: &[&[u8]] = &[
@@ -511,8 +483,6 @@ fn inline_elements_are_not_block() {
         );
     }
 }
-
-// ── Non-void elements do not carry is_void=true ───────────────────────────────
 
 #[test]
 fn non_void_elements_have_is_void_false() {

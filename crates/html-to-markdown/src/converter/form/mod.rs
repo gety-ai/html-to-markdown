@@ -24,14 +24,10 @@
 
 pub mod elements;
 
-// Re-export types from parent module for submodule access
 pub use super::walk_node;
 pub use super::{Context, DomContext};
 
-// Re-export handler function for direct use
 pub use elements::handle as handle_form_elements;
-
-// Re-exports are done via the dispatch function parameter types
 
 /// Dispatches form element handling to the appropriate handler.
 ///
@@ -71,7 +67,6 @@ pub fn dispatch_form_handler(
     dom_ctx: &super::DomContext,
 ) -> bool {
     match tag_name {
-        // Form containers and metadata
         "form" | "fieldset" | "legend" | "label" | "input" | "textarea" | "select" | "option" | "optgroup"
         | "button" | "progress" | "meter" | "output" | "datalist" => {
             handle_form_elements(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx);

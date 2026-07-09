@@ -41,7 +41,7 @@ fn assert_matches(html: &str) {
     );
 }
 
-// ── No custom elements: T2 preserves entities verbatim. ──────────────────────
+// ~keep ── No custom elements: T2 preserves entities verbatim. ──────────────────────
 
 #[test]
 fn plain_named_quote_preserved_verbatim() {
@@ -58,7 +58,7 @@ fn plain_hex_entity_preserved_verbatim() {
     assert_matches(r#"<p><img src="/x.png" alt="hello &#x22;w&#x22;"></p>"#);
 }
 
-// ── Custom elements present: T2 canonicalizes via html5ever roundtrip. ───────
+// ~keep ── Custom elements present: T2 canonicalizes via html5ever roundtrip. ───────
 
 #[test]
 fn with_custom_element_hex_entity_canonicalized() {

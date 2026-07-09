@@ -9,8 +9,6 @@
 
 #[cfg(feature = "visitor")]
 use std::borrow::Cow;
-// Note: Context and DomContext are defined in converter.rs
-// walk_node is also defined there and must be called via the parent module
 
 /// Handles the `<figure>` element.
 ///
@@ -41,7 +39,6 @@ pub fn handle_figure(
     dom_ctx: &super::DomContext,
 ) {
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-        // In inline context, just process children inline
         if ctx.convert_as_inline {
             let children = tag.children();
             {
@@ -52,7 +49,6 @@ pub fn handle_figure(
             return;
         }
 
-        // Check visit_figure_start before processing children.
         #[cfg(feature = "visitor")]
         if let Some(ref visitor_handle) = ctx.visitor {
             use crate::visitor::{NodeContext, NodeType, VisitResult};
@@ -77,14 +73,11 @@ pub fn handle_figure(
                 VisitResult::Continue => {}
                 VisitResult::Skip => return,
                 VisitResult::Custom(custom) => {
-                    // Record where custom content starts so visit_figure_end can see it
                     let start_pos = output.len();
                     if !output.is_empty() && !output.ends_with("\n\n") {
                         output.push_str("\n\n");
                     }
                     output.push_str(&custom);
-                    // Still call visit_figure_end with the custom content.
-                    // Clamp to a valid char boundary in case a pop landed mid-codepoint (#380).
                     let safe_start =
                         crate::converter::utility::content::floor_char_boundary(output, start_pos.min(output.len()));
                     let figure_output = output[safe_start..].to_owned();
@@ -134,14 +127,12 @@ pub fn handle_figure(
             }
         }
 
-        // Ensure spacing before the figure
         if !output.is_empty() && !output.ends_with("\n\n") {
             output.push_str("\n\n");
         }
 
         let figure_start = output.len();
 
-        // Collect content in a separate buffer
         let mut figure_content = String::new();
         let children = tag.children();
         {
@@ -150,11 +141,9 @@ pub fn handle_figure(
             }
         }
 
-        // Normalize image syntax
         figure_content = figure_content.replace("\n![", "![");
         figure_content = figure_content.replace(" ![", "![");
 
-        // Trim and output
         let trimmed = figure_content.trim_matches(|c| c == '\n' || c == ' ' || c == '\t');
         if !trimmed.is_empty() {
             output.push_str(trimmed);
@@ -166,7 +155,6 @@ pub fn handle_figure(
             }
         }
 
-        // Call visit_figure_end after collecting content.
         #[cfg(feature = "visitor")]
         if let Some(ref visitor_handle) = ctx.visitor {
             use crate::visitor::{NodeContext, NodeType, VisitResult};
@@ -183,7 +171,6 @@ pub fn handle_figure(
                 parent_tag.map(Cow::Borrowed),
                 false,
             );
-            // Clamp to a valid char boundary in case a pop landed mid-codepoint (#380).
             let safe_start =
                 crate::converter::utility::content::floor_char_boundary(output, figure_start.min(output.len()));
             let figure_output = output[safe_start..].to_owned();
@@ -282,7 +269,6 @@ pub fn handle_figcaption(
                 VisitResult::Continue => {}
                 VisitResult::Skip => return,
                 VisitResult::Custom(custom) => {
-                    // Add spacing before caption if needed
                     if !output.is_empty() {
                         if output.ends_with("```\n") {
                             output.push('\n');
@@ -317,12 +303,10 @@ pub fn handle_figcaption(
             }
         }
 
-        // Add spacing before caption if needed
         if !output.is_empty() {
             if output.ends_with("```\n") {
                 output.push('\n');
             } else {
-                // Trim trailing whitespace and ensure single blank line
                 while output.ends_with(' ') || output.ends_with('\t') {
                     output.pop();
                 }
@@ -334,7 +318,6 @@ pub fn handle_figcaption(
             }
         }
 
-        // Output caption as emphasized text
         output.push('*');
         output.push_str(&text);
         output.push_str("*\n\n");
@@ -373,7 +356,6 @@ mod tests {
             "image should be present: {content}"
         );
         assert!(content.contains("A nice photo"), "caption should be present: {content}");
-        // Image and caption should not be on the same line
         let lines: Vec<&str> = content.lines().filter(|l| !l.trim().is_empty()).collect();
         let img_line = lines.iter().position(|l| l.contains("![")).unwrap_or(999);
         let cap_line = lines.iter().position(|l| l.contains("A nice photo")).unwrap_or(999);

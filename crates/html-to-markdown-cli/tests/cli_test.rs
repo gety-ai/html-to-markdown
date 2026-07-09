@@ -381,7 +381,6 @@ fn test_code_block_style_tildes() {
 
 #[test]
 fn test_autolinks() {
-    // Autolinks are enabled by default — no flag needed
     cli()
         .write_stdin("<p><a href=\"https://example.com\">https://example.com</a></p>")
         .assert()
@@ -422,8 +421,6 @@ fn test_keep_inline_images_in() {
 
 #[test]
 fn test_br_in_tables() {
-    // When br_in_tables is enabled, <br> HTML tags should be converted to
-    // markdown line breaks (spaces-style: "  \n"), not literal "<br>" tags
     cli()
         .arg("--br-in-tables")
         .write_stdin("<table><tr><td>Line 1<br>Line 2</td></tr></table>")
@@ -808,7 +805,6 @@ fn test_multiple_options_combined() {
 
 #[test]
 fn test_metadata_flags_work_without_extract_metadata() {
-    // Without --extract-metadata, conversion proceeds normally
     cli()
         .write_stdin("<html><body><h1>Title</h1></body></html>")
         .assert()
@@ -818,7 +814,6 @@ fn test_metadata_flags_work_without_extract_metadata() {
 
 #[test]
 fn test_metadata_flags_work_with_json() {
-    // --json produces JSON output with a "content" field
     cli()
         .arg("--json")
         .write_stdin("<html><body><h1>Title</h1></body></html>")
@@ -864,10 +859,6 @@ fn serve_once_bytes(
 
     (format!("http://{addr}"), handle, rx)
 }
-
-// ============================================================================
-// MCP subcommand tests
-// ============================================================================
 
 /// Regression test: the existing convert-from-stdin path still works after the
 /// subcommand change (ensures `command: Option<Commands>` does not break the

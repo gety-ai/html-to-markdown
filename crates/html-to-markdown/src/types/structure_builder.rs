@@ -18,8 +18,6 @@ fn reversed_child_handles(tag: &tl::HTMLTag) -> Vec<tl::NodeHandle> {
     handles
 }
 
-// ── Text extraction ───────────────────────────────────────────────────────────
-
 /// Extract plain text from a tag's descendants, decoding HTML entities.
 fn extract_text(tag: &tl::HTMLTag, parser: &tl::Parser) -> String {
     let mut buf = String::new();
@@ -37,7 +35,6 @@ fn extract_text(tag: &tl::HTMLTag, parser: &tl::Parser) -> String {
             }
             tl::Node::Tag(child_tag) => {
                 let name = child_tag.name().as_utf8_str().to_ascii_lowercase();
-                // Skip invisible elements
                 if matches!(name.as_str(), "script" | "style" | "head") {
                     continue;
                 }
@@ -51,8 +48,6 @@ fn extract_text(tag: &tl::HTMLTag, parser: &tl::Parser) -> String {
 
     buf
 }
-
-// ── Inline annotation extraction ─────────────────────────────────────────────
 
 /// Scan the children of `tag` and collect [`TextAnnotation`]s into `annotations`.
 ///
@@ -136,11 +131,8 @@ fn collect_annotations(tag: &tl::HTMLTag, parser: &tl::Parser, text: &str, annot
     }
 }
 
-// ── Table extraction ──────────────────────────────────────────────────────────
-
 /// Build a [`TableGrid`] from a `<table>` element.
 fn extract_table_grid(table_tag: &tl::HTMLTag, parser: &tl::Parser) -> TableGrid {
-    // Gather all <tr> handles from the table subtree.
     let mut row_handles: Vec<tl::NodeHandle> = Vec::new();
     collect_tr_handles(table_tag, parser, &mut row_handles);
 
@@ -227,8 +219,6 @@ fn collect_tr_handles(tag: &tl::HTMLTag, parser: &tl::Parser, result: &mut Vec<t
     }
 }
 
-// ── Node ID generation ────────────────────────────────────────────────────────
-
 /// Generate a deterministic node ID from the node type, an excerpt of its text content,
 /// and its position (index) in the flat node list.
 fn make_node_id(node_type: &str, text: &str, index: usize) -> String {
@@ -237,15 +227,12 @@ fn make_node_id(node_type: &str, text: &str, index: usize) -> String {
 
     let mut hasher = DefaultHasher::new();
     node_type.hash(&mut hasher);
-    // Only hash a prefix of the text to keep cost bounded.
     let end = crate::converter::utility::content::floor_char_boundary(text, text.len().min(64));
     text[..end].hash(&mut hasher);
     index.hash(&mut hasher);
     let digest = hasher.finish();
     format!("{node_type}-{digest:016x}")
 }
-
-// ── Definition list helpers ───────────────────────────────────────────────────
 
 /// Collect `<dt>`/`<dd>` pairs from a `<dl>` element.
 ///
@@ -284,15 +271,12 @@ fn collect_definition_items(dl_tag: &tl::HTMLTag, parser: &tl::Parser) -> Vec<(S
         }
     }
 
-    // Flush trailing <dt>s without a corresponding <dd>.
     for term in pending_terms {
         items.push((term, String::new()));
     }
 
     items
 }
-
-// ── Head metadata extraction ──────────────────────────────────────────────────
 
 /// Extract `<meta name=… content=…>` and `<title>` entries from a `<head>` element.
 fn extract_head_metadata_entries(head_tag: &tl::HTMLTag, parser: &tl::Parser) -> Vec<MetadataEntry> {
@@ -315,7 +299,6 @@ fn extract_head_metadata_entries(head_tag: &tl::HTMLTag, parser: &tl::Parser) ->
                 }
             }
             "meta" => {
-                // name + content
                 if let (Some(Some(meta_name)), Some(Some(meta_content))) = (
                     child_tag.attributes().get("name"),
                     child_tag.attributes().get("content"),
@@ -325,7 +308,6 @@ fn extract_head_metadata_entries(head_tag: &tl::HTMLTag, parser: &tl::Parser) ->
                         value: meta_content.as_utf8_str().to_string(),
                     });
                 }
-                // property + content (Open Graph etc.)
                 if let (Some(Some(property)), Some(Some(content))) = (
                     child_tag.attributes().get("property"),
                     child_tag.attributes().get("content"),
@@ -342,8 +324,6 @@ fn extract_head_metadata_entries(head_tag: &tl::HTMLTag, parser: &tl::Parser) ->
 
     entries
 }
-
-// ── Main builder ──────────────────────────────────────────────────────────────
 
 /// State threaded through the recursive walk.
 struct BuilderState {
@@ -454,12 +434,10 @@ fn process_tag(
     depth: usize,
 ) {
     match tag_name {
-        // ── Headings ──────────────────────────────────────────────────────
         "h1" | "h2" | "h3" | "h4" | "h5" | "h6" => {
             let level = tag_name[1..].parse::<u8>().unwrap_or(1);
             let text = extract_text(tag, parser).trim().to_string();
 
-            // Close any open groups at the same or deeper heading level.
             while let Some(&(open_level, _)) = state.group_stack.last() {
                 if open_level >= level {
                     state.group_stack.pop();
@@ -468,7 +446,6 @@ fn process_tag(
                 }
             }
 
-            // Parent for the new group is the enclosing group or the explicit parent.
             let group_parent = state.group_stack.last().map(|(_, idx)| *idx).or(parent_idx);
             let group_id = make_node_id("group", &text, state.nodes.len());
             let group_idx = state.push(DocumentNode {
@@ -488,7 +465,6 @@ fn process_tag(
             }
             state.group_stack.push((level, group_idx));
 
-            // Emit the Heading node as a child of the new group.
             let mut annotations = Vec::new();
             collect_annotations(tag, parser, &text, &mut annotations);
             let heading_id = make_node_id("heading", &text, state.nodes.len());
@@ -503,7 +479,6 @@ fn process_tag(
             state.add_child(group_idx, heading_idx);
         }
 
-        // ── Paragraph ────────────────────────────────────────────────────
         "p" => {
             let text = extract_text(tag, parser).trim().to_string();
             if text.is_empty() {
@@ -526,7 +501,6 @@ fn process_tag(
             }
         }
 
-        // ── Lists ─────────────────────────────────────────────────────────
         "ul" | "ol" => {
             let ordered = tag_name == "ol";
             let effective_parent = state.current_group().or(parent_idx);
@@ -542,14 +516,12 @@ fn process_tag(
             if let Some(ep) = effective_parent {
                 state.add_child(ep, list_idx);
             }
-            // Recurse with the list node as the parent so <li>s attach to it.
             let children = tag.children();
             for child_handle in children.top().iter() {
                 walk(state, child_handle, parser, Some(list_idx), depth + 1);
             }
         }
 
-        // ── List item ─────────────────────────────────────────────────────
         "li" => {
             let text = extract_text(tag, parser).trim().to_string();
             let effective_parent = parent_idx.or_else(|| state.current_group());
@@ -569,7 +541,6 @@ fn process_tag(
             }
         }
 
-        // ── Table ─────────────────────────────────────────────────────────
         "table" => {
             let grid = extract_table_grid(tag, parser);
             let effective_parent = state.current_group().or(parent_idx);
@@ -587,7 +558,6 @@ fn process_tag(
             }
         }
 
-        // ── Image ─────────────────────────────────────────────────────────
         "img" => {
             let src = tag
                 .attributes()
@@ -620,7 +590,6 @@ fn process_tag(
             }
         }
 
-        // ── Code block (<pre><code …>) ────────────────────────────────────
         "pre" => {
             let mut language: Option<String> = None;
             let mut code_text: Option<String> = None;
@@ -630,7 +599,6 @@ fn process_tag(
                 if let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) {
                     let child_name = child_tag.name().as_utf8_str().to_ascii_lowercase();
                     if child_name == "code" {
-                        // Extract language from class="language-*"
                         if let Some(Some(class_val)) = child_tag.attributes().get("class") {
                             let class_str = class_val.as_utf8_str();
                             for token in class_str.split_whitespace() {
@@ -662,7 +630,6 @@ fn process_tag(
             }
         }
 
-        // ── Blockquote ────────────────────────────────────────────────────
         "blockquote" => {
             let effective_parent = state.current_group().or(parent_idx);
             let id = make_node_id("quote", "blockquote", state.nodes.len());
@@ -677,14 +644,12 @@ fn process_tag(
             if let Some(ep) = effective_parent {
                 state.add_child(ep, quote_idx);
             }
-            // Recurse into blockquote children under the Quote node.
             let children = tag.children();
             for child_handle in children.top().iter() {
                 walk(state, child_handle, parser, Some(quote_idx), depth + 1);
             }
         }
 
-        // ── Definition list ───────────────────────────────────────────────
         "dl" => {
             let effective_parent = state.current_group().or(parent_idx);
             let id = make_node_id("definition_list", "dl", state.nodes.len());
@@ -714,7 +679,6 @@ fn process_tag(
             }
         }
 
-        // ── Script / Style → RawBlock ─────────────────────────────────────
         "script" | "style" => {
             let format = if tag_name == "script" {
                 tag.attributes()
@@ -743,14 +707,12 @@ fn process_tag(
             }
         }
 
-        // ── Head → MetadataBlock ──────────────────────────────────────────
         "head" => {
             let entries = extract_head_metadata_entries(tag, parser);
             if entries.is_empty() {
                 return;
             }
             let id = make_node_id("metadata_block", "head", state.nodes.len());
-            // Metadata blocks sit at the root level.
             state.push(DocumentNode {
                 id,
                 content: NodeContent::MetadataBlock { entries },
@@ -761,7 +723,6 @@ fn process_tag(
             });
         }
 
-        // ── Semantic containers → Group node ──────────────────────────────
         "main" | "article" | "section" | "header" | "footer" | "nav" | "aside" => {
             let label = tag
                 .attributes()
@@ -791,7 +752,6 @@ fn process_tag(
             }
         }
 
-        // ── Transparent structural containers ─────────────────────────────
         "html" | "body" | "div" | "figure" | "figcaption" | "details" | "summary" | "address" | "hgroup" | "search"
         | "form" | "fieldset" => {
             let children = tag.children();
@@ -800,7 +760,6 @@ fn process_tag(
             }
         }
 
-        // ── Everything else: recurse transparently ────────────────────────
         _ => {
             let children = tag.children();
             for child_handle in children.top().iter() {
@@ -820,7 +779,6 @@ fn collect_attributes(tag: &tl::HTMLTag) -> Option<HashMap<String, String>> {
 
     for (key_cow, val_opt) in raw.iter() {
         let key = key_cow.to_ascii_lowercase();
-        // Drop event handlers.
         if key.starts_with("on") {
             continue;
         }
