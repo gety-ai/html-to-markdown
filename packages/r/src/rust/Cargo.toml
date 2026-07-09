@@ -1,6 +1,6 @@
 [package]
 name = "html-to-markdown-r"
-version = "3.8.2"
+version = "3.8.3"
 edition = "2024"
 license = "MIT"
 description = "High-performance HTML to Markdown converter"
@@ -9,8 +9,6 @@ keywords = ["converter", "html", "markdown"]
 categories = []
 
 [package.metadata.cargo-machete]
-# async-trait is declared for feature parity but the generated extendr shim has
-# no `#[async_trait]` callsite (same rationale as the pyo3 crate).
 ignored = ["async-trait"]
 
 [lib]
@@ -26,6 +24,6 @@ visitor = ["html-to-markdown-rs/visitor"]
 [dependencies]
 async-trait = "0.1"
 extendr-api = "0.9"
-html-to-markdown-rs = { version = "3.8.2", path = "../../../../crates/html-to-markdown", features = ["serde", "metadata", "visitor", "inline-images", "testkit"] }
+html-to-markdown-rs = { version = "3.8.3", path = "../../../../crates/html-to-markdown", features = ["serde", "metadata", "visitor", "inline-images", "testkit"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

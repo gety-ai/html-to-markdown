@@ -1,6 +1,6 @@
 [package]
 name = "html-to-markdown-rb"
-version = "3.8.1"
+version = "3.8.3"
 edition = "2024"
 license = "MIT"
 description = "High-performance HTML to Markdown converter"
@@ -9,9 +9,7 @@ keywords = ["converter", "html", "markdown"]
 categories = []
 
 [package.metadata.cargo-machete]
-# async-trait / tokio are declared for feature parity but the generated Magnus
-# shim has no direct callsite (same rationale as the pyo3 crate).
-ignored = ["rb-sys", "async-trait", "tokio"]
+ignored = ["async-trait", "rb-sys", "tokio"]
 
 [lib]
 name = "html_to_markdown_rb"
@@ -27,7 +25,7 @@ visitor = ["html-to-markdown-rs/visitor"]
 
 [dependencies]
 async-trait = "0.1"
-html-to-markdown-rs = { version = "3.8.2", path = "../../../../../crates/html-to-markdown", features = ["serde", "metadata", "visitor", "inline-images", "testkit"] }
+html-to-markdown-rs = { version = "3.8.3", path = "../../../../../crates/html-to-markdown", features = ["serde", "metadata", "visitor", "inline-images", "testkit"] }
 magnus = "0.8"
 rb-sys = ">=0.9, <0.9.128"
 serde = { version = "1", features = ["derive"] }

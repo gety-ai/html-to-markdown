@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.8.3] - 2026-07-09
+
+### Fixed
+
+- **Java visitor API** (#426): `ConversionOptions.builder().withVisitor(...)` now works. The visitor
+  upcall `FunctionDescriptor`s were generated with a `JAVA_LONG` return layout while the `handleVisit*`
+  bridge methods return `int`, so the Java Linker rejected every stub with `IllegalArgumentException:
+  Wrong method handle type: (MemorySegment×5)int` — even a no-op visitor threw before any callback ran.
+  Fixed upstream in the Alef generator (0.34.4); the descriptor return layout is now `JAVA_INT`.
+
+### Changed
+
+- Regenerate all bindings with alef 0.34.4.
+- Formatting is now poly-only: removed the `alef:format`, `ruby:format`, and `csharp:format` tasks
+  (which invoked `alef fmt`); `task format` / `poly fmt --fix .` is the single formatter.
+
 ## [3.8.0] - 2026-06-27
 
 Stable release promoting 3.8.0-rc.2 (fully published). Version-only bump synced across all manifests.

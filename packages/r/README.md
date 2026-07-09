@@ -121,29 +121,11 @@ devtools::install_github("xberg-io/html-to-markdown", subdir = "packages/r")
 
 Basic conversion:
 
-```r
-library(htmltomarkdown)
-
-html <- "<h1>Hello</h1><p>This is <strong>fast</strong>!</p>"
-result <- convert(html)
-markdown <- result$content
-cat(markdown)
-```
+<!-- snippet not found: getting-started/basic_usage.md -->
 
 With conversion options:
 
-```r
-library(htmltomarkdown)
-
-opts <- conversion_options(
-  heading_style = "atx",
-  wrap = TRUE,
-  wrap_width = 80L
-)
-
-result <- convert("<h1>Hello</h1><p>World</p>", opts)
-cat(result$content)
-```
+<!-- snippet not found: getting-started/with_options.md -->
 
 ## Architecture
 

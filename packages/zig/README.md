@@ -92,7 +92,7 @@ Distributed via GitHub Releases — pin a tag in `build.zig.zon` and `zig fetch`
 ## Installation
 
 ```bash
-zig fetch --save https://github.com/xberg-io/html-to-markdown/releases/download/v3.8.2/zig.tar.gz
+zig fetch --save https://github.com/xberg-io/html-to-markdown/releases/download/v3.8.3/zig.tar.gz
 ```
 
 ## Performance Snapshot
@@ -101,39 +101,11 @@ zig fetch --save https://github.com/xberg-io/html-to-markdown/releases/download/
 
 Basic conversion:
 
-```zig
-const std = @import("std");
-const html_to_markdown = @import("html_to_markdown_rs");
-
-pub fn main() !void {
-    const html = "<h1>Hello</h1><p>This is <strong>fast</strong>!</p>";
-    const result_json = try html_to_markdown.convert(html, null);
-    defer std.heap.c_allocator.free(result_json);
-
-    // result_json is the ConversionResult serialised as JSON; parse with
-    // std.json or read the `content` field directly.
-    std.debug.print("{s}\n", .{result_json});
-}
-```
+<!-- snippet not found: getting-started/basic_usage.md -->
 
 With conversion options:
 
-```zig
-const std = @import("std");
-const html_to_markdown = @import("html_to_markdown_rs");
-
-pub fn main() !void {
-    const html = "<h1>Hello</h1><p>This is <strong>formatted</strong> content.</p>";
-    const options_json =
-        \\{"heading_style":"atx","list_indent_width":2,"wrap":true}
-    ;
-
-    const result_json = try html_to_markdown.convert(html, options_json);
-    defer std.heap.c_allocator.free(result_json);
-
-    std.debug.print("{s}\n", .{result_json});
-}
-```
+<!-- snippet not found: getting-started/with_options.md -->
 
 ## Architecture
 

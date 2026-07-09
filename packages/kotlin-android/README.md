@@ -92,7 +92,7 @@ Server-side Kotlin/JVM consumers should use the `io.xberg:html-to-markdown` Java
 ## Installation
 
 ```bash
-implementation("io.xberg:html-to-markdown-android:3.8.2")
+implementation("io.xberg:html-to-markdown-android:3.8.3")
 ```
 
 ## Performance Snapshot
@@ -101,35 +101,11 @@ implementation("io.xberg:html-to-markdown-android:3.8.2")
 
 Basic conversion:
 
-```kotlin
-import io.xberg.android.HtmlToMarkdownRs
-
-val html = "<h1>Hello</h1><p>This is <strong>fast</strong>!</p>"
-val result = HtmlToMarkdownRs.convert(html)
-val markdown: String? = result.content
-```
+<!-- snippet not found: getting-started/basic_usage.md -->
 
 With conversion options:
 
-```kotlin
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import io.xberg.android.ConversionOptions
-import io.xberg.android.HtmlToMarkdownRs
-
-val mapper = ObjectMapper()
-    .registerKotlinModule()
-    .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
-val options = mapper.readValue(
-    "{\"heading_style\":\"Atx\",\"list_indent_width\":2,\"wrap\":true}",
-    ConversionOptions::class.java,
-)
-
-val html = "<h1>Hello</h1><p>This is <strong>formatted</strong> content.</p>"
-val result = HtmlToMarkdownRs.convert(html, options)
-val markdown: String? = result.content
-```
+<!-- snippet not found: getting-started/with_options.md -->
 
 ## Architecture
 

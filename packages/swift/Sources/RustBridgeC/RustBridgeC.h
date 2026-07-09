@@ -694,6 +694,7 @@ void* __swift_bridge__$HeaderMetadata$text(void* self);
 void* __swift_bridge__$HeaderMetadata$id(void* self);
 uintptr_t __swift_bridge__$HeaderMetadata$depth(void* self);
 uintptr_t __swift_bridge__$HeaderMetadata$html_offset(void* self);
+struct __private__ResultPtrAndPtr __swift_bridge__$header_metadata_is_valid_from_json(void* json);
 void* __swift_bridge__$LinkMetadata$href(void* self);
 void* __swift_bridge__$LinkMetadata$text(void* self);
 void* __swift_bridge__$LinkMetadata$title(void* self);
@@ -858,6 +859,8 @@ uintptr_t __swift_bridge__$NodeContext$depth(void* self);
 uintptr_t __swift_bridge__$NodeContext$index_in_parent(void* self);
 void* __swift_bridge__$NodeContext$parent_tag(void* self);
 bool __swift_bridge__$NodeContext$is_inline(void* self);
+struct __private__ResultPtrAndPtr __swift_bridge__$node_context_attributes_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$node_context_into_owned_from_json(void* json);
 void* __swift_bridge__$TextDirection$to_string(void* self);
 void* __swift_bridge__$LinkType$to_string(void* self);
 void* __swift_bridge__$ImageType$to_string(void* self);
@@ -952,6 +955,7 @@ void* __swift_bridge__$__alef_phantom_vec_link_type(void);
 void* __swift_bridge__$__alef_phantom_vec_image_type(void);
 void* __swift_bridge__$__alef_phantom_vec_structured_data_type(void);
 void* __swift_bridge__$__alef_phantom_vec_node_type(void);
+
 
 
 #endif /* RUST_BRIDGE_C_H */

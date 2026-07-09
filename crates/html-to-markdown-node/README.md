@@ -141,28 +141,11 @@ npm install @xberg-io/html-to-markdown-wasm
 
 Basic conversion:
 
-```typescript
-import { convert } from "@xberg-io/html-to-markdown";
-
-const result = convert("<h1>Hello World</h1>");
-const markdown: string = result.content;
-console.log(markdown); // # Hello World
-```
+<!-- snippet not found: getting-started/basic_usage.md -->
 
 With conversion options:
 
-```typescript
-import { convert, ConversionOptions } from "@xberg-io/html-to-markdown";
-
-const options: ConversionOptions = {
-  headingStyle: "atx",
-  listIndentWidth: 2,
-  wrap: true,
-};
-
-const result = convert("<h1>Title</h1><p>Content</p>", options);
-const markdown = result.content;
-```
+<!-- snippet not found: getting-started/with_options.md -->
 
 ## Architecture
 

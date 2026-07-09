@@ -1,8 +1,17 @@
 // swift-format-ignore-file
 import RustBridgeC
 
+public func headerMetadataIsValidFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> RustString {
+    try { let val = __swift_bridge__$header_metadata_is_valid_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return RustString(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
 public func visitor_handle_noop(_ client: VisitorHandleRef) {
     __swift_bridge__$visitor_handle_noop(client.ptr)
+}
+public func nodeContextAttributesFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> RustString {
+    try { let val = __swift_bridge__$node_context_attributes_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return RustString(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func nodeContextIntoOwnedFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> RustString {
+    try { let val = __swift_bridge__$node_context_into_owned_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return RustString(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
 public func convert<GenericIntoRustString: IntoRustString>(_ html: GenericIntoRustString, _ options: Optional<ConversionOptions>) throws -> ConversionResult {
     try { let val = __swift_bridge__$convert({ let rustString = html.intoRustString(); rustString.isOwned = false; return rustString.ptr }(), { if let val = options { val.isOwned = false; return val.ptr } else { return nil } }()); if val.is_ok { return ConversionResult(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
@@ -4429,3 +4438,6 @@ extension HtmlVisitorBox: Vectorizable {
 func __swift_bridge__SwiftHtmlVisitorBox__free (ptr: UnsafeMutableRawPointer) {
     let _ = Unmanaged<SwiftHtmlVisitorBox>.fromOpaque(ptr).takeRetainedValue()
 }
+
+
+

@@ -111,23 +111,11 @@ Requires Ruby 3.2+ with Magnus native extension bindings. Published for Linux, m
 
 Basic conversion:
 
-```ruby
-require 'html_to_markdown'
-
-html = "<h1>Hello</h1><p>This is <strong>fast</strong>!</p>"
-result = HtmlToMarkdown.convert(html)
-markdown = result[:content]
-```
+<!-- snippet not found: getting-started/basic_usage.md -->
 
 With conversion options:
 
-```ruby
-require 'html_to_markdown'
-
-html = "<h1>Hello</h1><p>This is <strong>fast</strong>!</p>"
-result = HtmlToMarkdown.convert(html, heading_style: :atx, code_block_style: :fenced)
-markdown = result[:content]
-```
+<!-- snippet not found: getting-started/with_options.md -->
 
 ## Architecture
 

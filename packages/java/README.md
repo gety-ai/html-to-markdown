@@ -95,7 +95,7 @@ Uses Foreign Function & Memory API for zero-dependency, thread-safe conversion w
 <dependency>
     <groupId>io.xberg</groupId>
     <artifactId>html-to-markdown</artifactId>
-    <version>3.8.2</version>
+    <version>3.8.3</version>
 </dependency>
 ```
 
@@ -107,14 +107,14 @@ Requires Java 25+ with Panama FFI support.
 <dependency>
     <groupId>io.xberg</groupId>
     <artifactId>html-to-markdown</artifactId>
-    <version>3.8.2</version>
+    <version>3.8.3</version>
 </dependency>
 ```
 
 **Gradle (Kotlin DSL):**
 
 ```kotlin
-implementation("io.xberg:html-to-markdown:3.8.2")
+implementation("io.xberg:html-to-markdown:3.8.3")
 ```
 
 ## Performance Snapshot
@@ -131,43 +131,11 @@ implementation("io.xberg:html-to-markdown:3.8.2")
 
 Basic conversion:
 
-```java
-import io.xberg.htmltomarkdown.HtmlToMarkdown;
-import io.xberg.htmltomarkdown.ConversionResult;
-
-public class Example {
-    public static void main(String[] args) {
-        String html = "<h1>Hello World</h1><p>This is a <strong>test</strong>.</p>";
-        ConversionResult result = HtmlToMarkdown.convert(html);
-        System.out.println(result.content());
-    }
-}
-```
+<!-- snippet not found: getting-started/basic_usage.md -->
 
 With conversion options:
 
-```java
-import io.xberg.htmltomarkdown.HtmlToMarkdown;
-import io.xberg.htmltomarkdown.ConversionOptions;
-import io.xberg.htmltomarkdown.ConversionResult;
-
-public class MetadataExample {
-    public static void main(String[] args) {
-        String html = "<html><head><title>My Page</title></head>"
-            + "<body><h1>Welcome</h1><a href=\"https://example.com\">Link</a></body></html>";
-
-        ConversionOptions options = ConversionOptions.builder()
-            .extractMetadata(true)
-            .build();
-        ConversionResult result = HtmlToMarkdown.convert(html, options);
-
-        System.out.println("Markdown: " + result.content());
-        System.out.println("Title: " + result.metadata().document().title());
-        System.out.println("Headers: " + result.metadata().headers().size());
-        System.out.println("Links: " + result.metadata().links().size());
-    }
-}
-```
+<!-- snippet not found: getting-started/with_options.md -->
 
 ## Architecture
 

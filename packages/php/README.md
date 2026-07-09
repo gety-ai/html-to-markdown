@@ -123,27 +123,11 @@ composer require xberg-io/html-to-markdown
 
 Basic conversion:
 
-```php
-use HtmlToMarkdown\HtmlToMarkdownApi;
-
-$result = HtmlToMarkdownApi::convert('<h1>Hello</h1><p>This is <strong>fast</strong>!</p>');
-echo $result->content;
-```
+<!-- snippet not found: getting-started/basic_usage.md -->
 
 With conversion options:
 
-```php
-use HtmlToMarkdown\HtmlToMarkdownApi;
-use HtmlToMarkdown\ConversionOptions;
-
-$options = ConversionOptions::builder()
-    ->headingStyle('atx')
-    ->listIndentWidth(2)
-    ->build();
-
-$result = HtmlToMarkdownApi::convert('<h1>Hello</h1>', $options);
-echo $result->content;
-```
+<!-- snippet not found: getting-started/with_options.md -->
 
 ## Architecture
 

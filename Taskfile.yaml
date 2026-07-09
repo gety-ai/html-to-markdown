@@ -130,20 +130,10 @@ tasks:
       - golangci-lint run ./... --config .golangci.yml
     dir: packages/go
 
-  ruby:format:
-    desc: "Format Ruby bindings with rubocop"
-    cmds:
-      - alef fmt --lang ruby
-
   ruby:lint:
     desc: "Lint Ruby bindings with rubocop and steep"
     cmds:
       - alef lint --lang ruby
-
-  csharp:format:
-    desc: "Format C# bindings with dotnet format"
-    cmds:
-      - alef fmt --lang csharp
 
   csharp:lint:
     desc: "Lint C# bindings with dotnet format"
@@ -256,11 +246,6 @@ tasks:
     desc: "Build all language bindings"
     cmds:
       - alef build
-
-  alef:format:
-    desc: "Format Alef-managed language bindings"
-    cmds:
-      - alef fmt
 
   alef:sync:
     desc: "Sync version from Cargo.toml to all manifests"

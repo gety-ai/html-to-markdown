@@ -92,7 +92,7 @@ Ship identical Markdown across every runtime while enjoying native performance w
 ## Installation
 
 ```bash
-Add {:html_to_markdown, "~> 3.8.2"} to mix.exs deps
+Add {:html_to_markdown, "~> 3.8.3"} to mix.exs deps
 ```
 
 Requires Elixir 1.19+ and OTP 28. Add to your `mix.exs`:
@@ -100,7 +100,7 @@ Requires Elixir 1.19+ and OTP 28. Add to your `mix.exs`:
 ```elixir
 def deps do
   [
-    {:html_to_markdown, "~> 3.8.2"}
+    {:html_to_markdown, "~> 3.8.3"}
   ]
 end
 ```
@@ -121,18 +121,11 @@ end
 
 Basic conversion:
 
-```elixir
-{:ok, result} = HtmlToMarkdown.convert("<h1>Hello</h1><p>This is <strong>fast</strong>!</p>")
-IO.puts(result.content)
-```
+<!-- snippet not found: getting-started/basic_usage.md -->
 
 With conversion options:
 
-```elixir
-opts = %HtmlToMarkdown.Options{wrap: true, wrap_width: 40}
-{:ok, result} = HtmlToMarkdown.convert("<h1>Hello</h1><p>World</p>", opts)
-IO.puts(result.content)
-```
+<!-- snippet not found: getting-started/with_options.md -->
 
 ## Architecture
 

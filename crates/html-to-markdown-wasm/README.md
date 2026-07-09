@@ -101,31 +101,11 @@ pnpm add @xberg-io/html-to-markdown-wasm
 
 Basic conversion:
 
-```javascript
-import init, { convert } from "@xberg-io/html-to-markdown-wasm";
-
-await init();
-
-const html = "<h1>Hello</h1><p>This is <strong>fast</strong>!</p>";
-const result = convert(html);
-const markdown = result.content;
-console.log(markdown);
-```
+<!-- snippet not found: getting-started/basic_usage.md -->
 
 With conversion options:
 
-```javascript
-import init, { convert } from "@xberg-io/html-to-markdown-wasm";
-
-await init();
-
-const result = convert('<h1>Hello</h1><img src="pic.jpg">', {
-  headingStyle: "atx",
-  skipImages: true,
-});
-const markdown = result.content;
-console.log(markdown);
-```
+<!-- snippet not found: getting-started/with_options.md -->
 
 ## Architecture
 
