@@ -2,7 +2,6 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import starlightLlmsTxt from "starlight-llms-txt";
-// Local link during migration; switch to "^0.1.0" once @xberg-io/docs-theme is published.
 import { xbergStarlightConfig } from "@xberg-io/docs-theme";
 
 const API_LANGUAGES = [
@@ -24,7 +23,6 @@ const API_LANGUAGES = [
   { label: "WebAssembly", slug: "reference/api-wasm" },
 ];
 
-// https://astro.build/config
 export default defineConfig({
   site: "https://docs.html-to-markdown.xberg.io",
   integrations: [

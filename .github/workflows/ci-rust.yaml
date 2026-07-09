@@ -54,12 +54,12 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           components: rustfmt, clippy, llvm-tools-preview
 
       - name: Install Task
-        uses: xberg-io/actions/install-task@v1 # v1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Check Rust Formatting
         run: task rust:lint:check
@@ -98,13 +98,13 @@ jobs:
           python-version: "3.13"
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           components: rustfmt, clippy, llvm-tools-preview
           cache-key-prefix: rust-tests-${{ matrix.os }}
 
       - name: Install Task
-        uses: xberg-io/actions/install-task@v1 # v1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Run Rust Tests
         env:
@@ -118,7 +118,7 @@ jobs:
 
       - name: Cleanup Rust cache
         if: always() && steps.checkout.outcome == 'success'
-        uses: xberg-io/actions/cleanup-rust-cache@v1 # v1
+        uses: xberg-io/actions/cleanup-rust-cache@v1
 
   rust-coverage:
     name: "Coverage: Rust"
@@ -129,12 +129,12 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           components: rustfmt, clippy, llvm-tools-preview
 
       - name: Install Task
-        uses: xberg-io/actions/install-task@v1 # v1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Generate Rust Coverage
         run: task rust:coverage

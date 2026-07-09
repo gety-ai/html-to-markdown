@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
-# Copy the freshly built FFI library into the C# package runtimes/ tree at
-# the RID + native filename .NET expects for the host platform. The package
-# csproj packs `runtimes/**` verbatim, so the RID directory must match what
-# the runtime probes for at NativeLibrary.Load time.
 set -euo pipefail
 
 os=$(uname -s)

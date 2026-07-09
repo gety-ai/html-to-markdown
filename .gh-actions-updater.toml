@@ -7,12 +7,7 @@ include = [
     "action.yml",
     "action.yaml",
 ]
-exclude = [
-    # publish.yaml uses multi-line `uses:` + `with:` entries that gau v0.1.1
-    # cannot rewrite ("uses value is not a simple single-line rewrite target").
-    # Re-include once upstream gh-actions-updater handles those.
-    ".github/workflows/publish.yaml",
-]
+exclude = [".github/workflows/publish.yaml"]
 recursive = false
 
 [cache]

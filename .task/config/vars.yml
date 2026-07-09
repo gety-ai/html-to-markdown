@@ -6,10 +6,8 @@ vars:
   VERSION:
     sh: grep -m 1 'version = ' Cargo.toml | sed 's/version = "\(.*\)"/\1/'
 
-  # Build profile (dev/release/ci) - default to release
   BUILD_PROFILE: '{{.BUILD_PROFILE | default "release"}}'
 
-  # Toolchain versions
   GOLANGCI_LINT_VERSION: "latest"
   GO_TOOLCHAIN: "go1.26.0"
   BUNDLER_VERSION: "4.0.0"
@@ -23,10 +21,8 @@ vars:
         echo "ruby"
       fi
 
-  # Logging
   RUST_LOG: "info"
 
-  # Root project directories (absolute paths)
   ROOT: "{{.ROOT_DIR}}"
   CRATES_DIR: "{{.ROOT_DIR}}/crates"
   PACKAGES_DIR: "{{.ROOT_DIR}}/packages"
@@ -35,7 +31,6 @@ vars:
   TARGET_DIR: "{{.ROOT_DIR}}/target"
   EXAMPLES_DIR: "{{.ROOT_DIR}}/examples"
 
-  # OS Detection - determine operating system
   OS:
     sh: |
       case "$(uname -s 2>/dev/null || echo 'unknown')" in
@@ -61,7 +56,6 @@ vars:
           ;;
       esac
 
-  # OS Boolean helpers
   IS_WINDOWS:
     sh: |
       if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "cygwin" ]] || [[ "$OSTYPE" == "win32" ]]; then
@@ -86,7 +80,6 @@ vars:
         echo "false"
       fi
 
-  # Architecture detection - determine CPU architecture
   ARCH:
     sh: |
       ARCH=$(uname -m)
@@ -111,7 +104,6 @@ vars:
           ;;
       esac
 
-  # Number of CPUs available
   NUM_CPUS:
     sh: |
       if command -v nproc >/dev/null 2>&1; then
@@ -124,5 +116,4 @@ vars:
         echo "4"
       fi
 
-  # GNU Make parallel flag for optimal builds
   MAKE_JOBS: "{{.NUM_CPUS}}"

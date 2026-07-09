@@ -108,7 +108,6 @@ fn line_similarity(a: &str, b: &str) -> f64 {
 }
 
 fn lcs_len(a: &[&str], b: &[&str]) -> usize {
-    // Bounded LCS — cap at 2000 lines per side to keep the test cheap.
     let cap = 2000;
     let a = &a[..a.len().min(cap)];
     let b = &b[..b.len().min(cap)];

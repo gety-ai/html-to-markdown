@@ -1,17 +1,5 @@
 name: Publish Release
 
-# Action-first html-to-markdown release pipeline.
-#
-# Orchestrates 11 alef language targets:
-#   crates · cli · python · node · typescript · wasm · ruby · php · go · c-ffi
-#   java · csharp · elixir · homebrew
-#
-# Mirrors Xberg's publish.yaml composition: every registry interaction,
-# every multi-platform build, and every release-asset upload routes through
-# a shared xberg-io/actions composite. Inline bash is reserved for
-# repo-quirky orchestration only (homebrew bottle assembly, Node platform
-# package staging, NIF artifact packaging, multi-formula brew flow).
-
 on:
   workflow_dispatch:
     inputs:
@@ -153,8 +141,6 @@ jobs:
         with:
           version: ${{ needs.prepare.outputs.version }}
 
-  # ─── Registry existence checks ────────────────────────────────────────
-
   check-pypi:
     name: Check PyPI for existing version
     needs: prepare
@@ -280,8 +266,6 @@ jobs:
             cli_exists=html-to-markdown-cli
 
       - id: derive
-        # Inline: aggregate two check-registry outputs into a single boolean
-        # the publish-crates job can guard on. No shared action equivalent.
         run: |
           if [[ "${{ steps.check.outputs.exists }}" == "true" && "${{ steps.check.outputs.cli_exists }}" == "true" ]]; then
             echo "all_exist=true" >> "$GITHUB_OUTPUT"
@@ -432,8 +416,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # rid == the lib/src/native/<rid>/ dir the dart loader (_alefHostRid) searches.
-        # Dart uses macos-arm64 / linux-x64 style (NOT x86_64/aarch64).
         include:
           - { os: ubuntu-latest, rid: linux-x64, target: x86_64-unknown-linux-gnu }
           - { os: ubuntu-24.04-arm, rid: linux-arm64, target: aarch64-unknown-linux-gnu }
@@ -458,11 +440,6 @@ jobs:
           cache-key-prefix: publish-dart-${{ matrix.rid }}
 
       - name: Build and stage Dart native library
-        # The dart binding ships a dedicated flutter_rust_bridge cdylib
-        # (html-to-markdown-rs-dart), not the C FFI lib. Build it natively per
-        # platform and stage under lib/src/native/<rid>/ so the published pub.dev
-        # package can locate it (the loader falls back to a relative path otherwise,
-        # which hardened runtimes reject).
         shell: bash
         run: |
           cargo build --release --locked -p html-to-markdown-rs-dart --target ${{ matrix.target }}
@@ -497,9 +474,6 @@ jobs:
           merge-multiple: true
 
       - name: Stage prebuilt native libraries into Dart package
-        # Populate lib/src/native/<rid>/ with the per-platform cdylibs built by
-        # dart-natives so the published tarball is self-contained. The loader
-        # (_alefResolveExternalLibrary) resolves these via Isolate.resolvePackageUri.
         shell: bash
         run: |
           for dir in dart-natives-artifacts/*/; do
@@ -516,17 +490,6 @@ jobs:
           path: packages/dart
           if-no-files-found: error
           retention-days: 7
-
-  # Swift Package Index has no central registry — packages are consumed
-  # directly from git tags, so the tag push IS the publish event. The
-  # previous `check-spi-swift` + `publish-swift` jobs only pinged SPI for
-  # fast re-indexing (SPI auto-discovers within ~1h without a ping), so
-  # they have been dropped to cut runner cost. The `release_swift` output
-  # from `prepare` is still emitted but no longer consumed.
-  #
-  # Zig is similarly tag-based, but the publish-zig job is retained because
-  # it appends the tarball URL + SHA-256 to the release notes so consumers
-  # can copy-paste straight into `build.zig.zon`.
 
   assemble-zig-package:
     name: Assemble Zig package with prebuilt FFI libraries
@@ -547,11 +510,6 @@ jobs:
           merge-multiple: true
 
       - name: Stage prebuilt FFI libraries into Zig package
-        # Inline: alef zig codegen produces packages/zig/ with include/ (C headers
-        # from the zig backend). This step populates lib/<rid>/ with the prebuilt
-        # C FFI shared libraries for each platform so the tarball is complete.
-        # Platform naming follows alef's Go platform convention: linux-x64,
-        # linux-arm64, darwin-x64, darwin-arm64, windows-x64, windows-arm64.
         shell: bash
         run: |
           mkdir -p packages/zig/lib
@@ -586,9 +544,6 @@ jobs:
           done
 
       - name: Create Zig package tarball
-        # Inline: archive packages/zig with the populated lib/ subdirectories.
-        # alef zig backend has already generated the source code, build files,
-        # and C headers. This step tarballs the complete package.
         shell: bash
         run: |
           cd packages/zig
@@ -610,11 +565,6 @@ jobs:
       exists: ${{ steps.check.outputs.exists }}
     steps:
       - id: check
-        # `registry: github-release` (not `registry: zig`) — alef check-registry's
-        # zig path only verifies the release tag exists. On a real release that's
-        # always true, so it short-circuits `publish-zig` to skipped (regression:
-        # v3.5.1 shipped without the zig tarball asset because of this). Verify
-        # the actual asset is present instead.
         uses: xberg-io/actions/check-registry@v1
         with:
           registry: github-release
@@ -623,8 +573,6 @@ jobs:
           repo: ${{ github.repository }}
           assets: html-to-markdown-rs-zig-v${{ needs.prepare.outputs.version }}.tar.gz
 
-  # ─── Build matrix jobs ────────────────────────────────────────────────
-
   python-wheels:
     name: Build Python wheels (${{ matrix.os }})
     needs: [prepare, check-pypi]
@@ -632,14 +580,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 180
     env:
-      # Required by cibuildwheel/delocate: the Rust-compiled .so/.dylib targets
-      # macOS 10.12+ (default in modern toolchains). 10.9 was the legacy default
-      # which causes delocate to refuse to relocate the wheel.
       MACOSX_DEPLOYMENT_TARGET: "10.12"
     strategy:
       fail-fast: false
       matrix:
-        # windows-11-arm: cibuildwheel does not yet support aarch64-pc-windows-msvc target
         os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-latest, macos-15-intel]
     steps:
       - uses: actions/checkout@v6
@@ -653,13 +597,6 @@ jobs:
         uses: xberg-io/actions/free-disk-space-linux@v1
 
       - name: Setup Rust on host (macOS, Windows)
-        # cibuildwheel's before-build runs `cargo build` which auto-installs
-        # the toolchain pinned by rust-toolchain.toml via rustup. On macOS-arm64
-        # this collides with the runner's pre-installed clippy/rustfmt and
-        # rustup aborts with "detected conflict: bin/cargo-clippy". Pre-install
-        # via actions-rust-lang/setup-rust-toolchain so the toolchain is ready
-        # by the time cibuildwheel runs cargo. No-op for Linux (cibw runs in
-        # a manylinux container — host rust is invisible there).
         if: runner.os != 'Linux'
         uses: xberg-io/actions/setup-rust@v1
         with:
@@ -670,8 +607,6 @@ jobs:
         with:
           python-version: "3.13"
           package-dir: packages/python
-          # abi3-py310 is enabled in pyo3 features → one wheel per platform covers 3.10+.
-          # Without this override, cibuildwheel rebuilds for cp310/cp311/cp312/cp313/cp314 = 5x duplicates.
           cibw-build: "cp310-*"
           cibw-before-build-linux: >
             yum install -y openssl-devel &&
@@ -714,7 +649,6 @@ jobs:
           python-version: "3.13"
 
       - name: Build and bundle CLI binary
-        # The CLI binary is bundled into the sdist so it can be installed via pipx.
         shell: bash
         run: |
           cargo build --release --locked --package html-to-markdown-cli
@@ -751,12 +685,6 @@ jobs:
           node-version: "24"
 
       - name: Generate TypeScript definitions
-        # Inline: napi build produces index.js + a fresh index.d.ts as a side
-        # effect. We keep napi's index.js (its platform-dispatch stub loader)
-        # but restore alef's committed index.d.ts: alef adds *Update DTO types
-        # (e.g. ConversionOptionsUpdate, PreprocessingOptionsUpdate) that the
-        # napi macros deliberately filter out — those types are committed in
-        # crates/html-to-markdown-node/index.d.ts.
         shell: bash
         run: |
           pnpm --filter ./crates/html-to-markdown-node exec napi build --release
@@ -789,7 +717,6 @@ jobs:
               rust_target: aarch64-unknown-linux-gnu,
               use_napi_cross: true,
             }
-          # musl + armv7 deferred — napi-cross artifact path mismatch ("No dist dir found") blocks every cross-compiled binding.
           - { os: windows-latest, target: x86_64-pc-windows-msvc, rust_target: "", use_napi_cross: false }
           - {
               os: windows-latest,
@@ -824,12 +751,6 @@ jobs:
           target: ${{ matrix.target }}
           use-napi-cross: ${{ matrix.use_napi_cross }}
           pack-target-tarball: node-bindings-${{ matrix.target }}.tar.gz
-          # setup-node-workspace already ran `pnpm install --no-frozen-lockfile`.
-          # Skip build-node-napi's own install: under pnpm 11.8.0 its plain
-          # `pnpm install --filter` re-enforces CI frozen-lockfile and fails on
-          # the napi platform optionalDependencies (pinned to the not-yet-published
-          # release version, so they can't be in the lockfile). pnpm 11.6.0 treated
-          # it as a no-op; 11.8.0 does not.
           install-deps: "false"
 
       - uses: actions/upload-artifact@v7
@@ -893,7 +814,6 @@ jobs:
           - { os: macos-latest, label: macos-arm64 }
           - { os: macos-15-intel, label: macos-x86_64 }
           - { os: ubuntu-latest, label: windows-x64, dock_platform: x64-mingw-ucrt }
-          # windows-11-arm: deferred until rb-sys + Magnus toolchain validated on aarch64-pc-windows-msvc
     steps:
       - uses: actions/checkout@v6
         with:
@@ -906,15 +826,11 @@ jobs:
         uses: xberg-io/actions/free-disk-space-linux@v1
 
       - name: Drop cached CLI binaries
-        # Inline: stale CLI artifacts under packages/ruby/exe/ confuse rake
-        # build's filtering. One-shot cleanup, no shared action equivalent.
         shell: bash
         run: rm -rf packages/ruby/exe/* packages/ruby/pkg
 
       - name: Install MSYS2 toolchain (Windows)
         if: runner.os == 'Windows'
-        # Inline: rb-sys requires the MSYS2 toolchain on Windows for clang +
-        # libffi headers. Magnus also needs ucrt64-prefixed binaries on PATH.
         shell: pwsh
         run: |
           ridk install 1 2 3
@@ -925,8 +841,6 @@ jobs:
 
       - name: Install Rust (GNU on Windows)
         if: runner.os == 'Windows'
-        # Inline: rb-sys/Magnus only build against the GNU ABI on Windows; the
-        # default MSVC toolchain produces incompatible artifacts.
         shell: pwsh
         run: |
           rustup install stable-x86_64-pc-windows-gnu
@@ -936,8 +850,6 @@ jobs:
 
       - name: Configure bindgen sysroot (Windows)
         if: runner.os == 'Windows'
-        # Inline: bindgen needs an explicit libclang sysroot pointing at the
-        # MSYS2 ucrt64 install — discovery fails on the GitHub runner image.
         shell: bash
         run: |
           UCRT="/c/msys64/ucrt64"
@@ -956,8 +868,6 @@ jobs:
           bundler-cache: false
 
       - name: Install Ruby dependencies
-        # Inline: bundle config + install in the package dir; trivially small
-        # and identical across crawlberg/xberg/html-to-markdown.
         shell: bash
         working-directory: packages/ruby
         run: |
@@ -971,13 +881,6 @@ jobs:
           package-dir: packages/ruby
 
       - name: Build platform gem
-        # Inline: each matrix runner builds the gem for its own native platform
-        # via `rake compile && rake build`. rake-compiler's compile step sets
-        # the gem's native platform tag from rb_config, so the produced gem is
-        # already platform-tagged (e.g. xberg-X.Y.Z-x86_64-linux.gem). This
-        # mirrors the Xberg sibling's proven Ruby publish path. For Windows
-        # we cross-compile inside rb-sys-dock so the GNU toolchain produces a
-        # x64-mingw-ucrt gem from the linux runner.
         shell: bash
         run: |
           if [ -n "${{ matrix.dock_platform }}" ]; then
@@ -1036,9 +939,6 @@ jobs:
 
       - name: Drop source gem on non-canonical builders
         if: ${{ matrix.label != 'linux' }}
-        # Inline: only the canonical `linux` builder ships the source gem; others
-        # would emit byte-different source gems that overwrite each other under
-        # merge-multiple and produce an invalid .gem at publish time.
         shell: bash
         run: |
           shopt -s nullglob
@@ -1056,10 +956,6 @@ jobs:
           path: packages/ruby/pkg/*.gem
           retention-days: 14
 
-  # PHP build matrix. The PIE upload (upload-php-pie-release) gates on this job
-  # succeeding, so every leg here must build dependably. x86_64 macOS (Apple
-  # Intel) is intentionally NOT built — Apple Silicon is the only supported macOS
-  # target. Apple Silicon (macos-arm64) covers PHP 8.2–8.5 with no exclusions.
   php-extension:
     name: Build PHP extension (php${{ matrix.php }} ${{ matrix.platform.label }})
     needs: [prepare, check-packagist, publish-crates]
@@ -1075,8 +971,6 @@ jobs:
           - { os: ubuntu-24.04-arm, label: linux-arm64, target: aarch64-unknown-linux-gnu }
           - { os: macos-latest, label: macos-arm64, target: aarch64-apple-darwin }
           - { os: windows-latest, label: windows-x86_64, target: x86_64-pc-windows-msvc }
-          # macos-x86_64 (Apple Intel): not supported — Apple Silicon only.
-          # windows-arm64: deferred until ext-php-rs cross-compile to aarch64-pc-windows-msvc is validated
     steps:
       - uses: actions/checkout@v6
         with:
@@ -1169,10 +1063,6 @@ jobs:
       - uses: xberg-io/actions/install-alef@v1
 
       - name: Build and package Go FFI library
-        # Inline: html-to-markdown's FFI build is driven by `alef publish` rather
-        # than the generic build-go-ffi action — the alef driver knows about
-        # workspace features, header generation, and the platform-specific
-        # cgo include paths the package layout expects.
         shell: bash
         run: |
           alef publish build --lang ffi --target ${{ matrix.target }}
@@ -1233,9 +1123,6 @@ jobs:
       - uses: xberg-io/actions/install-alef@v1
 
       - name: Build and package C FFI distribution
-        # Inline: alef-driven FFI packaging emits the pkgconfig + cmake metadata
-        # the homebrew formula expects. The generic build-rust-ffi action
-        # produces only the .so/.dylib/.dll without that scaffolding.
         shell: bash
         run: |
           alef publish build --lang ffi --target ${{ matrix.target }}
@@ -1307,9 +1194,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # platform == the natives/<rid>/ dir baked into the jar; it MUST match the
-          # loader's resolveNativesRid() (alef go_java_platform): macOS uses macos-arm64 /
-          # macos-x86_64, not osx-*. A mismatch makes the jar load fail on macOS.
           - { os: ubuntu-latest, platform: linux-x86_64, target: x86_64-unknown-linux-gnu }
           - { os: ubuntu-24.04-arm, platform: linux-aarch64, target: aarch64-unknown-linux-gnu }
           - { os: macos-latest, platform: macos-arm64, target: aarch64-apple-darwin }
@@ -1335,11 +1219,6 @@ jobs:
       - uses: xberg-io/actions/install-alef@v1
 
       - name: Build and stage FFI library
-        # Inline: html-to-markdown reuses the C FFI library for Java (Panama),
-        # so it builds via `alef publish build --lang ffi` and stages the .so/
-        # .dylib/.dll into a per-platform directory the publish-maven job
-        # collects into Maven resources. The build-java-natives shared action
-        # targets repos with a dedicated jni crate, which we don't have.
         shell: bash
         run: |
           alef publish build --lang ffi --target ${{ matrix.target }}
@@ -1392,11 +1271,6 @@ jobs:
       - uses: xberg-io/actions/install-alef@v1
 
       - name: Build and stage FFI library
-        # Inline: html-to-markdown reuses the C FFI library for C# (P/Invoke),
-        # so it builds via `alef publish build --lang ffi` and stages the .so/
-        # .dylib/.dll into runtimes/<rid>/native/ for NuGet packaging. The
-        # build-csharp-natives shared action targets repos with a dedicated
-        # csharp interop crate, which we don't have.
         shell: bash
         run: |
           alef publish build --lang ffi --target ${{ matrix.target }}
@@ -1444,17 +1318,12 @@ jobs:
           target: ${{ matrix.target }}
           cache-key-prefix: publish-elixir-${{ matrix.label }}
 
-      # Inline build: rewrite the NIF crate's workspace path-deps to registry
-      # version-deps so the hex source-fallback resolves on a consumer.
       - name: Rewrite native dependencies to registry versions
         uses: xberg-io/actions/rewrite-native-deps@v1
         with:
           lang: elixir
 
       - name: Build NIF
-        # Inline: rustler_precompiled expects flat .so/.dylib artifacts named
-        # libhtml_to_markdown_nif-vVERSION-nif-NIF-TARGET. We build once and
-        # tarball under both supported NIF API versions (2.16 and 2.17).
         env:
           TARGET: ${{ matrix.target }}
           VERSION: ${{ needs.prepare.outputs.version }}
@@ -1501,13 +1370,6 @@ jobs:
   elixir-package:
     name: Build Elixir Hex package
     needs: [prepare, check-hex, publish-crates]
-    # Must wait for `publish-crates`: the shared `build-elixir-hex` action
-    # rewrites the NIF's `Cargo.toml` path-dep on `html-to-markdown-rs` to a
-    # registry version-dep and runs `cargo generate-lockfile` against it. If
-    # publish-crates hasn't published the new version to crates.io yet, the
-    # lockfile resolution fails with `failed to select a version for the
-    # requirement \`html-to-markdown-rs = "^X.Y.Z"\``. Mirrors the gate used
-    # by python-sdist and ruby-gem.
     if: ${{ !cancelled() && needs.publish-crates.result != 'failure' && needs.prepare.outputs.release_elixir == 'true' && (needs.check-hex.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     env:
@@ -1553,10 +1415,6 @@ jobs:
       - uses: xberg-io/actions/setup-rust@v1
 
       - name: Package crates
-        # Inline: cargo package both crates into crate-artifacts/. The CLI
-        # crate's package step requires html-to-markdown-rs to already be
-        # registered, so we tolerate failure with --no-verify and fall back
-        # to publish-time packaging if needed.
         env:
           RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
         shell: bash
@@ -1578,12 +1436,6 @@ jobs:
           path: crate-artifacts/*.crate
           retention-days: 14
 
-  # ─── GitHub Release asset uploads ─────────────────────────────────────
-
-  # Builds the CLI across the reliable cross-platform matrix and attaches the
-  # archives to the release via the centralized reusable workflow. Job name is
-  # kept as `upload-cli-release` because downstream jobs (homebrew, finalize)
-  # gate on `needs.upload-cli-release.result`.
   upload-cli-release:
     name: Build & upload CLI binaries
     needs: [prepare, check-cli]
@@ -1694,12 +1546,6 @@ jobs:
   upload-php-pie-release:
     name: Upload PHP PIE archives to GitHub Release
     needs: [prepare, php-extension]
-    # `!cancelled()` lets this run even when a single matrix leg fails, so one
-    # flaky build can no longer orphan EVERY PHP PIE asset (v3.6.17 dropped all
-    # of them this way; #333). It uploads whatever legs succeeded; the
-    # `if-no-files-found: error` download guard below still hard-fails when the
-    # entire matrix produced nothing. Skip only when php-extension itself was
-    # skipped (release_php off / already on Packagist).
     if: ${{ !cancelled() && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.php-extension.result != 'skipped' }}
     runs-on: ubuntu-latest
     permissions:
@@ -1710,9 +1556,6 @@ jobs:
           pattern: php-package-*
           path: dist/php-package
           merge-multiple: true
-          # Fail fast if zero PIE archives reach this aggregator — a silently
-          # empty upload (the old failure mode that orphaned v3.6.11's PIE assets,
-          # see #333) now hard-errors instead of producing an empty release surface.
           if-no-files-found: error
 
       - uses: xberg-io/actions/upload-release-assets@v1
@@ -1725,8 +1568,6 @@ jobs:
             php_*.tgz.sha256
             php_*.zip
             php_*.zip.sha256
-
-  # ─── Publish jobs ─────────────────────────────────────────────────────
 
   publish-crates:
     name: Publish crates.io packages
@@ -1748,7 +1589,6 @@ jobs:
 
       - uses: xberg-io/actions/publish-crates@v1
         with:
-          # Order matters: html-to-markdown-rs is depended on by html-to-markdown-cli.
           crates: html-to-markdown-rs html-to-markdown-cli
           version: ${{ needs.prepare.outputs.version }}
           dry-run: ${{ needs.prepare.outputs.dry_run }}
@@ -1840,11 +1680,6 @@ jobs:
           registry-url: "https://registry.npmjs.org/"
 
       - name: Stage platform packages and main package
-        # Inline: html-to-markdown's per-platform Node artifact layout is bespoke
-        # (one tarball per target containing pre-staged npm/<platform>/) and the
-        # main package needs an injected optionalDependencies map listing every
-        # platform sub-package. Tightly coupled to napi-rs + repo conventions;
-        # the generic publish-npm action operates on a single package dir.
         shell: bash
         run: |
           rm -rf crates/html-to-markdown-node/npm
@@ -1937,8 +1772,6 @@ jobs:
           path: crates/html-to-markdown-wasm
 
       - name: Drop dist .gitignore files
-        # Inline: wasm-pack writes .gitignore into each dist dir which trips up
-        # `npm publish`. One-shot cleanup.
         shell: bash
         run: |
           rm -f crates/html-to-markdown-wasm/dist/.gitignore
@@ -1965,9 +1798,6 @@ jobs:
     steps:
       - uses: xberg-io/actions/publish-packagist@v1
         with:
-          # Packagist account login that owns the API token (the package
-          # maintainer), NOT the vendor namespace. Using the vendor here
-          # makes the update-package API return 403 "invalid username".
           packagist-username: Goldziher
           package-name: xberg-io/html-to-markdown
           version: ${{ needs.prepare.outputs.version }}
@@ -1994,9 +1824,6 @@ jobs:
           merge-multiple: true
 
       - name: Stage natives into resources
-        # Inline: copy classifier-bucketed libs from artifact tree into
-        # packages/java/src/main/resources/natives/<classifier>/. Tightly
-        # coupled to the Maven resource layout — no shared action covers it.
         shell: bash
         run: |
           mkdir -p packages/java/src/main/resources/natives
@@ -2056,8 +1883,6 @@ jobs:
           merge-multiple: true
 
       - name: Stage runtimes/<rid>/native into NuGet project
-        # Inline: NuGet expects native libs in runtimes/<rid>/native/ adjacent
-        # to the project. Copy from artifact tree into the C# project.
         shell: bash
         run: |
           mkdir -p packages/csharp/HtmlToMarkdown/runtimes
@@ -2072,7 +1897,6 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Pack NuGet package
-        # Inline: dotnet pack with the version override against the inner csproj.
         shell: bash
         run: |
           dotnet restore packages/csharp/HtmlToMarkdown/HtmlToMarkdown.csproj
@@ -2091,16 +1915,9 @@ jobs:
   publish-hex:
     name: Publish Hex package
     needs: [prepare, elixir-package, upload-elixir-release, check-hex]
-    # Skipped on dry-run: generate-elixir-checksums downloads NIF tarballs from
-    # the GitHub Release, which doesn't exist on dry-run (upload-release-assets
-    # only logs in dry-run mode). Real-release runs exercise this path.
     if: ${{ needs.prepare.outputs.release_elixir == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && needs.elixir-package.result == 'success' && (needs.check-hex.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     steps:
-      # App token with contents:write so generate-elixir-checksums can
-      # download NIF assets from the draft release via the authenticated
-      # gh release download path. The default github.token (contents:read
-      # at workflow scope) sees only published releases.
       - uses: actions/create-github-app-token@v2
         id: app-token
         with:
@@ -2213,8 +2030,6 @@ jobs:
   trigger-pubdev:
     name: Trigger pub.dev publish workflow
     needs: [prepare, check-pub, assemble-dart-package]
-    # pub.dev OIDC rejects tokens from `release` events. We dispatch a separate
-    # workflow whose `workflow_dispatch` event produces an accepted token.
     if: ${{ needs.prepare.outputs.release_dart == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && (needs.check-pub.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     permissions:
@@ -2270,34 +2085,14 @@ jobs:
         with:
           working-directory: packages/zig
           tag: ${{ needs.prepare.outputs.tag }}
-          # Override the auto-detected package-name (`html_to_markdown_rs` from
-          # build.zig.zon) to match the alef-emitted test_app URL pattern
-          # `{crate-name}-zig-v{version}.tar.gz`. Without this, the asset
-          # uploads as `html_to_markdown_rs-v{version}.tar.gz` while
-          # test_apps/zig fetches `html-to-markdown-rs-zig-v{version}.tar.gz`
-          # → 404 + consumer build.zig.zon TODO hash.
+          # ~keep → 404 + consumer build.zig.zon TODO hash.
           package-name: html-to-markdown-rs-zig
           update-release-notes: "true"
           dry-run: ${{ needs.prepare.outputs.dry_run }}
-          # Pass the App token explicitly so the action sees the draft
-          # release. The action's step-level env: GH_TOKEN: ${{ inputs.token }}
-          # overrides any job-level GH_TOKEN, so the env: below would
-          # otherwise be ignored.
           token: ${{ steps.app-token.outputs.token }}
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
 
-  # ─── Promote release out of draft (early) ─────────────────────────────
-  #
-  # homebrew-bottles runs `brew install --build-bottle` which fetches the CLI
-  # source tarball from the formula's URL block (https://github.com/.../releases/
-  # download/<tag>/cli-<triple>.tar.gz). Draft releases 404 on the public
-  # download URL, so the bottle build cannot succeed while the release is still
-  # draft. release-finalize at the end of the workflow is the canonical
-  # draft→published promoter, but it gates on homebrew-bottles itself — a
-  # deadlock. Promote the release here, once the CLI + FFI asset uploads have
-  # landed, then let release-finalize re-edit draft=false idempotently as the
-  # canonical home for Go-module tagging + prerelease flag.
   promote-release:
     name: Publish GitHub Release from draft
     needs:
@@ -2328,21 +2123,12 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: gh release edit "${{ needs.prepare.outputs.tag }}" --draft=false
 
-  # ─── Homebrew (formula update + bottles) ──────────────────────────────
-  #
-  # Topology (mirrors Xberg's; html-to-markdown ships TWO formulas):
-  #   1. publish-homebrew-formula — update Formula/{html-to-markdown,libhtml-to-markdown}.rb
-  #      (no bottles). Backed by the repo-quirky update-homebrew-formula.sh.
-  #   2. homebrew-bottles         — build per-platform bottle JSON manifests
-  #   3. publish-homebrew-bottles — merge bottle DSL into formulas and push
-
   publish-homebrew-formula:
     name: Update Homebrew formulas
     needs: [prepare, check-homebrew, upload-cli-release, upload-c-ffi-release]
     if: ${{ needs.prepare.outputs.release_homebrew == 'true' && needs.upload-cli-release.result == 'success' && needs.upload-c-ffi-release.result == 'success' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && (needs.check-homebrew.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     steps:
-      # tap-token: scoped to homebrew-tap for the cross-repo checkout + push.
       - uses: actions/create-github-app-token@v2
         id: tap-token
         with:
@@ -2351,9 +2137,6 @@ jobs:
           owner: xberg-io
           repositories: homebrew-tap
 
-      # source-token: org-wide (no `repositories:`) so the homebrew action's
-      # `gh release download` against html-to-markdown can see the draft
-      # release. The tap-token above can't read this repo's releases.
       - uses: actions/create-github-app-token@v2
         id: source-token
         with:
@@ -2387,7 +2170,6 @@ jobs:
         working-directory: homebrew-tap
         env:
           GH_TOKEN: ${{ steps.tap-token.outputs.token }}
-        # Inline: tap-side commit/push of the regenerated formulas.
         run: |
           git config user.name "xberg-dev-publisher[bot]"
           git config user.email "291994444+xberg-dev-publisher[bot]@users.noreply.github.com"
@@ -2402,13 +2184,6 @@ jobs:
   homebrew-bottles:
     name: Build Homebrew bottle (${{ matrix.bottle_tag }})
     needs: [prepare, publish-homebrew-formula, promote-release]
-    # Skipped on dry-run: `brew install --build-bottle` downloads CLI/FFI source
-    # tarballs from the GitHub Release, which doesn't exist on dry-run (formula
-    # is rendered locally only; tap isn't pushed). Real-release runs cover this.
-    # Gates on promote-release so the release is published (not draft) by the
-    # time `brew install` hits the formula's URL block; v3.6.0 saw all 4 bottles
-    # 404 because release-finalize was the only draft→public promoter and it
-    # waited on the bottles themselves.
     if: ${{ needs.prepare.outputs.release_homebrew == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && needs.publish-homebrew-formula.result == 'success' && needs.promote-release.result == 'success' }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -2416,10 +2191,6 @@ jobs:
       matrix:
         include:
           - { os: macos-latest, bottle_tag: arm64_sonoma, install_brew: false }
-          # No Intel macOS (sonoma) bottle: the formula intentionally dropped
-          # the Intel-mac build (no on_intel block / x86_64-apple-darwin url),
-          # so `brew install --build-bottle` fails with "formula requires at
-          # least a URL" on an Intel runner. (Chronic pre-v3.7.0 failure.)
           - { os: ubuntu-latest, bottle_tag: x86_64_linux, install_brew: true }
           - { os: ubuntu-24.04-arm, bottle_tag: arm64_linux, install_brew: true }
     steps:
@@ -2430,9 +2201,6 @@ jobs:
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
           owner: xberg-io
 
-      # Pinned to checkout@v5: v6 hits an includeIf credential regression on
-      # macos-15-intel runners (same workaround liter-llm uses). Other jobs
-      # stay on @v6; this matrix is the one that includes Intel macOS.
       - uses: actions/checkout@v5
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
@@ -2508,7 +2276,6 @@ jobs:
         working-directory: homebrew-tap
         env:
           GH_TOKEN: ${{ steps.tap-token.outputs.token }}
-        # Inline: tap-side commit/push of the regenerated formula.
         run: |
           git config user.name "xberg-dev-publisher[bot]"
           git config user.email "291994444+xberg-dev-publisher[bot]@users.noreply.github.com"
@@ -2519,8 +2286,6 @@ jobs:
           git add Formula/html-to-markdown.rb Formula/libhtml-to-markdown.rb
           git commit -m "html-to-markdown ${{ needs.prepare.outputs.version }}: add bottle DSL"
           git push origin HEAD
-
-  # ─── Verification & finalization ──────────────────────────────────────
 
   verify-assets:
     name: Verify release assets
@@ -2534,11 +2299,6 @@ jobs:
     if: ${{ always() && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && !contains(needs.*.result, 'failure') }}
     runs-on: ubuntu-latest
     steps:
-      # App token with contents:write so the action's /releases listing can
-      # see the draft release (release-finalize hasn't published it yet).
-      # The default github.token has contents:read at workflow scope and so
-      # only sees published releases — that's the source of the chronic
-      # "release v3.6.0-rc.* not found after 20 attempts" failure.
       - uses: actions/create-github-app-token@v2
         id: app-token
         with:
@@ -2712,9 +2472,6 @@ jobs:
           sudo apt-get install -y python3
 
       - name: Build R source tarball
-        # The packages/r/configure script vendors the html-to-markdown-rs core
-        # crate from the monorepo at build time; running `R CMD build` inside
-        # the repo therefore produces a self-contained source tarball.
         working-directory: packages/r
         run: |
           R CMD build .
@@ -2843,11 +2600,6 @@ jobs:
 
   cli-proxy:
     name: Publish CLI proxy package (npm)
-    # The npm trusted publisher is bound to this workflow file (publish.yaml). The publish
-    # runs inline here via the publish-npm composite action (which executes in this job's
-    # context) rather than delegating to a reusable workflow — otherwise npm's OIDC
-    # trusted-publishing check sees the reusable workflow's filename, not publish.yaml.
-    # Decoupled from the main release: fires only on its own `cli-proxy-v*` release tag.
     if: ${{ github.event_name == 'release' && startsWith(github.event.release.tag_name, 'cli-proxy-v') }}
     runs-on: ubuntu-latest
     permissions:

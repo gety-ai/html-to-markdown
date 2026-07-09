@@ -5,7 +5,6 @@ includes:
   vars: ./vars.yml
 
 vars:
-  # Executable extension - empty for Unix, .exe for Windows
   EXE_EXT:
     sh: |
       if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "cygwin" ]] || [[ "$OSTYPE" == "win32" ]]; then
@@ -14,7 +13,6 @@ vars:
         echo ""
       fi
 
-  # Library extension - platform specific shared library suffix
   LIB_EXT:
     sh: |
       if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -25,7 +23,6 @@ vars:
         echo "so"
       fi
 
-  # Library prefix - lib for Unix-like systems, empty for Windows
   LIB_PREFIX:
     sh: |
       if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "cygwin" ]] || [[ "$OSTYPE" == "win32" ]]; then
@@ -34,7 +31,6 @@ vars:
         echo "lib"
       fi
 
-  # Platform string for Rust targets
   RUST_TARGET:
     sh: |
       ARCH=$(uname -m)
@@ -64,12 +60,10 @@ vars:
         echo "${ARCH_STR}-unknown-unknown"
       fi
 
-  # Boolean platform checks (imported from vars.yml)
   IS_WINDOWS: "{{.IS_WINDOWS}}"
   IS_MACOS: "{{.IS_MACOS}}"
   IS_LINUX: "{{.IS_LINUX}}"
 
-  # Ruby path detection - handles Homebrew ARM64 and standard installations
   RUBY_FULL_PATH:
     sh: |
       if command -v ruby >/dev/null 2>&1; then
@@ -80,14 +74,12 @@ vars:
         echo "ruby"
       fi
 
-  # Convenient binary paths for platform-specific tools
   CARGO_BIN:
     sh: command -v cargo 2>/dev/null || echo "cargo"
 
   RUSTC_BIN:
     sh: command -v rustc 2>/dev/null || echo "rustc"
 
-  # Shell script extension for platform-specific scripts
   SHELL_EXT:
     sh: |
       if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "cygwin" ]] || [[ "$OSTYPE" == "win32" ]]; then

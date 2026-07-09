@@ -120,7 +120,6 @@ pub fn bless(snapshots_dir: &Path, rel_path: &str, html: &str, perm: Permutation
 pub fn compare(snapshots_dir: &Path, rel_path: &str, html: &str, perm: Permutation) -> Result<bool> {
     let snap_path = snapshots_dir.join(snapshot_name(rel_path, perm));
 
-    // If no snapshot exists, check if this is a known-panic fixture
     if !snap_path.exists() {
         let opts = perm.options();
         match catch_convert(html, opts) {
@@ -175,7 +174,6 @@ pub fn compare(snapshots_dir: &Path, rel_path: &str, html: &str, perm: Permutati
 ///
 /// Returns `Ok(String)` on success or `Err(String)` with the panic message.
 fn catch_convert(html: &str, opts: ConversionOptions) -> std::result::Result<String, String> {
-    // We need to own `html` and `opts` across the catch_unwind boundary.
     let html_owned = html.to_owned();
     let result = std::panic::catch_unwind(move || html_to_markdown_rs::convert(&html_owned, Some(opts)));
 

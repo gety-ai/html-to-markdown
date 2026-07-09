@@ -102,7 +102,6 @@ def _replace_package_fields(content: str, version: str, pkg: dict[str, object]) 
             flags=re.MULTILINE,
         )
 
-    # Replace workspace lints
     return re.sub(r"^\[lints\]\nworkspace = true\n?", "", content, flags=re.MULTILINE)
 
 
@@ -148,7 +147,6 @@ def replace_workspace_refs(toml_path: Path, version: str, pkg: dict[str, object]
 
     content = _replace_package_fields(content, version, pkg)
 
-    # Replace dependency-level workspace references
     for name, dep_spec in deps.items():
         pattern_dotted = rf"^{re.escape(name)}\.workspace = true$"
         content = re.sub(pattern_dotted, format_dependency(name, dep_spec), content, flags=re.MULTILINE)
@@ -178,16 +176,13 @@ def main() -> None:
     version, pkg, deps = get_workspace_config(repo_root)
     print(f"Workspace version: {version}")
 
-    # Clean existing vendor directory
     if dest_vendor.exists():
         shutil.rmtree(dest_vendor)
         print("Cleaned existing vendor directory")
 
-    # Copy crate source
     shutil.copytree(src_crate, dest_vendor)
     print("Copied crates/html-to-markdown/ -> vendor/html-to-markdown-rs/")
 
-    # Clean build artifacts from copied crate
     for artifact_dir in ["target", ".fastembed_cache"]:
         artifact = dest_vendor / artifact_dir
         if artifact.exists():
@@ -197,7 +192,6 @@ def main() -> None:
         for f in dest_vendor.rglob(pattern):
             f.unlink()
 
-    # Replace workspace references with explicit values
     vendor_toml = dest_vendor / "Cargo.toml"
     if vendor_toml.exists():
         replace_workspace_refs(vendor_toml, version, pkg, deps)

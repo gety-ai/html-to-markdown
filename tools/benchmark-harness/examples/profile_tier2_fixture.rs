@@ -10,7 +10,6 @@
 use std::time::Instant;
 
 fn main() -> anyhow::Result<()> {
-    // Use medium_python.html (1.2 MB, Tier-2, slow)
     let html = std::fs::read_to_string("tools/benchmark-harness/fixtures/real-world/wikipedia/medium_python.html")?;
 
     let opts = html_to_markdown_rs::ConversionOptions {
@@ -19,10 +18,8 @@ fn main() -> anyhow::Result<()> {
         ..html_to_markdown_rs::ConversionOptions::default()
     };
 
-    // Warm-up
     let _ = html_to_markdown_rs::convert(&html, Some(opts.clone()))?;
 
-    // Run many iterations for profiling
     const ITERS: u32 = 100;
     let start = Instant::now();
 

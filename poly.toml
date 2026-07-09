@@ -22,18 +22,28 @@ exclude = [
     "test_documents/**",
     "vendor/**",
     "**/Cargo.toml",
+    "Package.swift",
+    "packages/**",
+    "e2e/**",
+    "test_apps/**",
     "**/_generated/**",
+    "**/*_bridge_generated/**",
+    "crates/*-dart/**",
+    "crates/*-ffi/**",
+    "crates/*-jni/**",
+    "crates/*-node/**",
+    "crates/*-php/**",
+    "crates/*-py/**",
+    "crates/*-rb/**",
+    "crates/*-rs-jni/**",
+    "crates/*-ruby/**",
+    "crates/*-wasm/**",
     "**/coverage/**",
     "**/pkg/**",
     "**/.next/**",
     "**/*.min.js",
     "**/tsconfig*.json",
     "docs/demo/**",
-    "e2e/wasm/tests/**",
-    "test_apps/wasm/tests/**",
-    "crates/html-to-markdown-node/index.js",
-    "**/Cargo.toml",
-    "**/*_bridge_generated/**",
     "docs-site/public/demo/html_to_markdown_wasm.js",
 ]
 
@@ -42,6 +52,14 @@ disable = ["MD012", "MD013", "MD024", "MD033", "MD036", "MD041", "MD046", "MD051
 
 [fmt.markdown.rumdl]
 disable = ["MD012", "MD013", "MD024", "MD033", "MD036", "MD041", "MD046", "MD051", "MD076"]
+
+[lint.uncomment]
+enabled = true
+remove_todos = true
+remove_fixme = true
+remove_docs = false
+use_default_ignores = true
+preserve_patterns = ["~keep"]
 
 [lint.python.ruff]
 select = ["ALL"]
@@ -235,6 +253,8 @@ yor = "yor"
     "EXE001",
     "A001",
     "N801",
+    "comment",
+    "doc-comment",
 ]
 "**/test_apps/**" = [
     "ANN",
@@ -276,18 +296,35 @@ yor = "yor"
     "EXE001",
     "A001",
     "N801",
+    "comment",
+    "doc-comment",
 ]
+"**/_generated/**" = ["comment", "doc-comment"]
+"**/*_bridge_generated/**" = ["comment", "doc-comment"]
+"Package.swift" = ["comment", "doc-comment"]
+"packages/**" = ["comment", "doc-comment"]
+"crates/*-dart/**" = ["comment", "doc-comment"]
+"crates/*-ffi/**" = ["comment", "doc-comment"]
+"crates/*-jni/**" = ["comment", "doc-comment"]
+"crates/*-node/**" = ["comment", "doc-comment"]
+"crates/*-php/**" = ["comment", "doc-comment"]
+"crates/*-py/**" = ["comment", "doc-comment"]
+"crates/*-rs-jni/**" = ["comment", "doc-comment"]
+"crates/*-ruby/**" = ["comment", "doc-comment"]
+"crates/*-wasm/**" = ["comment", "doc-comment"]
 "**/skills/**/SKILL.md" = ["MD032"]
 ".github/workflows/publish.yaml" = ["typo"]
 "cli-proxy/**/*.py" = ["RUF100"]
+"crates/*-ffi/include/**" = ["comment", "doc-comment"]
 "crates/html-to-markdown/src/visitor/types.rs" = ["typo"]
 "e2e/**/*.py" = ["Q000"]
-"packages/kotlin-android/src/main/kotlin/**/*.kt" = ["typo"]
+"packages/go/include/**" = ["comment", "doc-comment"]
+"packages/kotlin-android/src/main/kotlin/**/*.kt" = ["typo", "comment", "doc-comment"]
 "packages/python/html_to_markdown/options.py" = ["F821"]
 "packages/r/R/version.R" = ["empty_file"]
-"packages/swift/Sources/RustBridge*/**" = ["trailing-whitespace"]
+"packages/swift/Sources/RustBridge*/**" = ["trailing-whitespace", "comment", "doc-comment"]
 "readme_templates/**" = ["MD057"]
-"scripts/**/*.py" = ["INP001", "S607", "T201", "D103", "D212"]
+"scripts/**/*.py" = ["INP001", "S607", "T201", "D103", "D212", "EXE001"]
 
 [hooks]
 stages = ["pre-commit"]

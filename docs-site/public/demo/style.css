@@ -307,7 +307,6 @@ footer a:hover {
   color: #ef4444;
 }
 
-/* Responsive Design */
 @media (min-width: 768px) {
   body {
     padding: 3rem 2rem;
@@ -345,7 +344,6 @@ footer a:hover {
   }
 }
 
-/* Loading Animation */
 @keyframes pulse {
   0%,
   100% {
@@ -360,7 +358,6 @@ footer a:hover {
   animation: pulse 1.5s ease-in-out infinite;
 }
 
-/* Scrollbar Styling */
 textarea::-webkit-scrollbar,
 .output::-webkit-scrollbar {
   width: 8px;

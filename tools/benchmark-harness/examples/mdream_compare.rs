@@ -45,7 +45,6 @@ fn main() -> anyhow::Result<()> {
         let html = std::fs::read_to_string(&fix.path)?;
         let bytes = html.len() as f64;
 
-        // Warm-up
         let _ = convert(&html, Some(h2m_opts.clone()))?;
         let _ = mdream_convert(&html, md_opts.clone());
 

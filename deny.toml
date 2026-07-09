@@ -9,11 +9,6 @@ feature-depth = 1
 
 [advisories]
 ignore = [
-    # pyo3 0.28 has two advisories fixed in 0.29.  We are pinned to 0.28 because
-    # pyo3-async-runtimes 0.28 is the latest published version and does not yet
-    # support pyo3 0.29; bumping pyo3 makes the workspace fail to resolve due to
-    # the `links = "python"` conflict in pyo3-ffi (see fix(deps): pin pyo3 to 0.28).
-    # Re-evaluate when pyo3-async-runtimes 0.29 releases on crates.io.
     { id = "RUSTSEC-2026-0176", reason = "pyo3 0.28: Out-of-bounds read in nth/nth_back for PyList/PyTuple iterators. The h2m bindings never call these iterator paths — every PyList/PyTuple traversal goes through the bound-handle wrappers." },
     { id = "RUSTSEC-2026-0177", reason = "pyo3 0.28: Missing Sync bound on PyCFunction::new_closure closures. The h2m bindings do not use PyCFunction::new_closure." },
 ]
@@ -34,10 +29,7 @@ allow = [
     "bzip2-1.0.6",
 ]
 confidence-threshold = 0.8
-exceptions = [
-    # cbindgen is a build-only tool for generating C headers, not linked into output
-    { allow = ["MPL-2.0"], crate = "cbindgen" },
-]
+exceptions = [{ allow = ["MPL-2.0"], crate = "cbindgen" }]
 
 [licenses.private]
 ignore = false

@@ -2,12 +2,7 @@ version: "3"
 internal: true
 
 # `com.github.ben-manes.versions` (pin 0.52.0, latest 0.53.0) throws
-# `java.util.ConcurrentModificationException` under Gradle 9.5.1 on every
-# `:dependencyUpdates` invocation; the plugin has not shipped a release
-# since 2024-11. Until upstream fixes it (or we swap to
 # `nl.littlerobots.version-catalog-update`), the kotlin_android update/upgrade
-# probe is a no-op so `task upgrade` does not fail on the rest of the chain.
-# Mirror the rationale in alef.toml `[crates.update.kotlin_android]`.
 tasks:
   update:
     desc: "Update Kotlin/Android dependencies (skipped: ben-manes versions plugin incompatible with Gradle 9.x)"

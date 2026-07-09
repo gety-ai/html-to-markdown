@@ -1,28 +1,7 @@
 version: "3"
 
 # ============================================================================
-# html-to-markdown — Root Taskfile
 # ============================================================================
-# Primary development interface. Rust core tasks delegate to .task/languages/rust.yml.
-# All binding language operations (setup, build, test, lint, format, clean, update)
-# are handled by alef v0.7.0.
-#
-# Command patterns:
-#   task setup         -> install all dependencies
-#   task build         -> build Rust core only
-#   task test          -> run Rust core tests only
-#   task lint          -> run all linters via poly
-#   task format        -> format Rust core code
-#   task rust:build    -> Rust-specific tasks
-# ============================================================================
-
-# Preconditions for task setup:
-# - Rust toolchain (rustup) — install via https://rustup.rs
-# - alef CLI — install via cargo install --git https://github.com/xberg-io/alef
-# - poly — install via cargo install --git https://github.com/xberg-io/polylint
-# - Per-language tools auto-skipped via alef preconditions; install as needed:
-#   - Python: uv, Node: pnpm (corepack enable), Ruby: bundle, PHP: composer
-#   - Go: go, Java: mvn, C#: dotnet, Elixir: mix, R: Rscript
 
 includes:
   rust:
@@ -64,7 +43,6 @@ includes:
     flatten: true
 
 tasks:
-  # === Setup ===
   setup:
     desc: "Install all dependencies and dev tools"
     cmds:
@@ -73,7 +51,6 @@ tasks:
       - command -v poly >/dev/null 2>&1 || brew install goldziher/tap/poly
       - poly hooks install
 
-  # === Build ===
   build:
     desc: "Build Rust core library only"
     cmds:
@@ -115,7 +92,6 @@ tasks:
     cmds:
       - task: rust:build:release
 
-  # === Test ===
   test:
     desc: "Run Rust core test suite only"
     cmds:
@@ -138,7 +114,6 @@ tasks:
       - task: rust:test:ci
       - alef test --coverage
 
-  # === Lint & Format ===
   lint:
     desc: "Lint all code via poly"
     cmds:
@@ -191,7 +166,6 @@ tasks:
       - task: format:check
       - task: lint:check
 
-  # === Update / Upgrade ===
   update:
     desc: "Update all dependencies (within major versions)"
     cmds:
@@ -232,7 +206,6 @@ tasks:
       - task: kotlin-android:upgrade
       - task: zig:upgrade
 
-  # === Coverage ===
   cov:rust:
     desc: "Generate Rust coverage report"
     cmds:
@@ -244,13 +217,11 @@ tasks:
       - task: rust:test:ci
       - alef test --coverage
 
-  # === Version ===
   versions:sync:
     desc: "Synchronize version from Cargo.toml to all package manifests"
     cmds:
       - task: version:sync
 
-  # === Publish ===
   publish:validate:
     desc: "Validate publish manifests are consistent"
     cmds:
@@ -271,7 +242,6 @@ tasks:
     cmds:
       - alef publish package -o dist/
 
-  # === Alef lifecycle ===
   alef:generate:
     desc: "Regenerate all Alef-managed outputs without building"
     cmds:
@@ -302,10 +272,6 @@ tasks:
     cmds:
       - alef docs
 
-  # === E2E tests (local fixture-based, via alef) ===
-  # Per-language: <lang>:e2e — builds binding then runs e2e/<lang> suite
-  # python:e2e is in .task/languages/python.yml (python: namespace)
-  # rust:e2e is in .task/languages/rust.yml (rust: namespace)
   node:e2e:
     desc: "Build Node binding and run e2e/node fixture tests"
     cmds:
@@ -458,10 +424,6 @@ tasks:
     desc: "Smoke test PHP package from Packagist"
     dir: test_apps/php
     cmds:
-      # Packagist publishes `xberg-io/html-to-markdown` as `type: php-ext`,
-      # so composer alone will not install it — PIE must place the native
-      # extension first. install.sh fetches the matching alef-pinned release
-      # via PIE before composer install can satisfy `ext-html_to_markdown: "*"`.
       - bash install.sh
       - composer install
       - vendor/bin/phpunit tests/SmokeTest.php
@@ -470,10 +432,6 @@ tasks:
     desc: "Smoke test Go package from pkg.go.dev"
     dir: test_apps/go
     cmds:
-      # Refresh go.sum for the bumped binding version (alef edits go.mod only, so
-      # go.sum lacks the new hash → "missing go.sum entry"). Use the targeted
-      # `go mod download <module>` Go itself suggests: it adds the entry without
-      # rewriting go.mod's block form (download_ffi.sh parses the version from it).
       - go mod download github.com/xberg-io/html-to-markdown/packages/go/v3
       - bash ./download_ffi.sh
       - go test -v -run Smoke
@@ -594,10 +552,6 @@ tasks:
     desc: "Comprehensive tests for Go package"
     dir: test_apps/go
     cmds:
-      # `go mod tidy` resolves the full transitive set into go.sum; without
-      # it `go mod download` fails when the consumed version hashes were not
-      # captured at version-bump time (alef text_replacement only edits
-      # go.mod, not go.sum).
       - go mod tidy
       - go test -v -run Test_
 
@@ -647,9 +601,6 @@ tasks:
       H2M_VERSION:
         sh: cd ../.. && grep -m1 '^version = ' Cargo.toml | sed -E 's/.*"([^"]+)".*/\1/'
     cmds:
-      # Resolve the per-tag tarball hash from the GitHub release before build.
-      # alef emits a placeholder hash in build.zig.zon because the real value
-      # is only known after the publish-zig job uploads the tarball.
       - zig fetch --save=html_to_markdown "https://github.com/xberg-io/html-to-markdown/releases/download/v{{.H2M_VERSION}}/html-to-markdown-rs-zig-v{{.H2M_VERSION}}.tar.gz"
       - zig build test
 
@@ -664,7 +615,6 @@ tasks:
     cmds:
       - task: test-apps:test
 
-  # === Demo ===
   build:demo:
     desc: "Build the GitHub Pages demo"
     cmds:
@@ -676,14 +626,12 @@ tasks:
     cmds:
       - python3 -m http.server 8000
 
-  # === Clean ===
   clean:
     desc: "Remove build artifacts across all languages"
     cmds:
       - task: rust:clean
       - alef clean
 
-  # === Default ===
   default:
     desc: "List available tasks"
     cmds:

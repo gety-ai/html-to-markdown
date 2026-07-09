@@ -57,7 +57,6 @@ fn run_once(html: &str, opts: Option<ConversionOptions>) -> Option<usize> {
 /// wall-clock time in milliseconds.  Returns `(0.0, 0)` when the fixture
 /// panics during conversion (known core bug on some fixtures).
 pub fn run_one(html: &str, opts: Option<ConversionOptions>) -> (f64, usize) {
-    // Warmup — check for panics upfront
     let mut output_bytes = 0usize;
     let mut panicked = false;
     for _ in 0..WARMUP_ITERS {
@@ -76,7 +75,6 @@ pub fn run_one(html: &str, opts: Option<ConversionOptions>) -> (f64, usize) {
         return (0.0, 0);
     }
 
-    // Calibrate: find N such that N iterations take ~50 ms
     let iters = {
         let start = Instant::now();
         let mut n: u32 = 1;
@@ -95,7 +93,6 @@ pub fn run_one(html: &str, opts: Option<ConversionOptions>) -> (f64, usize) {
             } else {
                 n = n.saturating_mul(2);
             }
-            // Safety cap: don't calibrate for more than 2 s total
             if start.elapsed() > Duration::from_secs(2) {
                 break;
             }
@@ -103,7 +100,6 @@ pub fn run_one(html: &str, opts: Option<ConversionOptions>) -> (f64, usize) {
         n.max(MIN_ITERS)
     };
 
-    // Best-of-3 timed runs
     let mut best_us = f64::MAX;
     for _ in 0..BEST_OF {
         let t0 = Instant::now();

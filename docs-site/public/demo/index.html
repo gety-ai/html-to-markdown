@@ -16,7 +16,6 @@
     <meta property="og:url" content="https://docs.html-to-markdown.xberg.io/demo/" />
     <meta property="og:type" content="website" />
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -477,13 +476,11 @@
     </style>
   </head>
   <body>
-    <!-- Animated Background Blobs -->
     <div class="blob-container">
       <div class="blob blob-cyan"></div>
       <div class="blob blob-purple"></div>
     </div>
 
-    <!-- Header -->
     <header>
       <a href="https://docs.html-to-markdown.xberg.io" class="header-brand">html-to-markdown</a>
       <div class="header-links">
@@ -501,7 +498,6 @@
       </div>
     </header>
 
-    <!-- Main -->
     <main>
       <h1 class="hero-title">Live Demo</h1>
       <p class="hero-subtitle">
@@ -510,7 +506,6 @@
 
       <div class="converter-card">
         <div class="panels">
-          <!-- Input panel -->
           <div class="panel">
             <label class="panel-label" for="htmlInput">HTML Input</label>
             <textarea id="htmlInput" placeholder="Paste your HTML here..." spellcheck="false">
@@ -554,7 +549,6 @@
 </table></textarea>
           </div>
 
-          <!-- Output panel -->
           <div class="panel">
             <div class="output-header">
               <div class="tab-switcher">
@@ -571,14 +565,12 @@
           </div>
         </div>
 
-        <!-- Status bar -->
         <div class="status-bar">
           <span id="status" class="status-text">Loading WASM module...</span>
           <button id="clearBtn" class="btn-clear" type="button">Clear</button>
         </div>
       </div>
 
-      <!-- Badges -->
       <div class="badges">
         <a href="https://crates.io/crates/html-to-markdown-rs" target="_blank" rel="noopener">
           <img

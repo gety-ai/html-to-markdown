@@ -18,5 +18,4 @@ minimumReleaseAgeExclude:
   - "@xberg-io/html-to-markdown-wasm"
   - "@xberg-io/html-to-markdown"
 
-# migrated from .npmrc
 minimumReleaseAge: 0

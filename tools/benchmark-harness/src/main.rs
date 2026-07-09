@@ -40,10 +40,6 @@ enum Commands {
     Survey(SurveyArgs),
 }
 
-// ---------------------------------------------------------------------------
-// Run subcommand
-// ---------------------------------------------------------------------------
-
 #[derive(Debug, Parser)]
 struct RunArgs {
     /// Path to the fixtures directory (contains groups.toml).
@@ -179,10 +175,6 @@ fn cmd_run(args: RunArgs) -> Result<()> {
     Ok(())
 }
 
-// ---------------------------------------------------------------------------
-// Compare subcommand
-// ---------------------------------------------------------------------------
-
 #[derive(Debug, Parser)]
 struct CompareArgs {
     /// Results file to evaluate.
@@ -243,10 +235,6 @@ fn cmd_compare(args: CompareArgs) -> Result<()> {
         anyhow::bail!("{} guardrail(s) violated", failures.len())
     }
 }
-
-// ---------------------------------------------------------------------------
-// Oracle subcommand
-// ---------------------------------------------------------------------------
 
 #[derive(Debug, Parser)]
 struct OracleArgs {
@@ -323,10 +311,6 @@ fn cmd_oracle(args: OracleArgs) -> Result<()> {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Survey subcommand
-// ---------------------------------------------------------------------------
-
 #[derive(Debug, Parser)]
 struct SurveyArgs {
     /// Path to the fixtures directory.
@@ -343,10 +327,6 @@ fn cmd_survey(args: SurveyArgs) -> Result<()> {
     survey::print_survey(&stats);
     Ok(())
 }
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
 fn load_json<T: serde::de::DeserializeOwned>(path: &PathBuf) -> Result<T> {
     let raw = std::fs::read_to_string(path).with_context(|| format!("reading {}", path.display()))?;
@@ -373,10 +353,6 @@ fn hostname() -> String {
         .or_else(|_| std::env::var("HOST"))
         .unwrap_or_else(|_| "unknown".to_owned())
 }
-
-// ---------------------------------------------------------------------------
-// Entry point
-// ---------------------------------------------------------------------------
 
 fn main() -> Result<()> {
     tracing_subscriber::fmt()

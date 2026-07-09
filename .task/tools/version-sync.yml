@@ -5,8 +5,6 @@ includes:
   platforms: ../config/platforms.yml
 
 vars:
-  # Use installed alef binary. Install via: cargo binstall alef-cli
-  # For local dev with sibling repo: cargo run --manifest-path ../alef/Cargo.toml --
   ALEF: "alef"
 
 tasks:

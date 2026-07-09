@@ -7,9 +7,7 @@ if [[ "${#all_modules[@]}" -eq 0 ]]; then
   exit 0
 fi
 
-# Filter out test-only modules (directories with only _test.go files and no
 # non-test .go files). golangci-lint cannot analyse these and would fail with
-# "no go files to analyze".
 modules=()
 for mod in "${all_modules[@]}"; do
   dir=$(dirname "$mod")

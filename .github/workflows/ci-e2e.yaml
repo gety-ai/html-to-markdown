@@ -232,13 +232,13 @@ jobs:
 
       - name: Free disk space
         if: startsWith(matrix.runner, 'ubuntu')
-        uses: xberg-io/actions/free-disk-space-linux@v1 # v1
+        uses: xberg-io/actions/free-disk-space-linux@v1
         with:
           show-initial: "false"
           show-final: "true"
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: ffi-${{ matrix.runner }}
           use-sccache: false
@@ -280,7 +280,7 @@ jobs:
 
       - name: Cleanup Rust cache
         if: always() && steps.checkout.outcome == 'success'
-        uses: xberg-io/actions/cleanup-rust-cache@v1 # v1
+        uses: xberg-io/actions/cleanup-rust-cache@v1
 
   build-python:
     needs: [changes]
@@ -302,7 +302,7 @@ jobs:
         id: checkout
 
       - name: Install Task
-        uses: xberg-io/actions/install-task@v1 # v1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7
@@ -315,13 +315,13 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           components: rustfmt, clippy, llvm-tools-preview
           cache-key-prefix: python-${{ matrix.os }}-${{ matrix.python }}
 
       - name: Install Python Dependencies
-        uses: nick-fields/retry@v4 # v4
+        uses: nick-fields/retry@v4
         with:
           timeout_minutes: 5
           max_attempts: 3
@@ -346,7 +346,7 @@ jobs:
 
       - name: Cleanup Rust cache
         if: always() && steps.checkout.outcome == 'success'
-        uses: xberg-io/actions/cleanup-rust-cache@v1 # v1
+        uses: xberg-io/actions/cleanup-rust-cache@v1
 
   build-node:
     needs: [changes]
@@ -371,16 +371,16 @@ jobs:
         id: checkout
 
       - name: Install Task
-        uses: xberg-io/actions/install-task@v1 # v1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: node-${{ matrix.os }}-${{ matrix.runtime }}
 
       - name: Setup Node.js workspace
         if: matrix.runtime == 'node'
-        uses: xberg-io/actions/setup-node-workspace@v1 # v1
+        uses: xberg-io/actions/setup-node-workspace@v1
 
       - name: Setup Bun
         if: matrix.runtime == 'bun'
@@ -390,7 +390,7 @@ jobs:
 
       - name: Build NAPI-RS Bindings (Node.js)
         if: matrix.runtime == 'node'
-        uses: xberg-io/actions/build-node-napi@v1 # v1
+        uses: xberg-io/actions/build-node-napi@v1
         with:
           crate-dir: crates/html-to-markdown-node
 
@@ -417,7 +417,7 @@ jobs:
 
       - name: Cleanup Rust cache
         if: always() && steps.checkout.outcome == 'success'
-        uses: xberg-io/actions/cleanup-rust-cache@v1 # v1
+        uses: xberg-io/actions/cleanup-rust-cache@v1
 
   build-ruby:
     needs: [changes]
@@ -439,7 +439,7 @@ jobs:
         id: checkout
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: ruby-${{ matrix.os }}-${{ matrix.ruby }}
 
@@ -463,17 +463,17 @@ jobs:
           windows-toolchain: UCRT64
 
       - name: Build CLI binary
-        uses: xberg-io/actions/build-rust-cli@v1 # v1
+        uses: xberg-io/actions/build-rust-cli@v1
         with:
           package-name: html-to-markdown-cli
           binary-name: html-to-markdown
 
       - name: Build Ruby extension
-        uses: xberg-io/actions/build-ruby-gem@v1 # v1
+        uses: xberg-io/actions/build-ruby-gem@v1
 
       - name: Cleanup Rust cache
         if: always() && steps.checkout.outcome == 'success'
-        uses: xberg-io/actions/cleanup-rust-cache@v1 # v1
+        uses: xberg-io/actions/cleanup-rust-cache@v1
 
   build-php:
     needs: [changes]
@@ -498,7 +498,7 @@ jobs:
           coverage: none
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: php
 
@@ -523,7 +523,7 @@ jobs:
 
       - name: Build PHP extension
         id: build-php-extension
-        uses: xberg-io/actions/build-php-extension@v1 # v1
+        uses: xberg-io/actions/build-php-extension@v1
         with:
           crate-name: html-to-markdown-php
           lib-name: html_to_markdown_php
@@ -537,7 +537,7 @@ jobs:
 
       - name: Cleanup Rust cache
         if: always() && steps.checkout.outcome == 'success'
-        uses: xberg-io/actions/cleanup-rust-cache@v1 # v1
+        uses: xberg-io/actions/cleanup-rust-cache@v1
 
   build-csharp:
     needs: [changes]
@@ -558,10 +558,10 @@ jobs:
         id: checkout
 
       - name: Install Task
-        uses: xberg-io/actions/install-task@v1 # v1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: csharp-${{ matrix.os }}
 
@@ -590,7 +590,7 @@ jobs:
 
       - name: Cleanup Rust cache
         if: always() && steps.checkout.outcome == 'success'
-        uses: xberg-io/actions/cleanup-rust-cache@v1 # v1
+        uses: xberg-io/actions/cleanup-rust-cache@v1
 
   build-java:
     needs: [changes]
@@ -612,12 +612,12 @@ jobs:
         id: checkout
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: java-${{ matrix.os }}
 
       - name: Test Java Panama FFI bindings
-        uses: xberg-io/actions/test-java-ffi@v1 # v1
+        uses: xberg-io/actions/test-java-ffi@v1
         with:
           ffi-crate-name: html-to-markdown-ffi
           ffi-lib-name: html_to_markdown_ffi
@@ -625,7 +625,7 @@ jobs:
 
       - name: Cleanup Rust cache
         if: always() && steps.checkout.outcome == 'success'
-        uses: xberg-io/actions/cleanup-rust-cache@v1 # v1
+        uses: xberg-io/actions/cleanup-rust-cache@v1
 
   build-wasm:
     needs: [changes]
@@ -642,7 +642,7 @@ jobs:
         id: checkout
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           target: wasm32-unknown-unknown
           use-sccache: false
@@ -657,16 +657,16 @@ jobs:
         shell: bash
 
       - name: Setup Node workspace
-        uses: xberg-io/actions/setup-node-workspace@v1 # v1
+        uses: xberg-io/actions/setup-node-workspace@v1
 
       - name: Build WASM (all targets)
-        uses: xberg-io/actions/build-wasm-package@v1 # v1
+        uses: xberg-io/actions/build-wasm-package@v1
         with:
           crate-dir: crates/html-to-markdown-wasm
 
       - name: Cleanup Rust cache
         if: always() && steps.checkout.outcome == 'success'
-        uses: xberg-io/actions/cleanup-rust-cache@v1 # v1
+        uses: xberg-io/actions/cleanup-rust-cache@v1
 
   test-python:
     needs: [build-python]
@@ -684,7 +684,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Install Task
-        uses: xberg-io/actions/install-task@v1 # v1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7
@@ -697,12 +697,12 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           components: rustfmt, clippy, llvm-tools-preview
 
       - name: Install Python Dependencies
-        uses: nick-fields/retry@v4 # v4
+        uses: nick-fields/retry@v4
         with:
           timeout_minutes: 5
           max_attempts: 3
@@ -726,7 +726,7 @@ jobs:
         shell: bash
 
       - name: Install alef
-        uses: xberg-io/actions/install-alef@v1 # v1
+        uses: xberg-io/actions/install-alef@v1
 
       - name: Run E2E tests
         run: alef test --e2e --lang python
@@ -751,14 +751,14 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Install Task
-        uses: xberg-io/actions/install-task@v1 # v1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
 
       - name: Setup Node.js workspace
         if: matrix.runtime == 'node'
-        uses: xberg-io/actions/setup-node-workspace@v1 # v1
+        uses: xberg-io/actions/setup-node-workspace@v1
 
       - name: Setup Bun
         if: matrix.runtime == 'bun'
@@ -768,7 +768,7 @@ jobs:
 
       - name: Build NAPI-RS Bindings (Node.js)
         if: matrix.runtime == 'node'
-        uses: xberg-io/actions/build-node-napi@v1 # v1
+        uses: xberg-io/actions/build-node-napi@v1
         with:
           crate-dir: crates/html-to-markdown-node
 
@@ -800,7 +800,7 @@ jobs:
 
       - name: Install alef
         if: matrix.runtime == 'node'
-        uses: xberg-io/actions/install-alef@v1 # v1
+        uses: xberg-io/actions/install-alef@v1
 
       - name: Run E2E tests (Node.js only)
         if: matrix.runtime == 'node'
@@ -823,7 +823,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
 
       - name: Setup Ruby (Unix)
         if: runner.os != 'Windows'
@@ -845,13 +845,13 @@ jobs:
           windows-toolchain: UCRT64
 
       - name: Build CLI binary
-        uses: xberg-io/actions/build-rust-cli@v1 # v1
+        uses: xberg-io/actions/build-rust-cli@v1
         with:
           package-name: html-to-markdown-cli
           binary-name: html-to-markdown
 
       - name: Build Ruby extension
-        uses: xberg-io/actions/build-ruby-gem@v1 # v1
+        uses: xberg-io/actions/build-ruby-gem@v1
 
       - name: Run Rubocop (Ubuntu/ruby-3.3 only)
         if: runner.os != 'Windows' && matrix.os == 'ubuntu-latest' && matrix.ruby == '3.3'
@@ -883,11 +883,11 @@ jobs:
 
       - name: Install Task
         if: runner.os != 'Windows'
-        uses: xberg-io/actions/install-task@v1 # v1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Install alef
         if: runner.os != 'Windows'
-        uses: xberg-io/actions/install-alef@v1 # v1
+        uses: xberg-io/actions/install-alef@v1
 
       - name: Run E2E tests (Unix only)
         if: runner.os != 'Windows'
@@ -913,7 +913,7 @@ jobs:
           coverage: none
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
 
       - name: Capture php-config path
         run: scripts/ci/php/set-php-config.sh
@@ -936,7 +936,7 @@ jobs:
 
       - name: Build PHP extension
         id: build-php-extension
-        uses: xberg-io/actions/build-php-extension@v1 # v1
+        uses: xberg-io/actions/build-php-extension@v1
         with:
           crate-name: html-to-markdown-php
           lib-name: html_to_markdown_php
@@ -948,10 +948,10 @@ jobs:
           EXTENSION_PATH: ${{ steps.build-php-extension.outputs.extension-path }}
 
       - name: Install Task
-        uses: xberg-io/actions/install-task@v1 # v1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Install alef
-        uses: xberg-io/actions/install-alef@v1 # v1
+        uses: xberg-io/actions/install-alef@v1
 
       - name: Run E2E tests
         run: alef test --e2e --lang php
@@ -979,10 +979,10 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Install Task
-        uses: xberg-io/actions/install-task@v1 # v1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: csharp-test-${{ matrix.os }}
 
@@ -1014,7 +1014,7 @@ jobs:
         shell: bash
 
       - name: Install alef
-        uses: xberg-io/actions/install-alef@v1 # v1
+        uses: xberg-io/actions/install-alef@v1
 
       - name: Run E2E tests (Unix)
         if: runner.os != 'Windows'
@@ -1026,10 +1026,6 @@ jobs:
 
       - name: Run E2E tests (Windows)
         if: runner.os == 'Windows'
-        # Prepend the target dirs to PATH at runtime (for FFI .dll resolution)
-        # using the live $PATH rather than the `env:` `${{ env.PATH }}`
-        # expression, which does not include cargo's $GITHUB_PATH additions on
-        # Windows Git Bash and broke the before-hook with `cargo: command not found`.
         run: |
           export PATH="${{ github.workspace }}/target/release:${{ github.workspace }}/target/debug:$PATH"
           alef test --e2e --lang csharp
@@ -1037,7 +1033,7 @@ jobs:
 
       - name: Cleanup Rust cache
         if: always()
-        uses: xberg-io/actions/cleanup-rust-cache@v1 # v1
+        uses: xberg-io/actions/cleanup-rust-cache@v1
 
   test-go:
     needs: [build-ffi, changes]
@@ -1055,7 +1051,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
 
       - name: Setup Go
         uses: actions/setup-go@v6
@@ -1089,10 +1085,10 @@ jobs:
           done
 
       - name: Install Task
-        uses: xberg-io/actions/install-task@v1 # v1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Install alef
-        uses: xberg-io/actions/install-alef@v1 # v1
+        uses: xberg-io/actions/install-alef@v1
 
       - name: Run E2E tests
         run: alef test --e2e --lang go
@@ -1114,26 +1110,23 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
 
       - name: Test Java Panama FFI bindings
-        uses: xberg-io/actions/test-java-ffi@v1 # v1
+        uses: xberg-io/actions/test-java-ffi@v1
         with:
           ffi-crate-name: html-to-markdown-ffi
           ffi-lib-name: html_to_markdown_ffi
           java-version: ${{ matrix.java }}
 
       - name: Install Task
-        uses: xberg-io/actions/install-task@v1 # v1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Install alef
         if: matrix.os != 'windows-latest'
-        uses: xberg-io/actions/install-alef@v1 # v1
+        uses: xberg-io/actions/install-alef@v1
 
       - name: Run E2E tests (Linux + macOS)
-        # macOS coverage exercises the Java native loader on Apple Silicon so
-        # macOS-specific binding/RID regressions are caught (alef test is not
-        # supported on the Windows runner here).
         if: matrix.os != 'windows-latest'
         run: alef test --e2e --lang java
         shell: bash
@@ -1160,7 +1153,7 @@ jobs:
           otp-version: "28.1"
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
 
       - name: Install Hex/Rebar
         run: scripts/ci/elixir/install-hex-rebar.sh
@@ -1182,10 +1175,10 @@ jobs:
         shell: bash
 
       - name: Install Task
-        uses: xberg-io/actions/install-task@v1 # v1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Install alef
-        uses: xberg-io/actions/install-alef@v1 # v1
+        uses: xberg-io/actions/install-alef@v1
 
       - name: Run E2E tests
         run: alef test --e2e --lang elixir
@@ -1206,12 +1199,12 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup R
-        uses: xberg-io/actions/setup-r@v1 # v1
+        uses: xberg-io/actions/setup-r@v1
         with:
           install-deps-script: scripts/ci/r/install-deps.sh
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
 
       - name: Run tests
         working-directory: packages/r
@@ -1224,10 +1217,10 @@ jobs:
         shell: bash
 
       - name: Install Task
-        uses: xberg-io/actions/install-task@v1 # v1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Install alef
-        uses: xberg-io/actions/install-alef@v1 # v1
+        uses: xberg-io/actions/install-alef@v1
 
       - name: Run E2E tests
         run: alef test --e2e --lang r
@@ -1255,7 +1248,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: c-ffi-${{ matrix.runner }}
           use-sccache: false
@@ -1306,7 +1299,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: c-ffi-windows
           use-sccache: false
@@ -1332,7 +1325,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           target: wasm32-unknown-unknown
           use-sccache: false
@@ -1346,10 +1339,10 @@ jobs:
         shell: bash
 
       - name: Setup Node workspace
-        uses: xberg-io/actions/setup-node-workspace@v1 # v1
+        uses: xberg-io/actions/setup-node-workspace@v1
 
       - name: Build WASM (all targets)
-        uses: xberg-io/actions/build-wasm-package@v1 # v1
+        uses: xberg-io/actions/build-wasm-package@v1
         with:
           crate-dir: crates/html-to-markdown-wasm
 
@@ -1379,7 +1372,7 @@ jobs:
         id: checkout
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           targets: aarch64-linux-android,x86_64-linux-android
           cache-key-prefix: kotlin-android
@@ -1388,7 +1381,7 @@ jobs:
         uses: android-actions/setup-android@v4
 
       - name: Build Android native libraries
-        uses: xberg-io/actions/build-android-natives@v1 # v1
+        uses: xberg-io/actions/build-android-natives@v1
         with:
           crate-name: html-to-markdown-ffi
           lib-name: html_to_markdown_ffi
@@ -1396,7 +1389,7 @@ jobs:
 
       - name: Cleanup Rust cache
         if: always() && steps.checkout.outcome == 'success'
-        uses: xberg-io/actions/cleanup-rust-cache@v1 # v1
+        uses: xberg-io/actions/cleanup-rust-cache@v1
 
   test-swift:
     needs: [changes]
@@ -1412,30 +1405,25 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Install Task
-        uses: xberg-io/actions/install-task@v1 # v1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: swift
 
       - name: Setup Swift
-        uses: xberg-io/actions/setup-swift@v1 # v1
+        uses: xberg-io/actions/setup-swift@v1
         with:
           version: "6.0"
 
       - name: Setup PHP
-        # ext-php-rs's build.rs requires a `php` binary on PATH even when the
-        # PHP binding crate isn't the one being built — cargo's workspace
-        # resolver evaluates ALL workspace members for unification. Without
-        # PHP here, `cargo build -p html-to-markdown-rs-swift` fails inside
-        # ext-php-rs's build script.
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
 
       - name: Install alef
-        uses: xberg-io/actions/install-alef@v1 # v1
+        uses: xberg-io/actions/install-alef@v1
 
       - name: Run E2E tests
         run: alef test --e2e --lang swift
@@ -1443,7 +1431,7 @@ jobs:
 
       - name: Cleanup Rust cache
         if: always()
-        uses: xberg-io/actions/cleanup-rust-cache@v1 # v1
+        uses: xberg-io/actions/cleanup-rust-cache@v1
 
   test-dart:
     needs: [changes]
@@ -1459,10 +1447,10 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Install Task
-        uses: xberg-io/actions/install-task@v1 # v1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: dart
 
@@ -1470,7 +1458,7 @@ jobs:
         uses: dart-lang/setup-dart@v1
 
       - name: Install alef
-        uses: xberg-io/actions/install-alef@v1 # v1
+        uses: xberg-io/actions/install-alef@v1
 
       - name: Run E2E tests
         run: alef test --e2e --lang dart
@@ -1478,7 +1466,7 @@ jobs:
 
       - name: Cleanup Rust cache
         if: always()
-        uses: xberg-io/actions/cleanup-rust-cache@v1 # v1
+        uses: xberg-io/actions/cleanup-rust-cache@v1
 
   test-zig:
     needs: [changes]
@@ -1495,20 +1483,20 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Install Task
-        uses: xberg-io/actions/install-task@v1 # v1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@v1 # v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: zig
 
       - name: Setup Zig
-        uses: xberg-io/actions/setup-zig@v1 # v1
+        uses: xberg-io/actions/setup-zig@v1
         with:
           version: "0.16.0"
 
       - name: Install alef
-        uses: xberg-io/actions/install-alef@v1 # v1
+        uses: xberg-io/actions/install-alef@v1
 
       - name: Run E2E tests
         run: alef test --e2e --lang zig
@@ -1516,4 +1504,4 @@ jobs:
 
       - name: Cleanup Rust cache
         if: always()
-        uses: xberg-io/actions/cleanup-rust-cache@v1 # v1
+        uses: xberg-io/actions/cleanup-rust-cache@v1
