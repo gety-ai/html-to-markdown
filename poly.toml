@@ -29,6 +29,7 @@ exclude = [
     "**/*.min.js",
     "**/tsconfig*.json",
     "docs/demo/**",
+    "docs-site/public/demo/html_to_markdown_wasm.js",
     "e2e/wasm/tests/**",
     "test_apps/wasm/tests/**",
     "crates/html-to-markdown-node/index.js",

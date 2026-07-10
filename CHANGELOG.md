@@ -879,7 +879,7 @@ Stable release promoting 3.8.0-rc.2 (fully published). Version-only bump synced 
 - **Java/C# visitor type conflicts** — fixed by skipping gen_bindings types when visitor bridge is active.
 - **Ruby `convert()` TypeError** (#319) — options type mismatch and wrong return type.
 - **PHP binding panics** — `from_update` and `from` methods now emit safe return values instead of `panic!()`.
-- **R `ConversionOptionsBuilder`** — fixed `todo!()` panics in opaque type delegation.
+- **R `ConversionOptionsBuilder`** — fixed placeholder panics in opaque type delegation.
 - **CLI `autolinks` default** — replaced `--autolinks` with `--no-autolinks` so defaults match library.
 - **CLI dead metadata flags** — removed flags that were parsed but never wired through.
 - **Python 3.14 wheels** (#322) — enabled `abi3-py310` stable ABI for PyO3 crate, so a single wheel works on Python 3.10 through 3.14+ without per-version builds.

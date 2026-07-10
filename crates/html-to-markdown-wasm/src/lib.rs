@@ -8062,7 +8062,7 @@ impl From<html_to_markdown_rs::NodeContent> for WasmNodeContent {
                 term: None,
                 text: None,
             },
-            _ => ::std::todo!("unmapped NodeContent variant"),
+            _ => ::std::panic!("unmapped NodeContent variant"),
         }
     }
 }
@@ -8135,7 +8135,7 @@ impl From<html_to_markdown_rs::AnnotationKind> for WasmAnnotationKind {
                 title: title,
                 url: Some(url),
             },
-            _ => ::std::todo!("unmapped AnnotationKind variant"),
+            _ => ::std::panic!("unmapped AnnotationKind variant"),
         }
     }
 }
