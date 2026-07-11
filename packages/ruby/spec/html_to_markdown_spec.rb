@@ -14,10 +14,6 @@ RSpec.describe HtmlToMarkdown do
       expect(result.to_s).to(include("Hello"))
     end
 
-    # Regression test for issue #334: alef regeneration reverts Rust FFI options fix.
-    # Passing any options previously raised TypeError because the Ruby wrapper was
-    # constructing a ConversionOptions object, which the Rust FFI (expecting a JSON
-    # string) cannot coerce — resulting in a TypeError on every call with options.
     it "does not raise TypeError when options are passed (regression #334)" do
       expect { described_class.convert("<h1>Hello</h1>", heading_style: "atx") }.not_to(raise_error)
     end

@@ -21,7 +21,6 @@ if (!grepl("rustc", sysreqs, ignore.case = TRUE)) {
   stop("SystemRequirements must mention rustc.")
 }
 
-# Add ~/.cargo/bin to PATH so we can find cargo/rustc
 new_path <- paste0(
   Sys.getenv("PATH"),
   ":",
@@ -29,7 +28,6 @@ new_path <- paste0(
 )
 Sys.setenv("PATH" = new_path)
 
-# Check cargo exists
 cargo_version <- tryCatch(
   system("cargo --version", intern = TRUE),
   error = function(e) {
@@ -40,7 +38,6 @@ cargo_version <- tryCatch(
   }
 )
 
-# Check rustc exists
 rustc_version <- tryCatch(
   system("rustc --version", intern = TRUE),
   error = function(e) {
@@ -51,7 +48,6 @@ rustc_version <- tryCatch(
   }
 )
 
-# Extract and check MSRV from SystemRequirements
 parts <- strsplit(sysreqs, ",\\s*")[[1]]
 rustc_part <- parts[grepl("rustc", parts)]
 msrv <- extract_semver(rustc_part)

@@ -189,14 +189,10 @@ pub fn conversion_result_to_robj(result: ConversionResult) -> Robj {
         .collect();
 
     let document_robj: Robj = match result.document {
-        Some(doc) => {
-            // Serialize to JSON then parse into an R list so callers can
-            // access fields via `result$document$nodes` etc.
-            match serde_json::to_value(&doc) {
-                Ok(v) => json_to_robj(&v),
-                Err(_) => ().into(),
-            }
-        }
+        Some(doc) => match serde_json::to_value(&doc) {
+            Ok(v) => json_to_robj(&v),
+            Err(_) => ().into(),
+        },
         None => ().into(),
     };
 

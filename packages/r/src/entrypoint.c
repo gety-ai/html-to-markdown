@@ -1,4 +1,3 @@
-// Generated entrypoint: forwards to the extendr-generated init function.
 // Do not edit — regenerate with `alef generate`.
 #include <R_ext/Visibility.h>
 

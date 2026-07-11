@@ -423,19 +423,15 @@ if (content.includes("options: any")) {
 
 content = content.replace("readonly attributes: any;", "readonly attributes: Record<string, string>;");
 
-// Fix return types: wasm-bindgen generates `string` or `any` for Result<JsValue, JsValue>
 if (!content.includes("WasmConversionResult")) {
-  // convert() returns a structured result object, not a string
   content = content.replace(
     /export function convert\(html: string, options\?: WasmConversionOptions \| null\): string;/,
     "export function convert(html: string, options?: WasmConversionOptions | null): WasmConversionResult;",
   );
-  // Also handle the case where wasm-bindgen emits `any` as the return type
   content = content.replace(
     /export function convert\(html: string, options\?: WasmConversionOptions \| null\): any;/,
     "export function convert(html: string, options?: WasmConversionOptions | null): WasmConversionResult;",
   );
-  // convertWithMetadata and convertBytesWithMetadata return structured results
   content = content.replace(
     /export function convertWithMetadata\(([^)]*)\): any;/,
     "export function convertWithMetadata($1): WasmConversionResult;",
@@ -456,12 +452,10 @@ const jsDocTarget = fs.existsSync(bgPath) ? bgPath : entryPath;
 const typeImportSpecifier = "./html_to_markdown_wasm";
 patchJsDoc(jsDocTarget, typeImportSpecifier);
 
-// Fix package.json "files" field to include all necessary files
 const pkgJsonPath = path.join(distDir, "package.json");
 if (fs.existsSync(pkgJsonPath)) {
   const pkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, "utf8"));
 
-  // Use glob patterns to ensure all generated files are included
   pkgJson.files = ["*.wasm", "*.js", "*.d.ts"];
 
   fs.writeFileSync(pkgJsonPath, JSON.stringify(pkgJson, null, 2) + "\n", "utf8");
