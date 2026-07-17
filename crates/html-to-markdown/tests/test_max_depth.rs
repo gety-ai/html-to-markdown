@@ -57,6 +57,50 @@ fn test_max_depth_truncates_at_limit() {
     );
 }
 
+/// Span pass-through should still count toward max_depth.
+#[test]
+fn test_max_depth_truncates_nested_spans() {
+    let html = "<span><span><span><span><span>deep</span></span></span></span></span>";
+
+    let options = ConversionOptions {
+        extract_metadata: false,
+        max_depth: Some(3),
+        ..Default::default()
+    };
+
+    let result = convert_with_options(html, options);
+    assert!(
+        !result.contains("deep"),
+        "Content inside spans at depth >= max_depth should be absent. Got:\n{result}"
+    );
+}
+
+/// Deep span-only trees should be cut off by max_depth before stack growth becomes unsafe.
+#[test]
+fn test_max_depth_prevents_stack_overflow_on_deep_spans() {
+    let levels = 10_000;
+    let mut html = String::with_capacity(levels * "<span></span>".len() + "deep".len());
+    for _ in 0..levels {
+        html.push_str("<span>");
+    }
+    html.push_str("deep");
+    for _ in 0..levels {
+        html.push_str("</span>");
+    }
+
+    let options = ConversionOptions {
+        extract_metadata: false,
+        max_depth: Some(64),
+        ..Default::default()
+    };
+
+    let result = convert_with_options(&html, options);
+    assert!(
+        !result.contains("deep"),
+        "Content past max_depth should be absent in very deep span trees. Got:\n{result}"
+    );
+}
+
 /// With `max_depth: Some(0)`, no nodes are processed and the output is empty or whitespace only.
 #[test]
 fn test_max_depth_zero_produces_empty() {
